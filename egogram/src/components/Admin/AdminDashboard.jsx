@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { loadResults, deleteResult, clearResults } from '../../lib/storage';
+import { loadResults, deleteResult, clearResults, saveResult } from '../../lib/storage';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import sampleData from '../../data/sampleResults.json';
 
@@ -64,7 +64,7 @@ export default function AdminDashboard({ onLogout }) {
   const [filter, setFilter] = useState('all');
 
   useEffect(() => {
-    setResults(loadResults());
+    loadResults().then(setResults);
   }, []);
 
   const groups = [...new Set(results.map(r => r.group).filter(Boolean))].sort();
@@ -74,23 +74,26 @@ export default function AdminDashboard({ onLogout }) {
     if (r.group) groupCounts[r.group] = (groupCounts[r.group] || 0) + 1;
   }
 
-  function handleDelete(id) {
-    const updated = deleteResult(id);
+  async function handleDelete(id) {
+    const updated = await deleteResult(id);
     setResults(updated);
   }
 
-  function handleClearAll() {
+  async function handleClearAll() {
     if (!window.confirm(`전체 ${results.length}건을 삭제하시겠습니까?`)) return;
-    clearResults();
+    await clearResults();
     setResults([]);
   }
 
-  function handleLoadSample() {
-    const key = 'm2a_egogram_results';
-    const existing = loadResults();
-    const merged = [...existing, ...sampleData];
-    localStorage.setItem(key, JSON.stringify(merged));
-    setResults(merged);
+  async function handleLoadSample() {
+    for (const r of sampleData) {
+      await saveResult(
+        { group: r.group, name: r.name, birthDate: r.birthDate, careerMonths: r.careerMonths, department: r.department, jobType: r.jobType, incomeRange: r.incomeRange, recruitCount: r.recruitCount },
+        { scores: r.scores, grades: r.grades, top1: r.top1, top2: r.top2, bottom: r.bottom, total: r.total }
+      );
+    }
+    const updated = await loadResults();
+    setResults(updated);
   }
 
   function handleExportCSV() {

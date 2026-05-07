@@ -21,9 +21,9 @@ export default function SurveyApp() {
     setStage('survey');
   }
 
-  function handleSurveyComplete(resultData) {
+  async function handleSurveyComplete(resultData) {
     const fullProfile = { ...profile, group };
-    saveResult(fullProfile, resultData);
+    await saveResult(fullProfile, resultData);
     setResult(resultData);
     setStage('result');
   }
