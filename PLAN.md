@@ -7,61 +7,69 @@
 
 - **서비스명**: MIND2ACTION
 - **도메인**: mind2action.kr (2028-03 만료)
-- **디자인 톤**: PRAXI 스타일 — 미니멀, 학술적, 흰 배경, 타이포그래피 중심
-  - 폰트: Urbanist(헤더) + Work Sans(본문)
-  - 색상: 무채색 중립 팔레트 + 흰 배경(#ffffff)
-  - 레퍼런스: `~/Desktop/_외근작업/_개발사무실/style-collection/praxi/`
+- **디자인 톤**: 미니멀 + 쨍한 액센트
+  - 폰트: Paperlogy (CDN, 전체 통일)
+  - 액센트: #0012de (파랑) + #f3e700 (노랑)
+  - 배경: #ffffff
+
+## 배포
+
+| 환경 | URL |
+|------|-----|
+| 프로덕션 | https://mice3nyc.github.io/mind2action/egogram/ |
+| 관리자 | https://mice3nyc.github.io/mind2action/egogram/#/admin |
+| GitHub | https://github.com/mice3nyc/mind2action |
+| Supabase | https://supabase.com/dashboard (프로젝트: Mind2Action) |
+
+배포 방법: `egogram/` 폴더에서 `npm run deploy` (vite build → gh-pages)
+다른 프로젝트 추가 시 같은 구조로 `/mind2action/다른프로젝트/`에 배포 가능.
 
 ## 서비스 구조
 
-두 축으로 나뉜다.
-
-**1축: 설문 시스템** — 참여자가 설문을 하고, 에고그램 점수가 계산·저장된다
-- 조직/그룹별 설문 수집
+**1축: 설문 시스템** — 참여자가 코드 입력 → 기본정보 → 50문항 → 결과
+- 그룹별 참여 코드로 분류 (현재: 망원동/서교동/합정동)
 - 50문항 응답 → 5개 자아상태 점수 자동 계산
-- 결과 DB 저장
+- 결과 Supabase DB 저장
 
-**2축: 리포트 시스템** — 저장된 점수를 바탕으로 개인별 맞춤 리포트를 생성한다
+**2축: 리포트 시스템** (Phase 3) — 저장된 점수 → 개인별 맞춤 코칭 텍스트
 - CM 텍스트 조회·조합 → 웹페이지 리포트
 - 참여자에게 링크로 제공
-- 관리자 대시보드 (테이블 뷰로 전체 결과 확인)
+
+**관리자 대시보드** — 전체 결과 테이블 + 그룹 필터 + CSV 다운로드
+- 참여자 경로(`/`)와 관리자 경로(`/#/admin`) 분리
+- 에고 유형 컬러코딩 + 점수 바 그래프 시각화
 
 ## 기술 스택
 
-| 영역 | 선택 | 이유 |
-|------|------|------|
-| 프론트엔드 | React | 설문 폼, 인증, 리포트, 관리자 등 화면 다수. 바닐라 JS 제약 없음 |
-| 백엔드/DB | Supabase | PostgreSQL + Auth(이메일 OTP) + Row Level Security |
-| 배포 | Vercel 또는 Netlify | Supabase와 궁합, 도메인 연결 간단 |
-| 디자인 | PRAXI 스타일 기반 커스텀 CSS | 프레임워크 미정 (Tailwind 검토 가능) |
+| 영역 | 선택 |
+|------|------|
+| 프론트엔드 | React (Vite) |
+| 백엔드/DB | Supabase (PostgreSQL + RLS) |
+| 배포 | GitHub Pages (gh-pages) |
+| 폰트 | Paperlogy (CDN) |
+| 라우팅 | react-router-dom (HashRouter) |
 
 ## Phase 구조
 
-### Phase 1: 설문 + 점수 계산 (로컬, Supabase 없이)
-- React 앱 세팅
-- 설문 폼 UI (기본정보 + 50문항)
-- 점수 계산 엔진 (합산 + 구간 분류 + TOP/BOTTOM)
-- 결과 화면 (점수 + 시각화)
-- MIND2ACTION 브랜딩 + PRAXI 스타일 적용
-- **완료 기준**: 브라우저에서 설문 → 결과 확인까지 한 바퀴 도는 것
+### Phase 1 ✅: 설문 + 점수 계산
+- React 앱 + 50문항 + 점수 엔진 + 결과 화면
+- 엑셀 샘플 5명 교차 검증 통과
 
-### Phase 2: Supabase 연결
-- Supabase 프로젝트 세팅
-- DB 스키마 (조직, 참여자, 응답, 점수)
-- 이메일 OTP 인증
-- 설문 응답 + 점수 DB 저장
-- Row Level Security (본인 데이터만 열람)
+### Phase 2 부분 완료: Supabase + 관리자 + 배포
+- DB 연결 (responses 테이블) ✅
+- 관리자 대시보드 (테이블 + 필터 + CSV) ✅
+- GitHub Pages 배포 ✅
+- 미완: 이메일 OTP 인증 / 그룹 동적 관리 / 관리자 인증 강화
 
 ### Phase 3: 리포트 생성
 - 엑셀 CM 데이터 → JSON 정규화
 - CM 조회 엔진 (점수 + TOP/BOTTOM → 텍스트 매칭)
 - 리포트 웹페이지 렌더링 (직군별 템플릿)
-- 참여자에게 리포트 링크 제공
 
-### Phase 4: 관리자 대시보드
-- 조직별 설문 결과 테이블 뷰
-- 엑셀 다운로드
+### Phase 4: 관리자 고도화
+- 조직별 설문 링크 동적 생성
 - 리포트 생성 관리
+- 통계 요약
 
 ## 미결 사항 (손소장 확인 필요)
 
