@@ -4,9 +4,13 @@ import { EGO_LABELS } from '../../lib/scoreEngine';
 import sampleData from '../../data/sampleResults.json';
 
 const JOB_LABELS = {
-  insurance: '설계사',
-  manager: '관리자',
-  coach: '코치',
+  sales: '영업',
+  coach: '코치/멘토',
+  sales_leader: '영업팀장/센터장',
+  branch_manager: '지점장/지사장',
+  training_leader: '교육팀장/지원팀장',
+  division_head: '사업단장/부장',
+  executive: '본부장',
 };
 
 const INCOME_LABELS = {
@@ -88,7 +92,7 @@ export default function AdminDashboard({ onLogout }) {
   async function handleLoadSample() {
     for (const r of sampleData) {
       await saveResult(
-        { group: r.group, name: r.name, birthDate: r.birthDate, careerMonths: r.careerMonths, department: r.department, jobType: r.jobType, incomeRange: r.incomeRange, recruitCount: r.recruitCount },
+        { group: r.group, name: r.name, birthDate: r.birthDate, careerMonths: r.careerMonths, company: r.company || '', department: r.department, jobType: r.jobType, incomeRange: r.incomeRange, recruitCount: r.recruitCount },
         { scores: r.scores, grades: r.grades, top1: r.top1, top2: r.top2, bottom: r.bottom, total: r.total }
       );
     }
@@ -98,12 +102,13 @@ export default function AdminDashboard({ onLogout }) {
 
   function handleExportCSV() {
     if (filtered.length === 0) return;
-    const headers = ['그룹', '이름', '생년월일', '경력(월)', '소속', '직무', '소득', '리크루팅', 'CP', 'NP', 'A', 'FC', 'AC', '총점', 'TOP1', 'TOP2', 'BOTTOM', '일시'];
+    const headers = ['그룹', '이름', '생년월일', '경력(월)', '회사', '소속', '직무', '소득', '리크루팅', 'CP', 'NP', 'A', 'FC', 'AC', '총점', 'TOP1', 'TOP2', 'BOTTOM', '일시'];
     const rows = filtered.map(r => [
       r.group,
       r.name,
       r.birthDate,
       r.careerMonths,
+      r.company || '',
       r.department,
       JOB_LABELS[r.jobType] || r.jobType,
       INCOME_LABELS[r.incomeRange] || r.incomeRange || '',
@@ -185,6 +190,7 @@ export default function AdminDashboard({ onLogout }) {
                 <th>이름</th>
                 <th>생년월일</th>
                 <th>경력</th>
+                <th>회사</th>
                 <th>소속</th>
                 <th>직무</th>
                 <th>소득</th>
@@ -206,6 +212,7 @@ export default function AdminDashboard({ onLogout }) {
                   <td className="td-name">{r.name}</td>
                   <td>{r.birthDate}</td>
                   <td>{r.careerMonths && `${r.careerMonths}개월`}</td>
+                  <td>{r.company || '-'}</td>
                   <td>{r.department}</td>
                   <td>{JOB_LABELS[r.jobType] || r.jobType}</td>
                   <td className="td-small">{INCOME_LABELS[r.incomeRange] || '-'}</td>

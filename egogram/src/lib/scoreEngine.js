@@ -1,3 +1,5 @@
+import questions from '../data/questions.json';
+
 const EGO_STATES = ['CP', 'NP', 'A', 'FC', 'AC'];
 const EGO_LABELS = {
   CP: '통제적 부모',
@@ -8,6 +10,11 @@ const EGO_LABELS = {
 };
 
 const TIE_PRIORITY = ['CP', 'A', 'NP', 'AC', 'FC'];
+
+const QUESTION_EGO = {};
+for (const q of questions) {
+  QUESTION_EGO[q.id] = q.egoState;
+}
 
 function getGrade(score) {
   if (score >= 17) return '극고';
@@ -29,14 +36,8 @@ export function calculateScores(answers) {
   }
 
   for (const [qId, value] of Object.entries(answers)) {
-    const qNum = parseInt(qId.replace('Q', ''));
-    let ego;
-    if (qNum <= 10) ego = 'CP';
-    else if (qNum <= 20) ego = 'NP';
-    else if (qNum <= 30) ego = 'A';
-    else if (qNum <= 40) ego = 'FC';
-    else ego = 'AC';
-    scores[ego] += value;
+    const ego = QUESTION_EGO[qId];
+    if (ego) scores[ego] += value;
   }
 
   const grades = {};

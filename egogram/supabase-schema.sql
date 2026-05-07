@@ -9,6 +9,7 @@ create table if not exists responses (
   name text not null,
   birth_date text,
   career_months text,
+  company text,
   department text,
   job_type text,
   income_range text,

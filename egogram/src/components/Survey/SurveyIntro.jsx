@@ -2,9 +2,13 @@ import { useState } from 'react';
 
 const JOB_OPTIONS = [
   { value: '', label: '선택해주세요' },
-  { value: 'insurance', label: '보험설계사' },
-  { value: 'manager', label: '관리자(지점장)' },
-  { value: 'coach', label: '코치, 멘토' },
+  { value: 'sales', label: '영업' },
+  { value: 'coach', label: '코치 / 멘토' },
+  { value: 'sales_leader', label: '영업팀장 / 센터장' },
+  { value: 'branch_manager', label: '지점장 / 지사장' },
+  { value: 'training_leader', label: '교육팀장 / 지원팀장' },
+  { value: 'division_head', label: '사업단장 / 부장' },
+  { value: 'executive', label: '본부장' },
 ];
 
 const INCOME_OPTIONS = [
@@ -24,6 +28,7 @@ export default function SurveyIntro({ group, onSubmit }) {
     name: '',
     birthDate: '',
     careerMonths: '',
+    company: '',
     department: '',
     jobType: '',
     incomeRange: '',
@@ -36,11 +41,11 @@ export default function SurveyIntro({ group, onSubmit }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!form.name || !form.birthDate || !form.careerMonths || !form.department || !form.jobType) return;
+    if (!form.name || !form.birthDate || !form.careerMonths || !form.company || !form.department || !form.jobType) return;
     onSubmit(form);
   }
 
-  const isValid = form.name && form.birthDate && form.careerMonths && form.department && form.jobType;
+  const isValid = form.name && form.birthDate && form.careerMonths && form.company && form.department && form.jobType;
 
   return (
     <section className="intro-section">
@@ -59,6 +64,10 @@ export default function SurveyIntro({ group, onSubmit }) {
         <div className="form-group">
           <label className="form-label">경력 (개월) *</label>
           <input className="form-input" name="careerMonths" type="number" value={form.careerMonths} onChange={handleChange} placeholder="36" />
+        </div>
+        <div className="form-group">
+          <label className="form-label">회사 *</label>
+          <input className="form-input" name="company" value={form.company} onChange={handleChange} placeholder="회사명" />
         </div>
         <div className="form-group">
           <label className="form-label">소속 *</label>
