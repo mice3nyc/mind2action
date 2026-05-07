@@ -1,0 +1,602 @@
+[
+  {
+    "id": "d1417bff-c387-4e4a-a2f4-3bfbb1972186",
+    "timestamp": "2026-05-08T07:16:00.000Z",
+    "group": "망원동",
+    "name": "김수아",
+    "birthDate": "19831206",
+    "careerMonths": "81",
+    "department": "용인 에이스지점 2팀",
+    "jobType": "insurance",
+    "incomeRange": "800-1000",
+    "recruitCount": "",
+    "scores": {
+      "CP": 16,
+      "NP": 9,
+      "A": 15,
+      "FC": 20,
+      "AC": 9
+    },
+    "grades": {
+      "CP": "고",
+      "NP": "저",
+      "A": "고",
+      "FC": "극고",
+      "AC": "저"
+    },
+    "top1": "FC",
+    "top2": "CP",
+    "bottom": "NP",
+    "total": 69
+  },
+  {
+    "id": "905dbeac-946d-433e-a732-07b2f9c03f8e",
+    "timestamp": "2026-05-08T08:19:00.000Z",
+    "group": "서교동",
+    "name": "장현정",
+    "birthDate": "19840325",
+    "careerMonths": "91",
+    "department": "용인동백지점 1팀",
+    "jobType": "manager",
+    "incomeRange": "400-600",
+    "recruitCount": "2",
+    "scores": {
+      "CP": 16,
+      "NP": 16,
+      "A": 16,
+      "FC": 6,
+      "AC": 10
+    },
+    "grades": {
+      "CP": "고",
+      "NP": "고",
+      "A": "고",
+      "FC": "극저",
+      "AC": "저"
+    },
+    "top1": "CP",
+    "top2": "A",
+    "bottom": "FC",
+    "total": 64
+  },
+  {
+    "id": "74d58dcd-5dbc-4a33-b2b9-e80a03d84af8",
+    "timestamp": "2026-05-08T05:22:00.000Z",
+    "group": "합정동",
+    "name": "김정임",
+    "birthDate": "19800223",
+    "careerMonths": "68",
+    "department": "용인 에이스지점",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 14,
+      "NP": 13,
+      "A": 18,
+      "FC": 14,
+      "AC": 6
+    },
+    "grades": {
+      "CP": "고",
+      "NP": "중",
+      "A": "극고",
+      "FC": "고",
+      "AC": "극저"
+    },
+    "top1": "A",
+    "top2": "CP",
+    "bottom": "AC",
+    "total": 65
+  },
+  {
+    "id": "e2312270-0172-45a6-8ba4-81a93df61d1d",
+    "timestamp": "2026-05-08T06:25:00.000Z",
+    "group": "망원동",
+    "name": "김지윤",
+    "birthDate": "19830528",
+    "careerMonths": "36차월",
+    "department": "북부티씨지점",
+    "jobType": "insurance",
+    "incomeRange": "800-1000",
+    "recruitCount": "3",
+    "scores": {
+      "CP": 17,
+      "NP": 15,
+      "A": 12,
+      "FC": 19,
+      "AC": 10
+    },
+    "grades": {
+      "CP": "극고",
+      "NP": "고",
+      "A": "중",
+      "FC": "극고",
+      "AC": "저"
+    },
+    "top1": "FC",
+    "top2": "CP",
+    "bottom": "AC",
+    "total": 73
+  },
+  {
+    "id": "a67a0a47-53ce-4877-b2fa-1fc416b7c72d",
+    "timestamp": "2026-05-08T07:28:00.000Z",
+    "group": "서교동",
+    "name": "박세미",
+    "birthDate": "19790628",
+    "careerMonths": "100",
+    "department": "DB손보용인 에이스4팀",
+    "jobType": "manager",
+    "incomeRange": "400-600",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 17,
+      "NP": 15,
+      "A": 17,
+      "FC": 16,
+      "AC": 8
+    },
+    "grades": {
+      "CP": "극고",
+      "NP": "고",
+      "A": "극고",
+      "FC": "고",
+      "AC": "저"
+    },
+    "top1": "CP",
+    "top2": "A",
+    "bottom": "AC",
+    "total": 73
+  },
+  {
+    "id": "0e040538-977e-416d-b072-75e256f7d1b4",
+    "timestamp": "2026-05-08T08:31:00.000Z",
+    "group": "합정동",
+    "name": "김동현",
+    "birthDate": "19820318",
+    "careerMonths": "150",
+    "department": "북부TC지점",
+    "jobType": "insurance",
+    "incomeRange": "800-1000",
+    "recruitCount": "38",
+    "scores": {
+      "CP": 13,
+      "NP": 15,
+      "A": 19,
+      "FC": 16,
+      "AC": 5
+    },
+    "grades": {
+      "CP": "중",
+      "NP": "고",
+      "A": "극고",
+      "FC": "고",
+      "AC": "극저"
+    },
+    "top1": "A",
+    "top2": "FC",
+    "bottom": "AC",
+    "total": 68
+  },
+  {
+    "id": "0c8eaaa8-66e4-4f2a-90e5-d87f387583a0",
+    "timestamp": "2026-05-08T05:34:00.000Z",
+    "group": "망원동",
+    "name": "박희수",
+    "birthDate": "19730916",
+    "careerMonths": "312",
+    "department": "남산지점",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "20",
+    "scores": {
+      "CP": 8,
+      "NP": 17,
+      "A": 11,
+      "FC": 15,
+      "AC": 18
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "극고",
+      "A": "중",
+      "FC": "고",
+      "AC": "극고"
+    },
+    "top1": "AC",
+    "top2": "NP",
+    "bottom": "CP",
+    "total": 69
+  },
+  {
+    "id": "08587ff1-7ee1-42ea-ac26-74a7dbeff1d6",
+    "timestamp": "2026-05-08T06:37:00.000Z",
+    "group": "서교동",
+    "name": "정혜은",
+    "birthDate": "19770329",
+    "careerMonths": "29",
+    "department": "북부tc 82팀",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "0",
+    "scores": {
+      "CP": 16,
+      "NP": 8,
+      "A": 16,
+      "FC": 14,
+      "AC": 9
+    },
+    "grades": {
+      "CP": "고",
+      "NP": "저",
+      "A": "고",
+      "FC": "고",
+      "AC": "저"
+    },
+    "top1": "CP",
+    "top2": "A",
+    "bottom": "NP",
+    "total": 63
+  },
+  {
+    "id": "7a685c3e-3b03-4fe5-85d4-55c7a93b46e8",
+    "timestamp": "2026-05-08T07:40:00.000Z",
+    "group": "합정동",
+    "name": "임명옥",
+    "birthDate": "19791120",
+    "careerMonths": "16",
+    "department": "북부TC지점 82센터",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "0",
+    "scores": {
+      "CP": 11,
+      "NP": 15,
+      "A": 9,
+      "FC": 19,
+      "AC": 10
+    },
+    "grades": {
+      "CP": "중",
+      "NP": "고",
+      "A": "저",
+      "FC": "극고",
+      "AC": "저"
+    },
+    "top1": "FC",
+    "top2": "NP",
+    "bottom": "A",
+    "total": 64
+  },
+  {
+    "id": "29211930-5e2b-492e-ac7c-e38dd7cfcbd7",
+    "timestamp": "2026-05-08T08:43:00.000Z",
+    "group": "망원동",
+    "name": "서한솔",
+    "birthDate": "19930223",
+    "careerMonths": "26",
+    "department": "북부사업단 북부tc 82팀",
+    "jobType": "coach",
+    "incomeRange": "over2000",
+    "recruitCount": "0",
+    "scores": {
+      "CP": 8,
+      "NP": 14,
+      "A": 15,
+      "FC": 16,
+      "AC": 14
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "고",
+      "A": "고",
+      "FC": "고",
+      "AC": "고"
+    },
+    "top1": "FC",
+    "top2": "A",
+    "bottom": "CP",
+    "total": 67
+  },
+  {
+    "id": "bdccc17a-c8ee-49d8-ad02-3919ebe6d6a7",
+    "timestamp": "2026-05-08T05:46:00.000Z",
+    "group": "서교동",
+    "name": "전미경",
+    "birthDate": "19770420",
+    "careerMonths": "17",
+    "department": "북부지점 82센터",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "3",
+    "scores": {
+      "CP": 9,
+      "NP": 16,
+      "A": 16,
+      "FC": 11,
+      "AC": 3
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "고",
+      "A": "고",
+      "FC": "중",
+      "AC": "극저"
+    },
+    "top1": "A",
+    "top2": "NP",
+    "bottom": "AC",
+    "total": 55
+  },
+  {
+    "id": "0ccd67be-88ab-4150-8810-4f0233cd18df",
+    "timestamp": "2026-05-08T06:49:00.000Z",
+    "group": "합정동",
+    "name": "이정희",
+    "birthDate": "19860119",
+    "careerMonths": "16",
+    "department": "북부TC 81팀",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 10,
+      "NP": 5,
+      "A": 10,
+      "FC": 6,
+      "AC": 5
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "극저",
+      "A": "저",
+      "FC": "극저",
+      "AC": "극저"
+    },
+    "top1": "CP",
+    "top2": "A",
+    "bottom": "NP",
+    "total": 36
+  },
+  {
+    "id": "673be236-a129-427f-8d43-c316d804fa33",
+    "timestamp": "2026-05-08T07:52:00.000Z",
+    "group": "망원동",
+    "name": "손용배",
+    "birthDate": "19680412",
+    "careerMonths": "50",
+    "department": "북부지점 1",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 12,
+      "NP": 9,
+      "A": 11,
+      "FC": 14,
+      "AC": 11
+    },
+    "grades": {
+      "CP": "중",
+      "NP": "저",
+      "A": "중",
+      "FC": "고",
+      "AC": "중"
+    },
+    "top1": "FC",
+    "top2": "CP",
+    "bottom": "NP",
+    "total": 57
+  },
+  {
+    "id": "eabdd2a9-a17f-4e61-8e9f-940a58652888",
+    "timestamp": "2026-05-08T08:55:00.000Z",
+    "group": "서교동",
+    "name": "이정희",
+    "birthDate": "19860119",
+    "careerMonths": "16",
+    "department": "북부TC 81센터",
+    "jobType": "insurance",
+    "incomeRange": "400-600",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 6,
+      "NP": 12,
+      "A": 7,
+      "FC": 5,
+      "AC": 10
+    },
+    "grades": {
+      "CP": "극저",
+      "NP": "중",
+      "A": "극저",
+      "FC": "극저",
+      "AC": "저"
+    },
+    "top1": "NP",
+    "top2": "AC",
+    "bottom": "FC",
+    "total": 40
+  },
+  {
+    "id": "d8cca97e-0609-4b14-bb50-26d2b8ac4718",
+    "timestamp": "2026-05-08T05:58:00.000Z",
+    "group": "합정동",
+    "name": "조태신",
+    "birthDate": "19711005",
+    "careerMonths": "257",
+    "department": "강남지점 1팀",
+    "jobType": "insurance",
+    "incomeRange": "800-1000",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 8,
+      "NP": 19,
+      "A": 7,
+      "FC": 12,
+      "AC": 13
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "극고",
+      "A": "극저",
+      "FC": "중",
+      "AC": "중"
+    },
+    "top1": "NP",
+    "top2": "AC",
+    "bottom": "A",
+    "total": 59
+  },
+  {
+    "id": "2dbdb569-0ba7-4356-9da7-8659dc84e6e2",
+    "timestamp": "2026-05-08T06:61:00.000Z",
+    "group": "망원동",
+    "name": "유현주",
+    "birthDate": "19791014",
+    "careerMonths": "88",
+    "department": "용인에이스 3팀",
+    "jobType": "manager",
+    "incomeRange": "800-1000",
+    "recruitCount": "2",
+    "scores": {
+      "CP": 10,
+      "NP": 16,
+      "A": 16,
+      "FC": 14,
+      "AC": 16
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "고",
+      "A": "고",
+      "FC": "고",
+      "AC": "고"
+    },
+    "top1": "A",
+    "top2": "NP",
+    "bottom": "CP",
+    "total": 72
+  },
+  {
+    "id": "b4c26df2-da32-433c-a23d-a54787df2fe0",
+    "timestamp": "2026-05-08T07:64:00.000Z",
+    "group": "서교동",
+    "name": "이현미",
+    "birthDate": "19781125",
+    "careerMonths": "61",
+    "department": "에이스지점 2팀",
+    "jobType": "manager",
+    "incomeRange": "800-1000",
+    "recruitCount": "1-2",
+    "scores": {
+      "CP": 12,
+      "NP": 8,
+      "A": 6,
+      "FC": 14,
+      "AC": 8
+    },
+    "grades": {
+      "CP": "중",
+      "NP": "저",
+      "A": "극저",
+      "FC": "고",
+      "AC": "저"
+    },
+    "top1": "FC",
+    "top2": "CP",
+    "bottom": "A",
+    "total": 48
+  },
+  {
+    "id": "7dead1bb-0fe8-4024-ae05-55e712401a03",
+    "timestamp": "2026-05-08T08:67:00.000Z",
+    "group": "합정동",
+    "name": "김도예",
+    "birthDate": "19861023",
+    "careerMonths": "46차월",
+    "department": "별내TC지점",
+    "jobType": "insurance",
+    "incomeRange": "under200",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 10,
+      "NP": 18,
+      "A": 8,
+      "FC": 19,
+      "AC": 16
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "극고",
+      "A": "저",
+      "FC": "극고",
+      "AC": "고"
+    },
+    "top1": "FC",
+    "top2": "NP",
+    "bottom": "A",
+    "total": 71
+  },
+  {
+    "id": "9aa8c6be-3abd-4a33-957b-1a5a28930c22",
+    "timestamp": "2026-05-08T05:10:00.000Z",
+    "group": "망원동",
+    "name": "조성순",
+    "birthDate": "19711102",
+    "careerMonths": "125",
+    "department": "노원별내",
+    "jobType": "insurance",
+    "incomeRange": "over2000",
+    "recruitCount": "1",
+    "scores": {
+      "CP": 16,
+      "NP": 10,
+      "A": 10,
+      "FC": 7,
+      "AC": 11
+    },
+    "grades": {
+      "CP": "고",
+      "NP": "저",
+      "A": "저",
+      "FC": "극저",
+      "AC": "중"
+    },
+    "top1": "CP",
+    "top2": "AC",
+    "bottom": "FC",
+    "total": 54
+  },
+  {
+    "id": "67f7777f-bea9-4948-a293-232e350c0a21",
+    "timestamp": "2026-05-08T06:13:00.000Z",
+    "group": "서교동",
+    "name": "은미옥",
+    "birthDate": "19800303",
+    "careerMonths": "65",
+    "department": "별내TC 83센터",
+    "jobType": "manager",
+    "incomeRange": "400-600",
+    "recruitCount": "4",
+    "scores": {
+      "CP": 10,
+      "NP": 20,
+      "A": 10,
+      "FC": 14,
+      "AC": 20
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "극고",
+      "A": "저",
+      "FC": "고",
+      "AC": "극고"
+    },
+    "top1": "NP",
+    "top2": "AC",
+    "bottom": "CP",
+    "total": 74
+  }
+]

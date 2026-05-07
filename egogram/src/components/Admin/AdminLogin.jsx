@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const ADMIN_PASS = 'mind2action';
+const ADMIN_PASS = 'sonson';
 
 export default function AdminLogin({ onLogin }) {
   const [pass, setPass] = useState('');

@@ -20,7 +20,7 @@
 }
 
 body {
-  font-family: 'Work Sans', -apple-system, sans-serif;
+  font-family: 'Paperlogy', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 400;
   font-size: 17px;
   line-height: 1.7;
@@ -43,8 +43,13 @@ body {
   padding: 48px 24px 80px;
 }
 
+.main-admin {
+  max-width: 100%;
+  padding: 32px 24px 80px;
+}
+
 h1, h2, h3, h4 {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-weight: 700;
   color: var(--text-strong);
   letter-spacing: -0.02em;
@@ -74,7 +79,7 @@ p {
 }
 
 .header-brand {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -103,7 +108,7 @@ p {
   align-items: center;
   justify-content: center;
   padding: 14px 36px;
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -147,7 +152,7 @@ p {
 .form-input {
   width: 100%;
   padding: 12px 16px;
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 16px;
   border: 1.5px solid var(--border);
   border-radius: 6px;
@@ -182,7 +187,7 @@ p {
   display: inline-block;
   background: var(--accent-yellow);
   color: var(--text-strong);
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -267,7 +272,7 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 11px;
   font-weight: 700;
   color: var(--text-muted);
@@ -304,7 +309,7 @@ p {
 }
 
 .question-number {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 13px;
   font-weight: 700;
   color: var(--accent-blue);
@@ -328,7 +333,7 @@ p {
 .answer-option {
   flex: 1;
   padding: 14px 10px;
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 15px;
   font-weight: 500;
   text-align: center;
@@ -395,7 +400,7 @@ p {
 }
 
 .score-label-ego {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: var(--text-strong);
@@ -447,7 +452,7 @@ p {
   width: 70px;
   text-align: right;
   flex-shrink: 0;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 22px;
   font-weight: 700;
 }
@@ -486,7 +491,7 @@ p {
 }
 
 .result-tag span {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-weight: 700;
 }
 
@@ -507,7 +512,7 @@ p {
 }
 
 .result-total-value {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 32px;
   font-weight: 700;
   color: var(--accent-blue);
@@ -515,7 +520,7 @@ p {
 
 /* ─── Admin Dashboard ─── */
 .admin-section {
-  max-width: var(--max-w-wide);
+  max-width: 100%;
 }
 
 .admin-header {
@@ -553,7 +558,7 @@ p {
 
 .filter-chip {
   padding: 7px 16px;
-  font-family: 'Work Sans', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 14px;
   font-weight: 500;
   border: 1.5px solid var(--border);
@@ -593,21 +598,29 @@ p {
   border-radius: 8px;
 }
 
+.admin-table-wrap {
+  overflow-x: visible;
+}
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
   white-space: nowrap;
+  table-layout: auto;
 }
 
 .admin-table thead {
   background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .admin-table th {
-  padding: 12px 14px;
+  padding: 10px 10px;
   text-align: left;
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-size: 12px;
   font-weight: 700;
   color: var(--text-muted);
@@ -617,7 +630,7 @@ p {
 }
 
 .admin-table td {
-  padding: 11px 14px;
+  padding: 10px 10px;
   border-bottom: 1px solid var(--border);
   color: var(--text);
 }
@@ -626,20 +639,51 @@ p {
   background: rgba(0, 18, 222, 0.02);
 }
 
+.th-ego {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
 .td-name {
   font-weight: 600;
+  font-size: 15px;
 }
 
 .td-score {
-  font-family: 'Urbanist', sans-serif;
+  font-family: 'Paperlogy', sans-serif;
   font-weight: 600;
   text-align: center;
-  font-size: 15px;
+  font-size: 14px;
+}
+
+.td-score-bar {
+  padding: 3px 2px;
+  vertical-align: bottom;
+}
+
+.score-cell-v {
+  border-radius: 0;
+  padding: 8px 6px 6px;
+  text-align: center;
+  min-width: 48px;
+  min-height: 44px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.score-num {
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .td-total {
   color: var(--accent-blue);
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .td-date {
@@ -649,31 +693,22 @@ p {
 
 .group-badge {
   display: inline-block;
-  background: var(--accent-yellow);
-  color: var(--text-strong);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: 10px;
-}
-
-.tag-inline {
-  display: inline-block;
-  font-family: 'Urbanist', sans-serif;
   font-size: 12px;
   font-weight: 700;
-  padding: 2px 8px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+}
+
+.ego-tag {
+  display: inline-block;
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 5px 14px;
   border-radius: 4px;
-}
-
-.tag-inline.top {
-  background: rgba(0, 18, 222, 0.1);
-  color: var(--accent-blue);
-}
-
-.tag-inline.bot {
-  background: var(--surface);
-  color: var(--text-muted);
+  text-align: center;
+  min-width: 44px;
 }
 
 .delete-btn {
@@ -689,6 +724,11 @@ p {
 .delete-btn:hover {
   background: #fee;
   color: #d32f2f;
+}
+
+.td-small {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 @media (max-width: 600px) {

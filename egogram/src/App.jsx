@@ -12,7 +12,7 @@ function AppContent() {
   return (
     <div className="app">
       <Header />
-      <main className="main-content" style={isAdmin ? { maxWidth: 1200 } : undefined}>
+      <main className={isAdmin ? 'main-content main-admin' : 'main-content'}>
         <Routes>
           <Route path="/admin" element={<AdminApp />} />
           <Route path="/*" element={<SurveyApp />} />
