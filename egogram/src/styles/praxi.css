@@ -867,68 +867,82 @@ p {
 .report-bling .bling-toggle:hover { background: #fff; color: #c23616; }
 
 /* ===== Bling Theme ===== */
-.report-bling { background: #f5f0eb; color: #2d2d2d; }
+.report-bling { background: #f8f5f0; color: #2d2d2d; }
 
-.report-bling .report-cover { border-bottom: none; padding: 100px 0 60px; }
-.report-bling .report-cover-badge { font-size: 12px; letter-spacing: 8px; color: #c23616; }
-.report-bling .report-cover h1 { font-size: 42px; font-weight: 800; letter-spacing: -1px; color: #111; }
-.report-bling .report-cover-name { font-size: 28px; font-weight: 300; letter-spacing: 2px; color: #c23616; }
-.report-bling .report-cover-meta { font-size: 13px; color: #999; }
+.report-bling .report-cover { border-bottom: none; padding: 120px 0 60px; }
+.report-bling .report-cover-badge { font-size: 11px; letter-spacing: 8px; color: #c23616; }
+.report-bling .report-cover h1 { font-size: 52px; font-weight: 800; letter-spacing: -2px; color: #111; line-height: 1.1; }
+.report-bling .report-cover-name { font-size: 36px; font-weight: 300; letter-spacing: 4px; color: #c23616; margin-top: 4px; }
+.report-bling .report-cover-meta { font-size: 13px; color: #aaa; margin-top: 12px; }
 
-.report-bling .report-intro { border-bottom: none; padding-bottom: 48px; }
-.report-bling .report-intro h2 { font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c23616; margin-bottom: 20px; }
-.report-bling .report-intro h3 { font-size: 24px; font-weight: 800; color: #111; margin: 36px 0 16px; }
-.report-bling .report-intro ol { font-size: 16px; line-height: 2; }
+.report-bling .report-intro { border-bottom: none; padding-bottom: 56px; }
+.report-bling .report-intro h2 { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: #c23616; margin-bottom: 24px; }
+.report-bling .report-intro h3 { font-size: 32px; font-weight: 800; color: #111; margin: 48px 0 16px; letter-spacing: -1px; }
+.report-bling .report-intro ol { font-size: 16px; line-height: 2.1; }
 .report-bling .report-intro p { font-size: 15px; }
+.report-bling .report-intro strong { color: #c23616; }
 
-.report-bling .report-section { border-bottom: none; padding-bottom: 48px; margin-bottom: 48px; }
-.report-bling .report-section-title { font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c23616; }
-.report-bling .report-section-num { font-size: 14px; color: #c23616; font-weight: 700; }
+.report-bling .report-section { border-bottom: none; padding-bottom: 56px; margin-bottom: 56px; }
+.report-bling .report-section-title { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: #c23616; margin-bottom: 28px; }
+.report-bling .report-section-num { font-size: 11px; color: #c23616; font-weight: 700; }
 
-.report-bling .report-chart-bar-wrap { border: none; background: #e8e0d8; height: 20px; }
-.report-bling .report-chart-success { border-color: rgba(0,0,0,0.15); }
+.report-bling .report-chart { gap: 14px; }
+.report-bling .report-chart-bar-wrap { border: none; background: #ede8e1; height: 24px; }
+.report-bling .report-chart-success { border-color: rgba(0,0,0,0.1); }
 .report-bling .report-chart-bar { background: #c23616 !important; }
-.report-bling .report-chart-label strong { color: #111; }
-.report-bling .report-chart-score { color: #c23616; font-size: 18px; }
+.report-bling .report-chart-label strong { color: #111; font-size: 18px; }
+.report-bling .report-chart-label span { color: #aaa; }
+.report-bling .report-chart-score { color: #c23616; font-size: 22px; font-weight: 800; }
 
-.report-bling .report-trait-item { border: none; padding: 16px 0; border-bottom: 1px solid #ddd5cc; }
+.report-bling .report-trait-item { border: none; padding: 20px 0; border-bottom: 1px solid #e5ddd4; }
 .report-bling .report-trait-item:last-child { border-bottom: none; }
-.report-bling .report-trait-ego { border-bottom: none; color: #111; font-size: 14px; }
-.report-bling .report-trait-ego span { color: #c23616; }
+.report-bling .report-trait-ego { border-bottom: none; color: #111; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+.report-bling .report-trait-ego span { color: #c23616; font-weight: 700; text-transform: none; letter-spacing: 0; }
+.report-bling .report-trait-item p { font-size: 16px; line-height: 1.9; }
 
-.report-bling .report-cm2-item { border-bottom: none; padding-bottom: 20px; }
-.report-bling .report-cm2-item h3 { color: #111 !important; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+.report-bling .report-cm2-item { border-bottom: none; padding-bottom: 24px; margin-bottom: 32px; }
+.report-bling .report-cm2-item h3 { color: #111 !important; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+.report-bling .report-cm2-item p { font-size: 16px; line-height: 1.9; }
+.report-bling .report-cm2-item p:first-of-type::first-line { font-size: 20px; font-weight: 700; color: #111; }
 
-.report-bling .report-strength-badge { border: none; background: transparent; padding: 0; font-size: 14px; color: #c23616; letter-spacing: 1px; }
+.report-bling .report-strength-badge { border: none; background: transparent; padding: 0; font-size: 12px; color: #c23616; letter-spacing: 2px; text-transform: uppercase; }
+.report-bling .report-section:has(.report-strength-badge) p { font-size: 17px; line-height: 2; }
+.report-bling .report-section:has(.report-strength-badge) p:first-of-type::first-line { font-size: 24px; font-weight: 700; color: #111; }
 
-.report-bling .report-score-table { border: none; gap: 4px; }
+.report-bling .report-score-table { border: none; gap: 4px; margin-bottom: 32px; }
 .report-bling .report-score-cell { border: none; }
-.report-bling .report-score-cell-label { background: #111 !important; font-size: 12px; letter-spacing: 2px; }
-.report-bling .report-score-cell-value { background: transparent; font-size: 28px; color: #111; }
+.report-bling .report-score-cell-label { background: #111 !important; font-size: 11px; letter-spacing: 3px; }
+.report-bling .report-score-cell-value { background: transparent; font-size: 36px; font-weight: 800; color: #111; padding: 14px 0; }
 
-.report-bling .report-coaching-item h4 { color: #111 !important; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
-.report-bling .report-coaching-ok { color: #bbb; font-style: normal; font-size: 13px; }
-.report-bling .report-coaching-detail { border-left: 2px solid #c23616; }
-.report-bling .report-coaching-message { border: none; background: transparent; padding: 24px 0; border-top: 1px solid #ddd5cc; }
+.report-bling .report-coaching-item { margin-bottom: 28px; }
+.report-bling .report-coaching-item h4 { color: #111 !important; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
+.report-bling .report-coaching-item p { font-size: 16px; line-height: 1.9; }
+.report-bling .report-coaching-ok { color: #ccc; font-style: normal; font-size: 13px; letter-spacing: 1px; }
+.report-bling .report-coaching-detail { border-left: 2px solid #c23616; padding-left: 20px; }
+.report-bling .report-coaching-message { border: none; background: transparent; padding: 28px 0; border-top: 1px solid #e5ddd4; }
+.report-bling .report-coaching-message p { font-size: 17px; line-height: 2; }
 
-.report-bling .report-detailed-item { border: none; background: transparent; padding: 20px 0; border-top: 1px solid #ddd5cc; }
-.report-bling .report-detailed-coaching h3 { color: #c23616; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; }
-.report-bling .report-detailed-script { border-top: 1px solid #ddd5cc; }
+.report-bling .report-detailed-item { border: none; background: transparent; padding: 24px 0; border-top: 1px solid #e5ddd4; }
+.report-bling .report-detailed-coaching h3 { color: #c23616; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; }
+.report-bling .report-detailed-text p { font-size: 16px; line-height: 1.9; }
+.report-bling .report-detailed-script { border-top: 1px solid #e5ddd4; margin-top: 16px; padding-top: 16px; }
+.report-bling .report-detailed-script p { font-size: 15px; line-height: 1.9; }
 
-.report-bling .report-combination { border: none; background: transparent; padding: 0; color: #c23616; font-size: 13px; letter-spacing: 2px; }
+.report-bling .report-combination { border: none; background: transparent; padding: 0; color: #c23616; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; }
 
-.report-bling .report-cm5 h4 { color: #111; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+.report-bling .report-cm5 h4 { color: #111; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 28px 0 12px; }
+.report-bling .report-cm5 p { font-size: 16px; line-height: 1.9; }
 
-.report-bling .report-quote { border: none; padding: 24px 0 24px 24px; }
+.report-bling .report-quote { border: none; padding: 32px 0 32px 28px; }
 .report-bling .report-quote.encourage { border-left: 3px solid #c23616; }
 .report-bling .report-quote.improve { border-left: 3px solid #111; }
-.report-bling .report-quote-label { color: #c23616; }
-.report-bling .report-quote p { font-size: 17px; font-weight: 400; color: #111; }
+.report-bling .report-quote-label { color: #c23616; font-size: 10px; letter-spacing: 4px; }
+.report-bling .report-quote p { font-size: 20px; font-weight: 400; color: #111; line-height: 1.6; }
 
-.report-bling .report-closing { border-top: none; padding: 60px 0; }
-.report-bling .report-closing h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #c23616; }
-.report-bling .report-closing p { color: #444; }
-.report-bling .report-signature { color: #999; }
+.report-bling .report-closing { border-top: none; padding: 72px 0; }
+.report-bling .report-closing h2 { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: #c23616; margin-bottom: 28px; }
+.report-bling .report-closing p { color: #444; font-size: 16px; line-height: 2; }
+.report-bling .report-signature { color: #aaa; font-size: 13px; letter-spacing: 1px; }
 
 @media print {
   .bling-toggle { display: none; }
