@@ -4,6 +4,12 @@ import { supabase } from '../../lib/supabase';
 import { lookupReport, EGO_STATES, EGO_LABELS, getScoreRange, needsCoaching } from '../../lib/cmLookup';
 import { getSuccessRange } from '../../lib/scoreEngine';
 
+function Paragraphs({ text }) {
+  if (!text) return null;
+  const paragraphs = text.split(/\n\s*\n/).map(p => p.replace(/\n/g, ' ').trim()).filter(Boolean);
+  return paragraphs.map((p, i) => <p key={i}>{p}</p>);
+}
+
 const EGO_COLORS = {
   CP: '#ef4444',
   NP: '#f59e0b',
@@ -152,7 +158,7 @@ export default function ReportPage() {
         {EGO_STATES.map(ego => (
           <div key={ego} className="report-cm2-item">
             <h3 style={{ color: EGO_COLORS[ego] }}>{ego} — {EGO_LABELS[ego]} ({scores[ego]}점)</h3>
-            <p>{report.cm2[ego]}</p>
+            <Paragraphs text={report.cm2[ego]} />
           </div>
         ))}
       </Section>
@@ -161,7 +167,7 @@ export default function ReportPage() {
         <div className="report-strength-badge">
           TOP1 <strong>{EGO_LABELS[top1]}</strong>({top1}) + TOP2 <strong>{EGO_LABELS[top2]}</strong>({top2})
         </div>
-        <p style={{ whiteSpace: 'pre-line' }}>{report.cm3}</p>
+        <Paragraphs text={report.cm3} />
       </Section>
 
       <Section number={4} title="내 성향의 코칭 포인트">
@@ -183,8 +189,8 @@ export default function ReportPage() {
               <h4 style={{ color: EGO_COLORS[ego] }}>{ego} — {EGO_LABELS[ego]}</h4>
               {needs ? (
                 <>
-                  <p>{coaching}</p>
-                  {detail && <p className="report-coaching-detail">{detail}</p>}
+                  <Paragraphs text={coaching} />
+                  {detail && <div className="report-coaching-detail"><Paragraphs text={detail} /></div>}
                 </>
               ) : (
                 <p className="report-coaching-ok">코칭이 필요 없는 구간입니다.</p>
@@ -206,7 +212,7 @@ export default function ReportPage() {
                   {item.ego} — {EGO_LABELS[item.ego]} ({item.condition === '0-7' ? '0~7점' : '17점 이상'})
                 </h4>
                 <div className="report-detailed-trait"><strong>성향:</strong> {item.trait}</div>
-                <div className="report-detailed-text">{item.coaching}</div>
+                <div className="report-detailed-text"><Paragraphs text={item.coaching} /></div>
                 {item.script && (
                   <div className="report-detailed-script">
                     <strong>화법 스크립트:</strong>
@@ -226,9 +232,9 @@ export default function ReportPage() {
           </div>
           <div className="report-cm5">
             <h4>이 성향의 말투와 태도</h4>
-            <p>{report.cm5.manner}</p>
+            <Paragraphs text={report.cm5.manner} />
             <h4>개선이 되는 코칭 내용</h4>
-            <p>{report.cm5.improvement}</p>
+            <Paragraphs text={report.cm5.improvement} />
           </div>
         </Section>
       )}
@@ -238,7 +244,7 @@ export default function ReportPage() {
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2}
           </div>
-          <p style={{ whiteSpace: 'pre-line' }}>{report.cm6}</p>
+          <Paragraphs text={report.cm6} />
         </Section>
       )}
 
@@ -247,7 +253,7 @@ export default function ReportPage() {
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
           </div>
-          <p style={{ whiteSpace: 'pre-line' }}>{report.cm7}</p>
+          <Paragraphs text={report.cm7} />
         </Section>
       )}
 
