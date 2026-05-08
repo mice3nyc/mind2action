@@ -11,9 +11,7 @@ const CM_DATA = {
 
 const JOB_TO_CM = {
   sales: 'sales',
-  insurance: 'sales',
   coach: 'coach',
-  manager: 'manager',
   sales_leader: 'manager',
   branch_manager: 'manager',
   training_leader: 'manager',

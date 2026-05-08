@@ -7,7 +7,7 @@
     "birthDate": "19831206",
     "careerMonths": "81",
     "department": "용인 에이스지점 2팀",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "800-1000",
     "recruitCount": "",
     "scores": {
@@ -37,7 +37,7 @@
     "birthDate": "19840325",
     "careerMonths": "91",
     "department": "용인동백지점 1팀",
-    "jobType": "manager",
+    "jobType": "sales_leader",
     "incomeRange": "400-600",
     "recruitCount": "2",
     "scores": {
@@ -67,7 +67,7 @@
     "birthDate": "19800223",
     "careerMonths": "68",
     "department": "용인 에이스지점",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "1",
     "scores": {
@@ -97,7 +97,7 @@
     "birthDate": "19830528",
     "careerMonths": "36차월",
     "department": "북부티씨지점",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "800-1000",
     "recruitCount": "3",
     "scores": {
@@ -127,7 +127,7 @@
     "birthDate": "19790628",
     "careerMonths": "100",
     "department": "DB손보용인 에이스4팀",
-    "jobType": "manager",
+    "jobType": "sales_leader",
     "incomeRange": "400-600",
     "recruitCount": "1",
     "scores": {
@@ -157,7 +157,7 @@
     "birthDate": "19820318",
     "careerMonths": "150",
     "department": "북부TC지점",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "800-1000",
     "recruitCount": "38",
     "scores": {
@@ -187,7 +187,7 @@
     "birthDate": "19730916",
     "careerMonths": "312",
     "department": "남산지점",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "20",
     "scores": {
@@ -217,7 +217,7 @@
     "birthDate": "19770329",
     "careerMonths": "29",
     "department": "북부tc 82팀",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "0",
     "scores": {
@@ -247,7 +247,7 @@
     "birthDate": "19791120",
     "careerMonths": "16",
     "department": "북부TC지점 82센터",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "0",
     "scores": {
@@ -307,7 +307,7 @@
     "birthDate": "19770420",
     "careerMonths": "17",
     "department": "북부지점 82센터",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "3",
     "scores": {
@@ -337,7 +337,7 @@
     "birthDate": "19860119",
     "careerMonths": "16",
     "department": "북부TC 81팀",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "1",
     "scores": {
@@ -367,7 +367,7 @@
     "birthDate": "19680412",
     "careerMonths": "50",
     "department": "북부지점 1",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "1",
     "scores": {
@@ -397,7 +397,7 @@
     "birthDate": "19860119",
     "careerMonths": "16",
     "department": "북부TC 81센터",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "400-600",
     "recruitCount": "1",
     "scores": {
@@ -427,7 +427,7 @@
     "birthDate": "19711005",
     "careerMonths": "257",
     "department": "강남지점 1팀",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "800-1000",
     "recruitCount": "1",
     "scores": {
@@ -457,7 +457,7 @@
     "birthDate": "19791014",
     "careerMonths": "88",
     "department": "용인에이스 3팀",
-    "jobType": "manager",
+    "jobType": "sales_leader",
     "incomeRange": "800-1000",
     "recruitCount": "2",
     "scores": {
@@ -487,7 +487,7 @@
     "birthDate": "19781125",
     "careerMonths": "61",
     "department": "에이스지점 2팀",
-    "jobType": "manager",
+    "jobType": "sales_leader",
     "incomeRange": "800-1000",
     "recruitCount": "1-2",
     "scores": {
@@ -517,7 +517,7 @@
     "birthDate": "19861023",
     "careerMonths": "46차월",
     "department": "별내TC지점",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "under200",
     "recruitCount": "1",
     "scores": {
@@ -547,7 +547,7 @@
     "birthDate": "19711102",
     "careerMonths": "125",
     "department": "노원별내",
-    "jobType": "insurance",
+    "jobType": "sales",
     "incomeRange": "over2000",
     "recruitCount": "1",
     "scores": {
@@ -577,7 +577,7 @@
     "birthDate": "19800303",
     "careerMonths": "65",
     "department": "별내TC 83센터",
-    "jobType": "manager",
+    "jobType": "sales_leader",
     "incomeRange": "400-600",
     "recruitCount": "4",
     "scores": {
