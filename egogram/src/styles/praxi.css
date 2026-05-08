@@ -860,7 +860,78 @@ p {
 .btn-delete-action { font-size: 11px; font-weight: 600; padding: 4px 10px; cursor: pointer; border: 1px solid #ef4444; color: #ef4444; background: transparent; }
 .btn-delete-action:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
 
+/* Bling toggle */
+.bling-toggle { position: fixed; top: 16px; right: 16px; z-index: 100; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 8px 20px; border: 1px solid #111; background: #fff; color: #111; cursor: pointer; }
+.bling-toggle:hover { background: #111; color: #fff; }
+.report-bling .bling-toggle { background: #c23616; color: #fff; border-color: #c23616; }
+.report-bling .bling-toggle:hover { background: #fff; color: #c23616; }
+
+/* ===== Bling Theme ===== */
+.report-bling { background: #f5f0eb; color: #2d2d2d; }
+
+.report-bling .report-cover { border-bottom: none; padding: 100px 0 60px; }
+.report-bling .report-cover-badge { font-size: 12px; letter-spacing: 8px; color: #c23616; }
+.report-bling .report-cover h1 { font-size: 42px; font-weight: 800; letter-spacing: -1px; color: #111; }
+.report-bling .report-cover-name { font-size: 28px; font-weight: 300; letter-spacing: 2px; color: #c23616; }
+.report-bling .report-cover-meta { font-size: 13px; color: #999; }
+
+.report-bling .report-intro { border-bottom: none; padding-bottom: 48px; }
+.report-bling .report-intro h2 { font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c23616; margin-bottom: 20px; }
+.report-bling .report-intro h3 { font-size: 24px; font-weight: 800; color: #111; margin: 36px 0 16px; }
+.report-bling .report-intro ol { font-size: 16px; line-height: 2; }
+.report-bling .report-intro p { font-size: 15px; }
+
+.report-bling .report-section { border-bottom: none; padding-bottom: 48px; margin-bottom: 48px; }
+.report-bling .report-section-title { font-size: 14px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #c23616; }
+.report-bling .report-section-num { font-size: 14px; color: #c23616; font-weight: 700; }
+
+.report-bling .report-chart-bar-wrap { border: none; background: #e8e0d8; height: 20px; }
+.report-bling .report-chart-success { border-color: rgba(0,0,0,0.15); }
+.report-bling .report-chart-bar { background: #c23616 !important; }
+.report-bling .report-chart-label strong { color: #111; }
+.report-bling .report-chart-score { color: #c23616; font-size: 18px; }
+
+.report-bling .report-trait-item { border: none; padding: 16px 0; border-bottom: 1px solid #ddd5cc; }
+.report-bling .report-trait-item:last-child { border-bottom: none; }
+.report-bling .report-trait-ego { border-bottom: none; color: #111; font-size: 14px; }
+.report-bling .report-trait-ego span { color: #c23616; }
+
+.report-bling .report-cm2-item { border-bottom: none; padding-bottom: 20px; }
+.report-bling .report-cm2-item h3 { color: #111 !important; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+
+.report-bling .report-strength-badge { border: none; background: transparent; padding: 0; font-size: 14px; color: #c23616; letter-spacing: 1px; }
+
+.report-bling .report-score-table { border: none; gap: 4px; }
+.report-bling .report-score-cell { border: none; }
+.report-bling .report-score-cell-label { background: #111 !important; font-size: 12px; letter-spacing: 2px; }
+.report-bling .report-score-cell-value { background: transparent; font-size: 28px; color: #111; }
+
+.report-bling .report-coaching-item h4 { color: #111 !important; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+.report-bling .report-coaching-ok { color: #bbb; font-style: normal; font-size: 13px; }
+.report-bling .report-coaching-detail { border-left: 2px solid #c23616; }
+.report-bling .report-coaching-message { border: none; background: transparent; padding: 24px 0; border-top: 1px solid #ddd5cc; }
+
+.report-bling .report-detailed-item { border: none; background: transparent; padding: 20px 0; border-top: 1px solid #ddd5cc; }
+.report-bling .report-detailed-coaching h3 { color: #c23616; font-size: 14px; letter-spacing: 3px; text-transform: uppercase; }
+.report-bling .report-detailed-script { border-top: 1px solid #ddd5cc; }
+
+.report-bling .report-combination { border: none; background: transparent; padding: 0; color: #c23616; font-size: 13px; letter-spacing: 2px; }
+
+.report-bling .report-cm5 h4 { color: #111; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; }
+
+.report-bling .report-quote { border: none; padding: 24px 0 24px 24px; }
+.report-bling .report-quote.encourage { border-left: 3px solid #c23616; }
+.report-bling .report-quote.improve { border-left: 3px solid #111; }
+.report-bling .report-quote-label { color: #c23616; }
+.report-bling .report-quote p { font-size: 17px; font-weight: 400; color: #111; }
+
+.report-bling .report-closing { border-top: none; padding: 60px 0; }
+.report-bling .report-closing h2 { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: #c23616; }
+.report-bling .report-closing p { color: #444; }
+.report-bling .report-signature { color: #999; }
+
 @media print {
+  .bling-toggle { display: none; }
   .report-container { max-width: 100%; }
   .report-section { break-inside: avoid; }
 }
@@ -869,7 +940,9 @@ p {
   .main-report { padding: 0 16px; }
   .report-cover { padding: 48px 0 32px; }
   .report-cover h1 { font-size: 22px; }
+  .report-bling .report-cover h1 { font-size: 30px; }
   .report-chart-label { width: 80px; }
   .report-score-table { gap: 0; }
   .report-score-cell-value { font-size: 18px; }
+  .report-bling .report-score-cell-value { font-size: 22px; }
 }

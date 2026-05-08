@@ -106,6 +106,8 @@ export default function ReportPage() {
     load();
   }, [id]);
 
+  const [bling, setBling] = useState(false);
+
   if (loading) return <div className="report-loading">리포트 생성 중...</div>;
   if (error) return <div className="report-error">{error}</div>;
   if (!report) return null;
@@ -114,7 +116,10 @@ export default function ReportPage() {
   const { scores, top1, top2, bottom } = result;
 
   return (
-    <div className="report-container">
+    <div className={`report-container ${bling ? 'report-bling' : ''}`}>
+      <button className="bling-toggle" onClick={() => setBling(!bling)}>
+        {bling ? '기본' : 'bling'}
+      </button>
       <div className="report-cover">
         <div className="report-cover-badge">MIND2ACTION</div>
         <h1>성향 코칭 리포트</h1>
