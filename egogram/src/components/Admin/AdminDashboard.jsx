@@ -232,7 +232,10 @@ export default function AdminDashboard({ onLogout }) {
                   <td><EgoTag ego={r.top1} type="top" /></td>
                   <td><EgoTag ego={r.bottom} type="bot" /></td>
                   <td className="td-date">{new Date(r.timestamp).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-                  <td><button className="delete-btn" onClick={() => handleDelete(r.id)}>×</button></td>
+                  <td className="td-actions">
+                    <a href={`#/report/${r.id}`} target="_blank" className="report-link" title="리포트 보기">📄</a>
+                    <button className="delete-btn" onClick={() => handleDelete(r.id)}>×</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
