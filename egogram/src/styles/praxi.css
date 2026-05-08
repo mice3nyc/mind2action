@@ -867,7 +867,9 @@ p {
 .report-bling .bling-toggle:hover { background: #f8f5f0; color: #1a6b5c; }
 
 /* ===== Bling Theme ===== */
-.report-bling { background: #f8f5f0; color: #333; --bling: #1a6b5c; }
+.report-bling { background: #f8f5f0; color: #333; --bling: #1a6b5c; min-height: 100vh; margin: -28px -24px 0; padding: 28px 24px 0; }
+body:has(.report-bling) { background: #f8f5f0; }
+.app:has(.report-bling) { background: #f8f5f0; }
 
 .report-bling .report-cover { border-bottom: 2px solid #c8bfb4; padding: 120px 0 60px; }
 .report-bling .report-cover-badge { font-size: 11px; letter-spacing: 8px; color: var(--bling); }
