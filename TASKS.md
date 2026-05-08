@@ -92,3 +92,4 @@
 | 5/8 | 60b20a7 | Supabase 연결 — DB 저장 + async 전환 |
 | 5/8 | f42e27d | GitHub Pages 배포 (/mind2action/egogram/) |
 | 5/8 | 3ee24f9 | 설문 업데이트 — 직무 7종, 회사 필드, 질문 교차 배치 |
+| 5/8 | d0a2f5c | gh-pages 배포 경로 수정 (--dest egogram) |

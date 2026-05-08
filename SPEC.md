@@ -168,8 +168,55 @@ grades jsonb
 - insert: 누구나 (설문 참여자)
 - select: 누구나 (관리자 — 후속 인증 추가 시 제한)
 - delete: 누구나 (후속 제한)
+- **update: 없음** — API로 기존 데이터 수정 불가. 수정 필요 시 Supabase SQL Editor에서 직접 실행
 
-## §8 React 앱 구조
+### 스키마 변경 시
+- anon 키로는 DDL(ALTER TABLE 등) 실행 불가
+- Supabase SQL Editor에서 직접 실행 필요
+- 변경 후 `supabase-schema.sql` + SPEC §7 동기화
+
+## §8 배포
+
+### GitHub Pages 배포 구조
+
+```
+GitHub Pages source: gh-pages 브랜치, / (root)
+리포 이름: mind2action → 기본 URL: mice3nyc.github.io/mind2action/
+
+gh-pages 브랜치 구조:
+├── egogram/           ← vite dist 산출물이 여기에 들어감
+│   ├── index.html
+│   ├── favicon.svg
+│   ├── icons.svg
+│   └── assets/
+│       ├── index-{hash}.js
+│       └── index-{hash}.css
+└── (향후 다른 프로젝트 추가 가능)
+```
+
+### 배포 명령
+
+```bash
+cd egogram/
+npm run deploy    # = vite build && gh-pages -d dist --dest egogram
+```
+
+`--dest egogram`이 핵심. 이것 없으면 dist가 gh-pages 루트에 올라가서 `/egogram/` 경로가 404.
+
+### Vite base path
+
+`vite.config.js`의 `base: '/mind2action/egogram/'`는 HTML 내 에셋 참조 경로를 결정한다.
+- 리포 이름(`/mind2action/`) + 서브폴더(`/egogram/`) = 전체 경로
+- 이 값을 변경하면 배포 경로도 맞춰야 함
+
+### 배포 후 확인
+
+배포 후 반드시 확인할 3가지:
+1. `curl -sI https://mice3nyc.github.io/mind2action/egogram/` → 200 OK
+2. `gh api repos/mice3nyc/mind2action/git/trees/gh-pages:egogram --jq '.tree[].path'` → index.html, assets/ 존재
+3. 브라우저 Cmd+Shift+R (GitHub Pages 캐시 최대 10분)
+
+## §9 React 앱 구조
 
 ```
 egogram/
@@ -210,7 +257,7 @@ egogram/
 └── dist/                   # 빌드 산출물 (gitignore)
 ```
 
-## §9 CM 데이터 구조 (Phase 3)
+## §10 CM 데이터 구조 (Phase 3)
 
 > Phase 3 진입 시 상세화. 현재는 구조 참조용.
 

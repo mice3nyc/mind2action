@@ -21,7 +21,8 @@
 | GitHub | https://github.com/mice3nyc/mind2action |
 | Supabase | https://supabase.com/dashboard (프로젝트: Mind2Action) |
 
-배포 방법: `egogram/` 폴더에서 `npm run deploy` (vite build → gh-pages)
+배포 방법: `egogram/` 폴더에서 `npm run deploy` (vite build → gh-pages -d dist --dest egogram)
+`--dest egogram` 필수 — 없으면 gh-pages 루트에 올라가서 /egogram/ 경로 404.
 다른 프로젝트 추가 시 같은 구조로 `/mind2action/다른프로젝트/`에 배포 가능.
 
 ## 서비스 구조
