@@ -6,8 +6,8 @@ const ANSWERS_PER_PAGE = 5;
 const TOTAL_PAGES = Math.ceil(questions.length / ANSWERS_PER_PAGE);
 const ANSWER_CHOICES = [
   { value: 2, label: '그렇다' },
-  { value: 1, label: '어느 쪽도 아니다' },
   { value: 0, label: '그렇지 않다' },
+  { value: 1, label: '어느 쪽도 아니다' },
 ];
 
 function StepDots({ currentPage, totalPages, completedPages }) {
