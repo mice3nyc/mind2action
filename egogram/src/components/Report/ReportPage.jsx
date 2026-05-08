@@ -161,7 +161,7 @@ export default function ReportPage() {
         <div className="report-strength-badge">
           TOP1 <strong>{EGO_LABELS[top1]}</strong>({top1}) + TOP2 <strong>{EGO_LABELS[top2]}</strong>({top2})
         </div>
-        <p>{report.cm3}</p>
+        <p style={{ whiteSpace: 'pre-line' }}>{report.cm3}</p>
       </Section>
 
       <Section number={4} title="내 성향의 코칭 포인트">
@@ -187,7 +187,7 @@ export default function ReportPage() {
                   {detail && <p className="report-coaching-detail">{detail}</p>}
                 </>
               ) : (
-                <p className="report-coaching-ok">—</p>
+                <p className="report-coaching-ok">코칭이 필요 없는 구간입니다.</p>
               )}
             </div>
           );
@@ -238,7 +238,7 @@ export default function ReportPage() {
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2}
           </div>
-          <p>{report.cm6}</p>
+          <p style={{ whiteSpace: 'pre-line' }}>{report.cm6}</p>
         </Section>
       )}
 
@@ -247,7 +247,7 @@ export default function ReportPage() {
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
           </div>
-          <p>{report.cm7}</p>
+          <p style={{ whiteSpace: 'pre-line' }}>{report.cm7}</p>
         </Section>
       )}
 
