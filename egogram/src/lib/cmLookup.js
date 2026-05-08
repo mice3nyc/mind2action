@@ -1,8 +1,12 @@
 import cmInsurance from '../data/cm_insurance.json';
+import cmManager from '../data/cm_manager.json';
+import cmCoach from '../data/cm_coach.json';
 import { EGO_STATES, EGO_LABELS } from './scoreEngine';
 
 const CM_DATA = {
   sales: cmInsurance,
+  manager: cmManager,
+  coach: cmCoach,
 };
 
 const JOB_TO_CM = {
@@ -65,9 +69,26 @@ export function lookupReport(result, jobType) {
   const top1top2 = `${top1}_${top2}`;
   const top1top2bottom = `${top1}_${top2}_${bottom}`;
 
+  const isInsurance = cmKey === 'sales';
+
+  let cm6val = '';
+  let cm7val = '';
+  let cm8val = null;
+
+  if (isInsurance) {
+    cm6val = cm.cm6[top1top2] || '';
+    cm7val = cm.cm7[top1top2bottom] || '';
+    cm8val = cm.cm8[top1] || null;
+  } else {
+    cm7val = cm.cm7[top1top2bottom] || '';
+    const cm8key = `${top1}_${bottom}`;
+    cm8val = cm.cm8[cm8key] || null;
+  }
+
   return {
     jobLabel: cm.job_label,
     name: '',
+    isInsurance,
     cm1,
     cm2,
     cm3: cm.cm3[top1top2] || '',
@@ -76,9 +97,9 @@ export function lookupReport(result, jobType) {
     cm4_3: allNoCoaching ? cm.cm4_3.all_no_coaching : cm.cm4_3.some_coaching,
     cm4_4: cm4_4_items,
     cm5: cm.cm5[top1top2bottom] || null,
-    cm6: cm.cm6[top1top2] || '',
-    cm7: cm.cm7[top1top2bottom] || '',
-    cm8: cm.cm8[top1] || null,
+    cm6: cm6val,
+    cm7: cm7val,
+    cm8: cm8val,
   };
 }
 

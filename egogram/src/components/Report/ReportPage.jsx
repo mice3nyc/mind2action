@@ -226,7 +226,7 @@ export default function ReportPage() {
       </Section>
 
       {report.cm5 && (
-        <Section number={5} title="보장에 대한 제안을 할 때">
+        <Section number={5} title={report.isInsurance ? '보장에 대한 제안을 할 때' : report.jobLabel === '관리자' ? '성과에 도움이 되는 화법' : '신인PA 성과에 도움되는 코칭'}>
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
           </div>
@@ -239,7 +239,7 @@ export default function ReportPage() {
         </Section>
       )}
 
-      {report.cm6 && (
+      {report.cm6 && report.isInsurance && (
         <Section number={6} title="클로징 전 고객님이 거절시">
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2}
@@ -249,7 +249,7 @@ export default function ReportPage() {
       )}
 
       {report.cm7 && (
-        <Section number={7} title="신인 리크루팅 레벨업">
+        <Section number={report.isInsurance ? 7 : 6} title="신인 리크루팅 레벨업">
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
           </div>
@@ -258,7 +258,7 @@ export default function ReportPage() {
       )}
 
       {report.cm8 && (
-        <Section number={8} title="명언">
+        <Section number={report.isInsurance ? 8 : 7} title="명언">
           <div className="report-quotes">
             <div className="report-quote encourage">
               <div className="report-quote-label">격려</div>
