@@ -4,7 +4,9 @@ import { EGO_LABELS } from '../../lib/scoreEngine';
 
 const JOB_TO_REPORT = {
   sales: '보험설계사',
+  insurance: '보험설계사',
   coach: '코치/멘토',
+  manager: '관리자',
   sales_leader: '관리자',
   branch_manager: '관리자',
   training_leader: '관리자',
