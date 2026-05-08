@@ -11,10 +11,11 @@
 | 1 | 이름 | text | Y | |
 | 2 | 생년월일 | text (8자리) | Y | YYYYMMDD |
 | 3 | 경력 | number (개월) | Y | |
-| 4 | 소속 | text | Y | |
-| 5 | 직무 | select | Y | 보험설계사 / 관리자(지점장) / 코치,멘토 |
-| 6 | 직전 3개월 평균 소득 | select | N | 200만원 미만 ~ 2000만원 이상 |
-| 7 | 직전 1년 리크루팅 수 | number | N | |
+| 4 | 회사 | text | Y | 회사명 |
+| 5 | 소속 | text | Y | OO지점 |
+| 6 | 직무 | select | Y | 영업 / 코치·멘토 / 영업팀장·센터장 / 지점장·지사장 / 교육팀장·지원팀장 / 사업단장·부장 / 본부장 |
+| 7 | 직전 3개월 평균 소득 | select | N | 200만원 미만 ~ 2000만원 이상 |
+| 8 | 직전 1년 리크루팅 수 | number | N | |
 
 ### 설문 문항
 
@@ -24,8 +25,8 @@
 
 ### 문항 → 자아상태 매핑
 
-| 자아상태 | 약어 | 문항 번호 | 한글명 |
-|----------|------|-----------|--------|
+| 자아상태 | 약어 | 문항 ID | 한글명 |
+|----------|------|---------|--------|
 | Critical Parent | CP | Q1~Q10 | 통제적 부모 |
 | Nurturing Parent | NP | Q11~Q20 | 자상한 부모 |
 | Adult | A | Q21~Q30 | 어른 자아 |
@@ -34,6 +35,12 @@
 
 출처: `Assets/incoming/에고그램/설문지 .xlsx` > "각 유형 별 항목" 시트.
 앱 데이터: `src/data/questions.json`
+
+### 문항 표시 순서
+
+질문은 교차 배치로 표시된다. 한 페이지(5문항)에 CP→NP→A→FC→AC 순서로 각 1문항씩.
+10라운드 × 5개 에고 상태 = 50문항. 참여자가 같은 유형 문항이 연속되는 것을 인지하지 못하도록 설계.
+scoreEngine은 문항 ID가 아니라 `egoState` 필드 기반으로 점수를 합산한다.
 
 ## §2 점수 계산 엔진
 
@@ -82,7 +89,7 @@ Phase 2 후속: 동적 그룹 생성
 ```
 
 ### 테이블 컬럼
-그룹 | 이름 | 생년월일 | 경력 | 소속 | 직무 | 소득 | 리크루팅 | CP | NP | A | FC | AC | 총점 | TOP1 | BOT | 일시
+그룹 | 이름 | 생년월일 | 경력 | 회사 | 소속 | 직무 | 소득 | 리크루팅 | CP | NP | A | FC | AC | 총점 | TOP1 | BOT | 일시
 
 ## §5 라우팅
 
@@ -140,6 +147,7 @@ group_name text NOT NULL,
 name text NOT NULL,
 birth_date text,
 career_months text,
+company text,
 department text,
 job_type text,
 income_range text,
