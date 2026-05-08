@@ -245,7 +245,7 @@ export default function AdminDashboard({ onLogout }) {
                   <td className="td-date">{new Date(r.timestamp).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                   <td>
                     <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
-                      리포트 보기<span className="btn-report-type">{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
+                      리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
                     </a>
                   </td>
                   <td>

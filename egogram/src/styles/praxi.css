@@ -852,8 +852,11 @@ p {
 /* Admin actions */
 .btn-report-action { display: block; font-size: 12px; font-weight: 600; text-align: center; padding: 6px 12px; text-decoration: none; border: 1px solid var(--text); color: var(--text); line-height: 1.3; white-space: nowrap; }
 .btn-report-action:hover { background: var(--text); color: #fff; }
-.btn-report-type { display: block; font-size: 10px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
-.btn-report-action:hover .btn-report-type { color: rgba(255,255,255,0.7); }
+.btn-report-type { display: block; font-size: 11px; font-weight: 700; margin-top: 2px; }
+.btn-report-type[data-type="보험설계사"] { color: #0012de; }
+.btn-report-type[data-type="코치/멘토"] { color: #059669; }
+.btn-report-type[data-type="관리자"] { color: #d97706; }
+.btn-report-action:hover .btn-report-type { color: #fff; }
 .btn-delete-action { font-size: 11px; font-weight: 600; padding: 4px 10px; cursor: pointer; border: 1px solid #ef4444; color: #ef4444; background: transparent; }
 .btn-delete-action:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
 
