@@ -850,12 +850,12 @@ p {
 .report-signature p { margin: 4px auto; }
 
 /* Admin actions */
-.td-actions-stack { display: flex; flex-direction: column; gap: 4px; align-items: stretch; }
-.btn-admin-action, .btn-report-action { display: block; font-size: 11px; font-weight: 600; text-align: center; padding: 4px 10px; cursor: pointer; white-space: nowrap; text-decoration: none; border: 1px solid; line-height: 1.4; }
-.btn-admin-action { color: #999; border-color: #ddd; background: transparent; }
-.btn-admin-action:hover { color: #ef4444; border-color: #ef4444; }
-.btn-report-action { color: var(--accent); border-color: var(--accent); background: transparent; }
+.btn-report-action { display: block; font-size: 12px; font-weight: 600; text-align: center; padding: 6px 12px; text-decoration: none; border: 1px solid var(--accent); color: var(--accent); line-height: 1.3; white-space: nowrap; }
 .btn-report-action:hover { background: var(--accent); color: #fff; }
+.btn-report-type { display: block; font-size: 10px; font-weight: 400; color: var(--text-muted); margin-top: 2px; }
+.btn-report-action:hover .btn-report-type { color: rgba(255,255,255,0.7); }
+.btn-delete-action { font-size: 11px; font-weight: 600; padding: 4px 10px; cursor: pointer; border: 1px solid #ef4444; color: #ef4444; background: transparent; }
+.btn-delete-action:hover { background: #ef4444; color: #fff; }
 
 @media print {
   .report-container { max-width: 100%; }

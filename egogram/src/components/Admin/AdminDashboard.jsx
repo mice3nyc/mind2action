@@ -1,6 +1,16 @@
 import { useState, useEffect } from 'react';
 import { loadResults, deleteResult, clearResults, saveResult } from '../../lib/storage';
 import { EGO_LABELS } from '../../lib/scoreEngine';
+
+const JOB_TO_REPORT = {
+  sales: '보험설계사',
+  coach: '코치/멘토',
+  sales_leader: '관리자',
+  branch_manager: '관리자',
+  training_leader: '관리자',
+  division_head: '관리자',
+  executive: '관리자',
+};
 import sampleData from '../../data/sampleResults.json';
 
 const JOB_LABELS = {
@@ -204,6 +214,7 @@ export default function AdminDashboard({ onLogout }) {
                 <th>TOP1</th>
                 <th>BOT</th>
                 <th>일시</th>
+                <th>리포트</th>
                 <th></th>
               </tr>
             </thead>
@@ -233,10 +244,12 @@ export default function AdminDashboard({ onLogout }) {
                   <td><EgoTag ego={r.bottom} type="bot" /></td>
                   <td className="td-date">{new Date(r.timestamp).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                   <td>
-                    <div className="td-actions-stack">
-                      <button className="btn-admin-action" onClick={() => handleDelete(r.id)}>삭제</button>
-                      <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">리포트</a>
-                    </div>
+                    <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
+                      리포트 보기<span className="btn-report-type">{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
+                    </a>
+                  </td>
+                  <td>
+                    <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>
                   </td>
                 </tr>
               ))}
