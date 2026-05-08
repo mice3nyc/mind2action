@@ -119,16 +119,7 @@ export default function ReportPage() {
         </div>
       </div>
 
-      <div className="report-intro">
-        <h2>성향 코칭 리포트의 목적</h2>
-        <p>이 리포트는 에고그램 검사를 통해 다섯 가지 자아상태의 균형을 파악하고, 현장에서 바로 활용할 수 있는 코칭 포인트를 제공합니다.</p>
-        <ul>
-          <li><strong>거울</strong> — 자신의 성향을 객관적으로 확인합니다.</li>
-          <li><strong>각성</strong> — 강점과 보완점을 인식합니다.</li>
-          <li><strong>비즈니스</strong> — 실전에서 성과로 연결되는 코칭을 받습니다.</li>
-          <li><strong>궁극적</strong> — 자기 성향을 이해하고 성장의 방향을 잡습니다.</li>
-        </ul>
-      </div>
+      {/* 리포트 목적 — 손소장 원문 대기 */}
 
       <Section number={1} title={`${report.name}님의 성향`}>
         <ScoreChart scores={scores} />
@@ -183,7 +174,7 @@ export default function ReportPage() {
                   {detail && <p className="report-coaching-detail">{detail}</p>}
                 </>
               ) : (
-                <p className="report-coaching-ok">코칭이 필요 없는 구간입니다.</p>
+                <p className="report-coaching-ok">—</p>
               )}
             </div>
           );
@@ -262,17 +253,7 @@ export default function ReportPage() {
         </Section>
       )}
 
-      <div className="report-closing">
-        <h2>마지막으로 드리고 싶은 말씀</h2>
-        <p>
-          {report.name}님, 이 리포트가 오늘의 현장에서 작은 변화를 만드는 거울이 되기를 바랍니다.
-          점수는 고정된 것이 아니라, 지금 이 순간부터 바꿔 나갈 수 있는 출발점입니다.
-        </p>
-        <div className="report-signature">
-          <p>손용배 올림</p>
-          <p>egogram.son@gmail.com</p>
-        </div>
-      </div>
+      {/* 클로징 메시지 — 손소장 원문 대기 */}
     </div>
   );
 }
