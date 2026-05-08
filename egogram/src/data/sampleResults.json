@@ -598,5 +598,67 @@
     "top2": "AC",
     "bottom": "CP",
     "total": 74
+  },
+  {
+    "id": "sample-coach-52",
+    "timestamp": "2026-01-14T10:00:00",
+    "group": "합정동",
+    "name": "이윤교",
+    "birthDate": "23055938.0",
+    "careerMonths": "32개월",
+    "company": "DB손해보험",
+    "department": "신노원리더tc",
+    "jobType": "coach",
+    "incomeRange": "월   300만원 이상",
+    "recruitCount": "4명",
+    "scores": {
+      "CP": 7,
+      "NP": 15,
+      "A": 10,
+      "FC": 15,
+      "AC": 13
+    },
+    "grades": {
+      "CP": "극저",
+      "NP": "고",
+      "A": "저",
+      "FC": "고",
+      "AC": "중"
+    },
+    "top1": "NP",
+    "top2": "FC",
+    "bottom": "CP",
+    "total": 60
+  },
+  {
+    "id": "sample-coach-65",
+    "timestamp": "2026-01-14T10:00:00",
+    "group": "합정동",
+    "name": "제은지",
+    "birthDate": "19921212.0",
+    "careerMonths": "65개월",
+    "company": "DB손해보험",
+    "department": "DB손해보험, 창원지점, 1팀",
+    "jobType": "coach",
+    "incomeRange": "월   300만원 이상",
+    "recruitCount": "9명",
+    "scores": {
+      "CP": 9,
+      "NP": 13,
+      "A": 16,
+      "FC": 5,
+      "AC": 12
+    },
+    "grades": {
+      "CP": "저",
+      "NP": "중",
+      "A": "고",
+      "FC": "극저",
+      "AC": "중"
+    },
+    "top1": "A",
+    "top2": "NP",
+    "bottom": "FC",
+    "total": 55
   }
 ]
