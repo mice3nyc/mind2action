@@ -79,6 +79,8 @@ export default function AdminDashboard({ onLogout }) {
   }
 
   async function handleDelete(id) {
+    const target = results.find(r => r.id === id);
+    if (!window.confirm(`${target?.name || ''}님의 결과를 삭제하시겠습니까?`)) return;
     const updated = await deleteResult(id);
     setResults(updated);
   }
