@@ -1,6 +1,6 @@
-import cmInsurance from '../data/cm_insurance.json';
-import cmManager from '../data/cm_manager.json';
-import cmCoach from '../data/cm_coach.json';
+import cmInsurance from '../data/cm_insurance.yaml';
+import cmManager from '../data/cm_manager.yaml';
+import cmCoach from '../data/cm_coach.yaml';
 import { EGO_STATES, EGO_LABELS } from './scoreEngine';
 
 const CM_DATA = {
