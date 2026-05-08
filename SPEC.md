@@ -42,6 +42,33 @@
 10라운드 × 5개 에고 상태 = 50문항. 참여자가 같은 유형 문항이 연속되는 것을 인지하지 못하도록 설계.
 scoreEngine은 문항 ID가 아니라 `egoState` 필드 기반으로 점수를 합산한다.
 
+### 문항 수정 워크플로우
+
+1. **내보내기**: `Assets/incoming/에고그램/에고그램_설문문항_50.csv` (번호, 유형, 유형명, 문항)
+2. **수정**: 손소장이 문항 텍스트/유형 수정 후 CSV 반환
+3. **반영**: CSV 파싱 → `src/data/questions.json` 갱신 (유형별 순서 → 교차 배치 자동 변환)
+4. **배포**: `cd egogram && npm run deploy`
+
+CSV→JSON 변환 스크립트:
+```bash
+cd egogram && node -e "
+const fs = require('fs');
+const rows = fs.readFileSync('CSV경로', 'utf8').split('\n').slice(1).filter(Boolean);
+const groups = { CP: [], NP: [], A: [], FC: [], AC: [] };
+for (const row of rows) {
+  const m = row.match(/^(\d+),(\w+),[^,]+,\"(.+)\"\s*$/);
+  if (!m) continue;
+  groups[m[2]].push({ id: 'Q' + m[1], egoState: m[2], text: m[3].replace(/\"\"/g, '\"') });
+}
+const interleaved = [];
+for (let i = 0; i < 10; i++) {
+  for (const ego of ['CP', 'NP', 'A', 'FC', 'AC']) interleaved.push(groups[ego][i]);
+}
+fs.writeFileSync('src/data/questions.json', JSON.stringify(interleaved, null, 2));
+console.log(interleaved.length + '문항 반영 완료');
+"
+```
+
 ## §2 점수 계산 엔진
 
 ### 합산
