@@ -33,6 +33,7 @@ function StepDots({ currentPage, totalPages, completedPages }) {
 export default function SurveyForm({ onComplete }) {
   const [answers, setAnswers] = useState({});
   const [page, setPage] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
 
   const startIdx = page * ANSWERS_PER_PAGE;
   const pageQuestions = questions.slice(startIdx, startIdx + ANSWERS_PER_PAGE);
@@ -67,9 +68,10 @@ export default function SurveyForm({ onComplete }) {
     }
   }
 
-  function handleSubmit() {
-    if (Object.keys(answers).length < 50) return;
-    onComplete(calculateScores(answers));
+  async function handleSubmit() {
+    if (Object.keys(answers).length < 50 || submitting) return;
+    setSubmitting(true);
+    await onComplete(calculateScores(answers));
   }
 
   const isLastPage = page === TOTAL_PAGES - 1;
@@ -103,8 +105,8 @@ export default function SurveyForm({ onComplete }) {
           이전
         </button>
         {isLastPage ? (
-          <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={!canAdvance}>
-            결과 보기
+          <button type="button" className="btn btn-primary" onClick={handleSubmit} disabled={!canAdvance || submitting}>
+            {submitting ? '저장 중...' : '결과 보기'}
           </button>
         ) : (
           <button type="button" className="btn btn-primary" onClick={handleNext} disabled={!canAdvance}>
