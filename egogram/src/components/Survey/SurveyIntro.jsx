@@ -2,9 +2,9 @@ import { useState } from 'react';
 
 const JOB_OPTIONS = [
   { value: '', label: '선택해주세요' },
-  { value: 'sales', label: '① 고객 컨설팅 영업' },
-  { value: 'coach', label: '② 신인 육성 코칭' },
-  { value: 'sales_leader', label: '③ 조직운영 리더' },
+  { value: 'sales', label: '고객 컨설팅 영업' },
+  { value: 'coach', label: '신인 육성 코칭' },
+  { value: 'sales_leader', label: '조직운영 리더' },
 ];
 
 const INCOME_OPTIONS = [

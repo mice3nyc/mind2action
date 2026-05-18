@@ -13,7 +13,7 @@
 | 3 | 경력 | number (개월) | Y | |
 | 4 | 회사 | text | Y | 회사명 |
 | 5 | 소속 | text | Y | OO지점 |
-| 6 | 성향 코칭을 받고 싶은 역할 | select | Y | ① 고객 컨설팅 영업 / ② 신인 육성 코칭 / ③ 조직운영 리더 |
+| 6 | 성향 코칭을 받고 싶은 역할 | select | Y | 고객 컨설팅 영업 / 신인 육성 코칭 / 조직운영 리더 |
 | 7 | 직전 3개월 평균 소득 | select | N | 200만원 미만 ~ 2000만원 이상 |
 | 8 | 직전 1년 리크루팅 수 | number | N | |
 
@@ -298,9 +298,9 @@ egogram/
 
 | 설문 역할 (3종) | 코드 키 | CM 리포트 (3종) |
 |----------------|--------|----------------|
-| ① 고객 컨설팅 영업 | `sales` | 보험설계사 (`cm_insurance`) |
-| ② 신인 육성 코칭 | `coach` | 코치/멘토 (`cm_coach`) |
-| ③ 조직운영 리더 | `sales_leader` | 관리자 (`cm_manager`) |
+| 고객 컨설팅 영업 | `sales` | 보험설계사 (`cm_insurance`) |
+| 신인 육성 코칭 | `coach` | 코치/멘토 (`cm_coach`) |
+| 조직운영 리더 | `sales_leader` | 관리자 (`cm_manager`) |
 
 > 코드 키는 기존 7종(sales / coach / sales_leader / branch_manager / training_leader / division_head / executive)을 유지. 사용자 화면 옵션은 3종으로 축소하되, 잔여 4종(branch_manager·training_leader·division_head·executive)은 AdminDashboard `JOB_LABELS`·`JOB_TO_REPORT`·`cmLookup.JOB_TO_CM`에 보존 — 기존 샘플 데이터 호환용.
 
