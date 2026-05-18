@@ -136,10 +136,6 @@ export default function ReportPage() {
         <ol>
           {uiTexts.report.intro.items.map((item, i) => <li key={i}>{item}</li>)}
         </ol>
-        <h3>{uiTexts.report.intro.sub_title}</h3>
-        {uiTexts.report.intro.sub_items.map((item, i) => (
-          <p key={i}><strong>{item.label}</strong> {item.text}</p>
-        ))}
       </div>
 
       <Section number={1} title={`${report.name}${uiTexts.report.sections.s1_title}`}>
@@ -148,31 +144,22 @@ export default function ReportPage() {
           {EGO_STATES.map(ego => (
             <div key={ego} className="report-trait-item">
               <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
-                {ego} <span>{scores[ego]}점 ({getScoreRange(scores[ego])})</span>
+                {ego} — {EGO_LABELS[ego]} <span>{scores[ego]}점 ({getScoreRange(scores[ego])})</span>
               </div>
-              <p>{report.cm1[ego]}</p>
+              <Paragraphs text={report.cm2[ego]} />
             </div>
           ))}
         </div>
       </Section>
 
-      <Section number={2} title={uiTexts.report.sections.s2_title}>
-        {EGO_STATES.map(ego => (
-          <div key={ego} className="report-cm2-item">
-            <h3 style={{ color: EGO_COLORS[ego] }}>{ego} — {EGO_LABELS[ego]} ({scores[ego]}점)</h3>
-            <Paragraphs text={report.cm2[ego]} />
-          </div>
-        ))}
-      </Section>
-
-      <Section number={3} title={uiTexts.report.sections.s3_title}>
+      <Section number={2} title={uiTexts.report.sections.s3_title}>
         <div className="report-strength-badge">
           TOP1 <strong>{EGO_LABELS[top1]}</strong>({top1}) + TOP2 <strong>{EGO_LABELS[top2]}</strong>({top2})
         </div>
         <Paragraphs text={report.cm3} />
       </Section>
 
-      <Section number={4} title={uiTexts.report.sections.s4_title}>
+      <Section number={3} title={uiTexts.report.sections.s4_title}>
         <div className="report-score-table">
           {EGO_STATES.map(ego => (
             <div key={ego} className="report-score-cell">
@@ -183,16 +170,26 @@ export default function ReportPage() {
         </div>
 
         {EGO_STATES.map(ego => {
-          const coaching = report.cm4_1[ego];
-          const detail = report.cm4_2[ego];
+          const detailed = report.cm4_4.find(item => item.ego === ego);
           const needs = needsCoaching(ego, scores[ego]);
           return (
             <div key={ego} className="report-coaching-item">
               <h4 style={{ color: EGO_COLORS[ego] }}>{ego} — {EGO_LABELS[ego]}</h4>
-              {needs ? (
+              {detailed ? (
+                <div className="report-coaching-detailed">
+                  <div className="report-detailed-trait"><strong>성향:</strong> {detailed.trait}</div>
+                  <Paragraphs text={detailed.coaching} />
+                  {detailed.script && (
+                    <div className="report-detailed-script">
+                      <strong>화법 스크립트:</strong>
+                      <p>{detailed.script}</p>
+                    </div>
+                  )}
+                </div>
+              ) : needs ? (
                 <>
-                  <Paragraphs text={coaching} />
-                  {detail && <div className="report-coaching-detail"><Paragraphs text={detail} /></div>}
+                  <Paragraphs text={report.cm4_1[ego]} />
+                  {report.cm4_2[ego] && <div className="report-coaching-detail"><Paragraphs text={report.cm4_2[ego]} /></div>}
                 </>
               ) : (
                 <p className="report-coaching-ok">{uiTexts.report.sections.s4_no_coaching}</p>
@@ -201,34 +198,15 @@ export default function ReportPage() {
           );
         })}
 
-        <div className="report-coaching-message">
-          <p>{report.cm4_3}</p>
-        </div>
-
-        {report.cm4_4.length > 0 && (
-          <div className="report-detailed-coaching">
-            <h3>{uiTexts.report.sections.s4_detailed_title}</h3>
-            {report.cm4_4.map(item => (
-              <div key={item.ego} className="report-detailed-item">
-                <h4 style={{ color: EGO_COLORS[item.ego] }}>
-                  {item.ego} — {EGO_LABELS[item.ego]} ({item.condition === '0-7' ? '0~7점' : '17점 이상'})
-                </h4>
-                <div className="report-detailed-trait"><strong>성향:</strong> {item.trait}</div>
-                <div className="report-detailed-text"><Paragraphs text={item.coaching} /></div>
-                {item.script && (
-                  <div className="report-detailed-script">
-                    <strong>화법 스크립트:</strong>
-                    <p>{item.script}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+        {report.cm4_3 && (
+          <div className="report-coaching-message">
+            <p>{report.cm4_3}</p>
           </div>
         )}
       </Section>
 
       {report.cm5 && (
-        <Section number={5} title={report.isInsurance ? uiTexts.report.sections.s5_title_insurance : report.jobLabel === '관리자' ? uiTexts.report.sections.s5_title_manager : uiTexts.report.sections.s5_title_coach}>
+        <Section number={4} title={report.isInsurance ? uiTexts.report.sections.s5_title_insurance : report.jobLabel === '관리자' ? uiTexts.report.sections.s5_title_manager : uiTexts.report.sections.s5_title_coach}>
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
           </div>
@@ -242,7 +220,7 @@ export default function ReportPage() {
       )}
 
       {report.cm6 && report.isInsurance && (
-        <Section number={6} title={uiTexts.report.sections.s6_title}>
+        <Section number={5} title={uiTexts.report.sections.s6_title}>
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2}
           </div>
@@ -251,7 +229,7 @@ export default function ReportPage() {
       )}
 
       {report.cm7 && (
-        <Section number={report.isInsurance ? 7 : 6} title={uiTexts.report.sections.s7_title}>
+        <Section number={report.isInsurance ? 6 : 5} title={uiTexts.report.sections.s7_title}>
           <div className="report-combination">
             TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
           </div>
@@ -259,29 +237,13 @@ export default function ReportPage() {
         </Section>
       )}
 
-      {report.cm8 && (
-        <Section number={report.isInsurance ? 8 : 7} title={uiTexts.report.sections.s8_title}>
-          <div className="report-quotes">
-            <div className="report-quote encourage">
-              <div className="report-quote-label">{uiTexts.report.sections.quote_encourage}</div>
-              <p>{report.cm8.encourage}</p>
-            </div>
-            <div className="report-quote improve">
-              <div className="report-quote-label">{uiTexts.report.sections.quote_improve}</div>
-              <p>{report.cm8.improve}</p>
-            </div>
-          </div>
-        </Section>
-      )}
-
       <div className="report-closing">
-        <h2>{uiTexts.report.closing.title}</h2>
-        {uiTexts.report.closing.paragraphs.map((p, i) => (
-          <p key={i}>{p.replace(/\{name\}/g, report.name)}</p>
-        ))}
-        <div className="report-signature">
-          <p>{uiTexts.report.closing.signature.name}</p>
-          <p>{uiTexts.report.closing.signature.email}</p>
+        <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>
+        <div className="report-contact">
+          <p><strong>{uiTexts.report.closing.contact.name}</strong></p>
+          {uiTexts.report.closing.contact.email && <p>이메일: {uiTexts.report.closing.contact.email}</p>}
+          {uiTexts.report.closing.contact.instagram && <p>인스타그램: {uiTexts.report.closing.contact.instagram}</p>}
+          {uiTexts.report.closing.contact.phone && <p>전화: {uiTexts.report.closing.contact.phone}</p>}
         </div>
       </div>
     </div>

@@ -94,7 +94,7 @@ export function lookupReport(result, jobType) {
     cm3: cm.cm3[top1top2] || '',
     cm4_1,
     cm4_2,
-    cm4_3: allNoCoaching ? cm.cm4_3.all_no_coaching : cm.cm4_3.some_coaching,
+    cm4_3: allNoCoaching ? cm.cm4_3.all_no_coaching : '',
     cm4_4: cm4_4_items,
     cm5: cm.cm5[top1top2bottom] || null,
     cm6: cm6val,

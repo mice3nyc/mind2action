@@ -28,7 +28,6 @@ export default function SurveyIntro({ group, onSubmit }) {
     department: '',
     jobType: '',
     incomeRange: '',
-    recruitCount: '',
   });
 
   function handleChange(e) {
@@ -80,10 +79,6 @@ export default function SurveyIntro({ group, onSubmit }) {
           <select className="form-input form-select" name="incomeRange" value={form.incomeRange} onChange={handleChange}>
             {INCOME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-        </div>
-        <div className="form-group">
-          <label className="form-label">직전 1년 리크루팅 수</label>
-          <input className="form-input" name="recruitCount" type="number" value={form.recruitCount} onChange={handleChange} placeholder="0" />
         </div>
         <button type="submit" className="btn btn-primary btn-full" disabled={!isValid}>
           설문 시작
