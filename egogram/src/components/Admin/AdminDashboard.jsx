@@ -14,9 +14,9 @@ const JOB_TO_REPORT = {
 import sampleData from '../../data/sampleResults.json';
 
 const JOB_LABELS = {
-  sales: '영업',
-  coach: '코치/멘토',
-  sales_leader: '영업팀장/센터장',
+  sales: '고객 컨설팅 영업',
+  coach: '신인 육성 코칭',
+  sales_leader: '조직운영 리더',
   branch_manager: '지점장/지사장',
   training_leader: '교육팀장/지원팀장',
   division_head: '사업단장/부장',

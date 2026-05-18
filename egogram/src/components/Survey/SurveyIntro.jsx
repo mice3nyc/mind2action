@@ -2,13 +2,9 @@ import { useState } from 'react';
 
 const JOB_OPTIONS = [
   { value: '', label: '선택해주세요' },
-  { value: 'sales', label: '영업' },
-  { value: 'coach', label: '코치 / 멘토' },
-  { value: 'sales_leader', label: '영업팀장 / 센터장' },
-  { value: 'branch_manager', label: '지점장 / 지사장' },
-  { value: 'training_leader', label: '교육팀장 / 지원팀장' },
-  { value: 'division_head', label: '사업단장 / 부장' },
-  { value: 'executive', label: '본부장' },
+  { value: 'sales', label: '① 고객 컨설팅 영업' },
+  { value: 'coach', label: '② 신인 육성 코칭' },
+  { value: 'sales_leader', label: '③ 조직운영 리더' },
 ];
 
 const INCOME_OPTIONS = [
@@ -74,7 +70,7 @@ export default function SurveyIntro({ group, onSubmit }) {
           <input className="form-input" name="department" value={form.department} onChange={handleChange} placeholder="OO지점" />
         </div>
         <div className="form-group">
-          <label className="form-label">직무 *</label>
+          <label className="form-label">성향 코칭을 받고 싶은 역할 *</label>
           <select className="form-input form-select" name="jobType" value={form.jobType} onChange={handleChange}>
             {JOB_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
