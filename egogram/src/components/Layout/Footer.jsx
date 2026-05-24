@@ -1,7 +1,7 @@
 export default function Footer() {
   return (
     <footer className="footer">
-      MIND2ACTION &copy; 2026 <span className="footer-version">v0.5</span>
+      MIND2ACTION &copy; 2026 <span className="footer-version">v0.6</span>
     </footer>
   );
 }
