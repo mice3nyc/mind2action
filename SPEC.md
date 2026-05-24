@@ -297,13 +297,23 @@ egogram/
 
 ## §10 CM 데이터 구조 (Phase 3)
 
-### JSON 파일
+### CM 데이터 파일 (현행 — yaml)
 
-| 파일 | 직군 | 크기 |
+| 파일 | 직군 | 비고 |
 |------|------|------|
-| `src/data/cm_insurance.json` | 보험설계사 | 258KB |
-| `src/data/cm_manager.json` | 관리자 | (미변환) |
-| `src/data/cm_coach.json` | 코치/멘토 | (미변환) |
+| `src/data/cm_insurance.yaml` | 컨설턴트(sales) | cm1~cm8 + cm6 조합 20 |
+| `src/data/cm_manager.yaml` | 리더(manager) | cm2 v0.6 신규, cm3~cm8은 구 데이터 |
+| `src/data/cm_coach.yaml` | 코치(coach) | cm2 v0.6 신규, cm3~cm8은 구 데이터 |
+| `src/data/cm6_common_consultant.yaml` | 컨설턴트 CM6 공통 | v0.7, 3섹션(title·body) |
+
+### 원본 데이터 출처 + v0.8 재변환 예정
+
+손소장 전체 새 데이터 = `Assets/incoming/에고그램/data/Archives/{코치,리더,컨설턴트}.xlsx`
+- 코치·리더: 8시트 (CM2·CM3강점추가·CM4-1·CM4-2·CM4-3·CM4-4·CM5코칭추가·CM6)
+- 컨설턴트: 9시트 (+CM7)
+- 호칭 일원화 완료 상태(컨설턴트 "고객님"·코치 "신인"·리더 "구성원")
+
+**v0.8 예정**: 위 xlsx 전 시트 → cm_*.yaml 통째 재변환. 현재는 코치·리더 CM2 + 컨설턴트 CM6공통·CM2만 반영. CM3·CM4·CM5(세 직군) + 코치·리더 CM6 + 컨설턴트 CM7 미반영 → 옛 호칭 잔존. 재변환으로 데이터+호칭 동시 해소. 변환 시 §10 "엑셀 원본 행 구조" 대조 필수 ("CM3강점추가"·"CM5코칭추가" 시트명 교체/병합 확인).
 
 ### 리포트 렌더링 변경 (5/18 회의 반영)
 
