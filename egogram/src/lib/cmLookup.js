@@ -1,7 +1,8 @@
 import cmInsurance from '../data/cm_insurance.yaml';
 import cmManager from '../data/cm_manager.yaml';
 import cmCoach from '../data/cm_coach.yaml';
-import { EGO_STATES, EGO_LABELS } from './scoreEngine';
+import cm6Common from '../data/cm6_common_consultant.yaml';
+import { EGO_STATES, EGO_LABELS, SAFE_RANGES, roleFromJobType } from './scoreEngine';
 
 const CM_DATA = {
   sales: cmInsurance,
@@ -27,11 +28,10 @@ function getScoreRange(score) {
   return '0-7';
 }
 
-function needsCoaching(ego, score) {
-  if (['CP', 'NP', 'A'].includes(ego)) return score < 11 || score > 16;
-  if (ego === 'FC') return score < 8 || score > 16;
-  if (ego === 'AC') return score < 8 || score > 13;
-  return false;
+function needsCoaching(ego, score, jobType) {
+  const role = roleFromJobType(jobType);
+  const [low, high] = SAFE_RANGES[role]?.[ego] || [11, 16];
+  return score < low || score > high;
 }
 
 function needsDetailedCoaching(ego, score) {
@@ -64,7 +64,7 @@ export function lookupReport(result, jobType) {
     }
   }
 
-  const allNoCoaching = EGO_STATES.every(ego => !needsCoaching(ego, scores[ego]));
+  const allNoCoaching = EGO_STATES.every(ego => !needsCoaching(ego, scores[ego], jobType));
 
   const top1top2 = `${top1}_${top2}`;
   const top1top2bottom = `${top1}_${top2}_${bottom}`;
@@ -98,6 +98,7 @@ export function lookupReport(result, jobType) {
     cm4_4: cm4_4_items,
     cm5: cm.cm5[top1top2bottom] || null,
     cm6: cm6val,
+    cm6_common: isInsurance ? (cm6Common?.items || []) : null,
     cm7: cm7val,
     cm8: cm8val,
   };

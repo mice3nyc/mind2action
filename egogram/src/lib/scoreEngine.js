@@ -24,9 +24,31 @@ function getGrade(score) {
   return '극저';
 }
 
-function getSuccessRange(egoState) {
-  if (['CP', 'NP', 'A'].includes(egoState)) return [14, 16];
-  return [11, 13];
+// 역할별 × 자아상태별 "조율(코칭) 불필요 안전구간" (손소장 26.0525 확정)
+// §1 성향 그래프의 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준
+const SAFE_RANGES = {
+  sales:   { CP: [11, 16], NP: [11, 16], A: [14, 20], FC: [11, 16], AC: [8, 16] },  // 컨설턴트
+  manager: { CP: [11, 16], NP: [14, 20], A: [14, 20], FC: [11, 16], AC: [8, 13] },  // 리더
+  coach:   { CP: [11, 16], NP: [14, 20], A: [11, 20], FC: [11, 16], AC: [11, 16] }, // 코치
+};
+
+const JOB_TO_ROLE = {
+  sales: 'sales',
+  coach: 'coach',
+  sales_leader: 'manager',
+  branch_manager: 'manager',
+  training_leader: 'manager',
+  division_head: 'manager',
+  executive: 'manager',
+};
+
+function roleFromJobType(jobType) {
+  return JOB_TO_ROLE[jobType] || 'sales';
+}
+
+function getSuccessRange(egoState, jobType) {
+  const role = roleFromJobType(jobType);
+  return SAFE_RANGES[role]?.[egoState] || [11, 16];
 }
 
 export function calculateScores(answers) {
@@ -65,4 +87,4 @@ export function calculateScores(answers) {
   };
 }
 
-export { EGO_STATES, EGO_LABELS, getSuccessRange };
+export { EGO_STATES, EGO_LABELS, getSuccessRange, SAFE_RANGES, roleFromJobType };

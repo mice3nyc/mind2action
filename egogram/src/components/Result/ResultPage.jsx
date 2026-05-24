@@ -1,7 +1,7 @@
 import { EGO_STATES, EGO_LABELS, getSuccessRange } from '../../lib/scoreEngine';
 
 export default function ResultPage({ result, profile, onRestart }) {
-  const { scores, grades, top1, top2, bottom, total } = result;
+  const { scores, grades, top1, top2, bottom } = result;
   const maxScore = 20;
 
   return (
@@ -15,7 +15,7 @@ export default function ResultPage({ result, profile, onRestart }) {
 
       <div className="score-grid">
         {EGO_STATES.map(ego => {
-          const [sLow, sHigh] = getSuccessRange(ego);
+          const [sLow, sHigh] = getSuccessRange(ego, profile?.jobType);
           const isTop = ego === top1 || ego === top2;
           const isBot = ego === bottom;
           let barClass = 'score-bar-fill';
@@ -57,15 +57,6 @@ export default function ResultPage({ result, profile, onRestart }) {
         <div className="result-tag tag-bottom">BOTTOM <span>{bottom}</span> {EGO_LABELS[bottom]}</div>
       </div>
 
-      <div className="result-total">
-        <div className="result-total-label">총점</div>
-        <div className="result-total-value">{total}</div>
-        <div className="result-total-label">/ 100</div>
-      </div>
-
-      <button type="button" className="btn btn-secondary btn-full" onClick={onRestart}>
-        처음부터 다시
-      </button>
     </section>
   );
 }

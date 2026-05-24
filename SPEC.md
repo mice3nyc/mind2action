@@ -1,6 +1,6 @@
 # MIND2ACTION — 기술 명세 (SPEC)
 
-> **현재 빌드: v0.6** (5/25 기록됨) — 코치·리더 cm2 신규 데이터 반영. CM6 공통적용은 보류.
+> **현재 빌드: v0.7** (5/25 기록됨) — 손소장 26.0525 수정 5건 + 리포트 헤더·마무리 정리. 역할별 안전구간 테이블(§1 그래프 경계선 + §3 조율 발동 통합), 컨설턴트 CM6 공통 3섹션, "코칭"→"조율" 라벨, 결과화면 총점·재시도 삭제. 호칭 일원화(②)는 드라이브 "에고그램 리포트 콘텐츠 데이터" 시트 수령 후 보류.
 > 이전 안정 빌드: v0.5 (`_dev/mind2action/egogram-v0.5/`)
 
 > Phase 1~2 반영. 이후 Phase 진입 시 확장.
@@ -91,7 +91,15 @@ console.log(interleaved.length + '문항 반영 완료');
 | 저 | 8~10 | 해당 성향 약함 |
 | 극저 | 0~7 | 해당 성향 매우 약함 |
 
-**성공구간**: CP/NP/A: 14~16점, FC/AC: 11~13점
+**안전구간 (조율 불필요, v0.7 역할별)** — §1 그래프 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준 (`scoreEngine.SAFE_RANGES`, 손소장 26.0525 확정):
+
+| 역할 (코드 키) | CP | NP | A | FC | AC |
+|----------------|----|----|---|----|----|
+| 컨설턴트 (`sales`) | 11-16 | 11-16 | 14-20 | 11-16 | 8-16 |
+| 리더 (`manager`) | 11-16 | 14-20 | 14-20 | 11-16 | 8-13 |
+| 코치 (`coach`) | 11-16 | 14-20 | 11-20 | 11-16 | 11-16 |
+
+> 점수가 해당 역할×자아상태 구간 밖이면 조율 필요. `getSuccessRange(ego, jobType)` / `needsCoaching(ego, score, jobType)` 모두 이 표를 참조한다. jobType→role은 `roleFromJobType` (sales_leader 등 잔여 키 → manager).
 
 ### TOP / BOTTOM 결정
 - **동점 우선순위**: CP > A > NP > AC > FC (TOP, BOTTOM 모두 동일)
@@ -306,6 +314,16 @@ egogram/
 - **마무리 (closing)**: "마지막으로 드리고 싶은 말씀" 4문단 + 시그니처 폐기 → 한두 줄 인사 + 연락처 (이름·이메일·인스타·전화). 인스타·전화는 빈 문자열일 때 미렌더 (손소장님 답 대기)
 - **설문 필드**: "직전 1년 리크루팅 수" 입력 삭제 (옛 데이터는 admin 표·CSV에 유지)
 
+### 리포트 렌더링 변경 (v0.7 — 손소장 26.0525)
+
+- **상단 커버**: 기존 badge "MIND2ACTION" + h1 "성향 코칭 리포트" 2줄 → **한 줄** `<h1><span class="report-cover-brand">MIND2ACTION</span> 성향 코칭 리포트</h1>` (브랜드만 accent 색)
+- **§1 성향 그래프 경계선**: `getSuccessRange`가 역할(jobType) 인자를 받아 §2 안전구간 표 적용. ScoreChart에 `jobType={data.job_type}` 전달
+- **§3 라벨**: `s4_title` "내 성향의 코칭 포인트" → "내 성향의 조율 포인트", `s4_no_coaching` "코칭이 필요 없는 구간입니다." → "조율을 하지 않아도 되는 성향"
+- **CM6 공통 블록**: 컨설턴트 리포트는 cm6 조합 텍스트 유무와 무관하게 §5 렌더 + 하단에 `cm6_common` 3섹션(title h4 + body) 추가. `.report-cm6-common`
+- **마무리(closing)**: 시그니처 이름(손용배) 제거 + 이메일 표기 `✉  {email}` (레이블 "이메일:" 폐기, `.report-contact-email` 중앙). `ui_texts.closing.contact.name` 빈 값으로
+- **하단 카피라이트**: report-container 맨 아래 `<div class="report-copyright">© 2026 MIND2ACTION</div>` (작은 회색 중앙)
+- **참여자 결과화면(ResultPage)**: 총점(`result-total`) + "처음부터 다시" 버튼 삭제 (총점 높낮이 ≠ 성향 우열 / 재시도 = 성향 왜곡). 그래프 경계선은 `profile?.jobType` 반영
+
 ### 역할 → CM 매핑 (5/18 3종 축소)
 
 | 설문 역할 (3종) | 코드 키 | CM 리포트 (3종) |
@@ -354,11 +372,11 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 4. CM3: cm3[`${top1}_${top2}`]
 5. CM4-1: cm4_1[구간][유형] × 5
 6. CM4-2: cm4_2[구간][유형] (빈 문자열이면 코칭 불필요)
-7. CM4-3: 모든 유형이 코칭 불필요 → all_no_coaching, 아니면 → some_coaching
-   코칭 불필요 조건: CP/NP/A 11-16, FC 8-16, AC 8-13
-8. CM4-4: CP/NP/A/FC 0-7점 또는 AC 17+일 때만 트리거
+7. CM4-3: 모든 유형이 조율 불필요 → all_no_coaching (some_coaching은 5/18 폐기)
+   조율 불필요 조건: 역할별 안전구간(§2 표) 안. `needsCoaching(ego, score, jobType)` → `SAFE_RANGES[role][ego]` 밖이면 필요
+8. CM4-4: CP/NP/A/FC 0-7점 또는 AC 17+일 때만 트리거 (세밀한 코칭 — 17점 초과 대상은 5/18 미결, 손소장 확정 대기)
 9. CM5: cm5[`${top1}_${top2}_${bottom}`]
-10. CM6: cm6[`${top1}_${top2}`]
+10. CM6 (컨설턴트만): cm6[`${top1}_${top2}`] (조합 텍스트, 없으면 생략) + **cm6_common 3섹션** (점수·조합 무관 공통, `cm6_common_consultant.yaml`의 title·body) 하단 항상 추가. v0.7
 11. CM7: cm7[`${top1}_${top2}_${bottom}`]
 12. CM8: cm8[`${top1}`] (TOP만으로 조회, BOTTOM 무관)
 ```

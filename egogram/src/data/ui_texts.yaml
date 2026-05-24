@@ -10,7 +10,7 @@ report:
   closing:
     greeting: 끝까지 함께해 주셔서 감사합니다. 이 리포트가 작은 거울이 되어 드리길 바랍니다.
     contact:
-      name: 손용배
+      name: ""
       email: egogram.son@gmail.com
       instagram: ""
       phone: ""
@@ -19,8 +19,8 @@ report:
     s1_title: 님의 성향
     s2_title: 자아상태의 성향과 말투
     s3_title: 내 성향의 강점
-    s4_title: 내 성향의 코칭 포인트
-    s4_no_coaching: 코칭이 필요 없는 구간입니다.
+    s4_title: 내 성향의 조율 포인트
+    s4_no_coaching: 조율을 하지 않아도 되는 성향
     s4_detailed_title: 세밀한 코칭
     s5_title_insurance: 보장에 대한 제안을 할 때
     s5_title_manager: 성과에 도움이 되는 화법

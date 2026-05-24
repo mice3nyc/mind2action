@@ -31,12 +31,12 @@ function Section({ number, title, children }) {
   );
 }
 
-function ScoreChart({ scores }) {
+function ScoreChart({ scores, jobType }) {
   const maxScore = 20;
   return (
     <div className="report-chart">
       {EGO_STATES.map(ego => {
-        const [sLow, sHigh] = getSuccessRange(ego);
+        const [sLow, sHigh] = getSuccessRange(ego, jobType);
         return (
           <div key={ego} className="report-chart-row">
             <div className="report-chart-label" style={{ color: EGO_COLORS[ego] }}>
@@ -122,8 +122,7 @@ export default function ReportPage() {
         {bling ? '기본' : 'bling'}
       </button>
       <div className="report-cover">
-        <div className="report-cover-badge">MIND2ACTION</div>
-        <h1>성향 코칭 리포트</h1>
+        <h1><span className="report-cover-brand">MIND2ACTION</span> 성향 코칭 리포트</h1>
         <div className="report-cover-name">{report.name}님</div>
         <div className="report-cover-meta">
           {data.company && <span>{data.company}</span>}
@@ -139,7 +138,7 @@ export default function ReportPage() {
       </div>
 
       <Section number={1} title={`${report.name}${uiTexts.report.sections.s1_title}`}>
-        <ScoreChart scores={scores} />
+        <ScoreChart scores={scores} jobType={data.job_type} />
         <div className="report-traits">
           {EGO_STATES.map(ego => (
             <div key={ego} className="report-trait-item">
@@ -171,7 +170,7 @@ export default function ReportPage() {
 
         {EGO_STATES.map(ego => {
           const detailed = report.cm4_4.find(item => item.ego === ego);
-          const needs = needsCoaching(ego, scores[ego]);
+          const needs = needsCoaching(ego, scores[ego], data.job_type);
           return (
             <div key={ego} className="report-coaching-item">
               <h4 style={{ color: EGO_COLORS[ego] }}>{ego} — {EGO_LABELS[ego]}</h4>
@@ -219,12 +218,26 @@ export default function ReportPage() {
         </Section>
       )}
 
-      {report.cm6 && report.isInsurance && (
+      {report.isInsurance && (
         <Section number={5} title={uiTexts.report.sections.s6_title}>
-          <div className="report-combination">
-            TOP1 {top1} + TOP2 {top2}
-          </div>
-          <Paragraphs text={report.cm6} />
+          {report.cm6 && (
+            <>
+              <div className="report-combination">
+                TOP1 {top1} + TOP2 {top2}
+              </div>
+              <Paragraphs text={report.cm6} />
+            </>
+          )}
+          {report.cm6_common && report.cm6_common.length > 0 && (
+            <div className="report-cm6-common">
+              {report.cm6_common.map((item, i) => (
+                <div key={i} className="report-cm6-common-item">
+                  <h4>{item.title}</h4>
+                  <Paragraphs text={item.body} />
+                </div>
+              ))}
+            </div>
+          )}
         </Section>
       )}
 
@@ -240,12 +253,13 @@ export default function ReportPage() {
       <div className="report-closing">
         <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>
         <div className="report-contact">
-          <p><strong>{uiTexts.report.closing.contact.name}</strong></p>
-          {uiTexts.report.closing.contact.email && <p>이메일: {uiTexts.report.closing.contact.email}</p>}
-          {uiTexts.report.closing.contact.instagram && <p>인스타그램: {uiTexts.report.closing.contact.instagram}</p>}
-          {uiTexts.report.closing.contact.phone && <p>전화: {uiTexts.report.closing.contact.phone}</p>}
+          {uiTexts.report.closing.contact.email && <p className="report-contact-email">✉&nbsp;&nbsp;{uiTexts.report.closing.contact.email}</p>}
+          {uiTexts.report.closing.contact.instagram && <p className="report-contact-email">인스타그램  {uiTexts.report.closing.contact.instagram}</p>}
+          {uiTexts.report.closing.contact.phone && <p className="report-contact-email">전화  {uiTexts.report.closing.contact.phone}</p>}
         </div>
       </div>
+
+      <div className="report-copyright">© 2026 MIND2ACTION</div>
     </div>
   );
 }
