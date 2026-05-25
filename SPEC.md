@@ -301,10 +301,12 @@ egogram/
 
 | 파일 | 직군 | 비고 |
 |------|------|------|
-| `src/data/cm_insurance.yaml` | 컨설턴트(sales) | v0.8 전체 재변환, cm6 조합 20 + cm7 60 |
+| `src/data/cm_insurance.yaml` | 컨설턴트(sales) | v0.8 전체 재변환 + **5/25 CM6 클로징 재정정**(9조합), cm6 조합 20 + cm7 60 |
 | `src/data/cm_manager.yaml` | 리더(manager) | v0.8 전체 재변환 (cm1·cm8만 보존) |
 | `src/data/cm_coach.yaml` | 코치(coach) | v0.8 전체 재변환 (cm1·cm8만 보존) |
-| `src/data/cm6_common_consultant.yaml` | 컨설턴트 CM6 공통 | v0.7, 3섹션(title·body) |
+| `src/data/cm6_common_consultant.yaml` | 컨설턴트 CM6 공통 | **5/25 재정정** — 소제목을 시트 좌열로 교체(고객의 실제 심리 해석/재질문 및 재결정 유도/최종 진행 멘트), 본문 2섹션 갱신 |
+
+> **5/25 CM6 재정정**: 손소장 새 파일 `Assets/incoming/에고그램/data/컨설턴트로 수정 - 손소장.xlsx`(CM6 시트 + CM6 공통적용 시트 추가). CM6만 정정 요청 — cm6 클로징 9조합("고객님은~" → "이 상황에서 컨설턴트는~" 화자 정정) + cm6_common 3섹션(좌열=소제목, 우열=본문). cm2~cm5·cm7은 현재 yaml과 동일 확인하고 건드리지 않음. cm4_2 2셀("코칭이 필요없는 구간"→"조율이 필요없는 구간")은 별도 발견, 반영 여부 피터공 확인 대기
 
 ### 원본 데이터 출처 + v0.8 재변환 (5/25 완료)
 
