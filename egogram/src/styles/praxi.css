@@ -792,7 +792,10 @@ p {
 .report-chart-bar { height: 100%; transition: width 0.5s ease; }
 .report-chart-score { width: 32px; text-align: right; font-weight: 700; font-size: 16px; }
 
-/* Traits (CM1) */
+/* Traits (CM1) — 그래프 아래 점선 + 박스 */
+.report-traits-divider { border-top: 1px dotted #999; margin: 24px 0 20px; }
+.report-traits-box { border: 1px solid #ddd; background: #fafafa; padding: 20px; }
+.report-traits-box .report-trait-item { background: #fff; }
 .report-traits { display: flex; flex-direction: column; gap: 12px; }
 .report-trait-item { padding: 14px 16px; border: 1px solid #ddd; }
 .report-trait-ego { font-weight: 700; font-size: 13px; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dotted #bbb; }
