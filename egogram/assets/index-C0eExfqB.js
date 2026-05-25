@@ -32,9 +32,9 @@ Option 2: Install and provide the "ws" package:
 `))throw Error(`@supabase/auth-js: Invalid SIWE message field "statement". Statement must not include '\\n'. Provided value: ${e.statement}`);let f=ks(e.address),p=`${l?`${l}://${n}`:n} wants you to sign in with your Ethereum account:\n${f}\n\n${e.statement?`${e.statement}\n`:``}`,m=`URI: ${u}\nVersion: ${d}\nChain ID: ${t}${a?`\nNonce: ${a}`:``}\nIssued At: ${i.toISOString()}`;if(r&&(m+=`\nExpiration Time: ${r.toISOString()}`),o&&(m+=`\nNot Before: ${o.toISOString()}`),s&&(m+=`\nRequest ID: ${s}`),c){let e=`
 Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/auth-js: Invalid SIWE message field "resources". Every resource must be a valid string. Provided value: ${t}`);e+=`\n- ${t}`}m+=e}return`${p}\n${m}`}var Ns=class extends Error{constructor({message:e,code:t,cause:n,name:r}){super(e,{cause:n}),this.__isWebAuthnError=!0,this.name=r??(n instanceof Error?n.name:void 0)??`Unknown Error`,this.code=t}toJSON(){return{name:this.name,message:this.message,code:this.code}}},Ps=class extends Ns{constructor(e,t){super({code:`ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,cause:t,message:e}),this.name=`WebAuthnUnknownError`,this.originalError=t}};function Fs({error:e,options:t}){let{publicKey:n}=t;if(!n)throw Error(`options was missing required publicKey property`);if(e.name===`AbortError`){if(t.signal instanceof AbortSignal)return new Ns({message:`Registration ceremony was sent an abort signal`,code:`ERROR_CEREMONY_ABORTED`,cause:e})}else if(e.name===`ConstraintError`){if(n.authenticatorSelection?.requireResidentKey===!0)return new Ns({message:`Discoverable credentials were required but no available authenticator supported it`,code:`ERROR_AUTHENTICATOR_MISSING_DISCOVERABLE_CREDENTIAL_SUPPORT`,cause:e});if(t.mediation===`conditional`&&n.authenticatorSelection?.userVerification===`required`)return new Ns({message:`User verification was required during automatic registration but it could not be performed`,code:`ERROR_AUTO_REGISTER_USER_VERIFICATION_FAILURE`,cause:e});if(n.authenticatorSelection?.userVerification===`required`)return new Ns({message:`User verification was required but no available authenticator supported it`,code:`ERROR_AUTHENTICATOR_MISSING_USER_VERIFICATION_SUPPORT`,cause:e})}else if(e.name===`InvalidStateError`)return new Ns({message:`The authenticator was previously registered`,code:`ERROR_AUTHENTICATOR_PREVIOUSLY_REGISTERED`,cause:e});else if(e.name===`NotAllowedError`)return new Ns({message:e.message,code:`ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,cause:e});else if(e.name===`NotSupportedError`)return n.pubKeyCredParams.filter(e=>e.type===`public-key`).length===0?new Ns({message:`No entry in pubKeyCredParams was of type "public-key"`,code:`ERROR_MALFORMED_PUBKEYCREDPARAMS`,cause:e}):new Ns({message:`No available authenticator supported any of the specified pubKeyCredParams algorithms`,code:`ERROR_AUTHENTICATOR_NO_SUPPORTED_PUBKEYCREDPARAMS_ALG`,cause:e});else if(e.name===`SecurityError`){let t=window.location.hostname;if(!Hs(t))return new Ns({message:`${window.location.hostname} is an invalid domain`,code:`ERROR_INVALID_DOMAIN`,cause:e});if(n.rp.id!==t)return new Ns({message:`The RP ID "${n.rp.id}" is invalid for this domain`,code:`ERROR_INVALID_RP_ID`,cause:e})}else if(e.name===`TypeError`){if(n.user.id.byteLength<1||n.user.id.byteLength>64)return new Ns({message:`User ID was not between 1 and 64 characters`,code:`ERROR_INVALID_USER_ID_LENGTH`,cause:e})}else if(e.name===`UnknownError`)return new Ns({message:`The authenticator was unable to process the specified options, or could not create a new credential`,code:`ERROR_AUTHENTICATOR_GENERAL_ERROR`,cause:e});return new Ns({message:`a Non-Webauthn related error has occurred`,code:`ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,cause:e})}function Is({error:e,options:t}){let{publicKey:n}=t;if(!n)throw Error(`options was missing required publicKey property`);if(e.name===`AbortError`){if(t.signal instanceof AbortSignal)return new Ns({message:`Authentication ceremony was sent an abort signal`,code:`ERROR_CEREMONY_ABORTED`,cause:e})}else if(e.name===`NotAllowedError`)return new Ns({message:e.message,code:`ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,cause:e});else if(e.name===`SecurityError`){let t=window.location.hostname;if(!Hs(t))return new Ns({message:`${window.location.hostname} is an invalid domain`,code:`ERROR_INVALID_DOMAIN`,cause:e});if(n.rpId!==t)return new Ns({message:`The RP ID "${n.rpId}" is invalid for this domain`,code:`ERROR_INVALID_RP_ID`,cause:e})}else if(e.name===`UnknownError`)return new Ns({message:`The authenticator was unable to process the specified options, or could not create a new assertion signature`,code:`ERROR_AUTHENTICATOR_GENERAL_ERROR`,cause:e});return new Ns({message:`a Non-Webauthn related error has occurred`,code:`ERROR_PASSTHROUGH_SEE_CAUSE_PROPERTY`,cause:e})}var Ls=new class{createNewAbortSignal(){if(this.controller){let e=Error(`Cancelling existing WebAuthn API call for new one`);e.name=`AbortError`,this.controller.abort(e)}let e=new AbortController;return this.controller=e,e.signal}cancelCeremony(){if(this.controller){let e=Error(`Manually cancelling existing WebAuthn API call`);e.name=`AbortError`,this.controller.abort(e),this.controller=void 0}}};function Rs(e){if(!e)throw Error(`Credential creation options are required`);if(typeof PublicKeyCredential<`u`&&`parseCreationOptionsFromJSON`in PublicKeyCredential&&typeof PublicKeyCredential.parseCreationOptionsFromJSON==`function`)return PublicKeyCredential.parseCreationOptionsFromJSON(e);let{challenge:t,user:n,excludeCredentials:r}=e,i=xr(e,[`challenge`,`user`,`excludeCredentials`]),a=Ao(t).buffer,o=Object.assign(Object.assign({},n),{id:Ao(n.id).buffer}),s=Object.assign(Object.assign({},i),{challenge:a,user:o});if(r&&r.length>0){s.excludeCredentials=Array(r.length);for(let e=0;e<r.length;e++){let t=r[e];s.excludeCredentials[e]=Object.assign(Object.assign({},t),{id:Ao(t.id).buffer,type:t.type||`public-key`,transports:t.transports})}}return s}function zs(e){if(!e)throw Error(`Credential request options are required`);if(typeof PublicKeyCredential<`u`&&`parseRequestOptionsFromJSON`in PublicKeyCredential&&typeof PublicKeyCredential.parseRequestOptionsFromJSON==`function`)return PublicKeyCredential.parseRequestOptionsFromJSON(e);let{challenge:t,allowCredentials:n}=e,r=xr(e,[`challenge`,`allowCredentials`]),i=Ao(t).buffer,a=Object.assign(Object.assign({},r),{challenge:i});if(n&&n.length>0){a.allowCredentials=Array(n.length);for(let e=0;e<n.length;e++){let t=n[e];a.allowCredentials[e]=Object.assign(Object.assign({},t),{id:Ao(t.id).buffer,type:t.type||`public-key`,transports:t.transports})}}return a}function Bs(e){if(`toJSON`in e&&typeof e.toJSON==`function`)return e.toJSON();let t=e;return{id:e.id,rawId:e.id,response:{attestationObject:Mo(new Uint8Array(e.response.attestationObject)),clientDataJSON:Mo(new Uint8Array(e.response.clientDataJSON))},type:`public-key`,clientExtensionResults:e.getClientExtensionResults(),authenticatorAttachment:t.authenticatorAttachment??void 0}}function Vs(e){if(`toJSON`in e&&typeof e.toJSON==`function`)return e.toJSON();let t=e,n=e.getClientExtensionResults(),r=e.response;return{id:e.id,rawId:e.id,response:{authenticatorData:Mo(new Uint8Array(r.authenticatorData)),clientDataJSON:Mo(new Uint8Array(r.clientDataJSON)),signature:Mo(new Uint8Array(r.signature)),userHandle:r.userHandle?Mo(new Uint8Array(r.userHandle)):void 0},type:`public-key`,clientExtensionResults:n,authenticatorAttachment:t.authenticatorAttachment??void 0}}function Hs(e){return e===`localhost`||/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}$/i.test(e)}function Us(){return!!(Fo()&&`PublicKeyCredential`in window&&window.PublicKeyCredential&&`credentials`in navigator&&typeof(navigator==null?void 0:navigator.credentials)?.create==`function`&&typeof(navigator==null?void 0:navigator.credentials)?.get==`function`)}async function Ws(e){try{let t=await navigator.credentials.create(e);return t?t instanceof PublicKeyCredential?{data:t,error:null}:{data:null,error:new Ps(`Browser returned unexpected credential type`,t)}:{data:null,error:new Ps(`Empty credential response`,t)}}catch(t){return{data:null,error:Fs({error:t,options:e})}}}async function Gs(e){try{let t=await navigator.credentials.get(e);return t?t instanceof PublicKeyCredential?{data:t,error:null}:{data:null,error:new Ps(`Browser returned unexpected credential type`,t)}:{data:null,error:new Ps(`Empty credential response`,t)}}catch(t){return{data:null,error:Is({error:t,options:e})}}}var Ks={hints:[`security-key`],authenticatorSelection:{authenticatorAttachment:`cross-platform`,requireResidentKey:!1,userVerification:`preferred`,residentKey:`discouraged`},attestation:`direct`},qs={userVerification:`preferred`,hints:[`security-key`],attestation:`direct`};function Js(...e){let t=e=>typeof e==`object`&&!!e&&!Array.isArray(e),n=e=>e instanceof ArrayBuffer||ArrayBuffer.isView(e),r={};for(let i of e)if(i)for(let e in i){let a=i[e];if(a!==void 0)if(Array.isArray(a))r[e]=a;else if(n(a))r[e]=a;else if(t(a)){let n=r[e];t(n)?r[e]=Js(n,a):r[e]=Js(a)}else r[e]=a}return r}function Ys(e,t){return Js(Ks,e,t||{})}function Xs(e,t){return Js(qs,e,t||{})}var Zs=class{constructor(e){this.client=e,this.enroll=this._enroll.bind(this),this.challenge=this._challenge.bind(this),this.verify=this._verify.bind(this),this.authenticate=this._authenticate.bind(this),this.register=this._register.bind(this)}async _enroll(e){return this.client.mfa.enroll(Object.assign(Object.assign({},e),{factorType:`webauthn`}))}async _challenge({factorId:e,webauthn:t,friendlyName:n,signal:r},i){try{let{data:a,error:o}=await this.client.mfa.challenge({factorId:e,webauthn:t});if(!a)return{data:null,error:o};let s=r??Ls.createNewAbortSignal();if(a.webauthn.type===`create`){let{user:e}=a.webauthn.credential_options.publicKey;if(!e.name){let t=n;if(t)e.name=`${e.id}:${t}`;else{let t=(await this.client.getUser()).data.user,n=t?.user_metadata?.name||t?.email||t?.id||`User`;e.name=`${e.id}:${n}`}}e.displayName||=e.name}switch(a.webauthn.type){case`create`:{let{data:t,error:n}=await Ws({publicKey:Ys(a.webauthn.credential_options.publicKey,i?.create),signal:s});return t?{data:{factorId:e,challengeId:a.id,webauthn:{type:a.webauthn.type,credential_response:t}},error:null}:{data:null,error:n}}case`request`:{let t=Xs(a.webauthn.credential_options.publicKey,i?.request),{data:n,error:r}=await Gs(Object.assign(Object.assign({},a.webauthn.credential_options),{publicKey:t,signal:s}));return n?{data:{factorId:e,challengeId:a.id,webauthn:{type:a.webauthn.type,credential_response:n}},error:null}:{data:null,error:r}}}}catch(e){return P(e)?{data:null,error:e}:{data:null,error:new fo(`Unexpected error in challenge`,e)}}}async _verify({challengeId:e,factorId:t,webauthn:n}){return this.client.mfa.verify({factorId:t,challengeId:e,webauthn:n})}async _authenticate({factorId:e,webauthn:{rpId:t=typeof window<`u`?window.location.hostname:void 0,rpOrigins:n=typeof window<`u`?[window.location.origin]:void 0,signal:r}={}},i){if(!t)return{data:null,error:new co(`rpId is required for WebAuthn authentication`)};try{if(!Us())return{data:null,error:new fo(`Browser does not support WebAuthn`,null)};let{data:a,error:o}=await this.challenge({factorId:e,webauthn:{rpId:t,rpOrigins:n},signal:r},{request:i});if(!a)return{data:null,error:o};let{webauthn:s}=a;return this._verify({factorId:e,challengeId:a.challengeId,webauthn:{type:s.type,rpId:t,rpOrigins:n,credential_response:s.credential_response}})}catch(e){return P(e)?{data:null,error:e}:{data:null,error:new fo(`Unexpected error in authenticate`,e)}}}async _register({friendlyName:e,webauthn:{rpId:t=typeof window<`u`?window.location.hostname:void 0,rpOrigins:n=typeof window<`u`?[window.location.origin]:void 0,signal:r}={}},i){if(!t)return{data:null,error:new co(`rpId is required for WebAuthn registration`)};try{if(!Us())return{data:null,error:new fo(`Browser does not support WebAuthn`,null)};let{data:a,error:o}=await this._enroll({friendlyName:e});if(!a)return await this.client.mfa.listFactors().then(t=>t.data?.all.find(t=>t.factor_type===`webauthn`&&t.friendly_name===e&&t.status!==`unverified`)).then(e=>e?this.client.mfa.unenroll({factorId:e?.id}):void 0),{data:null,error:o};let{data:s,error:c}=await this._challenge({factorId:a.id,friendlyName:a.friendly_name,webauthn:{rpId:t,rpOrigins:n},signal:r},{create:i});return s?this._verify({factorId:a.id,challengeId:s.challengeId,webauthn:{rpId:t,rpOrigins:n,type:s.webauthn.type,credential_response:s.webauthn.credential_response}}):{data:null,error:c}}catch(e){return P(e)?{data:null,error:e}:{data:null,error:new fo(`Unexpected error in register`,e)}}}};Os();var Qs={url:no,storageKey:ro,autoRefreshToken:!0,persistSession:!0,detectSessionInUrl:!0,headers:io,flowType:`implicit`,debug:!1,hasCustomAuthorizationHeader:!1,throwOnError:!1,lockAcquireTimeout:5e3,skipAutoInitialize:!1,experimental:{}};async function $s(e,t,n){return await n()}var ec={},tc=class e{get jwks(){return ec[this.storageKey]?.jwks??{keys:[]}}set jwks(e){ec[this.storageKey]=Object.assign(Object.assign({},ec[this.storageKey]),{jwks:e})}get jwks_cached_at(){return ec[this.storageKey]?.cachedAt??-(2**53-1)}set jwks_cached_at(e){ec[this.storageKey]=Object.assign(Object.assign({},ec[this.storageKey]),{cachedAt:e})}constructor(t){var n;this.userStorage=null,this.memoryStorage=null,this.stateChangeEmitters=new Map,this.autoRefreshTicker=null,this.autoRefreshTickTimeout=null,this.visibilityChangedCallback=null,this.refreshingDeferred=null,this.initializePromise=null,this.detectSessionInUrl=!0,this.hasCustomAuthorizationHeader=!1,this.suppressGetSessionWarning=!1,this.lockAcquired=!1,this.pendingInLock=[],this.broadcastChannel=null,this.logger=console.log;let r=Object.assign(Object.assign({},Qs),t);if(this.storageKey=r.storageKey,this.instanceID=e.nextInstanceID[this.storageKey]??0,e.nextInstanceID[this.storageKey]=this.instanceID+1,this.logDebugMessages=!!r.debug,typeof r.debug==`function`&&(this.logger=r.debug),this.instanceID>0&&Fo()){let e=`${this._logPrefix()} Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.`;console.warn(e),this.logDebugMessages&&console.trace(e)}if(this.persistSession=r.persistSession,this.autoRefreshToken=r.autoRefreshToken,this.experimental=r.experimental??{},this.admin=new Ss({url:r.url,headers:r.headers,fetch:r.fetch,experimental:this.experimental}),this.url=r.url,this.headers=r.headers,this.fetch=zo(r.fetch),this.lock=r.lock||$s,this.detectSessionInUrl=r.detectSessionInUrl,this.flowType=r.flowType,this.hasCustomAuthorizationHeader=r.hasCustomAuthorizationHeader,this.throwOnError=r.throwOnError,this.lockAcquireTimeout=r.lockAcquireTimeout,r.lock?this.lock=r.lock:this.persistSession&&Fo()&&(globalThis==null?void 0:globalThis.navigator)?.locks?this.lock=Ds:this.lock=$s,this.jwks||(this.jwks={keys:[]},this.jwks_cached_at=-(2**53-1)),this.mfa={verify:this._verify.bind(this),enroll:this._enroll.bind(this),unenroll:this._unenroll.bind(this),challenge:this._challenge.bind(this),listFactors:this._listFactors.bind(this),challengeAndVerify:this._challengeAndVerify.bind(this),getAuthenticatorAssuranceLevel:this._getAuthenticatorAssuranceLevel.bind(this),webauthn:new Zs(this)},this.oauth={getAuthorizationDetails:this._getAuthorizationDetails.bind(this),approveAuthorization:this._approveAuthorization.bind(this),denyAuthorization:this._denyAuthorization.bind(this),listGrants:this._listOAuthGrants.bind(this),revokeGrant:this._revokeOAuthGrant.bind(this)},this.passkey={startRegistration:this._startPasskeyRegistration.bind(this),verifyRegistration:this._verifyPasskeyRegistration.bind(this),startAuthentication:this._startPasskeyAuthentication.bind(this),verifyAuthentication:this._verifyPasskeyAuthentication.bind(this),list:this._listPasskeys.bind(this),update:this._updatePasskey.bind(this),delete:this._deletePasskey.bind(this)},this.persistSession?(r.storage?this.storage=r.storage:Lo()?this.storage=globalThis.localStorage:(this.memoryStorage={},this.storage=Cs(this.memoryStorage)),r.userStorage&&(this.userStorage=r.userStorage)):(this.memoryStorage={},this.storage=Cs(this.memoryStorage)),Fo()&&globalThis.BroadcastChannel&&this.persistSession&&this.storageKey){try{this.broadcastChannel=new globalThis.BroadcastChannel(this.storageKey)}catch(e){console.error(`Failed to create a new BroadcastChannel, multi-tab state changes will not be available`,e)}(n=this.broadcastChannel)==null||n.addEventListener(`message`,async e=>{this._debug(`received broadcast notification from other tab or client`,e);try{await this._notifyAllSubscribers(e.data.event,e.data.session,!1)}catch(e){this._debug(`#broadcastChannel`,`error`,e)}})}r.skipAutoInitialize||this.initialize().catch(e=>{this._debug(`#initialize()`,`error`,e)})}isThrowOnErrorEnabled(){return this.throwOnError}_returnResult(e){if(this.throwOnError&&e&&e.error)throw e.error;return e}_logPrefix(){return`GoTrueClient@${this.storageKey}:${this.instanceID} (${$a}) ${new Date().toISOString()}`}_debug(...e){return this.logDebugMessages&&this.logger(this._logPrefix(),...e),this}async initialize(){return this.initializePromise||=(async()=>await this._acquireLock(this.lockAcquireTimeout,async()=>await this._initialize()))(),await this.initializePromise}async _initialize(){try{let e={},t=`none`;if(Fo()&&(e=Ro(window.location.href),this._isImplicitGrantCallback(e)?t=`implicit`:await this._isPKCECallback(e)&&(t=`pkce`)),Fo()&&this.detectSessionInUrl&&t!==`none`){let{data:n,error:r}=await this._getSessionFromURL(e,t);if(r){if(this._debug(`#_initialize()`,`error detecting session from URL`,r),L(r)){let e=r.details?.code;if(e===`identity_already_exists`||e===`identity_not_found`||e===`single_identity_not_deletable`)return{error:r}}return{error:r}}let{session:i,redirectType:a}=n;return this._debug(`#_initialize()`,`detected session in URL`,i,`redirect type`,a),await this._saveSession(i),setTimeout(async()=>{a===`recovery`?await this._notifyAllSubscribers(`PASSWORD_RECOVERY`,i):await this._notifyAllSubscribers(`SIGNED_IN`,i)},0),{error:null}}return await this._recoverAndRefresh(),{error:null}}catch(e){return P(e)?this._returnResult({error:e}):this._returnResult({error:new fo(`Unexpected error during initialization`,e)})}finally{await this._handleVisibilityChange(),this._debug(`#_initialize()`,`end`)}}async signInAnonymously(e){try{let{data:t,error:n}=await B(this.fetch,`POST`,`${this.url}/signup`,{headers:this.headers,body:{data:e?.options?.data??{},gotrue_meta_security:{captcha_token:e?.options?.captchaToken}},xform:ms});if(n||!t)return this._returnResult({data:{user:null,session:null},error:n});let r=t.session,i=t.user;return t.session&&(await this._saveSession(t.session),await this._notifyAllSubscribers(`SIGNED_IN`,r)),this._returnResult({data:{user:i,session:r},error:null})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signUp(e){try{let t;if(`email`in e){let{email:n,password:r,options:i}=e,a=null,o=null;this.flowType===`pkce`&&([a,o]=await Qo(this.storage,this.storageKey)),t=await B(this.fetch,`POST`,`${this.url}/signup`,{headers:this.headers,redirectTo:i?.emailRedirectTo,body:{email:n,password:r,data:i?.data??{},gotrue_meta_security:{captcha_token:i?.captchaToken},code_challenge:a,code_challenge_method:o},xform:ms})}else if(`phone`in e){let{phone:n,password:r,options:i}=e;t=await B(this.fetch,`POST`,`${this.url}/signup`,{headers:this.headers,body:{phone:n,password:r,data:i?.data??{},channel:i?.channel??`sms`,gotrue_meta_security:{captcha_token:i?.captchaToken}},xform:ms})}else throw new ho(`You must provide either an email or phone number and a password`);let{data:n,error:r}=t;if(r||!n)return await Uo(this.storage,`${this.storageKey}-code-verifier`),this._returnResult({data:{user:null,session:null},error:r});let i=n.session,a=n.user;return n.session&&(await this._saveSession(n.session),await this._notifyAllSubscribers(`SIGNED_IN`,i)),this._returnResult({data:{user:a,session:i},error:null})}catch(e){if(await Uo(this.storage,`${this.storageKey}-code-verifier`),P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signInWithPassword(e){try{let t;if(`email`in e){let{email:n,password:r,options:i}=e;t=await B(this.fetch,`POST`,`${this.url}/token?grant_type=password`,{headers:this.headers,body:{email:n,password:r,gotrue_meta_security:{captcha_token:i?.captchaToken}},xform:hs})}else if(`phone`in e){let{phone:n,password:r,options:i}=e;t=await B(this.fetch,`POST`,`${this.url}/token?grant_type=password`,{headers:this.headers,body:{phone:n,password:r,gotrue_meta_security:{captcha_token:i?.captchaToken}},xform:hs})}else throw new ho(`You must provide either an email or phone number and a password`);let{data:n,error:r}=t;if(r)return this._returnResult({data:{user:null,session:null},error:r});if(!n||!n.session||!n.user){let e=new I;return this._returnResult({data:{user:null,session:null},error:e})}return n.session&&(await this._saveSession(n.session),await this._notifyAllSubscribers(`SIGNED_IN`,n.session)),this._returnResult({data:Object.assign({user:n.user,session:n.session},n.weak_password?{weakPassword:n.weak_password}:null),error:r})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signInWithOAuth(e){return await this._handleProviderSignIn(e.provider,{redirectTo:e.options?.redirectTo,scopes:e.options?.scopes,queryParams:e.options?.queryParams,skipBrowserRedirect:e.options?.skipBrowserRedirect})}async exchangeCodeForSession(e){return await this.initializePromise,this._acquireLock(this.lockAcquireTimeout,async()=>this._exchangeCodeForSession(e))}async signInWithWeb3(e){let{chain:t}=e;switch(t){case`ethereum`:return await this.signInWithEthereum(e);case`solana`:return await this.signInWithSolana(e);default:throw Error(`@supabase/auth-js: Unsupported chain "${t}"`)}}async signInWithEthereum(e){let t,n;if(`message`in e)t=e.message,n=e.signature;else{let{chain:r,wallet:i,statement:a,options:o}=e,s;if(!Fo()){if(typeof i!=`object`||!o?.url)throw Error(`@supabase/auth-js: Both wallet and url must be specified in non-browser environments.`);s=i}else if(typeof i==`object`)s=i;else{let e=window;if(`ethereum`in e&&typeof e.ethereum==`object`&&`request`in e.ethereum&&typeof e.ethereum.request==`function`)s=e.ethereum;else throw Error(`@supabase/auth-js: No compatible Ethereum wallet interface on the window object (window.ethereum) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'ethereum', wallet: resolvedUserWallet }) instead.`)}let c=new URL(o?.url??window.location.href),l=await s.request({method:`eth_requestAccounts`}).then(e=>e).catch(()=>{throw Error(`@supabase/auth-js: Wallet method eth_requestAccounts is missing or invalid`)});if(!l||l.length===0)throw Error(`@supabase/auth-js: No accounts available. Please ensure the wallet is connected.`);let u=ks(l[0]),d=o?.signInWithEthereum?.chainId;d||=As(await s.request({method:`eth_chainId`})),t=Ms({domain:c.host,address:u,statement:a,uri:c.href,version:`1`,chainId:d,nonce:o?.signInWithEthereum?.nonce,issuedAt:o?.signInWithEthereum?.issuedAt??new Date,expirationTime:o?.signInWithEthereum?.expirationTime,notBefore:o?.signInWithEthereum?.notBefore,requestId:o?.signInWithEthereum?.requestId,resources:o?.signInWithEthereum?.resources}),n=await s.request({method:`personal_sign`,params:[js(t),u]})}try{let{data:r,error:i}=await B(this.fetch,`POST`,`${this.url}/token?grant_type=web3`,{headers:this.headers,body:Object.assign({chain:`ethereum`,message:t,signature:n},e.options?.captchaToken?{gotrue_meta_security:{captcha_token:e.options?.captchaToken}}:null),xform:ms});if(i)throw i;if(!r||!r.session||!r.user){let e=new I;return this._returnResult({data:{user:null,session:null},error:e})}return r.session&&(await this._saveSession(r.session),await this._notifyAllSubscribers(`SIGNED_IN`,r.session)),this._returnResult({data:Object.assign({},r),error:i})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signInWithSolana(e){let t,n;if(`message`in e)t=e.message,n=e.signature;else{let{chain:r,wallet:i,statement:a,options:o}=e,s;if(!Fo()){if(typeof i!=`object`||!o?.url)throw Error(`@supabase/auth-js: Both wallet and url must be specified in non-browser environments.`);s=i}else if(typeof i==`object`)s=i;else{let e=window;if(`solana`in e&&typeof e.solana==`object`&&(`signIn`in e.solana&&typeof e.solana.signIn==`function`||`signMessage`in e.solana&&typeof e.solana.signMessage==`function`))s=e.solana;else throw Error(`@supabase/auth-js: No compatible Solana wallet interface on the window object (window.solana) detected. Make sure the user already has a wallet installed and connected for this app. Prefer passing the wallet interface object directly to signInWithWeb3({ chain: 'solana', wallet: resolvedUserWallet }) instead.`)}let c=new URL(o?.url??window.location.href);if(`signIn`in s&&s.signIn){let e=await s.signIn(Object.assign(Object.assign(Object.assign({issuedAt:new Date().toISOString()},o?.signInWithSolana),{version:`1`,domain:c.host,uri:c.href}),a?{statement:a}:null)),r;if(Array.isArray(e)&&e[0]&&typeof e[0]==`object`)r=e[0];else if(e&&typeof e==`object`&&`signedMessage`in e&&`signature`in e)r=e;else throw Error(`@supabase/auth-js: Wallet method signIn() returned unrecognized value`);if(`signedMessage`in r&&`signature`in r&&(typeof r.signedMessage==`string`||r.signedMessage instanceof Uint8Array)&&r.signature instanceof Uint8Array)t=typeof r.signedMessage==`string`?r.signedMessage:new TextDecoder().decode(r.signedMessage),n=r.signature;else throw Error(`@supabase/auth-js: Wallet method signIn() API returned object without signedMessage and signature fields`)}else{if(!(`signMessage`in s)||typeof s.signMessage!=`function`||!(`publicKey`in s)||typeof s!=`object`||!s.publicKey||!(`toBase58`in s.publicKey)||typeof s.publicKey.toBase58!=`function`)throw Error(`@supabase/auth-js: Wallet does not have a compatible signMessage() and publicKey.toBase58() API`);t=[`${c.host} wants you to sign in with your Solana account:`,s.publicKey.toBase58(),...a?[``,a,``]:[``],`Version: 1`,`URI: ${c.href}`,`Issued At: ${o?.signInWithSolana?.issuedAt??new Date().toISOString()}`,...o?.signInWithSolana?.notBefore?[`Not Before: ${o.signInWithSolana.notBefore}`]:[],...o?.signInWithSolana?.expirationTime?[`Expiration Time: ${o.signInWithSolana.expirationTime}`]:[],...o?.signInWithSolana?.chainId?[`Chain ID: ${o.signInWithSolana.chainId}`]:[],...o?.signInWithSolana?.nonce?[`Nonce: ${o.signInWithSolana.nonce}`]:[],...o?.signInWithSolana?.requestId?[`Request ID: ${o.signInWithSolana.requestId}`]:[],...o?.signInWithSolana?.resources?.length?[`Resources`,...o.signInWithSolana.resources.map(e=>`- ${e}`)]:[]].join(`
 `);let e=await s.signMessage(new TextEncoder().encode(t),`utf8`);if(!e||!(e instanceof Uint8Array))throw Error(`@supabase/auth-js: Wallet signMessage() API returned an recognized value`);n=e}}try{let{data:r,error:i}=await B(this.fetch,`POST`,`${this.url}/token?grant_type=web3`,{headers:this.headers,body:Object.assign({chain:`solana`,message:t,signature:Mo(n)},e.options?.captchaToken?{gotrue_meta_security:{captcha_token:e.options?.captchaToken}}:null),xform:ms});if(i)throw i;if(!r||!r.session||!r.user){let e=new I;return this._returnResult({data:{user:null,session:null},error:e})}return r.session&&(await this._saveSession(r.session),await this._notifyAllSubscribers(`SIGNED_IN`,r.session)),this._returnResult({data:Object.assign({},r),error:i})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async _exchangeCodeForSession(e){let[t,n]=(await Ho(this.storage,`${this.storageKey}-code-verifier`)??``).split(`/`);try{if(!t&&this.flowType===`pkce`)throw new _o;let{data:r,error:i}=await B(this.fetch,`POST`,`${this.url}/token?grant_type=pkce`,{headers:this.headers,body:{auth_code:e,code_verifier:t},xform:ms});if(await Uo(this.storage,`${this.storageKey}-code-verifier`),i)throw i;if(!r||!r.session||!r.user){let e=new I;return this._returnResult({data:{user:null,session:null,redirectType:null},error:e})}return r.session&&(await this._saveSession(r.session),await this._notifyAllSubscribers(n===`recovery`?`PASSWORD_RECOVERY`:`SIGNED_IN`,r.session)),this._returnResult({data:Object.assign(Object.assign({},r),{redirectType:n??null}),error:i})}catch(e){if(await Uo(this.storage,`${this.storageKey}-code-verifier`),P(e))return this._returnResult({data:{user:null,session:null,redirectType:null},error:e});throw e}}async signInWithIdToken(e){try{let{options:t,provider:n,token:r,access_token:i,nonce:a}=e,{data:o,error:s}=await B(this.fetch,`POST`,`${this.url}/token?grant_type=id_token`,{headers:this.headers,body:{provider:n,id_token:r,access_token:i,nonce:a,gotrue_meta_security:{captcha_token:t?.captchaToken}},xform:ms});if(s)return this._returnResult({data:{user:null,session:null},error:s});if(!o||!o.session||!o.user){let e=new I;return this._returnResult({data:{user:null,session:null},error:e})}return o.session&&(await this._saveSession(o.session),await this._notifyAllSubscribers(`SIGNED_IN`,o.session)),this._returnResult({data:o,error:s})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signInWithOtp(e){try{if(`email`in e){let{email:t,options:n}=e,r=null,i=null;this.flowType===`pkce`&&([r,i]=await Qo(this.storage,this.storageKey));let{error:a}=await B(this.fetch,`POST`,`${this.url}/otp`,{headers:this.headers,body:{email:t,data:n?.data??{},create_user:n?.shouldCreateUser??!0,gotrue_meta_security:{captcha_token:n?.captchaToken},code_challenge:r,code_challenge_method:i},redirectTo:n?.emailRedirectTo});return this._returnResult({data:{user:null,session:null},error:a})}if(`phone`in e){let{phone:t,options:n}=e,{data:r,error:i}=await B(this.fetch,`POST`,`${this.url}/otp`,{headers:this.headers,body:{phone:t,data:n?.data??{},create_user:n?.shouldCreateUser??!0,gotrue_meta_security:{captcha_token:n?.captchaToken},channel:n?.channel??`sms`}});return this._returnResult({data:{user:null,session:null,messageId:r?.message_id},error:i})}throw new ho(`You must provide either an email or phone number.`)}catch(e){if(await Uo(this.storage,`${this.storageKey}-code-verifier`),P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async verifyOtp(e){try{let t,n;`options`in e&&(t=e.options?.redirectTo,n=e.options?.captchaToken);let{data:r,error:i}=await B(this.fetch,`POST`,`${this.url}/verify`,{headers:this.headers,body:Object.assign(Object.assign({},e),{gotrue_meta_security:{captcha_token:n}}),redirectTo:t,xform:ms});if(i)throw i;if(!r)throw Error(`An error occurred on token verification.`);let a=r.session,o=r.user;return a?.access_token&&(await this._saveSession(a),await this._notifyAllSubscribers(e.type==`recovery`?`PASSWORD_RECOVERY`:`SIGNED_IN`,a)),this._returnResult({data:{user:o,session:a},error:null})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async signInWithSSO(e){try{let t=null,n=null;this.flowType===`pkce`&&([t,n]=await Qo(this.storage,this.storageKey));let r=await B(this.fetch,`POST`,`${this.url}/sso`,{body:Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({},`providerId`in e?{provider_id:e.providerId}:null),`domain`in e?{domain:e.domain}:null),{redirect_to:e.options?.redirectTo??void 0}),e?.options?.captchaToken?{gotrue_meta_security:{captcha_token:e.options.captchaToken}}:null),{skip_http_redirect:!0,code_challenge:t,code_challenge_method:n}),headers:this.headers,xform:_s});return r.data?.url&&Fo()&&!e.options?.skipBrowserRedirect&&window.location.assign(r.data.url),this._returnResult(r)}catch(e){if(await Uo(this.storage,`${this.storageKey}-code-verifier`),P(e))return this._returnResult({data:null,error:e});throw e}}async reauthenticate(){return await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>await this._reauthenticate())}async _reauthenticate(){try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;if(n)throw n;if(!t)throw new F;let{error:r}=await B(this.fetch,`GET`,`${this.url}/reauthenticate`,{headers:this.headers,jwt:t.access_token});return this._returnResult({data:{user:null,session:null},error:r})})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async resend(e){try{let t=`${this.url}/resend`;if(`email`in e){let{email:n,type:r,options:i}=e,{error:a}=await B(this.fetch,`POST`,t,{headers:this.headers,body:{email:n,type:r,gotrue_meta_security:{captcha_token:i?.captchaToken}},redirectTo:i?.emailRedirectTo});return this._returnResult({data:{user:null,session:null},error:a})}else if(`phone`in e){let{phone:n,type:r,options:i}=e,{data:a,error:o}=await B(this.fetch,`POST`,t,{headers:this.headers,body:{phone:n,type:r,gotrue_meta_security:{captcha_token:i?.captchaToken}}});return this._returnResult({data:{user:null,session:null,messageId:a?.message_id},error:o})}throw new ho(`You must provide either an email or phone number and a type`)}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async getSession(){return await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>this._useSession(async e=>e))}async _acquireLock(e,t){this._debug(`#_acquireLock`,`begin`,e);try{if(this.lockAcquired){let e=this.pendingInLock.length?this.pendingInLock[this.pendingInLock.length-1]:Promise.resolve(),n=(async()=>(await e,await t()))();return this.pendingInLock.push((async()=>{try{await n}catch{}})()),n}return await this.lock(`lock:${this.storageKey}`,e,async()=>{this._debug(`#_acquireLock`,`lock acquired for storage key`,this.storageKey);try{this.lockAcquired=!0;let e=t();for(this.pendingInLock.push((async()=>{try{await e}catch{}})()),await e;this.pendingInLock.length;){let e=[...this.pendingInLock];await Promise.all(e),this.pendingInLock.splice(0,e.length)}return await e}finally{this._debug(`#_acquireLock`,`lock released for storage key`,this.storageKey),this.lockAcquired=!1}})}finally{this._debug(`#_acquireLock`,`end`)}}async _useSession(e){this._debug(`#_useSession`,`begin`);try{return await e(await this.__loadSession())}finally{this._debug(`#_useSession`,`end`)}}async __loadSession(){this._debug(`#__loadSession()`,`begin`),this.lockAcquired||this._debug(`#__loadSession()`,`used outside of an acquired lock!`,Error().stack);try{let e=null,t=await Ho(this.storage,this.storageKey);if(this._debug(`#getSession()`,`session from storage`,t),t!==null&&(this._isValidSession(t)?e=t:(this._debug(`#getSession()`,`session from storage is not valid`),await this._removeSession())),!e)return{data:{session:null},error:null};let n=e.expires_at?e.expires_at*1e3-Date.now()<to:!1;if(this._debug(`#__loadSession()`,`session has${n?``:` not`} expired`,`expires_at`,e.expires_at),!n){if(this.userStorage){let t=await Ho(this.userStorage,this.storageKey+`-user`);t?.user?e.user=t.user:e.user=os()}if(this.storage.isServer&&e.user&&!e.user.__isUserNotAvailableProxy){let t={value:this.suppressGetSessionWarning};e.user=ss(e.user,t),t.value&&(this.suppressGetSessionWarning=!0)}return{data:{session:e},error:null}}let{data:r,error:i}=await this._callRefreshToken(e.refresh_token);return i?this._returnResult({data:{session:null},error:i}):this._returnResult({data:{session:r},error:null})}finally{this._debug(`#__loadSession()`,`end`)}}async getUser(e){if(e)return await this._getUser(e);await this.initializePromise;let t=await this._acquireLock(this.lockAcquireTimeout,async()=>await this._getUser());return t.data.user&&(this.suppressGetSessionWarning=!0),t}async _getUser(e){try{return e?await B(this.fetch,`GET`,`${this.url}/user`,{headers:this.headers,jwt:e,xform:gs}):await this._useSession(async e=>{let{data:t,error:n}=e;if(n)throw n;return!t.session?.access_token&&!this.hasCustomAuthorizationHeader?{data:{user:null},error:new F}:await B(this.fetch,`GET`,`${this.url}/user`,{headers:this.headers,jwt:t.session?.access_token??void 0,xform:gs})})}catch(e){if(P(e))return mo(e)&&(await this._removeSession(),await Uo(this.storage,`${this.storageKey}-code-verifier`)),this._returnResult({data:{user:null},error:e});throw e}}async updateUser(e,t={}){return await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>await this._updateUser(e,t))}async _updateUser(e,t={}){try{return await this._useSession(async n=>{let{data:r,error:i}=n;if(i)throw i;if(!r.session)throw new F;let a=r.session,o=null,s=null;this.flowType===`pkce`&&e.email!=null&&([o,s]=await Qo(this.storage,this.storageKey));let{data:c,error:l}=await B(this.fetch,`PUT`,`${this.url}/user`,{headers:this.headers,redirectTo:t?.emailRedirectTo,body:Object.assign(Object.assign({},e),{code_challenge:o,code_challenge_method:s}),jwt:a.access_token,xform:gs});if(l)throw l;return a.user=c.user,await this._saveSession(a),await this._notifyAllSubscribers(`USER_UPDATED`,a),this._returnResult({data:{user:a.user},error:null})})}catch(e){if(await Uo(this.storage,`${this.storageKey}-code-verifier`),P(e))return this._returnResult({data:{user:null},error:e});throw e}}async setSession(e){return await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>await this._setSession(e))}async _setSession(e){try{if(!e.access_token||!e.refresh_token)throw new F;let t=Date.now()/1e3,n=t,r=!0,i=null,{payload:a}=Go(e.access_token);if(a.exp&&(n=a.exp,r=n<=t),r){let{data:t,error:n}=await this._callRefreshToken(e.refresh_token);if(n)return this._returnResult({data:{user:null,session:null},error:n});if(!t)return{data:{user:null,session:null},error:null};i=t}else{let{data:r,error:a}=await this._getUser(e.access_token);if(a)return this._returnResult({data:{user:null,session:null},error:a});i={access_token:e.access_token,refresh_token:e.refresh_token,user:r.user,token_type:`bearer`,expires_in:n-t,expires_at:n},await this._saveSession(i),await this._notifyAllSubscribers(`SIGNED_IN`,i)}return this._returnResult({data:{user:i.user,session:i},error:null})}catch(e){if(P(e))return this._returnResult({data:{session:null,user:null},error:e});throw e}}async refreshSession(e){return await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>await this._refreshSession(e))}async _refreshSession(e){try{return await this._useSession(async t=>{if(!e){let{data:n,error:r}=t;if(r)throw r;e=n.session??void 0}if(!e?.refresh_token)throw new F;let{data:n,error:r}=await this._callRefreshToken(e.refresh_token);return r?this._returnResult({data:{user:null,session:null},error:r}):n?this._returnResult({data:{user:n.user,session:n},error:null}):this._returnResult({data:{user:null,session:null},error:null})})}catch(e){if(P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}}async _getSessionFromURL(e,t){try{if(!Fo())throw new go(`No browser detected.`);if(e.error||e.error_description||e.error_code)throw new go(e.error_description||`Error in URL with unspecified error_description`,{error:e.error||`unspecified_error`,code:e.error_code||`unspecified_code`});switch(t){case`implicit`:if(this.flowType===`pkce`)throw new R(`Not a valid PKCE flow url.`);break;case`pkce`:if(this.flowType===`implicit`)throw new go(`Not a valid implicit grant flow url.`);break;default:}if(t===`pkce`){if(this._debug(`#_initialize()`,`begin`,`is PKCE flow`,!0),!e.code)throw new R(`No code detected.`);let{data:t,error:n}=await this._exchangeCodeForSession(e.code);if(n)throw n;let r=new URL(window.location.href);return r.searchParams.delete(`code`),window.history.replaceState(window.history.state,``,r.toString()),{data:{session:t.session,redirectType:t.redirectType??null},error:null}}let{provider_token:n,provider_refresh_token:r,access_token:i,refresh_token:a,expires_in:o,expires_at:s,token_type:c}=e;if(!i||!o||!a||!c)throw new go(`No session defined in URL`);let l=Math.round(Date.now()/1e3),u=parseInt(o),d=l+u;s&&(d=parseInt(s));let f=d-l;f*1e3<=3e4&&console.warn(`@supabase/gotrue-js: Session as retrieved from URL expires in ${f}s, should have been closer to ${u}s`);let p=d-u;l-p>=120?console.warn(`@supabase/gotrue-js: Session as retrieved from URL was issued over 120s ago, URL could be stale`,p,d,l):l-p<0&&console.warn(`@supabase/gotrue-js: Session as retrieved from URL was issued in the future? Check the device clock for skew`,p,d,l);let{data:m,error:h}=await this._getUser(i);if(h)throw h;let g={provider_token:n,provider_refresh_token:r,access_token:i,expires_in:u,expires_at:d,refresh_token:a,token_type:c,user:m.user};return window.location.hash=``,this._debug(`#_getSessionFromURL()`,`clearing window.location.hash`),this._returnResult({data:{session:g,redirectType:e.type},error:null})}catch(e){if(P(e))return this._returnResult({data:{session:null,redirectType:null},error:e});throw e}}_isImplicitGrantCallback(e){return typeof this.detectSessionInUrl==`function`?this.detectSessionInUrl(new URL(window.location.href),e):!!(e.access_token||e.error_description)}async _isPKCECallback(e){let t=await Ho(this.storage,`${this.storageKey}-code-verifier`);return!!(e.code&&t)}async signOut(e={scope:`global`}){return await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>await this._signOut(e))}async _signOut({scope:e}={scope:`global`}){return await this._useSession(async t=>{let{data:n,error:r}=t;if(r&&!mo(r))return this._returnResult({error:r});let i=n.session?.access_token;if(i){let{error:t}=await this.admin.signOut(i,e);if(t&&!(uo(t)&&(t.status===404||t.status===401||t.status===403)||mo(t)))return this._returnResult({error:t})}return e!==`others`&&(await this._removeSession(),await Uo(this.storage,`${this.storageKey}-code-verifier`)),this._returnResult({error:null})})}onAuthStateChange(e){let t=Po(),n={id:t,callback:e,unsubscribe:()=>{this._debug(`#unsubscribe()`,`state change callback with id removed`,t),this.stateChangeEmitters.delete(t)}};return this._debug(`#onAuthStateChange()`,`registered callback with id`,t),this.stateChangeEmitters.set(t,n),(async()=>{await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>{this._emitInitialSession(t)})})(),{data:{subscription:n}}}async _emitInitialSession(e){return await this._useSession(async t=>{try{let{data:{session:n},error:r}=t;if(r)throw r;await this.stateChangeEmitters.get(e)?.callback(`INITIAL_SESSION`,n),this._debug(`INITIAL_SESSION`,`callback id`,e,`session`,n)}catch(t){await this.stateChangeEmitters.get(e)?.callback(`INITIAL_SESSION`,null),this._debug(`INITIAL_SESSION`,`callback id`,e,`error`,t),mo(t)?console.warn(t):console.error(t)}})}async resetPasswordForEmail(e,t={}){let n=null,r=null;this.flowType===`pkce`&&([n,r]=await Qo(this.storage,this.storageKey,!0));try{return await B(this.fetch,`POST`,`${this.url}/recover`,{body:{email:e,code_challenge:n,code_challenge_method:r,gotrue_meta_security:{captcha_token:t.captchaToken}},headers:this.headers,redirectTo:t.redirectTo})}catch(e){if(await Uo(this.storage,`${this.storageKey}-code-verifier`),P(e))return this._returnResult({data:null,error:e});throw e}}async getUserIdentities(){try{let{data:e,error:t}=await this.getUser();if(t)throw t;return this._returnResult({data:{identities:e.user.identities??[]},error:null})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async linkIdentity(e){return`token`in e?this.linkIdentityIdToken(e):this.linkIdentityOAuth(e)}async linkIdentityOAuth(e){try{let{data:t,error:n}=await this._useSession(async t=>{let{data:n,error:r}=t;if(r)throw r;let i=await this._getUrlForProvider(`${this.url}/user/identities/authorize`,e.provider,{redirectTo:e.options?.redirectTo,scopes:e.options?.scopes,queryParams:e.options?.queryParams,skipBrowserRedirect:!0});return await B(this.fetch,`GET`,i,{headers:this.headers,jwt:n.session?.access_token??void 0})});if(n)throw n;return Fo()&&!e.options?.skipBrowserRedirect&&window.location.assign(t?.url),this._returnResult({data:{provider:e.provider,url:t?.url},error:null})}catch(t){if(P(t))return this._returnResult({data:{provider:e.provider,url:null},error:t});throw t}}async linkIdentityIdToken(e){return await this._useSession(async t=>{try{let{error:n,data:{session:r}}=t;if(n)throw n;let{options:i,provider:a,token:o,access_token:s,nonce:c}=e,{data:l,error:u}=await B(this.fetch,`POST`,`${this.url}/token?grant_type=id_token`,{headers:this.headers,jwt:r?.access_token??void 0,body:{provider:a,id_token:o,access_token:s,nonce:c,link_identity:!0,gotrue_meta_security:{captcha_token:i?.captchaToken}},xform:ms});return u?this._returnResult({data:{user:null,session:null},error:u}):!l||!l.session||!l.user?this._returnResult({data:{user:null,session:null},error:new I}):(l.session&&(await this._saveSession(l.session),await this._notifyAllSubscribers(`USER_UPDATED`,l.session)),this._returnResult({data:l,error:u}))}catch(e){if(await Uo(this.storage,`${this.storageKey}-code-verifier`),P(e))return this._returnResult({data:{user:null,session:null},error:e});throw e}})}async unlinkIdentity(e){try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)throw r;return await B(this.fetch,`DELETE`,`${this.url}/user/identities/${e.identity_id}`,{headers:this.headers,jwt:n.session?.access_token??void 0})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _refreshAccessToken(e){let t=`#_refreshAccessToken(${e.substring(0,5)}...)`;this._debug(t,`begin`);try{let n=Date.now();return await qo(async n=>(n>0&&await Ko(200*2**(n-1)),this._debug(t,`refreshing attempt`,n),await B(this.fetch,`POST`,`${this.url}/token?grant_type=refresh_token`,{body:{refresh_token:e},headers:this.headers,xform:ms})),(e,t)=>{let r=200*2**e;return t&&yo(t)&&Date.now()+r-n<3e4})}catch(e){if(this._debug(t,`error`,e),P(e))return this._returnResult({data:{session:null,user:null},error:e});throw e}finally{this._debug(t,`end`)}}_isValidSession(e){return typeof e==`object`&&!!e&&`access_token`in e&&`refresh_token`in e&&`expires_at`in e}async _handleProviderSignIn(e,t){let n=await this._getUrlForProvider(`${this.url}/authorize`,e,{redirectTo:t.redirectTo,scopes:t.scopes,queryParams:t.queryParams});return this._debug(`#_handleProviderSignIn()`,`provider`,e,`options`,t,`url`,n),Fo()&&!t.skipBrowserRedirect&&window.location.assign(n),{data:{provider:e,url:n},error:null}}async _recoverAndRefresh(){let e=`#_recoverAndRefresh()`;this._debug(e,`begin`);try{let t=await Ho(this.storage,this.storageKey);if(t&&this.userStorage){let e=await Ho(this.userStorage,this.storageKey+`-user`);!this.storage.isServer&&Object.is(this.storage,this.userStorage)&&!e&&(e={user:t.user},await Vo(this.userStorage,this.storageKey+`-user`,e)),t.user=e?.user??os()}else if(t&&!t.user&&!t.user){let e=await Ho(this.storage,this.storageKey+`-user`);e&&e?.user?(t.user=e.user,await Uo(this.storage,this.storageKey+`-user`),await Vo(this.storage,this.storageKey,t)):t.user=os()}if(this._debug(e,`session from storage`,t),!this._isValidSession(t)){this._debug(e,`session is not valid`),t!==null&&await this._removeSession();return}let n=(t.expires_at??1/0)*1e3-Date.now()<to;if(this._debug(e,`session has${n?``:` not`} expired with margin of ${to}s`),n){if(this.autoRefreshToken&&t.refresh_token){let{error:n}=await this._callRefreshToken(t.refresh_token);n&&(console.error(n),yo(n)||(this._debug(e,`refresh failed with a non-retryable error, removing the session`,n),await this._removeSession()))}}else if(t.user&&t.user.__isUserNotAvailableProxy===!0)try{let{data:n,error:r}=await this._getUser(t.access_token);!r&&n?.user?(t.user=n.user,await this._saveSession(t),await this._notifyAllSubscribers(`SIGNED_IN`,t)):this._debug(e,`could not get user data, skipping SIGNED_IN notification`)}catch(t){console.error(`Error getting user data:`,t),this._debug(e,`error getting user data, skipping SIGNED_IN notification`,t)}else await this._notifyAllSubscribers(`SIGNED_IN`,t)}catch(t){this._debug(e,`error`,t),console.error(t);return}finally{this._debug(e,`end`)}}async _callRefreshToken(e){var t,n;if(!e)throw new F;if(this.refreshingDeferred)return this.refreshingDeferred.promise;let r=`#_callRefreshToken(${e.substring(0,5)}...)`;this._debug(r,`begin`);try{this.refreshingDeferred=new Wo;let{data:t,error:n}=await this._refreshAccessToken(e);if(n)throw n;if(!t.session)throw new F;await this._saveSession(t.session),await this._notifyAllSubscribers(`TOKEN_REFRESHED`,t.session);let r={data:t.session,error:null};return this.refreshingDeferred.resolve(r),r}catch(e){if(this._debug(r,`error`,e),P(e)){let n={data:null,error:e};return yo(e)||await this._removeSession(),(t=this.refreshingDeferred)==null||t.resolve(n),n}throw(n=this.refreshingDeferred)==null||n.reject(e),e}finally{this.refreshingDeferred=null,this._debug(r,`end`)}}async _notifyAllSubscribers(e,t,n=!0){let r=`#_notifyAllSubscribers(${e})`;this._debug(r,`begin`,t,`broadcast = ${n}`);try{this.broadcastChannel&&n&&this.broadcastChannel.postMessage({event:e,session:t});let r=[],i=Array.from(this.stateChangeEmitters.values()).map(async n=>{try{await n.callback(e,t)}catch(e){r.push(e)}});if(await Promise.all(i),r.length>0){for(let e=0;e<r.length;e+=1)console.error(r[e]);throw r[0]}}finally{this._debug(r,`end`)}}async _saveSession(e){this._debug(`#_saveSession()`,e),this.suppressGetSessionWarning=!0,await Uo(this.storage,`${this.storageKey}-code-verifier`);let t=Object.assign({},e),n=t.user&&t.user.__isUserNotAvailableProxy===!0;if(this.userStorage){!n&&t.user&&await Vo(this.userStorage,this.storageKey+`-user`,{user:t.user});let e=Object.assign({},t);delete e.user;let r=cs(e);await Vo(this.storage,this.storageKey,r)}else{let e=cs(t);await Vo(this.storage,this.storageKey,e)}}async _removeSession(){this._debug(`#_removeSession()`),this.suppressGetSessionWarning=!1,await Uo(this.storage,this.storageKey),await Uo(this.storage,this.storageKey+`-code-verifier`),await Uo(this.storage,this.storageKey+`-user`),this.userStorage&&await Uo(this.userStorage,this.storageKey+`-user`),await this._notifyAllSubscribers(`SIGNED_OUT`,null)}_removeVisibilityChangedCallback(){this._debug(`#_removeVisibilityChangedCallback()`);let e=this.visibilityChangedCallback;this.visibilityChangedCallback=null;try{e&&Fo()&&window!=null&&window.removeEventListener&&window.removeEventListener(`visibilitychange`,e)}catch(e){console.error(`removing visibilitychange callback failed`,e)}}async _startAutoRefresh(){await this._stopAutoRefresh(),this._debug(`#_startAutoRefresh()`);let e=setInterval(()=>this._autoRefreshTokenTick(),eo);this.autoRefreshTicker=e,e&&typeof e==`object`&&typeof e.unref==`function`?e.unref():typeof Deno<`u`&&typeof Deno.unrefTimer==`function`&&Deno.unrefTimer(e);let t=setTimeout(async()=>{await this.initializePromise,await this._autoRefreshTokenTick()},0);this.autoRefreshTickTimeout=t,t&&typeof t==`object`&&typeof t.unref==`function`?t.unref():typeof Deno<`u`&&typeof Deno.unrefTimer==`function`&&Deno.unrefTimer(t)}async _stopAutoRefresh(){this._debug(`#_stopAutoRefresh()`);let e=this.autoRefreshTicker;this.autoRefreshTicker=null,e&&clearInterval(e);let t=this.autoRefreshTickTimeout;this.autoRefreshTickTimeout=null,t&&clearTimeout(t)}async startAutoRefresh(){this._removeVisibilityChangedCallback(),await this._startAutoRefresh()}async stopAutoRefresh(){this._removeVisibilityChangedCallback(),await this._stopAutoRefresh()}async _autoRefreshTokenTick(){this._debug(`#_autoRefreshTokenTick()`,`begin`);try{await this._acquireLock(0,async()=>{try{let e=Date.now();try{return await this._useSession(async t=>{let{data:{session:n}}=t;if(!n||!n.refresh_token||!n.expires_at){this._debug(`#_autoRefreshTokenTick()`,`no session`);return}let r=Math.floor((n.expires_at*1e3-e)/eo);this._debug(`#_autoRefreshTokenTick()`,`access token expires in ${r} ticks, a tick lasts ${eo}ms, refresh threshold is 3 ticks`),r<=3&&await this._callRefreshToken(n.refresh_token)})}catch(e){console.error(`Auto refresh tick failed with error. This is likely a transient error.`,e)}}finally{this._debug(`#_autoRefreshTokenTick()`,`end`)}})}catch(e){if(e instanceof Ts)this._debug(`auto refresh token tick lock not available`);else throw e}}async _handleVisibilityChange(){if(this._debug(`#_handleVisibilityChange()`),!Fo()||!(window!=null&&window.addEventListener))return this.autoRefreshToken&&this.startAutoRefresh(),!1;try{this.visibilityChangedCallback=async()=>{try{await this._onVisibilityChanged(!1)}catch(e){this._debug(`#visibilityChangedCallback`,`error`,e)}},window==null||window.addEventListener(`visibilitychange`,this.visibilityChangedCallback),await this._onVisibilityChanged(!0)}catch(e){console.error(`_handleVisibilityChange`,e)}}async _onVisibilityChanged(e){let t=`#_onVisibilityChanged(${e})`;this._debug(t,`visibilityState`,document.visibilityState),document.visibilityState===`visible`?(this.autoRefreshToken&&this._startAutoRefresh(),e||(await this.initializePromise,await this._acquireLock(this.lockAcquireTimeout,async()=>{if(document.visibilityState!==`visible`){this._debug(t,`acquired the lock to recover the session, but the browser visibilityState is no longer visible, aborting`);return}await this._recoverAndRefresh()}))):document.visibilityState===`hidden`&&this.autoRefreshToken&&this._stopAutoRefresh()}async _getUrlForProvider(e,t,n){let r=[`provider=${encodeURIComponent(t)}`];if(n?.redirectTo&&r.push(`redirect_to=${encodeURIComponent(n.redirectTo)}`),n?.scopes&&r.push(`scopes=${encodeURIComponent(n.scopes)}`),this.flowType===`pkce`){let[e,t]=await Qo(this.storage,this.storageKey),n=new URLSearchParams({code_challenge:`${encodeURIComponent(e)}`,code_challenge_method:`${encodeURIComponent(t)}`});r.push(n.toString())}if(n?.queryParams){let e=new URLSearchParams(n.queryParams);r.push(e.toString())}return n?.skipBrowserRedirect&&r.push(`skip_http_redirect=${n.skipBrowserRedirect}`),`${e}?${r.join(`&`)}`}async _unenroll(e){try{return await this._useSession(async t=>{let{data:n,error:r}=t;return r?this._returnResult({data:null,error:r}):await B(this.fetch,`DELETE`,`${this.url}/factors/${e.factorId}`,{headers:this.headers,jwt:n?.session?.access_token})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _enroll(e){try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let i=Object.assign({friendly_name:e.friendlyName,factor_type:e.factorType},e.factorType===`phone`?{phone:e.phone}:e.factorType===`totp`?{issuer:e.issuer}:{}),{data:a,error:o}=await B(this.fetch,`POST`,`${this.url}/factors`,{body:i,headers:this.headers,jwt:n?.session?.access_token});return o?this._returnResult({data:null,error:o}):(e.factorType===`totp`&&a.type===`totp`&&a?.totp?.qr_code&&(a.totp.qr_code=`data:image/svg+xml;utf-8,${a.totp.qr_code}`),this._returnResult({data:a,error:null}))})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _verify(e){return this._acquireLock(this.lockAcquireTimeout,async()=>{try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let i=Object.assign({challenge_id:e.challengeId},`webauthn`in e?{webauthn:Object.assign(Object.assign({},e.webauthn),{credential_response:e.webauthn.type===`create`?Bs(e.webauthn.credential_response):Vs(e.webauthn.credential_response)})}:{code:e.code}),{data:a,error:o}=await B(this.fetch,`POST`,`${this.url}/factors/${e.factorId}/verify`,{body:i,headers:this.headers,jwt:n?.session?.access_token});return o?this._returnResult({data:null,error:o}):(await this._saveSession(Object.assign({expires_at:Math.round(Date.now()/1e3)+a.expires_in},a)),await this._notifyAllSubscribers(`MFA_CHALLENGE_VERIFIED`,a),this._returnResult({data:a,error:o}))})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}})}async _challenge(e){return this._acquireLock(this.lockAcquireTimeout,async()=>{try{return await this._useSession(async t=>{let{data:n,error:r}=t;if(r)return this._returnResult({data:null,error:r});let i=await B(this.fetch,`POST`,`${this.url}/factors/${e.factorId}/challenge`,{body:e,headers:this.headers,jwt:n?.session?.access_token});if(i.error)return i;let{data:a}=i;if(a.type!==`webauthn`)return{data:a,error:null};switch(a.webauthn.type){case`create`:return{data:Object.assign(Object.assign({},a),{webauthn:Object.assign(Object.assign({},a.webauthn),{credential_options:Object.assign(Object.assign({},a.webauthn.credential_options),{publicKey:Rs(a.webauthn.credential_options.publicKey)})})}),error:null};case`request`:return{data:Object.assign(Object.assign({},a),{webauthn:Object.assign(Object.assign({},a.webauthn),{credential_options:Object.assign(Object.assign({},a.webauthn.credential_options),{publicKey:zs(a.webauthn.credential_options.publicKey)})})}),error:null}}})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}})}async _challengeAndVerify(e){let{data:t,error:n}=await this._challenge({factorId:e.factorId});return n?this._returnResult({data:null,error:n}):await this._verify({factorId:e.factorId,challengeId:t.id,code:e.code})}async _listFactors(){let{data:{user:e},error:t}=await this.getUser();if(t)return{data:null,error:t};let n={all:[],phone:[],totp:[],webauthn:[]};for(let t of e?.factors??[])n.all.push(t),t.status===`verified`&&n[t.factor_type].push(t);return{data:n,error:null}}async _getAuthenticatorAssuranceLevel(e){if(e)try{let{payload:t}=Go(e),n=null;t.aal&&(n=t.aal);let r=n,{data:{user:i},error:a}=await this.getUser(e);if(a)return this._returnResult({data:null,error:a});((i?.factors)?.filter(e=>e.status===`verified`)??[]).length>0&&(r=`aal2`);let o=t.amr||[];return{data:{currentLevel:n,nextLevel:r,currentAuthenticationMethods:o},error:null}}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}let{data:{session:t},error:n}=await this.getSession();if(n)return this._returnResult({data:null,error:n});if(!t)return{data:{currentLevel:null,nextLevel:null,currentAuthenticationMethods:[]},error:null};let{payload:r}=Go(t.access_token),i=null;r.aal&&(i=r.aal);let a=i;(t.user.factors?.filter(e=>e.status===`verified`)??[]).length>0&&(a=`aal2`);let o=r.amr||[];return{data:{currentLevel:i,nextLevel:a,currentAuthenticationMethods:o},error:null}}async _getAuthorizationDetails(e){try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;return r?this._returnResult({data:null,error:r}):n?await B(this.fetch,`GET`,`${this.url}/oauth/authorizations/${e}`,{headers:this.headers,jwt:n.access_token,xform:e=>({data:e,error:null})}):this._returnResult({data:null,error:new F})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _approveAuthorization(e,t){try{return await this._useSession(async n=>{let{data:{session:r},error:i}=n;if(i)return this._returnResult({data:null,error:i});if(!r)return this._returnResult({data:null,error:new F});let a=await B(this.fetch,`POST`,`${this.url}/oauth/authorizations/${e}/consent`,{headers:this.headers,jwt:r.access_token,body:{action:`approve`},xform:e=>({data:e,error:null})});return a.data&&a.data.redirect_url&&Fo()&&!t?.skipBrowserRedirect&&window.location.assign(a.data.redirect_url),a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _denyAuthorization(e,t){try{return await this._useSession(async n=>{let{data:{session:r},error:i}=n;if(i)return this._returnResult({data:null,error:i});if(!r)return this._returnResult({data:null,error:new F});let a=await B(this.fetch,`POST`,`${this.url}/oauth/authorizations/${e}/consent`,{headers:this.headers,jwt:r.access_token,body:{action:`deny`},xform:e=>({data:e,error:null})});return a.data&&a.data.redirect_url&&Fo()&&!t?.skipBrowserRedirect&&window.location.assign(a.data.redirect_url),a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _listOAuthGrants(){try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;return n?this._returnResult({data:null,error:n}):t?await B(this.fetch,`GET`,`${this.url}/user/oauth/grants`,{headers:this.headers,jwt:t.access_token,xform:e=>({data:e,error:null})}):this._returnResult({data:null,error:new F})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _revokeOAuthGrant(e){try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;return r?this._returnResult({data:null,error:r}):n?(await B(this.fetch,`DELETE`,`${this.url}/user/oauth/grants`,{headers:this.headers,jwt:n.access_token,query:{client_id:e.clientId},noResolveJson:!0}),{data:{},error:null}):this._returnResult({data:null,error:new F})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async fetchJwk(e,t={keys:[]}){let n=t.keys.find(t=>t.kid===e);if(n)return n;let r=Date.now();if(n=this.jwks.keys.find(t=>t.kid===e),n&&this.jwks_cached_at+6e5>r)return n;let{data:i,error:a}=await B(this.fetch,`GET`,`${this.url}/.well-known/jwks.json`,{headers:this.headers});if(a)throw a;return!i.keys||i.keys.length===0||(this.jwks=i,this.jwks_cached_at=r,n=i.keys.find(t=>t.kid===e),!n)?null:n}async getClaims(e,t={}){try{let n=e;if(!n){let{data:e,error:t}=await this.getSession();if(t||!e.session)return this._returnResult({data:null,error:t});n=e.session.access_token}let{header:r,payload:i,signature:a,raw:{header:o,payload:s}}=Go(n);t?.allowExpired||ts(i.exp);let c=!r.alg||r.alg.startsWith(`HS`)||!r.kid||!(`crypto`in globalThis&&`subtle`in globalThis.crypto)?null:await this.fetchJwk(r.kid,t?.keys?{keys:t.keys}:t?.jwks);if(!c){let{error:e}=await this.getUser(n);if(e)throw e;return{data:{claims:i,header:r,signature:a},error:null}}let l=ns(r.alg),u=await crypto.subtle.importKey(`jwk`,c,l,!0,[`verify`]);if(!await crypto.subtle.verify(l,u,a,jo(`${o}.${s}`)))throw new xo(`Invalid JWT signature`);return{data:{claims:i,header:r,signature:a},error:null}}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async signInWithPasskey(e){as(this.experimental);try{if(!Us())return this._returnResult({data:null,error:new fo(`Browser does not support WebAuthn`,null)});let{data:t,error:n}=await this._startPasskeyAuthentication({options:{captchaToken:e?.options?.captchaToken}});if(n||!t)return this._returnResult({data:null,error:n});let{data:r,error:i}=await Gs({publicKey:zs(t.options),signal:e?.options?.signal??Ls.createNewAbortSignal()});if(i||!r)return this._returnResult({data:null,error:i??new fo(`WebAuthn ceremony failed`,null)});let a=Vs(r);return this._verifyPasskeyAuthentication({challengeId:t.challenge_id,credential:a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async registerPasskey(e){as(this.experimental);try{if(!Us())return this._returnResult({data:null,error:new fo(`Browser does not support WebAuthn`,null)});let{data:t,error:n}=await this._startPasskeyRegistration();if(n||!t)return this._returnResult({data:null,error:n});let{data:r,error:i}=await Ws({publicKey:Rs(t.options),signal:e?.options?.signal??Ls.createNewAbortSignal()});if(i||!r)return this._returnResult({data:null,error:i??new fo(`WebAuthn ceremony failed`,null)});let a=Bs(r);return this._verifyPasskeyRegistration({challengeId:t.challenge_id,credential:a})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _startPasskeyRegistration(){as(this.experimental);try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;if(n)return this._returnResult({data:null,error:n});if(!t)return this._returnResult({data:null,error:new F});let{data:r,error:i}=await B(this.fetch,`POST`,`${this.url}/passkeys/registration/options`,{headers:this.headers,jwt:t.access_token,body:{}});return i?this._returnResult({data:null,error:i}):this._returnResult({data:r,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _verifyPasskeyRegistration(e){as(this.experimental);try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;if(r)return this._returnResult({data:null,error:r});if(!n)return this._returnResult({data:null,error:new F});let{data:i,error:a}=await B(this.fetch,`POST`,`${this.url}/passkeys/registration/verify`,{headers:this.headers,jwt:n.access_token,body:{challenge_id:e.challengeId,credential:e.credential}});return a?this._returnResult({data:null,error:a}):this._returnResult({data:i,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _startPasskeyAuthentication(e){as(this.experimental);try{let{data:t,error:n}=await B(this.fetch,`POST`,`${this.url}/passkeys/authentication/options`,{headers:this.headers,body:{gotrue_meta_security:{captcha_token:e?.options?.captchaToken}}});return n?this._returnResult({data:null,error:n}):this._returnResult({data:t,error:null})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _verifyPasskeyAuthentication(e){as(this.experimental);try{let{data:t,error:n}=await B(this.fetch,`POST`,`${this.url}/passkeys/authentication/verify`,{headers:this.headers,body:{challenge_id:e.challengeId,credential:e.credential},xform:ms});return n?this._returnResult({data:null,error:n}):(t.session&&(await this._saveSession(t.session),await this._notifyAllSubscribers(`SIGNED_IN`,t.session)),this._returnResult({data:t,error:null}))}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _listPasskeys(){as(this.experimental);try{return await this._useSession(async e=>{let{data:{session:t},error:n}=e;if(n)return this._returnResult({data:null,error:n});if(!t)return this._returnResult({data:null,error:new F});let{data:r,error:i}=await B(this.fetch,`GET`,`${this.url}/passkeys`,{headers:this.headers,jwt:t.access_token,xform:e=>({data:e,error:null})});return i?this._returnResult({data:null,error:i}):this._returnResult({data:r,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _updatePasskey(e){as(this.experimental);try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;if(r)return this._returnResult({data:null,error:r});if(!n)return this._returnResult({data:null,error:new F});let{data:i,error:a}=await B(this.fetch,`PATCH`,`${this.url}/passkeys/${e.passkeyId}`,{headers:this.headers,jwt:n.access_token,body:{friendly_name:e.friendlyName}});return a?this._returnResult({data:null,error:a}):this._returnResult({data:i,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}async _deletePasskey(e){as(this.experimental);try{return await this._useSession(async t=>{let{data:{session:n},error:r}=t;if(r)return this._returnResult({data:null,error:r});if(!n)return this._returnResult({data:null,error:new F});let{error:i}=await B(this.fetch,`DELETE`,`${this.url}/passkeys/${e.passkeyId}`,{headers:this.headers,jwt:n.access_token,noResolveJson:!0});return i?this._returnResult({data:null,error:i}):this._returnResult({data:null,error:null})})}catch(e){if(P(e))return this._returnResult({data:null,error:e});throw e}}};tc.nextInstanceID={};var nc=tc,rc=`2.105.3`,ic=``;ic=typeof Deno<`u`?`deno`:typeof document<`u`?`web`:typeof navigator<`u`&&navigator.product===`ReactNative`?`react-native`:`node`;var ac={headers:{"X-Client-Info":`supabase-js-${ic}/${rc}`}},oc={schema:`public`},sc={autoRefreshToken:!0,persistSession:!0,detectSessionInUrl:!0,flowType:`implicit`},cc={};function lc(e){"@babel/helpers - typeof";return lc=typeof Symbol==`function`&&typeof Symbol.iterator==`symbol`?function(e){return typeof e}:function(e){return e&&typeof Symbol==`function`&&e.constructor===Symbol&&e!==Symbol.prototype?`symbol`:typeof e},lc(e)}function uc(e,t){if(lc(e)!=`object`||!e)return e;var n=e[Symbol.toPrimitive];if(n!==void 0){var r=n.call(e,t||`default`);if(lc(r)!=`object`)return r;throw TypeError(`@@toPrimitive must return a primitive value.`)}return(t===`string`?String:Number)(e)}function dc(e){var t=uc(e,`string`);return lc(t)==`symbol`?t:t+``}function fc(e,t,n){return(t=dc(t))in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function pc(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),n.push.apply(n,r)}return n}function V(e){for(var t=1;t<arguments.length;t++){var n=arguments[t]==null?{}:arguments[t];t%2?pc(Object(n),!0).forEach(function(t){fc(e,t,n[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):pc(Object(n)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))})}return e}var mc=e=>e?(...t)=>e(...t):(...e)=>fetch(...e),hc=()=>Headers,gc=(e,t,n)=>{let r=mc(n),i=hc();return async(n,a)=>{let o=await t()??e,s=new i(a?.headers);return s.has(`apikey`)||s.set(`apikey`,e),s.has(`Authorization`)||s.set(`Authorization`,`Bearer ${o}`),r(n,V(V({},a),{},{headers:s}))}};function _c(e){return e.endsWith(`/`)?e:e+`/`}function vc(e,t){let{db:n,auth:r,realtime:i,global:a}=e,{db:o,auth:s,realtime:c,global:l}=t,u={db:V(V({},o),n),auth:V(V({},s),r),realtime:V(V({},c),i),storage:{},global:V(V(V({},l),a),{},{headers:V(V({},l?.headers??{}),a?.headers??{})}),accessToken:async()=>``};return e.accessToken?u.accessToken=e.accessToken:delete u.accessToken,u}function yc(e){let t=e?.trim();if(!t)throw Error(`supabaseUrl is required.`);if(!t.match(/^https?:\/\//i))throw Error(`Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.`);try{return new URL(_c(t))}catch{throw Error(`Invalid supabaseUrl: Provided URL is malformed.`)}}var bc=class extends nc{constructor(e){super(e)}},xc=class{constructor(e,t,n){this.supabaseUrl=e,this.supabaseKey=t;let r=yc(e);if(!t)throw Error(`supabaseKey is required.`);this.realtimeUrl=new URL(`realtime/v1`,r),this.realtimeUrl.protocol=this.realtimeUrl.protocol.replace(`http`,`ws`),this.authUrl=new URL(`auth/v1`,r),this.storageUrl=new URL(`storage/v1`,r),this.functionsUrl=new URL(`functions/v1`,r);let i=`sb-${r.hostname.split(`.`)[0]}-auth-token`,a={db:oc,realtime:cc,auth:V(V({},sc),{},{storageKey:i}),global:ac},o=vc(n??{},a);this.storageKey=o.auth.storageKey??``,this.headers=o.global.headers??{},o.accessToken?(this.accessToken=o.accessToken,this.auth=new Proxy({},{get:(e,t)=>{throw Error(`@supabase/supabase-js: Supabase Client is configured with the accessToken option, accessing supabase.auth.${String(t)} is not possible`)}})):this.auth=this._initSupabaseAuthClient(o.auth??{},this.headers,o.global.fetch),this.fetch=gc(t,this._getAccessToken.bind(this),o.global.fetch),this.realtime=this._initRealtimeClient(V({headers:this.headers,accessToken:this._getAccessToken.bind(this),fetch:this.fetch},o.realtime)),this.accessToken&&Promise.resolve(this.accessToken()).then(e=>this.realtime.setAuth(e)).catch(e=>console.warn(`Failed to set initial Realtime auth token:`,e)),this.rest=new Jr(new URL(`rest/v1`,r).href,{headers:this.headers,schema:o.db.schema,fetch:this.fetch,timeout:o.db.timeout,urlLengthLimit:o.db.urlLengthLimit}),this.storage=new Qa(this.storageUrl.href,this.headers,this.fetch,n?.storage),o.accessToken||this._listenForAuthEvents()}get functions(){return new kr(this.functionsUrl.href,{headers:this.headers,customFetch:this.fetch})}from(e){return this.rest.from(e)}schema(e){return this.rest.schema(e)}rpc(e,t={},n={head:!1,get:!1,count:void 0}){return this.rest.rpc(e,t,n)}channel(e,t={config:{}}){return this.realtime.channel(e,t)}getChannels(){return this.realtime.getChannels()}removeChannel(e){return this.realtime.removeChannel(e)}removeAllChannels(){return this.realtime.removeAllChannels()}async _getAccessToken(){var e=this;if(e.accessToken)return await e.accessToken();let{data:t}=await e.auth.getSession();return t.session?.access_token??e.supabaseKey}_initSupabaseAuthClient({autoRefreshToken:e,persistSession:t,detectSessionInUrl:n,storage:r,userStorage:i,storageKey:a,flowType:o,lock:s,debug:c,throwOnError:l,experimental:u,lockAcquireTimeout:d,skipAutoInitialize:f},p,m){let h={Authorization:`Bearer ${this.supabaseKey}`,apikey:`${this.supabaseKey}`};return new bc({url:this.authUrl.href,headers:V(V({},h),p),storageKey:a,autoRefreshToken:e,persistSession:t,detectSessionInUrl:n,storage:r,userStorage:i,flowType:o,lock:s,debug:c,throwOnError:l,experimental:u,fetch:m,lockAcquireTimeout:d,skipAutoInitialize:f,hasCustomAuthorizationHeader:Object.keys(this.headers).some(e=>e.toLowerCase()===`authorization`)})}_initRealtimeClient(e){return new ea(this.realtimeUrl.href,V(V({},e),{},{params:V(V({},{apikey:this.supabaseKey}),e?.params)}))}_listenForAuthEvents(){return this.auth.onAuthStateChange((e,t)=>{this._handleTokenChanged(e,`CLIENT`,t?.access_token)})}_handleTokenChanged(e,t,n){(e===`TOKEN_REFRESHED`||e===`SIGNED_IN`)&&this.changedAccessToken!==n?(this.changedAccessToken=n,this.realtime.setAuth(n)):e===`SIGNED_OUT`&&(this.realtime.setAuth(),t==`STORAGE`&&this.auth.signOut(),this.changedAccessToken=void 0)}},Sc=(e,t,n)=>new xc(e,t,n);function Cc(){if(typeof window<`u`)return!1;let e=globalThis.process;if(!e)return!1;let t=e.version;if(t==null)return!1;let n=t.match(/^v(\d+)\./);return n?parseInt(n[1],10)<=18:!1}Cc()&&console.warn(`⚠️  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217`);var wc=Sc(`https://dkpsbsmpizjnukkpmgrq.supabase.co`,`sb_publishable_HB51IVJn5yV1OpsieMN7PA_Y5JPUFN8`);async function Tc(e,t){let n={group_name:e.group||``,name:e.name,birth_date:e.birthDate,career_months:e.careerMonths,company:e.company||``,department:e.department,job_type:e.jobType,income_range:e.incomeRange||``,recruit_count:e.recruitCount||``,score_cp:t.scores.CP,score_np:t.scores.NP,score_a:t.scores.A,score_fc:t.scores.FC,score_ac:t.scores.AC,total:t.total,top1:t.top1,top2:t.top2,bottom:t.bottom,grades:t.grades},{error:r}=await wc.from(`responses`).insert(n);return r&&console.error(`Save failed:`,r),n}async function Ec(){let{data:e,error:t}=await wc.from(`responses`).select(`*`).order(`created_at`,{ascending:!1});return t?(console.error(`Load failed:`,t),[]):(e||[]).map(e=>({id:e.id,timestamp:e.created_at,group:e.group_name,name:e.name,birthDate:e.birth_date,careerMonths:e.career_months,company:e.company||``,department:e.department,jobType:e.job_type,incomeRange:e.income_range,recruitCount:e.recruit_count,scores:{CP:e.score_cp,NP:e.score_np,A:e.score_a,FC:e.score_fc,AC:e.score_ac},grades:e.grades,total:e.total,top1:e.top1,top2:e.top2,bottom:e.bottom}))}async function Dc(e){let{error:t}=await wc.from(`responses`).delete().eq(`id`,e);return t&&console.error(`Delete failed:`,t),Ec()}async function Oc(){let{error:e}=await wc.from(`responses`).delete().neq(`id`,`00000000-0000-0000-0000-000000000000`);e&&console.error(`Clear failed:`,e)}function kc(){let[e,t]=(0,x.useState)(`landing`),[n,r]=(0,x.useState)(null),[i,a]=(0,x.useState)(null),[o,s]=(0,x.useState)(null);function c(e){r(e),t(`intro`)}function l(e){a({...e,group:n}),t(`survey`)}async function u(e){await Tc({...i,group:n},e),s(e),t(`result`)}function d(){t(`landing`),r(null),a(null),s(null)}return(0,k.jsxs)(k.Fragment,{children:[e===`landing`&&(0,k.jsx)(er,{onEnter:c}),e===`intro`&&(0,k.jsx)(rr,{group:n,onSubmit:l}),e===`survey`&&(0,k.jsx)(yr,{onComplete:u}),e===`result`&&(0,k.jsx)(br,{result:o,profile:i,onRestart:d})]})}var Ac=`sonson`;function jc({onLogin:e}){let[t,n]=(0,x.useState)(``),[r,i]=(0,x.useState)(``);function a(n){n.preventDefault(),t===Ac?e():i(`비밀번호가 틀렸습니다.`)}return(0,k.jsxs)(`section`,{className:`landing-section`,children:[(0,k.jsx)(`div`,{className:`landing-badge`,children:`ADMIN`}),(0,k.jsx)(`h1`,{children:`관리자 로그인`}),(0,k.jsx)(`p`,{className:`landing-desc`,children:`설문 결과를 확인하려면 관리자 비밀번호를 입력하세요.`}),(0,k.jsxs)(`form`,{onSubmit:a,className:`landing-code-wrap`,children:[(0,k.jsxs)(`div`,{className:`form-group`,children:[(0,k.jsx)(`input`,{className:`form-input landing-code-input`,type:`password`,value:t,onChange:e=>{n(e.target.value),i(``)},placeholder:`비밀번호`}),r&&(0,k.jsx)(`div`,{className:`landing-error`,children:r})]}),(0,k.jsx)(`button`,{type:`submit`,className:`btn btn-primary btn-full`,disabled:!t,children:`로그인`})]})]})}var Mc=JSON.parse(`[{"id":"d1417bff-c387-4e4a-a2f4-3bfbb1972186","timestamp":"2026-05-08T07:16:00.000Z","group":"망원동","name":"김수아","birthDate":"19831206","careerMonths":"81","department":"용인 에이스지점 2팀","jobType":"sales","incomeRange":"800-1000","recruitCount":"","scores":{"CP":16,"NP":9,"A":15,"FC":20,"AC":9},"grades":{"CP":"고","NP":"저","A":"고","FC":"극고","AC":"저"},"top1":"FC","top2":"CP","bottom":"NP","total":69},{"id":"905dbeac-946d-433e-a732-07b2f9c03f8e","timestamp":"2026-05-08T08:19:00.000Z","group":"서교동","name":"장현정","birthDate":"19840325","careerMonths":"91","department":"용인동백지점 1팀","jobType":"sales_leader","incomeRange":"400-600","recruitCount":"2","scores":{"CP":16,"NP":16,"A":16,"FC":6,"AC":10},"grades":{"CP":"고","NP":"고","A":"고","FC":"극저","AC":"저"},"top1":"CP","top2":"A","bottom":"FC","total":64},{"id":"74d58dcd-5dbc-4a33-b2b9-e80a03d84af8","timestamp":"2026-05-08T05:22:00.000Z","group":"합정동","name":"김정임","birthDate":"19800223","careerMonths":"68","department":"용인 에이스지점","jobType":"sales","incomeRange":"400-600","recruitCount":"1","scores":{"CP":14,"NP":13,"A":18,"FC":14,"AC":6},"grades":{"CP":"고","NP":"중","A":"극고","FC":"고","AC":"극저"},"top1":"A","top2":"CP","bottom":"AC","total":65},{"id":"e2312270-0172-45a6-8ba4-81a93df61d1d","timestamp":"2026-05-08T06:25:00.000Z","group":"망원동","name":"김지윤","birthDate":"19830528","careerMonths":"36차월","department":"북부티씨지점","jobType":"sales","incomeRange":"800-1000","recruitCount":"3","scores":{"CP":17,"NP":15,"A":12,"FC":19,"AC":10},"grades":{"CP":"극고","NP":"고","A":"중","FC":"극고","AC":"저"},"top1":"FC","top2":"CP","bottom":"AC","total":73},{"id":"a67a0a47-53ce-4877-b2fa-1fc416b7c72d","timestamp":"2026-05-08T07:28:00.000Z","group":"서교동","name":"박세미","birthDate":"19790628","careerMonths":"100","department":"DB손보용인 에이스4팀","jobType":"sales_leader","incomeRange":"400-600","recruitCount":"1","scores":{"CP":17,"NP":15,"A":17,"FC":16,"AC":8},"grades":{"CP":"극고","NP":"고","A":"극고","FC":"고","AC":"저"},"top1":"CP","top2":"A","bottom":"AC","total":73},{"id":"0e040538-977e-416d-b072-75e256f7d1b4","timestamp":"2026-05-08T08:31:00.000Z","group":"합정동","name":"김동현","birthDate":"19820318","careerMonths":"150","department":"북부TC지점","jobType":"sales","incomeRange":"800-1000","recruitCount":"38","scores":{"CP":13,"NP":15,"A":19,"FC":16,"AC":5},"grades":{"CP":"중","NP":"고","A":"극고","FC":"고","AC":"극저"},"top1":"A","top2":"FC","bottom":"AC","total":68},{"id":"0c8eaaa8-66e4-4f2a-90e5-d87f387583a0","timestamp":"2026-05-08T05:34:00.000Z","group":"망원동","name":"박희수","birthDate":"19730916","careerMonths":"312","department":"남산지점","jobType":"sales","incomeRange":"400-600","recruitCount":"20","scores":{"CP":8,"NP":17,"A":11,"FC":15,"AC":18},"grades":{"CP":"저","NP":"극고","A":"중","FC":"고","AC":"극고"},"top1":"AC","top2":"NP","bottom":"CP","total":69},{"id":"08587ff1-7ee1-42ea-ac26-74a7dbeff1d6","timestamp":"2026-05-08T06:37:00.000Z","group":"서교동","name":"정혜은","birthDate":"19770329","careerMonths":"29","department":"북부tc 82팀","jobType":"sales","incomeRange":"400-600","recruitCount":"0","scores":{"CP":16,"NP":8,"A":16,"FC":14,"AC":9},"grades":{"CP":"고","NP":"저","A":"고","FC":"고","AC":"저"},"top1":"CP","top2":"A","bottom":"NP","total":63},{"id":"7a685c3e-3b03-4fe5-85d4-55c7a93b46e8","timestamp":"2026-05-08T07:40:00.000Z","group":"합정동","name":"임명옥","birthDate":"19791120","careerMonths":"16","department":"북부TC지점 82센터","jobType":"sales","incomeRange":"400-600","recruitCount":"0","scores":{"CP":11,"NP":15,"A":9,"FC":19,"AC":10},"grades":{"CP":"중","NP":"고","A":"저","FC":"극고","AC":"저"},"top1":"FC","top2":"NP","bottom":"A","total":64},{"id":"29211930-5e2b-492e-ac7c-e38dd7cfcbd7","timestamp":"2026-05-08T08:43:00.000Z","group":"망원동","name":"서한솔","birthDate":"19930223","careerMonths":"26","department":"북부사업단 북부tc 82팀","jobType":"coach","incomeRange":"over2000","recruitCount":"0","scores":{"CP":8,"NP":14,"A":15,"FC":16,"AC":14},"grades":{"CP":"저","NP":"고","A":"고","FC":"고","AC":"고"},"top1":"FC","top2":"A","bottom":"CP","total":67},{"id":"bdccc17a-c8ee-49d8-ad02-3919ebe6d6a7","timestamp":"2026-05-08T05:46:00.000Z","group":"서교동","name":"전미경","birthDate":"19770420","careerMonths":"17","department":"북부지점 82센터","jobType":"sales","incomeRange":"400-600","recruitCount":"3","scores":{"CP":9,"NP":16,"A":16,"FC":11,"AC":3},"grades":{"CP":"저","NP":"고","A":"고","FC":"중","AC":"극저"},"top1":"A","top2":"NP","bottom":"AC","total":55},{"id":"0ccd67be-88ab-4150-8810-4f0233cd18df","timestamp":"2026-05-08T06:49:00.000Z","group":"합정동","name":"이정희","birthDate":"19860119","careerMonths":"16","department":"북부TC 81팀","jobType":"sales","incomeRange":"400-600","recruitCount":"1","scores":{"CP":10,"NP":5,"A":10,"FC":6,"AC":5},"grades":{"CP":"저","NP":"극저","A":"저","FC":"극저","AC":"극저"},"top1":"CP","top2":"A","bottom":"NP","total":36},{"id":"673be236-a129-427f-8d43-c316d804fa33","timestamp":"2026-05-08T07:52:00.000Z","group":"망원동","name":"손용배","birthDate":"19680412","careerMonths":"50","department":"북부지점 1","jobType":"sales","incomeRange":"400-600","recruitCount":"1","scores":{"CP":12,"NP":9,"A":11,"FC":14,"AC":11},"grades":{"CP":"중","NP":"저","A":"중","FC":"고","AC":"중"},"top1":"FC","top2":"CP","bottom":"NP","total":57},{"id":"eabdd2a9-a17f-4e61-8e9f-940a58652888","timestamp":"2026-05-08T08:55:00.000Z","group":"서교동","name":"이정희","birthDate":"19860119","careerMonths":"16","department":"북부TC 81센터","jobType":"sales","incomeRange":"400-600","recruitCount":"1","scores":{"CP":6,"NP":12,"A":7,"FC":5,"AC":10},"grades":{"CP":"극저","NP":"중","A":"극저","FC":"극저","AC":"저"},"top1":"NP","top2":"AC","bottom":"FC","total":40},{"id":"d8cca97e-0609-4b14-bb50-26d2b8ac4718","timestamp":"2026-05-08T05:58:00.000Z","group":"합정동","name":"조태신","birthDate":"19711005","careerMonths":"257","department":"강남지점 1팀","jobType":"sales","incomeRange":"800-1000","recruitCount":"1","scores":{"CP":8,"NP":19,"A":7,"FC":12,"AC":13},"grades":{"CP":"저","NP":"극고","A":"극저","FC":"중","AC":"중"},"top1":"NP","top2":"AC","bottom":"A","total":59},{"id":"2dbdb569-0ba7-4356-9da7-8659dc84e6e2","timestamp":"2026-05-08T06:61:00.000Z","group":"망원동","name":"유현주","birthDate":"19791014","careerMonths":"88","department":"용인에이스 3팀","jobType":"sales_leader","incomeRange":"800-1000","recruitCount":"2","scores":{"CP":10,"NP":16,"A":16,"FC":14,"AC":16},"grades":{"CP":"저","NP":"고","A":"고","FC":"고","AC":"고"},"top1":"A","top2":"NP","bottom":"CP","total":72},{"id":"b4c26df2-da32-433c-a23d-a54787df2fe0","timestamp":"2026-05-08T07:64:00.000Z","group":"서교동","name":"이현미","birthDate":"19781125","careerMonths":"61","department":"에이스지점 2팀","jobType":"sales_leader","incomeRange":"800-1000","recruitCount":"1-2","scores":{"CP":12,"NP":8,"A":6,"FC":14,"AC":8},"grades":{"CP":"중","NP":"저","A":"극저","FC":"고","AC":"저"},"top1":"FC","top2":"CP","bottom":"A","total":48},{"id":"7dead1bb-0fe8-4024-ae05-55e712401a03","timestamp":"2026-05-08T08:67:00.000Z","group":"합정동","name":"김도예","birthDate":"19861023","careerMonths":"46차월","department":"별내TC지점","jobType":"sales","incomeRange":"under200","recruitCount":"1","scores":{"CP":10,"NP":18,"A":8,"FC":19,"AC":16},"grades":{"CP":"저","NP":"극고","A":"저","FC":"극고","AC":"고"},"top1":"FC","top2":"NP","bottom":"A","total":71},{"id":"9aa8c6be-3abd-4a33-957b-1a5a28930c22","timestamp":"2026-05-08T05:10:00.000Z","group":"망원동","name":"조성순","birthDate":"19711102","careerMonths":"125","department":"노원별내","jobType":"sales","incomeRange":"over2000","recruitCount":"1","scores":{"CP":16,"NP":10,"A":10,"FC":7,"AC":11},"grades":{"CP":"고","NP":"저","A":"저","FC":"극저","AC":"중"},"top1":"CP","top2":"AC","bottom":"FC","total":54},{"id":"67f7777f-bea9-4948-a293-232e350c0a21","timestamp":"2026-05-08T06:13:00.000Z","group":"서교동","name":"은미옥","birthDate":"19800303","careerMonths":"65","department":"별내TC 83센터","jobType":"sales_leader","incomeRange":"400-600","recruitCount":"4","scores":{"CP":10,"NP":20,"A":10,"FC":14,"AC":20},"grades":{"CP":"저","NP":"극고","A":"저","FC":"고","AC":"극고"},"top1":"NP","top2":"AC","bottom":"CP","total":74},{"id":"sample-coach-52","timestamp":"2026-01-14T10:00:00","group":"합정동","name":"이윤교","birthDate":"23055938.0","careerMonths":"32개월","company":"DB손해보험","department":"신노원리더tc","jobType":"coach","incomeRange":"월   300만원 이상","recruitCount":"4명","scores":{"CP":7,"NP":15,"A":10,"FC":15,"AC":13},"grades":{"CP":"극저","NP":"고","A":"저","FC":"고","AC":"중"},"top1":"NP","top2":"FC","bottom":"CP","total":60},{"id":"sample-coach-65","timestamp":"2026-01-14T10:00:00","group":"합정동","name":"제은지","birthDate":"19921212.0","careerMonths":"65개월","company":"DB손해보험","department":"DB손해보험, 창원지점, 1팀","jobType":"coach","incomeRange":"월   300만원 이상","recruitCount":"9명","scores":{"CP":9,"NP":13,"A":16,"FC":5,"AC":12},"grades":{"CP":"저","NP":"중","A":"고","FC":"극저","AC":"중"},"top1":"A","top2":"NP","bottom":"FC","total":55}]`),Nc={sales:`보험설계사`,coach:`코치/멘토`,sales_leader:`관리자`,branch_manager:`관리자`,training_leader:`관리자`,division_head:`관리자`,executive:`관리자`},Pc={sales:`고객 컨설팅 영업`,coach:`신인 육성 코칭`,sales_leader:`조직운영 리더`,branch_manager:`지점장/지사장`,training_leader:`교육팀장/지원팀장`,division_head:`사업단장/부장`,executive:`본부장`},Fc={under200:`200만 미만`,"200-400":`200~400만`,"400-600":`400~600만`,"600-800":`600~800만`,"800-1000":`800~1000만`,"1000-1500":`1000~1500만`,"1500-2000":`1500~2000만`,over2000:`2000만 이상`},Ic={CP:{bg:`#ef4444`,light:`#fef2f2`,text:`#dc2626`},NP:{bg:`#f59e0b`,light:`#fffbeb`,text:`#d97706`},A:{bg:`#38bdf8`,light:`#f0f9ff`,text:`#0284c7`},FC:{bg:`#10b981`,light:`#ecfdf5`,text:`#059669`},AC:{bg:`#8b5cf6`,light:`#f5f3ff`,text:`#7c3aed`}},Lc={망원동:{bg:`#0012de`,text:`#fff`},서교동:{bg:`#e11d48`,text:`#fff`},합정동:{bg:`#059669`,text:`#fff`}};function Rc({ego:e,score:t,isTop:n,isBottom:r}){let i=t/20*100,a=Ic[e];return(0,k.jsx)(`td`,{className:`td-score-bar`,children:(0,k.jsx)(`div`,{className:`score-cell-v`,style:{background:`linear-gradient(to top, ${a.bg}30 ${i}%, transparent ${i}%)`},children:(0,k.jsx)(`span`,{className:`score-num`,children:t})})})}function zc({ego:e,type:t}){let n=Ic[e];return(0,k.jsx)(`span`,{className:`ego-tag`,style:t===`top`?{background:n.light,color:n.text,border:`1.5px solid ${n.bg}40`}:{background:`#f5f5f5`,color:`#999`,border:`1.5px solid #e0e0e0`},children:e})}function H({group:e}){let t=Lc[e]||{bg:`#888`,text:`#fff`};return(0,k.jsx)(`span`,{className:`group-badge`,style:{background:t.bg,color:t.text},children:e})}function Bc({onLogout:e}){let[t,n]=(0,x.useState)([]),[r,i]=(0,x.useState)(`all`);(0,x.useEffect)(()=>{Ec().then(n)},[]);let a=[...new Set(t.map(e=>e.group).filter(Boolean))].sort(),o=r===`all`?t:t.filter(e=>e.group===r),s={};for(let e of t)e.group&&(s[e.group]=(s[e.group]||0)+1);async function c(e){let r=t.find(t=>t.id===e);window.confirm(`${r?.name||``}님의 결과를 삭제하시겠습니까?`)&&n(await Dc(e))}async function l(){window.confirm(`전체 ${t.length}건을 삭제하시겠습니까?`)&&(await Oc(),n([]))}async function u(){for(let e of Mc)await Tc({group:e.group,name:e.name,birthDate:e.birthDate,careerMonths:e.careerMonths,company:e.company||``,department:e.department,jobType:e.jobType,incomeRange:e.incomeRange,recruitCount:e.recruitCount},{scores:e.scores,grades:e.grades,top1:e.top1,top2:e.top2,bottom:e.bottom,total:e.total});n(await Ec())}function d(){if(o.length===0)return;let e=`﻿`+[[`그룹`,`이름`,`생년월일`,`경력(월)`,`회사`,`소속`,`직무`,`소득`,`리크루팅`,`CP`,`NP`,`A`,`FC`,`AC`,`총점`,`TOP1`,`TOP2`,`BOTTOM`,`일시`],...o.map(e=>[e.group,e.name,e.birthDate,e.careerMonths,e.company||``,e.department,Pc[e.jobType]||e.jobType,Fc[e.incomeRange]||e.incomeRange||``,e.recruitCount||``,e.scores?.CP,e.scores?.NP,e.scores?.A,e.scores?.FC,e.scores?.AC,e.total,`${e.top1} ${or[e.top1]}`,`${e.top2} ${or[e.top2]}`,`${e.bottom} ${or[e.bottom]}`,new Date(e.timestamp).toLocaleString(`ko-KR`)])].map(e=>e.join(`,`)).join(`
-`),t=new Blob([e],{type:`text/csv;charset=utf-8;`}),n=URL.createObjectURL(t),r=document.createElement(`a`);r.href=n,r.download=`egogram_results_${new Date().toISOString().slice(0,10)}.csv`,r.click(),URL.revokeObjectURL(n)}let f=[`CP`,`NP`,`A`,`FC`,`AC`];return(0,k.jsxs)(`section`,{className:`admin-section`,children:[(0,k.jsxs)(`div`,{className:`admin-header`,children:[(0,k.jsxs)(`div`,{children:[(0,k.jsx)(`h1`,{children:`설문 결과`}),(0,k.jsxs)(`p`,{className:`admin-count`,children:[`총 `,o.length,`건 `,r!==`all`&&`(${r})`]})]}),(0,k.jsx)(`button`,{className:`btn btn-secondary`,onClick:e,children:`로그아웃`})]}),(0,k.jsxs)(`div`,{className:`admin-toolbar`,children:[(0,k.jsxs)(`div`,{className:`admin-filters`,children:[(0,k.jsxs)(`button`,{className:`filter-chip ${r===`all`?`active`:``}`,onClick:()=>i(`all`),children:[`전체 (`,t.length,`)`]}),a.map(e=>{let t=Lc[e]||{bg:`#888`};return(0,k.jsxs)(`button`,{className:`filter-chip ${r===e?`active`:``}`,onClick:()=>i(e),style:r===e?{background:t.bg,borderColor:t.bg,color:`#fff`}:{borderColor:t.bg,color:t.bg},children:[e,` (`,s[e]||0,`)`]},e)})]}),(0,k.jsxs)(`div`,{className:`admin-actions`,children:[(0,k.jsx)(`button`,{className:`btn btn-secondary`,onClick:u,children:`샘플 20명`}),(0,k.jsx)(`button`,{className:`btn btn-primary`,onClick:d,disabled:o.length===0,children:`CSV 다운로드`}),(0,k.jsx)(`button`,{className:`btn btn-secondary`,onClick:l,disabled:t.length===0,children:`전체 삭제`})]})]}),o.length===0?(0,k.jsx)(`div`,{className:`admin-empty`,children:`아직 설문 결과가 없습니다.`}):(0,k.jsx)(`div`,{className:`admin-table-wrap`,children:(0,k.jsxs)(`table`,{className:`admin-table`,children:[(0,k.jsx)(`thead`,{children:(0,k.jsxs)(`tr`,{children:[(0,k.jsx)(`th`,{children:`그룹`}),(0,k.jsx)(`th`,{children:`이름`}),(0,k.jsx)(`th`,{children:`생년월일`}),(0,k.jsx)(`th`,{children:`경력`}),(0,k.jsx)(`th`,{children:`회사`}),(0,k.jsx)(`th`,{children:`소속`}),(0,k.jsx)(`th`,{children:`직무`}),(0,k.jsx)(`th`,{children:`소득`}),(0,k.jsx)(`th`,{children:`리크루팅`}),f.map(e=>(0,k.jsx)(`th`,{className:`th-ego`,style:{color:Ic[e].bg},children:e},e)),(0,k.jsx)(`th`,{children:`총점`}),(0,k.jsx)(`th`,{children:`TOP1`}),(0,k.jsx)(`th`,{children:`BOT`}),(0,k.jsx)(`th`,{children:`일시`}),(0,k.jsx)(`th`,{children:`리포트`}),(0,k.jsx)(`th`,{})]})}),(0,k.jsx)(`tbody`,{children:o.map(e=>(0,k.jsxs)(`tr`,{children:[(0,k.jsx)(`td`,{children:(0,k.jsx)(H,{group:e.group})}),(0,k.jsx)(`td`,{className:`td-name`,children:e.name}),(0,k.jsx)(`td`,{children:e.birthDate}),(0,k.jsx)(`td`,{children:e.careerMonths&&`${e.careerMonths}개월`}),(0,k.jsx)(`td`,{children:e.company||`-`}),(0,k.jsx)(`td`,{children:e.department}),(0,k.jsx)(`td`,{children:Pc[e.jobType]||e.jobType}),(0,k.jsx)(`td`,{className:`td-small`,children:Fc[e.incomeRange]||`-`}),(0,k.jsx)(`td`,{children:e.recruitCount||`-`}),f.map(t=>(0,k.jsx)(Rc,{ego:t,score:e.scores?.[t]||0,isTop:t===e.top1||t===e.top2,isBottom:t===e.bottom},t)),(0,k.jsx)(`td`,{className:`td-score td-total`,children:e.total}),(0,k.jsx)(`td`,{children:(0,k.jsx)(zc,{ego:e.top1,type:`top`})}),(0,k.jsx)(`td`,{children:(0,k.jsx)(zc,{ego:e.bottom,type:`bot`})}),(0,k.jsx)(`td`,{className:`td-date`,children:new Date(e.timestamp).toLocaleString(`ko-KR`,{month:`numeric`,day:`numeric`,hour:`2-digit`,minute:`2-digit`})}),(0,k.jsx)(`td`,{children:(0,k.jsxs)(`a`,{href:`#/report/${e.id}`,target:`_blank`,className:`btn-report-action`,children:[`리포트 보기`,(0,k.jsx)(`span`,{className:`btn-report-type`,"data-type":Nc[e.jobType]||`보험설계사`,children:Nc[e.jobType]||`보험설계사`})]})}),(0,k.jsx)(`td`,{children:(0,k.jsx)(`button`,{className:`btn-delete-action`,onClick:()=>c(e.id),children:`삭제`})})]},e.id))})]})})]})}function Vc(){let[e,t]=(0,x.useState)(!1);return e?(0,k.jsx)(Bc,{onLogout:()=>t(!1)}):(0,k.jsx)(jc,{onLogin:()=>t(!0)})}var Hc={job_type:`insurance`,job_label:`보험설계사`,cm1:{"17-20":{CP:`주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`이성적, 균형감, 현실적, 분석적.`,FC:`밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`협조, 적당한 순응, 적당한 눈치, 조율.`},"11-13":{CP:`균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`적당한 친절, 예의 바름, 부담 없음.`,A:`평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`안정감, 차분한, 균형감, 무난함.`,AC:`적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`차분함, 무심해 보임, 실무형, 표현 적음.`,A:`감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`조용함, 신중함, 진지함, 다소 거리감`,AC:`독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`우유부단, 착함,  결정 어려움, 말을 아낌.`,NP:`무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족 .`,FC:`무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`단호함, 직선적, 눈치 안 봄, 상대를 통제.`}},cm2:{"17-20":{CP:`기준과 원칙이 아주 분명합니다. 상담 자리에서 말과 자세가 단정하고 자신감이 있습니다. “이 부분은 꼭 필요합니다”, “이 선택이 가장 안전합니다”처럼 단호하게 말합니다. 고객님이 망설이면 방향을 잡아 주려는 마음이 강합니다. 다만 너무 확신에 찬 말투 때문에 고객님이 압박을 느낄 수 있습니다.`,NP:`고객님을 향한 마음의 온도가 매우 높습니다. 고객님의 말을 들으면 먼저 이해하려 하고, 판단보다 공감을 앞세웁니다. 그래서 고객님은 이분과 상담할 때 편안함을 느끼고, 자신의 이야기를 솔직하게 꺼내도 괜찮겠다는 신뢰를 갖게 됩니다. 힘든 상황에서도 끝까지 함께해 줄 사람이라는 확신을 주는, 관계의 기반을 만드는 따뜻한 힘이 있습니다.`,A:`고객 상담에서 감정에 치우치지 않고 사실과 흐름을 차분히 정리하는 능력이 뛰어납니다. 복잡한 조건 속에서도 핵심을 잡아 주기 때문에 고객님은 방향을 잃지 않습니다. 설명은 명확하고 판단은 균형 잡혀 있어, 고객님에게 안정감과 전문성을 동시에 느끼게 합니다. 믿고 맡길 수 있는 사람이라는 확신을 만드는 힘입니다.`,FC:`사람을 만나는 걸 정말 즐깁니다. 상담할 때 표정이 밝고 마음이 열려 있으며, 먼저 웃으며 말을 겁니다. 고객님 이야기에 고개를 끄덕이고 반응이 빠릅니다. 말투는 부드럽고 친근해서 “아, 그런 상황이셨군요”처럼 공감부터 합니다. 다만 분위기가 너무 가벼워 보이면 중요한 설명이 가볍게 느껴질 수 있어 조절이 필요합니다.`,AC:`고객님의 표정과 말투를 아주 민감하게 살핍니다. 고객님이 불편해할까 봐 먼저 조심하고, 맞춰 주는 태도가 강합니다. 말할 때도 “괜찮으시면요”, “부담되시면 안 하셔도 돼요” 같은 표현을 자주 씁니다. 고객님 기분은 잘 읽지만, 본인 의견을 끝까지 말하지 못해 설명이 흐려질 수 있습니다.`},"14-16":{CP:`책임감 있고 믿음직한 태도를 보입니다. 상담할 때 흐트러짐 없이 차분하게 설명하고, 중요한 포인트를 분명히 짚어 줍니다. 말투는 또렷하지만 공격적이지 않고 “이 기준으로 보시면 이해가 쉬워요”처럼 안내합니다. 고객님은 이 설계사를 통해 안정감과 신뢰를 느끼기 쉽습니다.`,NP:`따뜻하면서도 안정감 있게 고객님을 대합니다. 고객님 이야기를 잘 들어주고 고개를 끄덕이며 공감해 줍니다. 말투는 부드럽고 “그렇게 느끼실 수 있어요”, “많이 고민되셨죠” 같은 표현을 자연스럽게 씁니다. 필요할 때는 조심스럽게 방향을 제시해 고객님이 혼자 결정한다고 느끼게 해줍니다. 신뢰받기 쉬운 태도입니다.`,A:`감정보다 이성과 논리로 코칭합니다. 고객님 이야기를 차분히 듣고, 필요한 정보만 골라 쉽게 코칭합니다. “걱정되실 수 있어요. 그래서 이 상황에서는 이렇게 해 봅시다”처럼 짧게 공감을 한 후에 코칭을 합니다. 말투가 안정적이고 판단이 흔들리지 않아 고객님이 신뢰하기 쉽습니다. 가장 이상적인 면담 태도입니다.`,FC:`편안한 분위기를 자연스럽게 만듭니다. 자세는 안정적이고 표정도 부드러워 고객님이 긴장을 풀기 쉽습니다. 말할 때는 웃음과 공감을 섞어 “편하게 생각하셔도 됩니다”라고 말합니다. 분위기는 밝고 과하지 않아 상담이 부담스럽지 않습니다.`,AC:`상황을 보며 말을 고르는 편입니다. 고객님 반응을 보면서 속도를 조절하고, 무리하게 밀지 않습니다. “이 부분은 고객님 상황에 맞춰 생각해 보셔도 돼요”처럼 부드럽게 말합니다. 배려와 안정감은 주지만, 결정이 늦어질 수 있습니다.`},"11-13":{CP:`상황에 맞게 유연하게 대응합니다. 자기 의견도 있지만 고객님 말도 잘 듣습니다. 상담에서는 “제 생각은 이렇지만, 고객님 상황도 중요합니다”처럼 균형 잡힌 말을 합니다. 강하게 밀어붙이지도, 너무 물러서지도 않아 편안한 상담이 됩니다. 고객님은 부담 없이 설명을 받아들입니다.`,NP:`친절하지만 감정에 너무 치우치지는 않습니다. 고객님에게 예의 있게 대하고 필요한 설명을 차분히 합니다. 말은 짧고 정리되어 있으며 “이 부분은 이렇게 보시면 돼요”처럼 담백한 표현을 씁니다. 고객님은 부담 없이 설명을 듣는 느낌을 받습니다. 다만 공감하는 표현을 조금만 더 한다면 고객님의 만족도는 더 상승합니다.`,A:`상황에 따라 감정과 논리를 오가며 상담합니다. 고객님 반응을 보며 설명을 조절하고, 너무 딱딱하지도 너무 감정적이지도 않습니다. “이렇게 생각하실 수 있는데, 현실적으로 보면 이 선택이 좋아요”처럼 말합니다. 무난하지만 결정이 조금 늦어질 수 있어 정리 멘트가 필요합니다.`,FC:`무난하고 차분한 태도를 보입니다. 자세는 바르고 표정은 안정적입니다. 말투는 또렷하지만 감정 표현은 많지 않습니다. “이 부분을 설명드리겠습니다”처럼 설명 중심으로 말합니다. 편하지도 불편하지도 않은 느낌을 주며, 고객님은 안정감을 느끼며 “이 분은 전문가 답다"라고 느낌`,AC:`고객님 눈치도 보고 자기 생각도 말할 줄 압니다. 분위기가 무겁지 않게 유지하면서도 필요한 설명은 분명히 합니다. “이건 장단점이 있어요. 고객님께 맞는 쪽을 같이 보죠”처럼 균형 잡힌 말투를 씁니다. 고객님도 부담 없이 듣습니다.`},"8-10":{CP:`고객님을 존중하면서도 자기 생각을 조금씩 말할 수 있습니다. 상담할 때 “제 경험으로 보면 이 방법이 더 안전해요”처럼 조심스럽게 방향을 제시합니다. 고객님을 몰아붙이지는 않지만, 완전히 맡기지도 않습니다. 다만 확신이 조금은 약해 보여서 고객님이 결정을 미루는 경우가 가끔 생기기도 합니다.`,NP:`감정 표현이 적은 편입니다. 고객님을 존중하긴 하지만 말수가 많지 않고 표정도 차분합니다. 상담에서는 설명 위주로 말하며 “이 상품은 이런 구조입니다”처럼 사실 중심으로 이야기합니다. 공감 표현은 적어 다소 차갑게 느껴질 수 있지만, 일은 또렷하게 진행됩니다. 고객님에 따라 거리감이 느껴질 수 있습니다.`,A:`느낌을 먼저 받아들이고 나중에 생각합니다. 고객님 말에 공감은 잘하지만 설명이 정리되지 않을 때가 있습니다. “괜찮을 것 같아요” 같은 표현이 많고, 이유 설명은 약합니다. 말투는 부드럽지만 판단력이 약해 보일 수 있어, 미리 준비한 설명을 쓰는 연습이 필요합니다.`,FC:`조용하고 진지한 모습이 강합니다. 상담 중 말수가 적고 표정 변화도 크지 않습니다. 자세는 단정하지만 다소 굳어 보일 수 있습니다. 말할 때는 필요한 말만 짧게 하며 감정 표현이 거의 없습니다. 고객님은 신뢰는 느끼지만 “조금 신중하다”고 느낄 수 있습니다.`,AC:`고객님 반응에 크게 흔들리지 않습니다. 자기 기준으로 차분하게 설명하고, 필요하면 직설적으로 말합니다. “이 상품은 이런 분께 맞습니다”처럼 간단히 말합니다. 솔직해서 신뢰는 주지만, 예민한 고객님에게는 조금은 차갑게 느껴질 수 있습니다.`},"0-7":{CP:`자기 기준을 강하게 내세우지 않습니다. 상담할 때 고객님 말을 먼저 듣고, 웬만하면 반대하지 않습니다. “고객님 생각이 맞아요”, “원하시는 대로 하셔도 됩니다”라는 말을 자주 합니다. 분위기는 편하지만, 고객님이 “그래서 뭘 선택해야 하지?” 하고 헷갈릴 수 있습니다. 방향을 잡아주는 힘은 약한 편입니다.`,NP:`감정을 잘 드러내지 않습니다. 상담할 때도 바로 본론으로 들어가며 “필요한 것만 말씀드리겠습니다”라는 식의 말투를 씁니다. 위로나 공감보다는 정보 전달이 중심입니다. 고객님은 정확하다고 느낄 수 있지만, 마음을 이해받는 느낌은 적을 수 있습니다. 친절해 보이지 않는다는 오해를 받을 수 있습니다.`,A:`상담 중 감정에 많이 휘둘립니다. 고객님 표정이나 말에 따라 말이 바뀌고, 설명보다 반응이 먼저 나옵니다. “아… 그러면 안 하셔도 돼요”처럼 쉽게 물러납니다. 친절해 보이지만 전문가로서의 신뢰는 떨어질 수 있어, 말하기 전 잠깐 생각하는 습관이 꼭 필요합니다.`,FC:`감정을 거의 드러내지 않습니다. 표정이 굳어 있고 몸도 긴장돼 보일 수 있습니다. 말투는 건조하고 설명 위주이며 공감 표현이 적습니다. 고객님이 말을 해도 반응이 적어 “내 말이 전달됐나?”라고 느낄 수 있습니다. 신뢰는 줄 수 있지만 거리감이 커질 가능성이 있습니다.`,AC:`남의 시선을 크게 신경 쓰지 않습니다. 고객님 눈치를 거의 보지 않고 자기 생각대로 말합니다. “이게 제일 합리적입니다”처럼 단정적인 표현이 많습니다. 자신감은 느껴지지만, 고객님이 압박을 느끼는 경우가 발생할 수 있습니다.`}},cm3:{CP_NP:`(CP 통제적부모 & NP 자상한부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
+`),t=new Blob([e],{type:`text/csv;charset=utf-8;`}),n=URL.createObjectURL(t),r=document.createElement(`a`);r.href=n,r.download=`egogram_results_${new Date().toISOString().slice(0,10)}.csv`,r.click(),URL.revokeObjectURL(n)}let f=[`CP`,`NP`,`A`,`FC`,`AC`];return(0,k.jsxs)(`section`,{className:`admin-section`,children:[(0,k.jsxs)(`div`,{className:`admin-header`,children:[(0,k.jsxs)(`div`,{children:[(0,k.jsx)(`h1`,{children:`설문 결과`}),(0,k.jsxs)(`p`,{className:`admin-count`,children:[`총 `,o.length,`건 `,r!==`all`&&`(${r})`]})]}),(0,k.jsx)(`button`,{className:`btn btn-secondary`,onClick:e,children:`로그아웃`})]}),(0,k.jsxs)(`div`,{className:`admin-toolbar`,children:[(0,k.jsxs)(`div`,{className:`admin-filters`,children:[(0,k.jsxs)(`button`,{className:`filter-chip ${r===`all`?`active`:``}`,onClick:()=>i(`all`),children:[`전체 (`,t.length,`)`]}),a.map(e=>{let t=Lc[e]||{bg:`#888`};return(0,k.jsxs)(`button`,{className:`filter-chip ${r===e?`active`:``}`,onClick:()=>i(e),style:r===e?{background:t.bg,borderColor:t.bg,color:`#fff`}:{borderColor:t.bg,color:t.bg},children:[e,` (`,s[e]||0,`)`]},e)})]}),(0,k.jsxs)(`div`,{className:`admin-actions`,children:[(0,k.jsx)(`button`,{className:`btn btn-secondary`,onClick:u,children:`샘플 20명`}),(0,k.jsx)(`button`,{className:`btn btn-primary`,onClick:d,disabled:o.length===0,children:`CSV 다운로드`}),(0,k.jsx)(`button`,{className:`btn btn-secondary`,onClick:l,disabled:t.length===0,children:`전체 삭제`})]})]}),o.length===0?(0,k.jsx)(`div`,{className:`admin-empty`,children:`아직 설문 결과가 없습니다.`}):(0,k.jsx)(`div`,{className:`admin-table-wrap`,children:(0,k.jsxs)(`table`,{className:`admin-table`,children:[(0,k.jsx)(`thead`,{children:(0,k.jsxs)(`tr`,{children:[(0,k.jsx)(`th`,{children:`그룹`}),(0,k.jsx)(`th`,{children:`이름`}),(0,k.jsx)(`th`,{children:`생년월일`}),(0,k.jsx)(`th`,{children:`경력`}),(0,k.jsx)(`th`,{children:`회사`}),(0,k.jsx)(`th`,{children:`소속`}),(0,k.jsx)(`th`,{children:`직무`}),(0,k.jsx)(`th`,{children:`소득`}),(0,k.jsx)(`th`,{children:`리크루팅`}),f.map(e=>(0,k.jsx)(`th`,{className:`th-ego`,style:{color:Ic[e].bg},children:e},e)),(0,k.jsx)(`th`,{children:`총점`}),(0,k.jsx)(`th`,{children:`TOP1`}),(0,k.jsx)(`th`,{children:`BOT`}),(0,k.jsx)(`th`,{children:`일시`}),(0,k.jsx)(`th`,{children:`리포트`}),(0,k.jsx)(`th`,{})]})}),(0,k.jsx)(`tbody`,{children:o.map(e=>(0,k.jsxs)(`tr`,{children:[(0,k.jsx)(`td`,{children:(0,k.jsx)(H,{group:e.group})}),(0,k.jsx)(`td`,{className:`td-name`,children:e.name}),(0,k.jsx)(`td`,{children:e.birthDate}),(0,k.jsx)(`td`,{children:e.careerMonths&&`${e.careerMonths}개월`}),(0,k.jsx)(`td`,{children:e.company||`-`}),(0,k.jsx)(`td`,{children:e.department}),(0,k.jsx)(`td`,{children:Pc[e.jobType]||e.jobType}),(0,k.jsx)(`td`,{className:`td-small`,children:Fc[e.incomeRange]||`-`}),(0,k.jsx)(`td`,{children:e.recruitCount||`-`}),f.map(t=>(0,k.jsx)(Rc,{ego:t,score:e.scores?.[t]||0,isTop:t===e.top1||t===e.top2,isBottom:t===e.bottom},t)),(0,k.jsx)(`td`,{className:`td-score td-total`,children:e.total}),(0,k.jsx)(`td`,{children:(0,k.jsx)(zc,{ego:e.top1,type:`top`})}),(0,k.jsx)(`td`,{children:(0,k.jsx)(zc,{ego:e.bottom,type:`bot`})}),(0,k.jsx)(`td`,{className:`td-date`,children:new Date(e.timestamp).toLocaleString(`ko-KR`,{month:`numeric`,day:`numeric`,hour:`2-digit`,minute:`2-digit`})}),(0,k.jsx)(`td`,{children:(0,k.jsxs)(`a`,{href:`#/report/${e.id}`,target:`_blank`,className:`btn-report-action`,children:[`리포트 보기`,(0,k.jsx)(`span`,{className:`btn-report-type`,"data-type":Nc[e.jobType]||`보험설계사`,children:Nc[e.jobType]||`보험설계사`})]})}),(0,k.jsx)(`td`,{children:(0,k.jsx)(`button`,{className:`btn-delete-action`,onClick:()=>c(e.id),children:`삭제`})})]},e.id))})]})})]})}function Vc(){let[e,t]=(0,x.useState)(!1);return e?(0,k.jsx)(Bc,{onLogout:()=>t(!1)}):(0,k.jsx)(jc,{onLogin:()=>t(!0)})}var Hc={job_type:`insurance`,job_label:`보험설계사`,cm1:{"17-20":{CP:`주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`이성적, 균형감, 현실적, 분석적.`,FC:`밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`협조, 적당한 순응, 적당한 눈치, 조율.`},"11-13":{CP:`균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`적당한 친절, 예의 바름, 부담 없음.`,A:`평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`안정감, 차분한, 균형감, 무난함.`,AC:`적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`차분함, 무심해 보임, 실무형, 표현 적음.`,A:`감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`조용함, 신중함, 진지함, 다소 거리감`,AC:`독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`우유부단, 착함,  결정 어려움, 말을 아낌.`,NP:`무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족 .`,FC:`무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`단호함, 직선적, 눈치 안 봄, 상대를 통제.`}},cm2:{"17-20":{CP:`기준과 원칙이 아주 분명합니다. 상담 자리에서 말과 자세가 단정하고 자신감이 있습니다. “이 부분은 꼭 필요합니다”, “이 선택이 가장 안전합니다”처럼 단호하게 말합니다. 고객님이 망설이면 방향을 잡아 주려는 마음이 강합니다. 다만 너무 확신에 찬 말투 때문에 고객님이 압박을 느낄 수 있습니다.`,NP:`고객님을 향한 마음의 온도가 매우 높습니다. 고객님의 말을 들으면 먼저 이해하려 하고, 판단보다 공감을 앞세웁니다. 그래서 고객님은 이분과 상담할 때 편안함을 느끼고, 자신의 이야기를 솔직하게 꺼내도 괜찮겠다는 신뢰를 갖게 됩니다. 힘든 상황에서도 끝까지 함께해 줄 사람이라는 확신을 주는, 관계의 기반을 만드는 따뜻한 힘이 있습니다.`,A:`고객 상담에서 감정에 치우치지 않고 사실과 흐름을 차분히 정리하는 능력이 뛰어납니다. 복잡한 조건 속에서도 핵심을 잡아 주기 때문에 고객님은 방향을 잃지 않습니다. 설명은 명확하고 판단은 균형 잡혀 있어, 고객님에게 안정감과 전문성을 동시에 느끼게 합니다. 믿고 맡길 수 있는 사람이라는 확신을 만드는 힘입니다.`,FC:`사람을 만나는 걸 정말 즐깁니다. 상담할 때 표정이 밝고 마음이 열려 있으며, 먼저 웃으며 말을 겁니다. 고객님 이야기에 고개를 끄덕이고 반응이 빠릅니다. 말투는 부드럽고 친근해서 “아, 그런 상황이셨군요”처럼 공감부터 합니다. 다만 분위기가 너무 가벼워 보이면 중요한 설명이 가볍게 느껴질 수 있어 조절이 필요합니다.`,AC:`고객님의 표정과 말투를 아주 민감하게 살핍니다. 고객님이 불편해할까 봐 먼저 조심하고, 맞춰 주는 태도가 강합니다. 말할 때도 “괜찮으시면요”, “부담되시면 안 하셔도 돼요” 같은 표현을 자주 씁니다. 고객님 기분은 잘 읽지만, 본인 의견을 끝까지 말하지 못해 설명이 흐려질 수 있습니다.`},"14-16":{CP:`책임감 있고 믿음직한 태도를 보입니다. 상담할 때 흐트러짐 없이 차분하게 설명하고, 중요한 포인트를 분명히 짚어 줍니다. 말투는 또렷하지만 공격적이지 않고 “이 기준으로 보시면 이해가 쉬워요”처럼 안내합니다. 고객님은 이 컨설턴트를 통해 안정감과 신뢰를 느끼기 쉽습니다.`,NP:`따뜻하면서도 안정감 있게 고객님을 대합니다. 고객님 이야기를 잘 들어주고 고개를 끄덕이며 공감해 줍니다. 말투는 부드럽고 “그렇게 느끼실 수 있어요”, “많이 고민되셨죠” 같은 표현을 자연스럽게 씁니다. 필요할 때는 조심스럽게 방향을 제시해 고객님이 혼자 결정한다고 느끼게 해줍니다. 신뢰받기 쉬운 태도입니다.`,A:`감정보다 이성과 논리로 코칭합니다. 고객님 이야기를 차분히 듣고, 필요한 정보만 골라 쉽게 코칭합니다. “걱정되실 수 있어요. 그래서 이 상황에서는 이렇게 해 봅시다”처럼 짧게 공감을 한 후에 코칭을 합니다. 말투가 안정적이고 판단이 흔들리지 않아 고객님이 신뢰하기 쉽습니다. 가장 이상적인 면담 태도입니다.`,FC:`편안한 분위기를 자연스럽게 만듭니다. 자세는 안정적이고 표정도 부드러워 고객님이 긴장을 풀기 쉽습니다. 말할 때는 웃음과 공감을 섞어 “편하게 생각하셔도 됩니다”라고 말합니다. 분위기는 밝고 과하지 않아 상담이 부담스럽지 않습니다.`,AC:`상황을 보며 말을 고르는 편입니다. 고객님 반응을 보면서 속도를 조절하고, 무리하게 밀지 않습니다. “이 부분은 고객님 상황에 맞춰 생각해 보셔도 돼요”처럼 부드럽게 말합니다. 배려와 안정감은 주지만, 결정이 늦어질 수 있습니다.`},"11-13":{CP:`상황에 맞게 유연하게 대응합니다. 자기 의견도 있지만 고객님 말도 잘 듣습니다. 상담에서는 “제 생각은 이렇지만, 고객님 상황도 중요합니다”처럼 균형 잡힌 말을 합니다. 강하게 밀어붙이지도, 너무 물러서지도 않아 편안한 상담이 됩니다. 고객님은 부담 없이 설명을 받아들입니다.`,NP:`친절하지만 감정에 너무 치우치지는 않습니다. 고객님에게 예의 있게 대하고 필요한 설명을 차분히 합니다. 말은 짧고 정리되어 있으며 “이 부분은 이렇게 보시면 돼요”처럼 담백한 표현을 씁니다. 고객님은 부담 없이 설명을 듣는 느낌을 받습니다. 다만 공감하는 표현을 조금만 더 한다면 고객님의 만족도는 더 상승합니다.`,A:`상황에 따라 감정과 논리를 오가며 상담합니다. 고객님 반응을 보며 설명을 조절하고, 너무 딱딱하지도 너무 감정적이지도 않습니다. “이렇게 생각하실 수 있는데, 현실적으로 보면 이 선택이 좋아요”처럼 말합니다. 무난하지만 결정이 조금 늦어질 수 있어 정리 멘트가 필요합니다.`,FC:`무난하고 차분한 태도를 보입니다. 자세는 바르고 표정은 안정적입니다. 말투는 또렷하지만 감정 표현은 많지 않습니다. “이 부분을 설명드리겠습니다”처럼 설명 중심으로 말합니다. 편하지도 불편하지도 않은 느낌을 주며, 고객님은 안정감을 느끼며 “이 분은 전문가 답다"라고 느낌`,AC:`고객님 눈치도 보고 자기 생각도 말할 줄 압니다. 분위기가 무겁지 않게 유지하면서도 필요한 설명은 분명히 합니다. “이건 장단점이 있어요. 고객님께 맞는 쪽을 같이 보죠”처럼 균형 잡힌 말투를 씁니다. 고객님도 부담 없이 듣습니다.`},"8-10":{CP:`고객님을 존중하면서도 자기 생각을 조금씩 말할 수 있습니다. 상담할 때 “제 경험으로 보면 이 방법이 더 안전해요”처럼 조심스럽게 방향을 제시합니다. 고객님을 몰아붙이지는 않지만, 완전히 맡기지도 않습니다. 다만 확신이 조금은 약해 보여서 고객님이 결정을 미루는 경우가 가끔 생기기도 합니다.`,NP:`배려하는 표현이 다소 적은 편입니다. 고객님을 존중하긴 하지만 말수가 많지 않습니다. 상담에서는 설명 위주로 말하며 “이 상품은 이런 구조입니다”처럼 사실 중심으로 이야기합니다. 공감 표현은 적어 다소 차갑게 느껴질 수 있지만, 일은 또렷하게 진행됩니다. 고객님에 따라 거리감이 느껴질 수 있습니다.`,A:`느낌을 먼저 받아들이고 나중에 생각합니다. 고객님 말에 공감은 잘하지만 설명이 정리되지 않을 때가 있습니다. “괜찮을 것 같아요” 같은 표현이 많고, 이유 설명은 약합니다. 말투는 부드럽지만 판단력이 약해 보일 수 있어, 미리 준비한 설명을 쓰는 연습이 필요합니다.`,FC:`조용하고 진지한 모습이 강합니다. 상담 중 말수가 적고 표정 변화도 크지 않습니다. 자세는 단정하지만 다소 굳어 보일 수 있습니다. 말할 때는 필요한 말만 짧게 하며 감정 표현이 거의 없습니다. 고객님은 신뢰는 느끼지만 “조금 신중하다”고 느낄 수 있습니다.`,AC:`고객님 반응에 크게 흔들리지 않습니다. 자기 기준으로 차분하게 설명하고, 필요하면 직설적으로 말합니다. “이 상품은 이런 분께 맞습니다”처럼 간단히 말합니다. 솔직해서 신뢰는 주지만, 예민한 고객님에게는 조금은 차갑게 느껴질 수 있습니다.`},"0-7":{CP:`자기 기준을 강하게 내세우지 않습니다. 상담할 때 고객님 말을 먼저 듣고, 웬만하면 반대하지 않습니다. “고객님 생각이 맞아요”, “원하시는 대로 하셔도 됩니다”라는 말을 자주 합니다. 분위기는 편하지만, 고객님이 “그래서 뭘 선택해야 하지?” 하고 헷갈릴 수 있습니다. 방향을 잡아주는 힘은 약한 편입니다.`,NP:`상대가 느끼기에 다소 차갑게 보일 수 있습니다.  상담할 때도 바로 본론으로 들어가며 “필요한 것만 말씀드리겠습니다”라는 식의 말투를 씁니다. 위로나 공감보다는 정보 전달이 중심입니다. 고객님은 정확하다고 느낄 수 있지만, 마음을 이해받는 느낌은 적을 수 있습니다. 친절해 보이지 않는다는 오해를 받을 수 있습니다.`,A:`상담 중 감정에 많이 휘둘립니다. 고객님 표정이나 말에 따라 말이 바뀌고, 설명보다 반응이 먼저 나옵니다. “아… 그러면 안 하셔도 돼요”처럼 쉽게 물러납니다. 친절해 보이지만 전문가로서의 신뢰는 떨어질 수 있어, 말하기 전 잠깐 생각하는 습관이 꼭 필요합니다.`,FC:`감정을 거의 드러내지 않습니다. 표정이 굳어 있고 몸도 긴장돼 보일 수 있습니다. 말투는 건조하고 설명 위주이며 공감 표현이 적습니다. 고객님이 말을 해도 반응이 적어 “내 말이 전달됐나?”라고 느낄 수 있습니다. 신뢰는 줄 수 있지만 거리감이 커질 가능성이 있습니다.`,AC:`남의 시선을 크게 신경 쓰지 않습니다. 고객님 눈치를 거의 보지 않고 자기 생각대로 말합니다. “이게 제일 합리적입니다”처럼 단정적인 표현이 많습니다. 자신감은 느껴지지만, 고객님이 압박을 느끼는 경우가 발생할 수 있습니다.`}},cm3:{CP_NP:`(CP 통제적부모 & NP 자상한부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님은 처음 만나는 순간부터 이 고객님에게서 단단함과 따뜻함을 동시에 느끼게 됩니다. 무엇이 맞는지 분명하게 이야기해 주는 힘이 있어 방향을 잃지 않게 도와주고, 혹시라도 마음이 불안해지면 옆에서 손을 잡아 주듯 안정감을 줍니다. 그래서 고객님은 “나를 제대로 챙겨 줄 사람을 만났다”는 느낌을 자연스럽게 받습니다.
+고객님은 이 성향을 통해 단단함과 따뜻함을 동시에 느끼게 됩니다. 무엇이 맞는지 분명하게 이야기해 주는 힘이 있어 방향을 잃지 않게 도와주고, 혹시라도 마음이 불안해지면 옆에서 손을 잡아 주듯 안정감을 줍니다. 그래서 고객님은 “나를 제대로 챙겨 줄 사람을 만났다”는 느낌을 자연스럽게 받습니다.
 
 기준이 있다는 것은 전문가라는 뜻입니다.
 하지만 그 기준을 사람을 위해 사용한다는 점이 더 큰 감동을 만듭니다. 고객님의 상황을 듣고, 이해하고, 무리한 선택을 막아 주며, 필요한 부분을 책임 있게 정리해 줍니다. 이 모습은 신뢰를 만들고, 신뢰는 결국 관계를 오래가게 합니다.
@@ -43,12 +43,12 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 “이 사람은 나에게 팔려고 하기보다 지켜 주려고 한다.”
 
 보험은 계약보다 사람이 남는 일입니다.
-그리고 이 고객님은 사람을 남기는 힘이 매우 큽니다.
+그리고 이 컨설턴트는 사람을 남기는 힘이 매우 큽니다.
 
 앞으로의 성장 가능성은 분명합니다.
 원칙이 흔들리지 않기 때문에 실수로 무너지지 않고, 따뜻함이 있기 때문에 고객님이 떠나지 않습니다. 단단한 뿌리와 넓은 그늘을 함께 가진 나무처럼, 시간이 흐를수록 더 많은 사람이 찾게 될 것입니다.
 
-이미 좋은 설계사의 길 위에 서 있습니다.
+이미 좋은 컨설턴트의 길 위에 서 있습니다.
 그리고 앞으로는 더 많은 사람이 그 가치를 알아보게 될 것입니다.`,CP_A:`(CP 통제적부모 & A 어른자아가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
 상담 자리에 앉는 순간 고객님은 묘한 안정감을 느낍니다. 말의 기준이 분명하고, 설명에는 흔들림이 없습니다. 감정에 휩쓸리기보다 사실을 바탕으로 또박또박 정리해 주기 때문에 고객님은 복잡했던 생각이 차분하게 정돈됩니다. 무엇을 선택해야 할지 몰라 답답했던 마음이 “이제 알겠다”로 바뀌는 경험을 하게 됩니다.
@@ -58,28 +58,28 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 상담이 끝날 즈음이면 고객님의 머릿속에는 이런 생각이 남습니다.
 “나에게 팔려고 온 사람이 아니라, 제대로 판단하게 도와주는 전문가구나.”
 
-보험은 결국 신뢰가 쌓여야 이어지는 일입니다. 이 고객님은 말을 많이 하지 않아도 믿음이 쌓이는 구조를 이미 가지고 있습니다. 시간이 지날수록 고객님은 더 의지하게 되고, 소개와 재계약으로 관계는 넓어집니다.
+보험은 결국 신뢰가 쌓여야 이어지는 일입니다. 이 컨설턴트는 말을 많이 하지 않아도 믿음이 쌓이는 구조를 이미 가지고 있습니다. 시간이 지날수록 고객님은 더 의지하게 되고, 소개와 재계약으로 관계는 넓어집니다.
 
 앞으로의 성장 가능성은 매우 큽니다. 기준이 단단하기 때문에 방향을 잃지 않고, 이성적인 판단이 받쳐 주기 때문에 큰 실수를 줄일 수 있습니다. 한 번 신뢰를 얻으면 오래 가는 상담을 만들어 내는 힘, 그것이 가장 큰 자산입니다.
 
 지금도 충분히 잘하고 있습니다.
 그리고 경험이 더해질수록 무게감 있는 전문가로 기억될 것입니다.`,CP_FC:`(CP 통제적부모 & FC 자유로운아이가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만나는 순간 분위기가 단번에 살아납니다. 기준과 원칙은 분명하게 세워 두면서도, 딱딱하기보다는 밝고 생기가 흐르기 때문입니다. 해야 할 말은 또렷하게 전달하고, 동시에 상대가 편안하게 웃을 수 있는 여유도 있습니다. 그래서 상담 시간이 부담이 아니라 즐거운 만남처럼 느껴집니다.
+고객님을 만나는 순간부터 분위기가 단번에 살아납니다. 기준과 원칙은 분명하게 세워 두면서도, 딱딱하기보다는 밝고 생기가 흐르기 때문입니다. 해야 할 말은 또렷하게 전달하고, 동시에 상대가 편안하게 웃을 수 있는 여유도 있습니다. 그래서 상담 시간이 부담이 아니라 즐거운 만남처럼 느껴집니다.
 
 이 조합의 힘은 신뢰와 친밀함을 동시에 만든다는 점입니다. 한쪽만 있으면 부족해질 수 있지만, 두 가지가 함께 움직이니 고객님의 마음은 빠르게 열립니다. 설명을 들을수록 “이 사람은 믿을 수 있다”는 생각이 들고, 함께 이야기할수록 “또 만나고 싶다”는 마음이 생깁니다.
 
 상담이 끝나면 고객님의 기억 속에는 이런 느낌이 남습니다.
 “원칙이 분명한데도 불편하지 않고, 오히려 기분 좋게 결정하게 해 준 사람.”
 
-보험은 결국 사람의 마음을 얻는 일입니다. 즐거움 속에서 신뢰를 만들 수 있다면, 관계는 오래 갑니다. 시간이 갈수록 소개가 늘어나고, 고객님은 자연스럽게 주변 사람에게 이 고객님 이야기를 꺼내게 됩니다.
+보험은 결국 사람의 마음을 얻는 일입니다. 즐거움 속에서 신뢰를 만들 수 있다면, 관계는 오래 갑니다. 시간이 갈수록 소개가 늘어나고, 고객님은 자연스럽게 주변 사람에게 이 컨설턴트 이야기를 꺼내게 됩니다.
 
 앞으로의 성장 가능성은 더욱 기대됩니다. 기준이 중심을 잡아 주고, 밝은 에너지가 사람을 끌어당기기 때문입니다. 경험이 더해질수록 만남 하나하나가 팬을 만드는 시간이 될 것입니다.
 
 지금의 모습 자체가 이미 큰 경쟁력입니다.
 그리고 앞으로는 사람을 모으는 전문가로 더 또렷하게 빛나게 될 것입니다.`,CP_AC:`(CP 통제적부모 & AC 순응하는아이 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만날 때 이 고객님에게서는 묘하게 안심이 됩니다. 왜냐하면 기준이 분명하기 때문입니다. 해야 할 말과 하지 말아야 할 말을 구분하고, 도움이 되는 방향을 또렷하게 제시합니다. 그래서 고객님은 생각합니다.
+고객님은 이 성향을 통해 묘하게 안심이 됩니다. 왜냐하면 기준이 분명하기 때문입니다. 해야 할 말과 하지 말아야 할 말을 구분하고, 도움이 되는 방향을 또렷하게 제시합니다. 그래서 고객님은 생각합니다.
 “이 사람은 흔들리지 않는 전문가구나.”
 
 그런데 여기에 한 가지 힘이 더 있습니다. 상대의 입장과 분위기를 빠르게 읽고 맞추는 능력입니다. 고객님이 조심스러워하면 속도를 낮추고, 고민이 많아 보이면 충분히 기다려 줍니다. 강하게 밀어붙이기보다 편안하게 결정할 수 있는 환경을 만들어 줍니다.
@@ -97,7 +97,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 계속 이렇게만 가시면 됩니다.
 이미 좋은 전문가의 길 위에 올라와 있습니다.`,NP_CP:`(NP 자상한부모 & CP 통제적부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만나는 순간부터 따뜻함이 먼저 전달됩니다. 말투에는 배려가 담겨 있고, 표정에는 상대를 진심으로 도와주고 싶다는 마음이 보입니다. 그래서 처음 보는 사람도 경계하기보다 편안함을 느끼게 됩니다. 그런데 이 부드러움 속에는 분명한 기준과 방향이 함께 자리 잡고 있습니다. 필요한 부분에서는 또렷하게 정리해 주고, 무엇이 고객님에게 더 안전하고 유리한 선택인지 확신 있게 안내합니다.
+고객님은 이 성향을 통해 만나는 순간부터 따뜻함을 느끼게 됩니다. 말투에는 배려가 담겨 있고, 표정에는 상대를 진심으로 도와주고 싶다는 마음이 보입니다. 그래서 처음 보는 사람도 경계하기보다 편안함을 느끼게 됩니다. 그런데 이 부드러움 속에는 분명한 기준과 방향이 함께 자리 잡고 있습니다. 필요한 부분에서는 또렷하게 정리해 주고, 무엇이 고객님에게 더 안전하고 유리한 선택인지 확신 있게 안내합니다.
 
 이 조합의 힘은 마음을 열게 만드는 친절함과 결정을 돕는 단단함이 동시에 존재한다는 데 있습니다. 고객님은 이야기를 나누면서 “정말 나를 생각해 주는구나”라는 감동을 받고, 설명을 들을수록 “그래서 믿고 맡길 수 있겠다”라는 확신을 가지게 됩니다.
 
@@ -111,7 +111,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 지금도 충분히 훌륭합니다.
 그리고 앞으로는 고객님의 인생에 오래 기억되는 이름으로 남게 될 것입니다.`,NP_A:`(NP 자상한부모 & A 어른자아가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만났을 때 가장 먼저 느껴지는 것은 따뜻함입니다. 상대의 이야기를 끊지 않고 끝까지 들으며, 무엇이 힘들고 무엇이 필요한지를 세심하게 살핍니다. 그래서 고객님은 자연스럽게 마음을 열고 속마음까지 이야기하게 됩니다. 그런데 여기서 끝나지 않습니다. 충분히 공감한 뒤에는 감정에만 머물지 않고, 상황을 차분히 정리하여 현실적으로 도움이 되는 방법을 제시합니다.
+고객님이 이 성향을 통해 가장 먼저 느껴지는 것은 따뜻함입니다. 상대의 이야기를 끊지 않고 끝까지 들으며, 무엇이 힘들고 무엇이 필요한지를 세심하게 살핍니다. 그래서 고객님은 자연스럽게 마음을 열고 속마음까지 이야기하게 됩니다. 그런데 여기서 끝나지 않습니다. 충분히 공감한 뒤에는 감정에만 머물지 않고, 상황을 차분히 정리하여 현실적으로 도움이 되는 방법을 제시합니다.
 
 이 성향의 큰 힘은 배려와 판단이 함께 움직인다는 점입니다. 고객님은 “내 마음을 이해해 준다”는 안정감을 느끼면서도 동시에 “그래서 무엇을 하면 좋을지 명확하다”는 신뢰를 갖게 됩니다. 따뜻한데도 흔들리지 않고, 친절한데도 결정이 분명하니 상담의 밀도가 높아집니다.
 
@@ -125,7 +125,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 결국 고객님에게 이렇게 기억됩니다.
 “힘들 때 생각나는 전문가.”`,NP_FC:`(NP 자상한부모 & FC 자유로운아이가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만나는 순간 분위기가 부드러워집니다. 상대를 편안하게 해주는 따뜻함이 먼저 전해지고, 이어서 밝은 에너지가 공간을 환하게 만듭니다. 그래서 처음 만난 사람도 금방 긴장을 풀고 웃게 됩니다. 보험 이야기는 딱딱할 수 있지만, 이 성향을 가진 사람의 설명은 부담이 적고 자연스럽게 들립니다.
+고객님은 이 성향을 통해 만나는 순간 분위기가 부드러지는 것을 느낍니다. 상대를 편안하게 해주는 따뜻함이 먼저 전해지고, 이어서 밝은 에너지가 공간을 환하게 만듭니다. 그래서 처음 만난 사람도 금방 긴장을 풀고 웃게 됩니다. 보험 이야기는 딱딱할 수 있지만, 이 성향을 가진 사람의 설명은 부담이 적고 자연스럽게 들립니다.
 
 상대의 상황을 세심하게 살피는 마음이 있기 때문에 고객님은 “나를 생각해 주는 사람”이라고 느낍니다. 동시에 유연하고 생동감 있는 표현 덕분에 상담이 지루하지 않습니다. 어렵던 내용도 이야기처럼 쉽게 이해됩니다. 고객님은 어느새 고개를 끄덕이며 대화를 따라오고, 상담 시간이 길어도 힘들다고 느끼지 않습니다.
 
@@ -138,23 +138,23 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 이 한마디가 앞으로의 성장을 계속 열어 줄 것입니다.`,NP_AC:`(NP 자상한부모 & AC 순응하는아이가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만나면 상대는 금방 마음의 문을 엽니다. 나를 이해해 주고 내 편이 되어 줄 사람이라는 느낌을 받기 때문입니다. 말 한마디, 표정 하나에도 배려가 묻어나고, 고객님의 이야기를 끝까지 들으려는 태도가 자연스럽게 전달됩니다. 그래서 상담은 설득의 시간이 아니라 함께 고민하는 시간처럼 느껴집니다.
+고객은 이성향을 통해서 금방 마음의 문을 엽니다. 나를 이해해 주고 내 편이 되어 줄 사람이라는 느낌을 받기 때문입니다. 말 한마디, 표정 하나에도 배려가 묻어나고, 고객님의 이야기를 끝까지 들으려는 태도가 자연스럽게 전달됩니다. 그래서 상담은 설득의 시간이 아니라 함께 고민하는 시간처럼 느껴집니다.
 
 여기에 더해 조직과 상황을 존중하는 태도가 더해지면 고객님은 이렇게 생각합니다. “이 사람이라면 무리하게 밀어붙이지 않겠구나.” 신뢰는 바로 여기서 만들어집니다. 부담을 주지 않으면서도 필요한 방향으로 안내해 주기 때문에 편안함 속에서 결정이 이루어집니다.
 
-이 성향을 가진 설계사는 고객님의 속도를 기다릴 줄 압니다. 재촉하지 않고, 이해할 때까지 설명하며, 불안해 보이면 다시 풀어줍니다. 그래서 시간이 지나면 고객님은 상품보다 사람을 믿고 선택하게 됩니다.
+이 성향을 가진 컨설턴트는 고객님의 속도를 기다릴 줄 압니다. 재촉하지 않고, 이해할 때까지 설명하며, 불안해 보이면 다시 풀어줍니다. 그래서 시간이 지나면 고객님은 상품보다 사람을 믿고 선택하게 됩니다.
 
 경험이 쌓일수록 공감 능력은 더 깊어지고, 배려는 더 세밀해집니다. 그러면 고객님은 주변 사람에게 이렇게 말합니다.
-“나를 생각해 주는 설계사가 있는데, 꼭 한번 만나봐.”
+“나를 생각해 주는 컨설턴트가 있는데, 꼭 한번 만나봐.”
 
 이 말 한마디가 새로운 만남을 계속 만들어 줍니다. 결국 성장은 숫자가 아니라 사람의 신뢰가 쌓이는 속도만큼 커지게 됩니다.`,A_CP:`(A 어른자아 & CP 통제적부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만나면 말의 무게가 다르게 느껴집니다. 감정에 흔들리지 않고 차분하게 상황을 정리해 주기 때문에, 복잡했던 고민이 또렷해집니다. 무엇이 필요하고 무엇을 먼저 준비해야 하는지 길을 잡아 주는 사람처럼 보입니다. 그래서 고객님은 “이 사람 말이라면 믿고 따라가도 되겠다”는 안정감을 느낍니다.
+이 성향은 말의 무게가 다르게 느껴집니다. 감정에 흔들리지 않고 차분하게 상황을 정리해 주기 때문에, 복잡했던 고민이 또렷해집니다. 무엇이 필요하고 무엇을 먼저 준비해야 하는지 길을 잡아 주는 사람처럼 보입니다. 그래서 고객님은 “이 사람 말이라면 믿고 따라가도 되겠다”는 안정감을 느낍니다.
 
 원칙을 중요하게 여기면서도 판단은 냉정하고 공정합니다. 되는 것과 어려운 것을 분명하게 알려주기 때문에 오히려 더 신뢰가 깊어집니다. 듣기 좋은 말보다 도움이 되는 말을 해 주는 사람이라는 인상을 주기 때문입니다.
 
 이 성향은 시간이 지날수록 더 큰 힘을 냅니다. 경험이 쌓일수록 설명은 더 정확해지고, 방향 제시는 더 단단해집니다. 고객님은 선택의 순간마다 다시 연락하게 되고, 주변 사람에게 이렇게 소개합니다.
-“정확하게 판단해 주는 설계사야. 괜히 맡기는 게 아니야.”
+“정확하게 판단해 주는 컨설턴트야. 괜히 맡기는 게 아니야.”
 
 결국 이 신뢰가 소개로 이어지고, 소개가 또 다른 인연을 만듭니다. 당신의 성장은 빠른 설득이 아니라 단단한 믿음이 넓어지는 과정으로 만들어집니다.`,A_NP:`(A 어른자아 & NP 자상한부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
@@ -192,7 +192,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 결국 이 성향은 정확함으로 믿음을 만들고, 배려로 마음을 얻는 힘을 가진 모습입니다. 그래서 시간이 흐를수록 더 크게 인정받게 됩니다.`,FC_CP:`(FC 자유로운아이 & CP 통제적부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만나는 순간 밝은 에너지와 자신감이 동시에 느껴집니다. 표정은 따뜻하고 말투는 생동감이 있어 처음 보는 사람도 금세 마음의 문을 열게 됩니다. 그런데 그 안에는 분명한 기준과 책임감이 자리 잡고 있어서, 분위기에만 머무르지 않고 반드시 결론까지 안내하는 힘이 있습니다. 즐겁게 이야기를 풀어가다가도 중요한 순간에는 딱 중심을 잡아 주기 때문에 고객님은 “편하지만 믿을 수 있다”는 느낌을 받게 됩니다.
+고객님은 이 성향을 만나는 순간 밝은 에너지와 자신감이 동시에 느껴집니다. 표정은 따뜻하고 말투는 생동감이 있어 처음 보는 사람도 금세 마음의 문을 열게 됩니다. 그런데 그 안에는 분명한 기준과 책임감이 자리 잡고 있어서, 분위기에만 머무르지 않고 반드시 결론까지 안내하는 힘이 있습니다. 즐겁게 이야기를 풀어가다가도 중요한 순간에는 딱 중심을 잡아 주기 때문에 고객님은 “편하지만 믿을 수 있다”는 느낌을 받게 됩니다.
 
 고객님의 입장에서는 이렇게 보일 가능성이 큽니다.
 “나를 편하게 해주면서도, 중요한 건 정확하게 짚어 준다. 그래서 맡겨도 되겠다.”
@@ -238,15 +238,15 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 부드럽게 다가가되 원칙을 지키는 태도는 보험 일을 오래 할수록 더 큰 힘이 됩니다. 시간이 지날수록 고객님은 중요한 결정을 맡길 수 있는 사람으로 기억하게 되고, 한 번의 만남이 관계로 이어집니다. 소개가 생기고, 다시 찾는 고객님이 늘어납니다.
 
-앞으로의 성장 가능성도 매우 큽니다. 이미 상대를 존중하는 마음과, 일을 바로 세우는 기준을 함께 가지고 있기 때문입니다. 여기에 경험과 확신이 더해지면, 고객님에게 편안함을 주면서도 믿고 따를 수 있는 전문가로 자리 잡게 됩니다. 결국 오래 사랑받는 설계사의 길을 걷게 될 것입니다.`,AC_NP:`(AC 순응하는아이 & NP 자상한부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
+앞으로의 성장 가능성도 매우 큽니다. 이미 상대를 존중하는 마음과, 일을 바로 세우는 기준을 함께 가지고 있기 때문입니다. 여기에 경험과 확신이 더해지면, 고객님에게 편안함을 주면서도 믿고 따를 수 있는 전문가로 자리 잡게 됩니다. 결국 오래 사랑받는 컨설턴트의 길을 걷게 될 것입니다.`,AC_NP:`(AC 순응하는아이 & NP 자상한부모가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
-고객님을 만나는 순간부터 상대의 표정과 분위기를 빠르게 읽고, 마음이 어디에 있는지 먼저 느끼는 힘이 큽니다. 부담을 주기보다 편안하게 다가가고, 상대가 말을 꺼내기 쉽게 기다려 줄 줄 압니다. 그래서 고객님은 “이 사람은 나를 이해하려고 한다”는 안도감을 느낍니다.
+고객님을 만나는 순간부터 이 성향은 상대의 표정과 분위기를 빠르게 읽고, 마음이 어디에 있는지 먼저 느끼는 힘이 큽니다. 부담을 주기보다 편안하게 다가가고, 상대가 말을 꺼내기 쉽게 기다려 줄 줄 압니다. 그래서 고객님은 “이 사람은 나를 이해하려고 한다”는 안도감을 느낍니다.
 
 따뜻함이 기본이기 때문에 대화에는 방어가 생기지 않습니다. 고객님이 걱정을 털어놓고, 가족 이야기를 하고, 자신의 상황을 솔직하게 말하게 됩니다. 상담의 출발점이 신뢰이기 때문에 관계가 깊어질 가능성이 매우 큽니다.
 
 또한 조직과 흐름을 존중하는 태도가 있어 무리하게 밀어붙이지 않습니다. 대신 상대에게 맞는 속도를 찾습니다. 그 결과 고객님은 강요받는 느낌 없이 스스로 결정했다고 느끼게 됩니다. 이런 경험은 시간이 지나 소개와 재상담으로 이어집니다.
 
-앞으로의 성장 가능성은 더욱 큽니다. 이미 사람의 마음을 얻는 재능을 가지고 있기 때문입니다. 여기에 작은 자신감과 한 문장의 방향 제시가 더해지면, 고객님에게 가장 편안하면서도 믿을 수 있는 전문가로 자리 잡게 됩니다. 오래 함께하고 싶은 설계사, 가족에게 소개하고 싶은 사람이 되는 길 위에 서 있습니다.`,AC_A:`(AC 순응하는아이 & A 어른자아가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
+앞으로의 성장 가능성은 더욱 큽니다. 이미 사람의 마음을 얻는 재능을 가지고 있기 때문입니다. 여기에 작은 자신감과 한 문장의 방향 제시가 더해지면, 고객님에게 가장 편안하면서도 믿을 수 있는 전문가로 자리 잡게 됩니다. 오래 함께하고 싶은 컨설턴트, 가족에게 소개하고 싶은 사람이 되는 길 위에 서 있습니다.`,AC_A:`(AC 순응하는아이 & A 어른자아가 각각 첫번째와 두번째로 높아 강점으로 발현됨.)
 
 고객님을 만났을 때 가장 먼저 드러나는 힘은 상대를 존중하는 태도와 차분한 판단력입니다. 말을 하기 전에 분위기를 읽고, 고객님이 어떤 마음 상태인지 먼저 살핍니다. 그래서 고객님은 부담을 느끼지 않고 자연스럽게 이야기를 꺼내게 됩니다. “이 사람은 내 편이다”라는 안정감이 생기기 때문입니다.
 
@@ -269,56 +269,56 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 앞으로 경험이 쌓이고 제안의 힘이 조금 더 단단해지면, 편안함 위에 전문성까지 더해집니다. 그러면 고객님은 단순히 좋은 사람이 아니라 믿고 맡길 수 있는 사람으로 보게 됩니다. 관계는 오래가고, 다시 찾게 되고, 소개로 이어질 가능성도 커집니다.
 
 지금 가지고 있는 따뜻함과 친근함은 이미 큰 자산입니다. 여기에 작은 확신과 방향 제시만 더해진다면, 성장의 문은 훨씬 더 크게 열릴 준비가 되어 있습니다.`},cm4_1:{"17-20":{CP:`(원칙이 아주 강하고, 주도권이 강한 성향) 주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`(너무 따뜻해서 고객님 말에 맞춰주는 성향) 탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`(숫자, 사실, 근거를 먼저 보는 강한 이성적 성향) 강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`(상담이 즐겁고 분위기를 스스로 띄우는 성향) 아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`(고객님 반응에 매우 민감한 성향) 순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`(현실적 원칙과 주도성이 균형이 잡힌 성향) 결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`(고객님을 잘 챙기고 사람 냄새 나는 성향) 공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`(감정에 휘둘리지 않고 설명과 판단이 안정적인 성향) 이성적, 균형감, 현실적, 분석적.`,FC:`(고객님이 부담없이 이야기 하도록 분위기를 잘 만드는 성향) 밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`(고객님 상황에 맞게 잘 맞추는 성향) 협조, 적당한 순응 ,적당한 눈치, 조절.`},"11-13":{CP:`(상황에 따라 기준을 조절하는 성향) 균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`(친절하지만 감정에 치우치지 않는 성향) 적당한 친절, 예의 바름, 부담 없음.`,A:`(감정과 논리 사이에서 무난하게 맞추는 성향) 평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`(튀지않고 차분하고 안정적인 설명 중심의 성향) 안정감, 차분한, 균형감, 무난함.`,AC:`(눈치와 주장성이 균형잡힌 상향) 적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`(기준 제시보다 맞춰주는 쪽에 가까운 성향) 완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`(감정 표현은 적고 일은 담백하게 하는 성향) 차분함, 무심해 보임, 실무형, 표현 적음.`,A:`(생각보다 느낌에 따라 말이 먼저 나오는 경우가 많은 성향)
-감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`(신중해서 신뢰를 주지만 표현이 적어 딱딱하게 보일 수 있는 성향) 조용함, 신중함, 진지함, 다소 거리감.`,AC:`(눈치보다는 내 기준이 더 중요한 성향) 독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,NP:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족.`,FC:`(말과 표정이 적어서 고객님이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`(타인의 상황을 잘 못살피는 성향) 단호함,직선적, 눈치 안 봄, 상대를 통제.`}},cm4_2:{"17-20":{CP:`준이 분명하고 결정력이 뛰어나 상담의 중심을 잡아 줍니다. 고객님은 고객님의 확신 있는 태도에서 전문성과 책임감을 느끼며 의지하고 싶어집니다. 다만 강도가 높아지면 압박이나 지시처럼 들릴 수 있으니, 결론을 말하기 전 고객님의 생각을 한 번 확인하고 선택의 이유를 함께 설명해 주면 수용성과 만족도가 더욱 높아집니다.`,NP:`따뜻한 배려가 매우 강해 고객님의 감정을 빠르게 읽고 편안한 분위기를 만듭니다. 고객님은 존중받는 느낌을 받으며 마음을 열고, 관계 형성과 유지에 큰 강점이 됩니다.
-다만 배려가 커질수록 고객님의 부담을 대신 지거나 결정 순간에 말을 줄일 수 있습니다. 충분히 공감한 뒤 전문가로서 방향을 정리해 주면 상담의 밀도와 계약 전환력이 더 좋아집니다.`,A:`코칭이 필요없는 구간`,FC:`밝은 에너지와 따뜻한 반응 덕분에 고객님이 빠르게 마음을 엽니다. 자연스러운 웃음과 공감 표현은 첫 만남의 긴장을 풀어 주는 큰 힘이 됩니다. 다만 분위기가 너무 편안해지면 상담의 무게가 가벼워 보일 수 있으니, 중요한 순간에는 “이 부분은 꼭 짚고 넘어가겠습니다”처럼 중심을 잡아 전문성을 함께 보여 주는 조절이 필요합니다.`,AC:`고객님의 입장을 세심하게 살피는 배려가 매우 뛰어납니다. 분위기를 부드럽게 맞추며 관계를 편안하게 만드는 힘이 큽니다. 다만 조심스러움이 커지면 결정 제안이 약해질 수 있으니, 필요한 순간에는 “고객님께 가장 적합한 방향을 제가 정리해 드리겠습니다”처럼 기준을 제시하는 말로 주도권을 잡는 연습이 필요합니다.`},"14-16":{CP:`코칭이 필요없는 구간`,NP:`코칭이 필요없는 구간`,A:``,FC:`코칭이 필요없는 구간`,AC:`코칭이 필요없는 구간`},"11-13":{CP:``,NP:``,A:`상황을 차분하게 바라보고 사실과 근거로 설명하는 능력이 잘 갖춰져 있습니다. 감정에 흔들리지 않는 안정적인 태도 덕분에 고객님은 전문적인 사람이라는 신뢰를 자연스럽게 느낍니다. 다만 설명이 무난하게 흘러가면 결정의 힘이 약해질 수 있으니, 핵심을 정리하며 “그래서 지금은 이 선택이 가장 좋습니다”처럼 결론을 분명히 잡아 주는 연습이 필요합니다.`,FC:``,AC:``},"8-10":{CP:`신중하고 부드러운 태도로 고객님을 편안하게 만듭니다. 고객님 입장을 존중하는 분위기 덕분에 부담 없이 이야기를 이어갈 수 있습니다. 다만 기준 제시와 결단 표현이 약하면 전문가로서 방향을 잡아주는 힘이 부족해 보일 수 있으니, 필요한 순간에는 “이 선택이 더 유리합니다”처럼 결론을 분명히 말해 신뢰를 강화해 주세요.`,NP:`고객님을 배려하려는 마음은 분명히 가지고 있습니다. 과하지 않은 친절함 덕분에 부담 없는 상담이 진행되고 관계도 안정적으로 이어집니다. 다만 따뜻함이 말로 표현되지 않으면 차갑게 느껴질 수 있으니, 설명 전에 “충분히 고민되실 수 있습니다”와 같은 공감 문장을 먼저 사용해 마음의 거리를 줄이는 연습이 필요합니다.`,A:`이해한 내용을 전달하려는 노력과 책임감 있는 자세가 보입니다. 고객님에게 틀린 정보를 주지 않으려는 신중함 덕분에 상담은 안정적으로 이어집니다. 다만 판단이 늦어지면 확신이 부족해 보일 수 있으니, 설명을 시작할 때 “결론부터 말씀드리면”이라는 구조로 먼저 방향을 제시해 주면 신뢰와 설득력이 더 빠르게 올라갑니다.`,FC:`차분하면서도 부드러운 태도로 고객님을 편안하게 만드는 장점이 있습니다. 과하지 않은 반응 덕분에 상담이 안정적으로 흘러가며 부담을 주지 않습니다. 다만 감정 표현이 적으면 거리감이 생길 수 있으니, 고개 끄덕임이나 “충분히 그럴 수 있습니다” 같은 공감 표현을 의식적으로 늘리면 신뢰 형성이 더 빨라집니다.`,AC:``},"0-7":{CP:`온화하고 유연한 태도로 고객님을 배려하는 상담을 합니다. 고객님은 강요받지 않는 느낌 속에서 편안함과 안정감을 느끼게 됩니다. 다만 원칙과 기준이 약하게 전달되면 전문성이 흐려질 수 있으니, 핵심 판단에서는 “이 부분은 꼭 필요합니다”처럼 단정적인 표현을 의식적으로 사용해 방향을 또렷하게 잡아줄 필요가 있습니다.`,NP:`감정보다 내용을 먼저 전달하는 힘이 있어 상담의 흐름은 분명합니다. 필요한 말을 정확히 전달하려는 태도 덕분에 일의 진행은 깔끔하게 이루어집니다. 다만 고객님의 마음을 어루만지는 표현이 부족하면 정서적 연결이 약해질 수 있으니, “그럴 수 있습니다”, “많이 고민되셨죠”처럼 공감의 말을 의식적으로 앞에 배치해 따뜻함을 보완해 주세요.`,A:`고객님의 마음을 배려하려는 태도는 좋아 관계 형성은 잘 이루어집니다. 부드럽게 말하려는 성향 덕분에 상담 분위기도 편안하게 유지됩니다. 다만 근거와 이유가 부족하면 전문가 느낌이 약해질 수 있으니, “이 선택을 권하는 이유는 세 가지입니다”처럼 숫자와 기준을 붙여 설명하는 습관을 들이면 상담의 힘이 훨씬 단단해집니다.`,FC:`신중하고 진지한 태도 덕분에 고객님은 책임감 있는 사람이라는 느낌을 받습니다. 가볍지 않은 분위기가 오히려 상담의 무게와 안정감을 만들어 줍니다. 다만 표정과 반응이 부족하면 차갑게 보일 수 있으니, 웃는 얼굴과 함께 “말씀해 주셔서 감사합니다” 같은 따뜻한 표현을 의도적으로 사용하면 관계의 온도가 훨씬 좋아집니다.`,AC:`자기 생각과 기준이 분명해 상담을 또렷하게 이끌어 갑니다. 흔들리지 않는 태도 덕분에 전문가로 보이는 장점이 있습니다. 다만 고객님의 감정 속도를 놓칠 수 있으니, 설명 전에 “혹시 부담되시지는 않으세요?”처럼 확인하는 한마디를 더하면 신뢰와 수용도가 훨씬 높아집니다.`}},cm4_3:{all_no_coaching:`지금 설계사님은 다섯 가지 자아의 힘을 상황에 맞게 자연스럽게 꺼내 쓸 수 있는 안정된 단계에 와 있습니다. 필요할 때는 기준을 세워 방향을 잡고, 또 필요할 때는 고객의 마음을 살피며, 판단해야 할 순간에는 균형 있게 결정을 내릴 줄 압니다. 그래서 상담이 무리 없이 이어지고, 고객은 편안함 속에서 신뢰를 느끼게 됩니다.
+감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`(신중해서 신뢰를 주지만 표현이 적어 딱딱하게 보일 수 있는 성향) 조용함, 신중함, 진지함, 다소 거리감.`,AC:`(눈치보다는 내 기준이 더 중요한 성향) 독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,NP:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 판단과 논리가 조금 부족.`,FC:`(말과 표정이 적어서 고객님이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`(타인의 상황을 잘 못살피는 성향) 단호함,직선적, 눈치 안 봄, 상대를 통제.`}},cm4_2:{"17-20":{CP:`기준이 분명하고 결정력이 뛰어나 상담의 중심을 잡아 줍니다. 고객님은 고객님의 확신 있는 태도에서 전문성과 책임감을 느끼며 의지하고 싶어집니다. 다만 강도가 높아지면 압박이나 지시처럼 들릴 수 있으니, 결론을 말하기 전 고객님의 생각을 한 번 확인하고 선택의 이유를 함께 설명해 주면 수용성과 만족도가 더욱 높아집니다.`,NP:`따뜻한 배려가 매우 강해 고객님의 감정을 빠르게 읽고 편안한 분위기를 만듭니다. 고객님은 존중받는 느낌을 받으며 마음을 열고, 관계 형성과 유지에 큰 강점이 됩니다.
+다만 배려가 커질수록 고객님의 부담을 대신 지거나 결정 순간에 말을 줄일 수 있습니다. 충분히 공감한 뒤 전문가로서 방향을 정리해 주면 상담의 밀도와 계약 전환력이 더 좋아집니다.`,A:`코칭이 필요없는 구간`,FC:`밝은 에너지와 따뜻한 반응 덕분에 고객님이 빠르게 마음을 엽니다. 자연스러운 웃음과 공감 표현은 첫 만남의 긴장을 풀어 주는 큰 힘이 됩니다. 다만 분위기가 너무 편안해지면 상담의 무게가 가벼워 보일 수 있으니, 중요한 순간에는 “이 부분은 꼭 짚고 넘어가겠습니다”처럼 중심을 잡아 전문성을 함께 보여 주는 조절이 필요합니다.`,AC:``},"14-16":{CP:`코칭이 필요없는 구간`,NP:`코칭이 필요없는 구간`,A:``,FC:`코칭이 필요없는 구간`,AC:`코칭이 필요없는 구간`},"11-13":{CP:``,NP:``,A:`상황을 차분하게 바라보고 사실과 근거로 설명하는 능력이 잘 갖춰져 있습니다. 감정에 흔들리지 않는 안정적인 태도 덕분에 고객님은 전문적인 사람이라는 신뢰를 자연스럽게 느낍니다. 다만 설명이 무난하게 흘러가면 결정의 힘이 약해질 수 있으니, 핵심을 정리하며 “그래서 지금은 이 선택이 가장 좋습니다”처럼 결론을 분명히 잡아 주는 연습이 필요합니다.`,FC:``,AC:``},"8-10":{CP:`신중하고 부드러운 태도로 고객님을 편안하게 만듭니다. 고객님 입장을 존중하는 분위기 덕분에 부담 없이 이야기를 이어갈 수 있습니다. 다만 기준 제시와 결단 표현이 약하면 전문가로서 방향을 잡아주는 힘이 부족해 보일 수 있으니, 필요한 순간에는 “이 선택이 더 유리합니다”처럼 결론을 분명히 말해 신뢰를 강화해 주세요.`,NP:`배려와 공감의 표현이 다소 적어 고객에게 차갑거나 거리감 있게 느껴질 수 있는 성향입니다. 상담에서는 설명과 정보 전달은 정확하지만, 고객의 마음을 먼저 공감해주는 표현을 조금 더 늘려주는 연습이 필요합니다. “걱정되실 수 있습니다”, “충분히 고민되실 수 있습니다”처럼 고객 입장을 먼저 이해해주면 상담의 편안함과 신뢰감, 계약 연결력이 더욱 안정적으로 올라갈 수 있습니다.`,A:`고객의 감정과 분위기에 영향을 받아 설명과 판단이 조금은 흔들려 보일 수 있는 성향입니다. 고객 공감은 잘하지만 상담의 방향과 결론이 흐려지지 않도록 핵심과 우선순위를 먼저 정리해 전달하는 연습이 필요합니다. “현재 상황에서는 이 선택이 가장 안정적입니다”처럼 이유와 결론을 분명하게 설명하면 고객의 신뢰감과 결정력이 더욱 안정적으로 올라갈 수 있습니다.`,FC:`차분하면서도 부드러운 태도로 고객님을 편안하게 만드는 장점이 있습니다. 과하지 않은 반응 덕분에 상담이 안정적으로 흘러가며 부담을 주지 않습니다. 다만 감정 표현이 적으면 거리감이 생길 수 있으니, 고개 끄덕임이나 “충분히 그럴 수 있습니다” 같은 공감 표현을 의식적으로 늘리면 신뢰 형성이 더 빨라집니다.`,AC:``},"0-7":{CP:``,NP:``,A:``,FC:``,AC:`자기 생각과 기준이 분명해 상담을 또렷하게 이끌어 갑니다. 흔들리지 않는 태도 덕분에 전문가로 보이는 장점이 있습니다. 다만 고객님의 감정 속도를 놓칠 수 있으니, 설명 전에 “혹시 부담되시지는 않으세요?”처럼 확인하는 한마디를 더하면 신뢰와 수용도가 훨씬 높아집니다.`}},cm4_3:{all_no_coaching:`지금 컨설턴트는 다섯 가지 자아의 힘을 상황에 맞게 자연스럽게 꺼내 쓸 수 있는 안정된 단계에 와 있습니다. 필요할 때는 기준을 세워 방향을 잡고, 또 필요할 때는 고객의 마음을 살피며, 판단해야 할 순간에는 균형 있게 결정을 내릴 줄 압니다. 그래서 상담이 무리 없이 이어지고, 고객은 편안함 속에서 신뢰를 느끼게 됩니다.
 
-이 일은 분명 설계사님에게 잘 맞는 분야입니다. 억지로 애쓰는 느낌이 아니라, 본래 가지고 있는 기질과 업무 방식이 서로 맞물리며 힘을 내고 있기 때문입니다. 이미 충분한 준비가 되어 있고, 앞으로 더 발전할 수 있는 잠재력도 크게 보입니다.
+이 일은 분명 컨설턴트에게 잘 맞는 분야입니다. 억지로 애쓰는 느낌이 아니라, 본래 가지고 있는 기질과 업무 방식이 서로 맞물리며 힘을 내고 있기 때문입니다. 이미 충분한 준비가 되어 있고, 앞으로 더 발전할 수 있는 잠재력도 크게 보입니다.
 
 뿐만 아니라 이런 균형감은 고객에게만 좋은 것이 아닙니다. 함께 일하는 동료들에게도 안정감을 주고, 조직 안에서 믿고 의지할 수 있는 사람이라는 평가로 이어집니다. 말보다 태도가 기준이 되고, 행동이 곧 신뢰가 됩니다.
 
-이제 중요한 것은 새로운 무언가를 더하기보다, 지금의 좋은 흐름을 꾸준히 유지하고 반복해 누구 앞에서도 같은 실력을 보여주는 것입니다. 그 지속성이 설계사님을 더 높은 자리로 이끌 것입니다.
+이제 중요한 것은 새로운 무언가를 더하기보다, 지금의 좋은 흐름을 꾸준히 유지하고 반복해 누구 앞에서도 같은 실력을 보여주는 것입니다. 그 지속성이 컨설턴트를 더 높은 자리로 이끌 것입니다.
 
-지금처럼 계속 가시면 됩니다. 충분히 잘하고 계십니다.`,some_coaching:`점수 중 일부가 코칭이 필요한 영역에 있더라도 걱정할 이유는 없습니다. 이미 현장에서 활동하고 있다는 것 자체가 충분한 가능성과 힘을 증명합니다. 중요한 것은 점수가 아니라, 자신의 성향을 알고 어떻게 사용할지 이해하는 것입니다. 특히 말의 방식은 연습을 통해 가장 빠르게 좋아질 수 있는 부분입니다.
-
-지금부터는 타고난 기질을 바꾸려 하기보다, 상황에 맞는 표현을 반복해서 익히는 것이 핵심입니다. 준비된 문장을 입에 붙을 때까지 사용하다 보면 상담의 흐름이 달라지고, 고객의 반응 역시 눈에 띄게 변합니다. 말이 안정되면 자신감이 생기고, 자신감은 다시 성과로 이어집니다.
-
-설계사님은 이미 출발선 위에 서 있습니다. 여기에 화법 훈련이 더해지면 성장 속도는 훨씬 빨라질 것입니다.`},cm4_4:{CP:{condition:`0-7`,trait:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,coaching:`이 구간은 사람을 존중하고 신중하게 접근하려는 태도가 참 좋습니다. 섣불리 밀어붙이지 않기 때문에 고객님이 부담을 느끼지 않고 편안함을 경험합니다.
+지금처럼 계속 가시면 됩니다. 충분히 잘하고 계십니다.`,some_coaching:``},cm4_4:{CP:{condition:`0-7`,trait:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,coaching:`이 구간은 사람을 존중하고 신중하게 접근하려는 태도가 참 좋습니다. 섣불리 밀어붙이지 않기 때문에 고객님이 부담을 느끼지 않고 편안함을 경험합니다.
 주변에서는 부드럽고 배려 깊은 사람으로 받아들일 가능성이 큽니다. 다만 상담에서 방향을 잡아야 할 순간에 결정을 못 하거나 고객님 반응에 따라 흐름이 쉽게 흔들릴 수 있습니다.
 
  즉 다소 우유부단한 성향으로 인해 밀어붙이지 못해 상담이 길어지고, 고객님에게 끌려다니는 형국으로 보일 수 있습니다. 
 
-결국 고객님의 판단을 기다리다 성과가 정체되는 방식으로 누적이 되어 슬럼프가 발생하기도 합니다. 이 구간은 코칭에서 기준과 원칙을 강요하기보다는(그런 성향이 낮음) 고객님이 잘 이해할 수 있도록 판단의 순서를 세워주는 것이 중요합니다.
+결국 고객님의 판단을 기다리다 성과가 정체되는 일이 발생하기도 합니다. 이 구간은 기준과 원칙을 고객님이 잘 이해할 수 있도록 세워주는 것이 중요합니다.`,script:`“고객님 입장에서는 충분히 고민되실 수 있습니다. 다만 현재 상황에서는 이 방향이 가장 안정적인 선택입니다.”
 
-먼저 A를 통해 조건과 선택지를 만들어 주고, 그다음 짧고 명확한 결론 문장을 연습해서 반복 훈련하는 것이 필요합니다.`,script:`판단의 순서를 세워주는 스크립트 “ 지금 상황을 먼저 정리해 보면, 보장 조건은 두 가지 안으로 보입니다"
-“ 이 간병 보험이 좋은 이유는 정확히 세 가지입니다"
-짧고 명확한 결론 문장 스크립트 “ 그런 이유로 이 제안 내용을 추천드립니다"
-“ 보장내용과 환급금을 감안하면 이쪽이 맞습니다"`},NP:{condition:`0-7`,trait:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,coaching:`이 구간은 감정에 쉽게 흔들리지 않고 상담의 핵심을 놓치지 않으려는 강점이 있습니다. 정보와 조건을 분명하게 전달하려는 태도 덕분에 전문적으로 보일 수 있고, 일의 방향을 흐리지 않는 안정감도 가지고 있습니다.
+“여러 내용을 한꺼번에 보기보다, 지금 가장 필요한 보장부터 먼저 정리해서 설명드리겠습니다.”
+
+“고객님 의견도 중요하지만, 전문가 기준으로 봤을 때는 이 부분을 우선 준비하시는 게 가장 좋습니다.”`},NP:{condition:`0-7`,trait:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,coaching:`이 구간은 감정에 쉽게 흔들리지 않고 상담의 핵심을 놓치지 않으려는 강점이 있습니다. 정보와 조건을 분명하게 전달하려는 태도 덕분에 전문적으로 보일 수 있고, 일의 방향을 흐리지 않는 안정감도 가지고 있습니다.
  
-다만 공감과 정서 반응이 다소 약해 고객님과의 관계 접점이 쉽게 얇아질 가능성이 있습니다. 상담이 정보와 조건 중심으로만 흘러가면서 고객님의 감정 신호를 놓치기 쉬우며, 신뢰가 충분히 쌓이기 전에 대화가 종료될 수 있습니다. 고객님은 “맞는 말인데 마음이 가지 않는다”라고 느낄 수도 있습니다. 그 결과 설명은 했지만 성과로 연결되지 않아 슬럼프로 이어질 수 있습니다.
+다만 공감과 정서 반응이 다소 약해 고객님과의 관계 접점이 쉽게 얇아질 가능성이 있습니다. 상담이 정보와 조건 중심으로만 흘러가면서 고객님의 감정 신호를 놓치기 쉬우며, 신뢰가 충분히 쌓이기 전에 대화가 종료될 수 있습니다. 고객님은 “맞는 말인데 마음이 가지 않는다”라고 느낄 수도 있습니다. 그 결과 설명은 했지만 성과로 연결되지 않을 수 있습니다.
 
-이 구간의 코칭은 감정에 대한 공감 능력을 키우는 훈련이라기보다, 말하는 형식을 바꾸는 훈련에 가깝습니다. 먼저 A의 태도로 고객님이 한 말을 짧게 요약해 드리고, 간단한 인정 문장을 한 줄 덧붙여 관계를 확보합니다. 그 다음 CP의 결정 문장을 제시하며 결론을 내리시면 됩니다.`,script:`A로 요약하고 쩗은 인정 문장 과 결정문장 “ 네 환급금은 적어도 보장이 많이 되는 게 낫다는 거죠?” -요약
- “ 그렇게 생각하시는 게 합리적입니다" - 인정 공감
- “ 그러시다면 이 안이 가장 부합하겠네요”  - 결정`},A:{condition:`0-7`,trait:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족.`,coaching:`이 구간은 순간의 분위기와 고객님의 반응을 민감하게 느끼는 감각이 좋습니다. 현장에서 유연하게 대응하려는 태도가 있고, 쉽게 단정하지 않으려는 신중함도 가지고 있습니다.
+이 구간의 조율은 고객이 감정에 대한 공감을 충분히 받고 있다고 느끼게 하도록 스크립트를 연습해야 함.`,script:`“고객님 입장에서는 충분히 고민되고 부담될 수 있는 부분입니다. 하나씩 편하게 설명드리겠습니다.”
 
-다만 사실과 감정을 분리해 판단하는 힘이 다소 약해 상담 중 정보가 쌓일수록 머릿속이 복잡해지고 결론을 내리지 못해 흐름이 끊어질 수 있습니다. 설명은 많지만 논리와 구조가 약해 고객님 반응에 따라 판단이 흔들릴 수 있습니다. 고객님이 고개를 끄덕이면 설명을 더 늘리고, 조용하면 주제를 바꾸고, 고민한다고 하면 결론을 미루는 패턴이 반복되기 쉽습니다. 그래서 열심히 했지만 결과가 나오지 않는 슬럼프로 이어질 수 있습니다.
+“보장 내용도 중요하지만, 고객님 마음이 먼저 편안해야 오래 유지할 수 있습니다.”
 
-이 구간의 코칭은 사고력을 키우는 것이 아니라 판단의 순서를 고정하는 연습이 중요합니다. 제안 내용을 두 가지 안으로 나누고 그 안에서 선택을 돕는 구조를 만드는 훈련이 핵심입니다.`,script:`제안은 두 가지, 선택지를 제한하고 결론 문장 말하기 “ 정리하면 보장내용 선택지는 두 가지입니다 ” - 두 가지 제안
-“ 이 상황에서는 이 두 가지 중 하나를 생각하시면 됩니다" - 선택지 제한
-“ 결론부터 말씀드리면 이 안이 맞습니다” - 결정 문장 말하기`},FC:{condition:`0-7`,trait:`(말과 표정이 적어서 고객님이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,coaching:`이 구간은 감정에 휘둘리지 않고 차분하게 상담을 이어가는 힘이 있습니다. 진지함과 집중력이 좋아 일의 방향을 놓치지 않는 안정적인 태도도 갖추고 있습니다.
+“제가 설명은 드리지만 결정은 고객님 속도에 맞춰 함께 정리해가겠습니다. 부담 없이 질문 주세요.”`},A:{condition:`0-7`,trait:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 판단과 논리가 조금 부족.`,coaching:`이 구간은 순간의 분위기와 고객님의 반응을 민감하게 느끼는 감각이 좋습니다. 현장에서 유연하게 대응하려는 태도가 있고, 쉽게 단정하지 않으려는 신중함도 가지고 있습니다.
 
-다만 성과 부족이 아니라 정서 에너지의 소모가 누적되면서 슬럼프가 찾아오는 특징이 있습니다. 감정을 표현하거나 풀어내는 통로가 적기 때문에 상담에서는 문제가 없어 보여도 고객님의 거절이나 미루기, 무반응이 반복되면 스트레스를 밖으로 풀지 못하고 안으로만 쌓게 됩니다. 어느 순간 의욕 저하, 무기력, 상담 회피로 이어질 수 있습니다. 성과가 나와도 회복이 느리고, 말수가 줄어들고, 즐거움과 에너지가 떨어지는 모습이 나타날 수 있습니다.
+다만 사실과 감정을 분리해 판단하는 힘이 다소 약해 상담 중 정보가 쌓일수록 머릿속이 복잡해지고 결론을 내리지 못해 흐름이 끊어질 수 있습니다. 설명은 많지만 논리와 구조가 약해 고객님 반응에 따라 판단이 흔들릴 수 있습니다. 고객님이 고개를 끄덕이면 설명을 더 늘리고, 조용하면 주제를 바꾸고, 고민한다고 하면 결론을 미루는 패턴이 반복되기 쉽습니다. 그래서 열심히 했지만 결과가 나오지 않을 수 있습니다.
 
-이 구간의 코칭은 감정을 더 잘 느끼게 하는 것이 아니라 감정을 밖으로 배출하는 루틴을 만드는 것입니다. 의도적으로 말하고, 웃고, 표현하는 시간을 만드는 훈련이 핵심입니다.`,script:`그래서 다음 세 가지 훈련이 필요함
-- 완충 문장 훈련 : 감정을 표현이 아니라 완화로 배출 “조심스러운 판단이라는 점은 이해합니다” “이 부분은 충분히 고민되실 수 있습니다.
-- 상담 종료 리셋 문장 : 상담 감정을 끌고 나오지 않게 차단 “오늘 성담은 이걸로 충분합니다" “이것에 대한 판단은 여기까지 하겠습니다"
-- 이 업무 감정 배출 루틴 : 걷기 운동 정리, 취미 FC가 낮은 사람은 대화형 힐링이 역효과(지점장이 독려한다고 자리 만드는 것 비추)`},AC:{condition:`17-20`,trait:`(고객님 반응에 매우 민감한 성향) 순응, 눈치, 조심, 맞춤형, 불안.`,coaching:`이 구간은 고객님의 표정과 말의 변화에 매우 민감하게 반응하는 뛰어난 관찰력을 가지고 있습니다. 상대를 불편하게 하지 않으려는 배려가 깊고, 신중하게 접근하려는 책임감도 강합니다.
+이 구간의 조율은 논리력을 키우는 것이 아니라 판단의 순서를 고정해서 암기하는 연습이 중요합니다.`,script:`“고객님 반응도 중요하지만, 지금은 우선 핵심 내용부터 하나씩 정리해서 설명드리겠습니다.”   
+                                                                                                                                                                                  “지금 단계에서는 느낌보다 현재 상황과 필요한 보장을 기준으로 판단하시는 게 가장 중요합니다.” 
 
-다만 실수를 피하려는 마음이 커지면서 고객님의 작은 반응 하나에도 의미를 크게 두게 되고, 그로 인해 결정을 미루는 흐름이 반복될 수 있습니다. 상담은 안전하게 진행되지만 정작 왜 성과가 나오지 않는지 설명하기 어려운 상태가 만들어질 수 있습니다. 이것은 능력 부족이 아니라 조심성이 과해 행동이 멈추는 현상에 가깝습니다. 특히 “부담을 드리면 안 된다”는 생각이 강해질수록 제안은 부드러워지지만 선택의 순간이 사라질 수 있습니다.
+ “여러 가지를 한꺼번에 고민하기보다, 지금 가장 필요한 부분부터 먼저 결정하고 다음 순서로 넘어가겠습니다.”`},FC:{condition:`0-7`,trait:`(말과 표정이 적어서 고객님이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,coaching:`이 구간은 감정에 휘둘리지 않고 차분하게 상담을 이어가는 힘이 있습니다. 진지함과 집중력이 좋아 일의 방향을 놓치지 않는 안정적인 태도도 갖추고 있습니다.
 
-이 구간의 코칭 핵심은 자신감을 넣어주는 것이 아니라 결정과 선택을 연습의 영역으로 가져오는 것입니다. 기준을 제시하고 그 안에서 고르게 돕는 구조를 반복 훈련할 때 안정감과 성과가 함께 살아납니다.`,script:`과도한 고민을 멈추고 판단 범위를 줄이는 훈련 “ 고객님이 하신 말씀에서 판단해야 할 부분은 딱 두 개입니다"
-“ 오늘은 보장에 대해서만 정리하고, 판단과 결정은 다음 단계로 넘기겠습니다"
-결론 문장 고정 스크립트 “ 그래서 오늘은 이 방향으로 정리하겠습니다"
-“ 지금 조건에서는 이 선택이 가장 합리적이어서 이 안으로 가겠습니다"`}},cm5:{CP_NP_A:{manner:`고객님에게 도움이 되는 길을 분명히 알려주려는 책임감이 강하게 드러납니다. 옳다고 생각하는 방향을 흔들림 없이 제시하고, 동시에 따뜻하게 챙기려는 마음이 함께 느껴집니다. 그래서 고객님은 보호받는 느낌과 믿고 맡겨도 되겠다는 안정감을 받습니다. 다만 설명의 속도가 빨라지거나 비교 과정이 충분하지 않으면, 배려 속에서도 다소 단정적으로 느껴질 수 있습니다.`,improvement:`이미 좋은 의도로 권하고 있다는 점은 큰 강점입니다. 여기에 한 가지만 더 보태면 좋습니다. 내가 맞다는 전달보다 고객님이 이해했는지 확인하는 과정을 목표로 두는 것입니다. 고객님의 고개 끄덕임이 나올 때까지 기다리는 여유가 성과를 키웁니다.
+다만 성과 부족이 아니라 정서 에너지의 소모가 누적되면서 슬럼프가 찾아오는 특징이 있습니다. 감정을 표현하거나 풀어내는 통로가 적기 때문에 상담에서는 문제가 없어 보여도 고객님의 거절이나 미루기, 무반응이 반복되면 스트레스를 밖으로 풀지 못하고 안으로만 쌓게 됩니다. 어느 순간 말수가 줄어들고, 즐거움과 에너지가 떨어지는 모습이 나타날 수 있습니다.
+
+이 구간의 조율은 두가지 입니다. 첫째, 감정을 배출할 수 있는 취미활동과 둘째, 상담시 고객이 다소 무겁게 느낄 수 있으므로 의식적으로 웃고, 표현하는  훈련이 핵심입니다.`,script:`상담 실력을 더 높이기 위해서는 설명 능력보다 “표현 방식”을 조율하는 연습이 중요합니다. 상담 시작 전에 의식적으로 미소를 짓고, 고객 말에 고개를 끄덕이며 반응하는 습관을 만드는 것이 도움이 됩니다. 
+
+“고객님 말씀 충분히 이해했습니다. 부담되지 않도록 중요한 부분부터 천천히 같이 정리해보겠습니다.”
+
+“걱정되실 수 있는 부분이라 고객님 입장에서 하나씩 쉽게 설명드리겠습니다.”`},AC:{condition:`17-20`,trait:`(고객님 반응에 매우 민감한 성향) 순응, 눈치, 조심, 맞춤형, 불안.`,coaching:`이 구간은 고객님의 표정과 말의 변화에 매우 민감하게 반응하는 뛰어난 관찰력을 가지고 있습니다. 상대를 불편하게 하지 않으려는 마음이 깊고, 신중하게 접근하려는 책임감도 강합니다.
+
+다만 실수를 피하려는 마음이 커지면서 고객님의 작은 반응 하나에도 의미를 크게 두게 되고, 그로 인해 결정을 미루는 흐름이 반복될 수 있습니다. 상담은 안전하게 진행되지만 정작 왜 성과가 나오지 않는지 설명하기 어려운 상태가 만들어질 수 있습니다. 특히 “부담을 드리면 안 된다”는 생각이 강해질수록 제안은 부드러워지지만 선택의 순간이 사라질 수 있습니다.
+
+이 구간의 조율 핵심은 고객의 결정과 선택을 이끌 수 있는 스크립트 연습을 반복적으로 하는 것입니다.`,script:`“고객님 입장은 충분히 이해합니다. 다만 현재 상황에서는 이 방향이 가장 안정적인 선택이라고 판단됩니다.”
+
+“부담되지 않게 설명드리되, 지금 결정하셔야 하는 핵심 부분은 분명하게 정리해드리겠습니다.”
+
+“고객님 생각도 중요하지만, 전문가 기준으로 봤을 때는 지금 이 부분을 먼저 준비하시는 게 가장 필요합니다.”`}},cm5:{CP_NP_A:{manner:`고객님에게 도움이 되는 길을 분명히 알려주려는 책임감이 강하게 드러납니다. 옳다고 생각하는 방향을 흔들림 없이 제시하고, 동시에 따뜻하게 챙기려는 마음이 함께 느껴집니다. 그래서 고객님은 보호받는 느낌과 믿고 맡겨도 되겠다는 안정감을 받습니다. 다만 설명의 속도가 빨라지거나 비교 과정이 충분하지 않으면, 배려 속에서도 다소 단정적으로 느껴질 수 있습니다.`,improvement:`이미 좋은 의도로 권하고 있다는 점은 큰 강점입니다. 여기에 한 가지만 더 보태면 좋습니다. 내가 맞다는 전달보다 고객님이 이해했는지 확인하는 과정을 목표로 두는 것입니다. 고객님의 고개 끄덕임이 나올 때까지 기다리는 여유가 성과를 키웁니다.
 
 🗣 화법①
 “제가 추천드리는 이유를 하나씩 같이 보시면서 결정하시죠.”
@@ -731,7 +731,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 이 성향은 머릿속이 먼저 정리됩니다. 계산이 끝났고 비교도 끝났고 지금 결정하는 게 왜 좋은지 이미 알고 있습니다. 그런데 분위기를 부드럽게 만들고 싶어집니다. 혹시 부담 줄까 봐, 혹시 밀어붙인다고 느낄까 봐 한 번 더 웃으며 풀어주려 합니다. 그래서 응대는 논리적이면서도 가볍게 들립니다. “충분히 생각하실 수 있죠, 그래도 방향은 잡아 두시는 게 좋습니다.”처럼 말입니다. 정리는 잘하지만 힘 있게 잠그는 동작이 약해질 수 있습니다.
 
-이때 고객님의 마음은 이해는 했지만 아직 감정이 완전히 넘어오지 않은 상태입니다. 필요성은 공감하지만 결정의 책임을 바로 지고 싶지는 않습니다. 그래서 시간을 벌 수 있는 말을 꺼냅니다. 배우자 이야기, 다음에 하겠다는 말은 사실 거절이라기보다 뒤로 미루는 신호에 가깝습니다. 설계사가 더 부드러워질수록 고객님도 같이 뒤로 갑니다.
+이때 고객님의 마음은 이해는 했지만 아직 감정이 완전히 넘어오지 않은 상태입니다. 필요성은 공감하지만 결정의 책임을 바로 지고 싶지는 않습니다. 그래서 시간을 벌 수 있는 말을 꺼냅니다. 배우자 이야기, 다음에 하겠다는 말은 사실 거절이라기보다 뒤로 미루는 신호에 가깝습니다. 컨설턴트가 더 부드러워질수록 고객님도 같이 뒤로 갑니다.
 
 여기서 필요한 코칭은 친절은 유지하되 마침표를 찍는 힘입니다. 이미 분석은 충분히 되었으니 이제는 선택을 도와주고 방향을 잡아 줘야 합니다. 즉 공감은 하되 결론은 제시해야 합니다. 그래야 고객님이 안심하고 따라옵니다.`,A_AC:`첫째, 미루는 이유를 정확히 말로 꺼내게 한다.
 둘째, 고객님의 표정 변화를 읽고 속도를 맞춘다.
@@ -739,7 +739,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 이 성향은 상황을 머리로 빠르게 정리합니다. 왜 망설이는지, 어디에서 걸리는지 계산이 됩니다. 동시에 상대의 눈빛과 말투를 세심하게 읽기 때문에 강하게 밀기보다는 분위기를 맞추려 합니다. 응대는 차분하고 합리적입니다. “충분히 고민되실 수 있습니다, 다만 현재 조건에서 가장 유리한 선택은 이것입니다.”처럼 설명 중심으로 갑니다. 문제는 너무 이해해 주다 보면 주도권까지 같이 넘겨줄 수 있다는 점입니다.
 
-이때 고객님의 마음은 아직 결정을 확정할 준비가 끝난 상태는 아닙니다. 틀렸다고 생각하지는 않지만, 혹시 모를 선택의 부담을 줄이고 싶어 합니다. 그래서 시간을 확보할 수 있는 표현을 씁니다. 설계사가 더 배려해 줄수록 고객님은 더 생각해 보겠다고 뒤로 이동합니다. 서로 맞춰 주다가 계약 타이밍이 흘러갈 수 있습니다.
+이때 고객님의 마음은 아직 결정을 확정할 준비가 끝난 상태는 아닙니다. 틀렸다고 생각하지는 않지만, 혹시 모를 선택의 부담을 줄이고 싶어 합니다. 그래서 시간을 확보할 수 있는 표현을 씁니다. 컨설턴트가 더 배려해 줄수록 고객님은 더 생각해 보겠다고 뒤로 이동합니다. 서로 맞춰 주다가 계약 타이밍이 흘러갈 수 있습니다.
 
 필요한 코칭은 읽는 능력 위에 리드하는 힘을 얹는 것입니다. 이미 충분히 파악했으니 이제는 방향을 잡아 줘야 합니다. 공감은 하되 결론은 제시해야 합니다. 그래야 고객님이 안심하고 따라옵니다.`,FC_CP:`첫째, 분위기 좋을 때 바로 결정 구간으로 이동시킨다.
 둘째, 웃으며 말하되 선택은 분명하게 제시한다.
@@ -747,7 +747,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 이 성향은 에너지가 밝고 현장이 부드럽습니다. 말이 재미있고 분위기를 따뜻하게 만들 줄 압니다. 동시에 기준은 분명해서 필요하다고 판단되면 방향을 잡으려 합니다. 그래서 응대는 “고민되실 수 있지만 지금 준비하시는 게 맞습니다.”처럼 친근함 속에 단호함이 섞입니다. 문제는 분위기가 좋다 보니 고객님이 아직 웃고 있고, 거절도 부드럽게 나오기 때문에 ‘조금 더 이야기해도 되겠지’ 하며 타이밍을 늦출 수 있다는 점입니다.
 
-이때 고객님의 마음은 나쁘지 않습니다. 설계사가 싫어서가 아니라 결정의 무게를 뒤로 미루고 싶은 상태입니다. 편안한 분위기를 유지하고 싶어서 상의, 다음에 같은 말을 꺼냅니다. 설계사가 더 맞춰 주면 고객님은 더 천천히 가려고 합니다. 결국 관계는 좋은데 계약은 미뤄지는 그림이 됩니다.
+이때 고객님의 마음은 나쁘지 않습니다. 컨설턴트가 싫어서가 아니라 결정의 무게를 뒤로 미루고 싶은 상태입니다. 편안한 분위기를 유지하고 싶어서 상의, 다음에 같은 말을 꺼냅니다. 컨설턴트가 더 맞춰 주면 고객님은 더 천천히 가려고 합니다. 결국 관계는 좋은데 계약은 미뤄지는 그림이 됩니다.
 
 필요한 코칭은 웃음 뒤에 결론을 붙이는 습관입니다. 이미 분석은 충분히 되었으니 이제는 선택을 도와주고 방향을 잡아 줘야 합니다. 즉 공감은 하되 결론은 제시해야 합니다. 그래야 고객님이 안심하고 따라옵니다.`,FC_NP:`첫째, 감정이 열려 있을 때 결정을 요청한다.
 둘째, 공감 후 바로 선택 질문으로 넘어간다.
@@ -765,7 +765,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 하지만 결정의 순간에도 설명을 더 해 주려는 경향이 있습니다. 한 번 더 이해시키면 되겠지라고 생각합니다. 그래서 고객님이 미루는 말을 하면 바로 닫기보다 추가 설명이나 자료로 들어갈 가능성이 큽니다. 상담은 좋았는데 마지막 문을 닫는 힘이 약해질 수 있습니다.
 
-이때 고객님의 마음은 거의 다 왔습니다. 필요성도 알고 있고 맞는 선택이라는 것도 압니다. 다만 책임지는 느낌이 부담돼서 시간을 벌고 싶어 합니다. 설계사가 더 설명해 주면 편하게 뒤로 빠질 수 있다고 느끼기도 합니다.
+이때 고객님의 마음은 거의 다 왔습니다. 필요성도 알고 있고 맞는 선택이라는 것도 압니다. 다만 책임지는 느낌이 부담돼서 시간을 벌고 싶어 합니다. 컨설턴트가 더 설명해 주면 편하게 뒤로 빠질 수 있다고 느끼기도 합니다.
 
 코칭 포인트는 충분히 이해했다는 전제를 깔고 선택만 남기는 것입니다. 즉 이미 분석은 충분히 되었으니 이제는 선택을 도와주고 방향을 잡아 줘야 합니다. 그래야 고객님이 안심하고 따라옵니다.`,FC_AC:`첫째, 미루는 이유를 짧게 확인하고 바로 결정 질문으로 간다.
 둘째, 고객님의 불안을 줄여 주되 선택은 오늘로 묶는다.
@@ -775,7 +775,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 하지만 바로 그 편안함 때문에 결정이 늦어지기도 합니다. 고객님의 마음속에는 고객님이 불편해하면 안 된다는 생각이 큽니다. 그래서 확정 질문 대신 한 발 물러나는 선택을 하기가 쉽습니다. 괜히 강하게 말했다가 관계가 멀어질까 걱정도 됩니다.
 
-이때 고객님의 마음은 어떤 상태일까요. 사실은 대부분 가입 쪽으로 많이 기울어 있습니다. 필요성도 이해했고 조건도 나쁘지 않다는 걸 압니다. 다만 누가 등을 살짝 밀어 주면 좋겠다는 상태입니다. 설계사가 기다려 주면 고맙지만, 동시에 지금 안 해도 되겠다고 뒤로 빠질 구멍을 찾게 됩니다.
+이때 고객님의 마음은 어떤 상태일까요. 사실은 대부분 가입 쪽으로 많이 기울어 있습니다. 필요성도 이해했고 조건도 나쁘지 않다는 걸 압니다. 다만 누가 등을 살짝 밀어 주면 좋겠다는 상태입니다. 컨설턴트가 기다려 주면 고맙지만, 동시에 지금 안 해도 되겠다고 뒤로 빠질 구멍을 찾게 됩니다.
 
 코칭의 핵심은 공감 후 전환입니다. 따뜻함은 이미 충분합니다. 이제는 방향을 잡아줘야 합니다. 친절은 유지하되 결론을 제시해야 합니다. 그래야 고객님이 안심하고 따라옵니다.`,AC_CP:`첫째, 고객님의 망설임을 인정한 뒤 결정 질문으로 연결한다.
 둘째, 배려의 말 뒤에 오늘 해야 하는 이유를 붙인다.
@@ -795,7 +795,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 응대는 부드럽습니다. “그러실 수 있죠, 충분히 이해합니다.”라고 안정감을 줍니다. 고객님은 이 말을 들으며 경계가 풀립니다. 대신 방향을 못 잡아 주면 대화가 길어지거나 자연스럽게 다음으로 밀릴 수 있습니다. 좋게 말하면 배려, 나쁘게 말하면 결단이 약해질 수 있는 순간입니다.
 
-이때 고객님 마음은 사실 완전 거절이라기보다 불안 회피에 가깝습니다. 누군가 대신 괜찮다고 말해 주면 움직일 수 있는데, 설계사가 같이 망설여 주면 그냥 미루는 쪽을 선택합니다.
+이때 고객님 마음은 사실 완전 거절이라기보다 불안 회피에 가깝습니다. 누군가 대신 괜찮다고 말해 주면 움직일 수 있는데, 컨설턴트가 같이 망설여 주면 그냥 미루는 쪽을 선택합니다.
 
 코칭의 핵심은 공감 후 전환입니다. 따뜻함은 이미 충분합니다. 이제는 방향을 잡아줘야 합니다. 친절은 유지하되 결론을 제시해야 합니다. 그래야 고객님이 안심하고 따라옵니다.`,AC_A:`첫째, 고객님의 표정과 속도를 먼저 읽는다.
 둘째, 망설임의 이유를 질문으로 확인한다.
@@ -815,7 +815,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 응대도 따뜻합니다. “아, 충분히 그러실 수 있죠.”, “당연히 상의는 필요하시죠.” 하며 고객님 마음을 안심시킵니다. 고객님은 압박받지 않으니 편해집니다. 하지만 동시에 ‘오늘 안 해도 되겠다’는 출구도 같이 열립니다. 편안하지만 결정은 멀어질 수 있습니다.
 
-이때 고객님 마음은 사실 틀릴까 봐 두려운 상태입니다. 누가 대신 확신을 조금만 얹어 주면 움직일 준비는 되어 있습니다. 그런데 설계사가 배려에 집중하면, 고객님은 계속 생각해 보겠다고 뒤로 갑니다.
+이때 고객님 마음은 사실 틀릴까 봐 두려운 상태입니다. 누가 대신 확신을 조금만 얹어 주면 움직일 준비는 되어 있습니다. 그런데 컨설턴트가 배려에 집중하면, 고객님은 계속 생각해 보겠다고 뒤로 갑니다.
 
 코칭의 핵심은 공감 후 전환입니다. 따뜻함은 이미 충분합니다. 이제는 방향을 잡아줘야 합니다. 친절은 유지하되 결론을 제시해야 합니다. 그래야 고객님이 안심하고 따라옵니다.`},cm7:{CP_NP_A:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
 첫째, 상대의 마음을 읽는 능력입니다.
@@ -1575,13 +1575,13 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 — 노자, 도덕경 43장`,improve:`내가 나를 위하지 않으면, 누가 나를 위하겠는가.
 — 힐렐, 탈무드 피르케이 아보트`}}},Uc={job_type:`manager`,job_label:`관리자`,cm1:{"17-20":{CP:`주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움.`,AC:`순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`이성적, 균형감, 현실적, 분석적.`,FC:`밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`협조, 적당한 순응, 적당한 눈치, 조율.`},"11-13":{CP:`균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`적당한 친절, 예의 바름, 부담 없음.`,A:`평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`안정감, 차분한, 균형감, 무난함.`,AC:`적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`차분함, 무심해 보임, 실무형, 표현 적음.`,A:`감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`조용함, 신중함, 진지함, 다소 거리감`,AC:`독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`우유부단, 착함, 결정 어려움, 말을 아낌.`,NP:`무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족`,FC:`무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`단호함, 직선적, 눈치 안 봄, 상대를 통제.`}},cm2:{"17-20":{CP:`기준과 원칙이 아주 분명합니다. 면담 자리에서 말과 자세가 단정하고 자신감이 있습니다. “이 부분은 꼭 필요합니다”, “이렇게 하셔야 성과가 납니다”처럼 단호하게 말합니다. 구성원들이 망설이면 방향을 잡아 주려는 마음이 강합니다. 다만 너무 확신에 찬 말투 때문에 구성원들이 압박을 느낄 수 있습니다.`,NP:`구성원들을 향한 마음의 온도가 매우 높습니다. 구성원들의 말을 들으면 먼저 이해하려 하고, 판단보다 공감을 앞세웁니다. 그래서 구성원들은 이분과 상담할 때 편안함을 느끼고, 자신의 이야기를 솔직하게 꺼내도 괜찮겠다는 신뢰를 갖게 됩니다. 힘든 상황에서도 끝까지 함께해 줄 사람이라는 확신을 주는, 관계의 기반을 만드는 따뜻한 힘이 있습니다.`,A:`구성원들과의 상담에서 감정에 치우치지 않고 사실과 흐름을 차분히 정리하는 능력이 뛰어납니다. 복잡한 조건 속에서도 핵심을 잡아 주기 때문에 구성원들은 방향을 잃지 않습니다. 설명은 명확하고 판단은 균형 잡혀 있어, 구성원들에게 안정감과 전문성을 동시에 느끼게 합니다. 믿고 맡길 수 있는 사람이라는 확신을 만드는 힘입니다.`,FC:`구성원들을 만나는 걸 정말 즐깁니다. 면담할 때 표정이 밝고 마음이 열려 있으며, 먼저 웃으며 말을 겁니다. 구성원들 이야기에 고개를 끄덕이고 반응이 빠릅니다. 말투는 부드럽고 친근해서 “아, 그런 상황이셨군요”처럼 공감부터 합니다. 다만 분위기가 너무 가벼워 보이면 중요한 코칭이 가볍게 느껴질 수 있어 조절이 필요합니다.`,AC:`구성원들의 표정과 말투를 아주 민감하게 살핍니다. 구성원들이 불편해할까 봐 먼저 조심하고, 맞춰 주는 태도가 강합니다. 말할 때도 “괜찮으시면요”, “부담되시면 안 하셔도 돼요” 같은 표현을 자주 씁니다. 구성원들 기분은 잘 읽지만, 본인 의견을 끝까지 말하지 못해 코칭이 흐려질 수 있습니다.`},"14-16":{CP:`책임감 있고 믿음직한 태도를 보입니다. 면담할 때 흐트러짐 없이 차분하게 코칭하고, 중요한 포인트를 분명히 짚어 줍니다. 말투는 또렷하지만 공격적이지 않고 “이 기준으로 보시면 이해가 쉬워요”처럼 안내합니다. 구성원들은 리더를 통해 안정감과 신뢰를 느끼기 쉽습니다.`,NP:`따뜻하면서도 안정감 있게 구성원들을 대합니다. 구성원들 이야기를 잘 들어주고 고개를 끄덕이며 공감해 줍니다. 말투는 부드럽고 “그렇게 느끼실 수 있어요”, “많이 고민되셨죠” 같은 표현을 자연스럽게 씁니다. 필요할 때는 조심스럽게 방향을 제시해 구성원들이 혼자 결정한다고 느끼게 해줍니다. 신뢰받기 쉬운 태도입니다.`,A:`감정보다 이성과 논리로 코칭합니다. 구성원들 이야기를 차분히 듣고, 필요한 정보만 골라 쉽게 코칭합니다. “걱정되실 수 있어요. 그래서 이 상황에서는 이렇게 해 봅시다”처럼 짧게 공감을 한 후에 코칭을 합니다. 말투가 안정적이고 판단이 흔들리지 않아 구성원들이 신뢰하기 쉽습니다. 가장 이상적인 면담 태도입니다.`,FC:`편안한 분위기를 자연스럽게 만듭니다. 자세는 안정적이고 표정도 부드러워 구성원들이 긴장을 풀기 쉽습니다. 말할 때는 웃음과 공감을 섞어 “편하게 생각하셔도 됩니다”라고 말합니다. 분위기는 밝고 과하지 않아 면담이 부담스럽지 않습니다.`,AC:`상황을 보며 말을 고르는 편입니다. 구성원들 반응을 보면서 속도를 조절하고, 무리하게 밀지 않습니다. “이 부분은 ㅇㅇ님 상황에 맞춰 생각해 보셔도 돼요”처럼 부드럽게 말합니다. 배려와 안정감은 주지만, 결정이 늦어질 수 있습니다.`},"11-13":{CP:`상황에 맞게 유연하게 대응합니다. 자기 의견도 있지만 구성원들 말도 잘 듣습니다. 면담에서는 “제 생각은 이렇지만, ㅇㅇ님 상황도 중요합니다”처럼 균형 잡힌 말을 합니다. 강하게 밀어붙이지도, 너무 물러서지도 않아 편안한 면담이 됩니다. 구성원들은 부담 없이 코칭을 받아들입니다.`,NP:`친절하지만 감정에 너무 치우치지는 않습니다. 구성원들에게 예의 있게 대하고 필요한 코칭을 차분히 합니다. 말은 짧고 정리되어 있으며 “이 부분은 이렇게 보시면 돼요”처럼 담백한 표현을 씁니다. 공감도 하지만 과하지 않아 면담이 깔끔하게 끝납니다. 구성원들은 부담 없이 코칭을 듣는 느낌을 받습니다.`,A:`상황에 따라 감정과 논리를 오가며 면담합니다. 구성원들 반응을 보며 코칭을 조절하고, 너무 딱딱하지도 너무 감정적이지도 않습니다. “이렇게 생각하실 수 있는데, 현실적으로 보면 이 방법이 좋아요”처럼 말합니다. 무난하지만 결정이 조금 늦어질 수 있어 정리 멘트가 필요합니다.`,FC:`무난하고 차분한 태도를 보입니다. 자세는 바르고 표정은 안정적입니다. 말투는 또렷하지만 감정 표현은 많지 않습니다. “이 부분을 코칭드리겠습니다”처럼 코칭 중심으로 말합니다. 편하지도 불편하지도 않은 느낌을 주며, 구성원들은 안정감을 느끼며 “이 분은 전문가 답다"라고 느낌`,AC:`구성원들 눈치도 보고 자기 생각도 말할 줄 압니다. 분위기가 무겁지 않게 유지하면서도 필요한 코칭은 분명히 합니다. “이건 장단점이 있어요. ㅇㅇ님께 맞는 쪽을 같이 보죠”처럼 균형 잡힌 말투를 씁니다. 구성원들도 부담 없이 듣습니다.`},"8-10":{CP:`구성원들을 존중하면서도 자기 생각을 조금씩 말할 수 있습니다. 면담할 때 “제 경험으로 보면 이 방법이 더 안전해요”처럼 조심스럽게 방향을 제시합니다. 구성원들을 몰아붙이지는 않지만, 완전히 맡기지도 않습니다. 다만 확신이 조금은 약해 보여서 구성원들이 결정을 미루는 경우가 가끔 생기기도 합니다.`,NP:`배려하는 표현이 다소 적은 편입니다. 구성원들을 존중하긴 하지만 말수가 많지 않고 표정도 차분합니다. 면담에서는 코칭 위주로 말하며 “이 내용은 이런 구조입니다”처럼 사실 중심으로 이야기합니다. 공감 표현은 적어 다소 차갑게 느껴질 수 있지만, 일은 또렷하게 진행됩니다. 구성원들에 따라 거리감이 느껴질 수 있습니다.`,A:`느낌을 먼저 받아들이고 나중에 생각합니다. 구성원들 말에 공감은 잘하지만 코칭이 정리되지 않을 때가 있습니다. “괜찮을 것 같아요” 같은 표현이 많고, 이유 코칭은 약합니다. 말투는 부드럽지만 판단력이 약해 보일 수 있어, 미리 준비한 코칭을 쓰는 연습이 필요합니다.`,FC:`조용하고 진지한 모습이 강합니다. 면담 중 말수가 적고 표정 변화도 크지 않습니다. 자세는 단정하지만 다소 굳어 보일 수 있습니다. 말할 때는 필요한 말만 짧게 하며 감정 표현이 거의 없습니다. 구성원들은 신뢰는 느끼지만 “조금 신중하다”고 느낄 수 있습니다.`,AC:`구성원들 반응에 크게 흔들리지 않습니다. 자기 기준으로 차분하게 코칭하고, 필요하면 직설적으로 말합니다. “이 내용은 이렇게 해야 맞습니다”처럼 간단히 말합니다. 솔직해서 신뢰는 주지만, 예민한 구성원들에게는 조금은 차갑게 느껴질 수 있어서 이 점만 주위하면 됩니다.`},"0-7":{CP:`자기 기준을 강하게 내세우지 않습니다. 면담할 때 구성원들 말을 먼저 듣고, 웬만하면 반대하지 않습니다. “ㅇㅇ님 생각이 맞아요”, “원하시는 대로 하셔도 됩니다”라는 말을 자주 합니다. 분위기는 편하지만, 구성원들이 “그래서 뭘 선택해야 하지?” 하고 헷갈릴 수 있습니다. 방향을 잡아주는 힘은 약한 편입니다.`,NP:`상대가 느끼기에 다소 차갑게 보일 수 있습니다. 상담할 때도 바로 본론으로 들어가며 “필요한 것만 말씀드리겠습니다”라는 식의 말투를 씁니다. 위로나 공감보다는 정보 전달이 중심입니다. 구성원들은 정확하다고 느낄 수 있지만, 마음을 이해받는 느낌은 적을 수 있습니다. 친절해 보이지 않는다는 오해를 받을 수 있습니다.`,A:`면담 중 감정에 많이 휘둘립니다. 구성원들 표정이나 말에 따라 말이 바뀌고, 코칭보다 반응이 먼저 나옵니다. “아… 그러면 안 하셔도 돼요”처럼 쉽게 물러납니다. 친절해 보이지만 코칭하는 입장으로서의 신뢰는 떨어질 수 있어, 말하기 전 잠깐 생각하는 습관이 꼭 필요합니다.`,FC:`감정을 거의 드러내지 않습니다. 표정이 굳어 있고 몸도 긴장돼 보일 수 있습니다. 말투는 건조하고 코칭 위주이며 공감 표현이 적습니다. 구성원들이 말을 해도 반응이 적어 “내 말이 전달됐나?”라고 느낄 수 있습니다. 신뢰는 줄 수 있지만 거리감이 커질 가능성이 있습니다.`,AC:`남의 시선을 크게 신경 쓰지 않습니다. 구성원들 눈치를 거의 보지 않고 자기 생각대로 말합니다. “이게 제일 합리적입니다”처럼 단정적인 표현이 많습니다. 자신감은 느껴지지만, 구성원들이 압박을 느끼는 경우가 발생할 수 있습니다.`}},cm3:{CP_NP:`(CP 통제적부모 & NP 자상한부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직이 기대하는 리더의 가장 이상적인 모습을 가지고 있습니다.
+이 성향의 리더는 조직이 기대하는 리더의 가장 이상적인 모습을 가지고 있습니다.
 왜냐하면 기준을 세우는 힘과 사람을 끝까지 품는 마음을 함께 갖추고 있기 때문입니다.
 
 구성원들은 무엇을 해야 하는지, 어디로 가야 하는지, 지금 내가 잘 가고 있는지 알고 싶어 합니다.
-지점장님은 애매한 표현 대신 분명한 방향을 제시합니다. 해야 할 것과 하지 말아야 할 것을 또렷하게 말해 주기 때문에 조직은 혼란이 줄어듭니다. 기준이 명확하면 사람은 안정감을 느끼고, 안정감 속에서 실력이 자랍니다.
+리더는 애매한 표현 대신 분명한 방향을 제시합니다. 해야 할 것과 하지 말아야 할 것을 또렷하게 말해 주기 때문에 조직은 혼란이 줄어듭니다. 기준이 명확하면 사람은 안정감을 느끼고, 안정감 속에서 실력이 자랍니다.
 
-동시에 지점장님은 사람을 쉽게 놓지 않습니다.
+동시에 리더는 사람을 쉽게 놓지 않습니다.
 성과가 부족한 날에도 이유를 먼저 묻고, 다시 해볼 수 있도록 기회를 줍니다.
 혼내기보다 붙잡아 주는 시간이 많기 때문에 구성원들은 마음으로 충성하게 됩니다.
 “이분 밑에서라면 다시 한번 해보고 싶다”라는 생각이 자연스럽게 생깁니다.
@@ -1592,9 +1592,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 단단한 기준과 따뜻한 보호가 함께 있는 리더.
 조직이 오래가고 커질 수밖에 없는 이유가 바로 여기에 있습니다.`,CP_A:`(CP 통제적부모 & A 어른자아가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직을 안정적으로 성장시키는 리더가 갖추어야 할 두 개의 기둥을 단단히 가지고 있습니다. 하나는 기준을 세우는 힘, 또 하나는 흔들리지 않고 판단하는 힘입니다.
+이 성향의 리더는 조직을 안정적으로 성장시키는 리더가 갖추어야 할 두 개의 기둥을 단단히 가지고 있습니다. 하나는 기준을 세우는 힘, 또 하나는 흔들리지 않고 판단하는 힘입니다.
 
-조직에서 사람들이 가장 불안해지는 순간은 “그래서 어떻게 해야 하지?”가 보이지 않을 때입니다. 지점장님은 그 질문을 오래 남겨두지 않습니다. 무엇이 맞는지, 어디로 가야 하는지, 지금 선택이 왜 필요한지를 분명하고 논리적으로 설명해 줍니다. 그래서 구성원들은 감정에 휩쓸리기보다 방향을 보고 움직이게 됩니다.
+조직에서 사람들이 가장 불안해지는 순간은 “그래서 어떻게 해야 하지?”가 보이지 않을 때입니다. 리더는 그 질문을 오래 남겨두지 않습니다. 무엇이 맞는지, 어디로 가야 하는지, 지금 선택이 왜 필요한지를 분명하고 논리적으로 설명해 줍니다. 그래서 구성원들은 감정에 휩쓸리기보다 방향을 보고 움직이게 됩니다.
 
 성과에 대해서도 마찬가지입니다. 결과가 좋으면 이유를 분석해 다시 재현할 방법을 찾고, 부족하면 감정 대신 데이터를 보며 해결책을 만듭니다. 변명보다 개선이 먼저 나오는 문화가 만들어집니다.
 
@@ -1605,7 +1605,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 원칙과 판단이 만났을 때, 조직은 비로소 흔들리지 않는 힘을 갖게 됩니다.`,CP_FC:`(CP 통제적부모 & FC 자유로운아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 강한 기준과 살아 있는 에너지를 동시에 갖춘 리더입니다. 조직은 규칙만으로 움직이지도 않고, 분위기만으로 성장하지도 않습니다. 그런데 이 두 요소가 한 사람 안에서 함께 나오면 이야기가 달라집니다.
+이 성향의 리더는 강한 기준과 살아 있는 에너지를 동시에 갖춘 리더입니다. 조직은 규칙만으로 움직이지도 않고, 분위기만으로 성장하지도 않습니다. 그런데 이 두 요소가 한 사람 안에서 함께 나오면 이야기가 달라집니다.
 
 먼저 기준을 분명히 세웁니다. 무엇을 해야 하고, 무엇은 하지 말아야 하는지 모호하게 두지 않습니다. 그래서 구성원들은 헷갈리지 않습니다. 실적에 대해서도 책임의 선을 또렷하게 긋습니다. 노력의 방향이 틀어지지 않도록 중심을 잡아 줍니다.
 
@@ -1618,7 +1618,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 사람들은 강한 리더에게 복종하지 않습니다. 살아 있는 리더를 따라갑니다.`,CP_AC:`(CP 통제적부모 & AC 순응하는아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 원칙을 세우는 힘과 조직의 흐름을 읽는 감각을 함께 가진 리더입니다. 기준을 말할 줄 알고, 동시에 그 기준이 현장에서 어떻게 받아들여질지도 생각합니다. 그래서 말 한마디, 결정 하나가 가볍지 않습니다.
+이 성향의 리더는 원칙을 세우는 힘과 조직의 흐름을 읽는 감각을 함께 가진 리더입니다. 기준을 말할 줄 알고, 동시에 그 기준이 현장에서 어떻게 받아들여질지도 생각합니다. 그래서 말 한마디, 결정 하나가 가볍지 않습니다.
 
 무엇이 맞는지 분명하게 이야기합니다. 해야 할 일과 하지 말아야 할 일을 정확히 알려 주기 때문에 구성원들은 흔들리지 않습니다. 목표가 생기면 돌아가지 않고 곧게 갑니다. 실적에 대해서도 책임을 피하지 않습니다. 리더가 중심을 잡고 있으니 조직은 안심하고 움직입니다.
 
@@ -1629,9 +1629,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 원칙이 무너지지 않으면서도 관계가 깨지지 않는 조직,
 그 균형을 만들 수 있는 사람이 바로 이런 리더입니다.`,NP_CP:`(NP 자상한부모 & CP 통제적부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 사람을 살리면서도 기준을 무너지지 않게 만드는 리더입니다. 따뜻함과 원칙이 함께 움직입니다. 그래서 조직은 편안하지만 느슨해지지 않습니다.
+이 성향의 리더는 사람을 살리면서도 기준을 무너지지 않게 만드는 리더입니다. 따뜻함과 원칙이 함께 움직입니다. 그래서 조직은 편안하지만 느슨해지지 않습니다.
 
-구성원의 어려움을 먼저 알아보고 손을 내밀 줄 압니다. 힘들어하는 사람을 외면하지 않고, 다시 일어설 수 있도록 곁에서 도와줍니다. 그래서 구성원들은 “지점장님은 우리 편”이라고 느낍니다. 그 신뢰가 조직의 바닥을 단단하게 만듭니다.
+구성원의 어려움을 먼저 알아보고 손을 내밀 줄 압니다. 힘들어하는 사람을 외면하지 않고, 다시 일어설 수 있도록 곁에서 도와줍니다. 그래서 구성원들은 “리더는 우리 편”이라고 느낍니다. 그 신뢰가 조직의 바닥을 단단하게 만듭니다.
 
 동시에 해야 할 일에 대해서는 분명합니다. 목표, 방향, 책임을 또렷하게 제시합니다. 잘하고 못하고의 기준을 명확히 알려 주기 때문에 조직은 어디로 가야 하는지 헷갈리지 않습니다. 따뜻하지만 흐리지 않습니다. 배려하지만 물러서지 않습니다.
 
@@ -1640,7 +1640,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 사람을 품는 마음 위에 기준을 세우는 힘이 더해질 때,
 조직은 오래가고 결과는 자연스럽게 따라옵니다.`,NP_A:`(NP 자상한부모 & A 어른자아가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 마음을 품으면서도 흔들리지 않는 판단을 내릴 수 있는 리더입니다. 따뜻함이 바탕이 되지만 운영은 냉정하고, 배려를 하면서도 방향을 잃지 않습니다. 그래서 조직은 편안함 속에서 안정감을 느낍니다.
+이 성향의 리더는 마음을 품으면서도 흔들리지 않는 판단을 내릴 수 있는 리더입니다. 따뜻함이 바탕이 되지만 운영은 냉정하고, 배려를 하면서도 방향을 잃지 않습니다. 그래서 조직은 편안함 속에서 안정감을 느낍니다.
 
 구성원의 이야기를 충분히 들어주고, 어려움을 이해해 주며, 사람을 먼저 생각합니다. 누군가 실수를 해도 바로 문제를 삼기보다 어떻게 다시 세울 수 있을지를 고민합니다. 그 과정에서 신뢰가 쌓이고, 사람들은 스스로 책임지고 싶어집니다.
 
@@ -1652,7 +1652,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 결과를 만들어내는 이성이 함께 갈 때,
 조직은 오래 성장합니다.`,NP_FC:`(NP 자상한부모 & FC 자유로운아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 사람을 사랑하는 힘과 현장을 움직이게 하는 활력을 동시에 가진 리더입니다. 조직을 관리한다는 느낌보다 함께 뛰어준다는 느낌을 주기 때문에 구성원들의 마음이 자연스럽게 열립니다.
+이 성향의 리더는 사람을 사랑하는 힘과 현장을 움직이게 하는 활력을 동시에 가진 리더입니다. 조직을 관리한다는 느낌보다 함께 뛰어준다는 느낌을 주기 때문에 구성원들의 마음이 자연스럽게 열립니다.
 
 누군가 힘들어하면 먼저 다가가 안부를 묻고, 성과가 부족해도 가능성을 보며 다시 도전할 용기를 줍니다. 혼내기보다 격려가 앞서고, 지적보다 응원이 많습니다. 그래서 사람들은 “이 조직에 남고 싶다”는 마음을 갖게 됩니다.
 
@@ -1665,7 +1665,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 조직은 떠밀려 가는 곳이 아니라
 스스로 뛰고 싶은 무대가 됩니다.`,NP_AC:`(NP 자상한부모 & AC 순응하는아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 사람을 먼저 생각하는 마음과 조직의 흐름을 읽는 감각이 함께 움직이는 리더입니다. 구성원을 대할 때 계산보다 배려가 앞서고, 성과를 요구하기 전에 마음을 살핍니다. 그래서 구성원은 보호받고 있다는 안정감을 느끼며 자연스럽게 신뢰를 보냅니다.
+이 성향의 리더는 사람을 먼저 생각하는 마음과 조직의 흐름을 읽는 감각이 함께 움직이는 리더입니다. 구성원을 대할 때 계산보다 배려가 앞서고, 성과를 요구하기 전에 마음을 살핍니다. 그래서 구성원은 보호받고 있다는 안정감을 느끼며 자연스럽게 신뢰를 보냅니다.
 
 또한 조직의 분위기와 회사의 방향을 민감하게 읽어내기 때문에 위와 아래를 부드럽게 이어주는 연결자가 됩니다. 정책이 내려오면 현장의 언어로 풀어 전달하고, 현장의 어려움은 정제해 위로 올립니다. 덕분에 조직은 불필요한 충돌 없이 한 방향으로 움직일 수 있습니다.
 
@@ -1678,7 +1678,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 조직은 단단해지며,
 방향은 자연스럽게 하나로 모입니다.`,A_CP:`(A 어른자아 & CP 통제적부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 냉정한 판단과 분명한 기준으로 조직을 세우는 리더입니다. 감정이나 분위기에 흔들리기보다 무엇이 옳은지, 무엇이 필요한지를 먼저 생각합니다. 그래서 방향을 정할 때 망설임이 적고, 결정에는 힘이 실립니다. 구성원들은 그 단단함 속에서 “이 길을 따라가면 된다”는 확신을 얻습니다.
+이 성향의 리더는 냉정한 판단과 분명한 기준으로 조직을 세우는 리더입니다. 감정이나 분위기에 흔들리기보다 무엇이 옳은지, 무엇이 필요한지를 먼저 생각합니다. 그래서 방향을 정할 때 망설임이 적고, 결정에는 힘이 실립니다. 구성원들은 그 단단함 속에서 “이 길을 따라가면 된다”는 확신을 얻습니다.
 
 또한 기준을 말로만 두지 않고 실제 행동으로 보여 줍니다. 목표를 세우면 왜 필요한지 설명하고, 방법을 정하면 끝까지 관리합니다. 이 과정에서 조직은 점점 정리되고, 흐트러짐 없이 움직이게 됩니다. 성과가 좋아질 수밖에 없는 구조가 만들어집니다.
 
@@ -1692,7 +1692,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 책임은 분명해지며,
 조직은 자연스럽게 성장합니다.`,A_NP:`(A 어른자아 & NP 자상한부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 이성으로 길을 찾고, 마음으로 사람을 붙잡는 리더입니다. 방향을 정할 때 감정에 휘둘리지 않고 현실을 정확히 봅니다. 무엇이 가능하고 무엇이 위험한지 차분하게 판단하기 때문에 조직은 불안하지 않습니다. 동시에 사람을 숫자로만 보지 않습니다. 한 명 한 명의 상황을 이해하고, 어려움이 있으면 먼저 손을 내밉니다.
+이 성향의 리더는 이성으로 길을 찾고, 마음으로 사람을 붙잡는 리더입니다. 방향을 정할 때 감정에 휘둘리지 않고 현실을 정확히 봅니다. 무엇이 가능하고 무엇이 위험한지 차분하게 판단하기 때문에 조직은 불안하지 않습니다. 동시에 사람을 숫자로만 보지 않습니다. 한 명 한 명의 상황을 이해하고, 어려움이 있으면 먼저 손을 내밉니다.
 
 그래서 구성원은 이렇게 느낍니다.
 “우리 리더는 냉정하지만 차갑지 않다.”
@@ -1708,7 +1708,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 억지로 움직이지 않아도
 스스로 앞으로 나아갑니다.`,A_FC:`(A 어른자아 & FC 자유로운아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 냉정한 판단 위에 따뜻한 활력을 더하는 리더입니다. 방향을 잡을 때는 숫자와 현실을 분명히 보고, 왜 이 길로 가야 하는지를 이해하기 쉽게 설명합니다. 그래서 조직은 막연히 끌려가는 느낌이 아니라, 이유를 알고 스스로 움직이게 됩니다.
+이 성향의 리더는 냉정한 판단 위에 따뜻한 활력을 더하는 리더입니다. 방향을 잡을 때는 숫자와 현실을 분명히 보고, 왜 이 길로 가야 하는지를 이해하기 쉽게 설명합니다. 그래서 조직은 막연히 끌려가는 느낌이 아니라, 이유를 알고 스스로 움직이게 됩니다.
 
 동시에 분위기를 살리는 힘이 있습니다. 무거워질 수 있는 목표도 다시 해볼 만한 도전으로 바꾸고, 지친 마음에 웃음을 넣어 줍니다. 사람들은 “힘들지만 같이 가보고 싶다”는 마음이 생깁니다.
 
@@ -1722,18 +1722,18 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 그래서 이 지점에서는
 포기가 오래 머물지 못합니다.`,A_AC:`(A 어른자아 & AC 순응하는아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 현실을 정확히 읽으면서도 조직의 흐름을 놓치지 않는 리더입니다. 목표를 정할 때 감정이나 분위기에 흔들리기보다, 지금 우리에게 필요한 선택이 무엇인지 차분하게 판단합니다. 그래서 구성원은 “왜 이 방향으로 가는지”를 납득하게 되고, 결정에는 힘이 실립니다.
+이 성향의 리더는 현실을 정확히 읽으면서도 조직의 흐름을 놓치지 않는 리더입니다. 목표를 정할 때 감정이나 분위기에 흔들리기보다, 지금 우리에게 필요한 선택이 무엇인지 차분하게 판단합니다. 그래서 구성원은 “왜 이 방향으로 가는지”를 납득하게 되고, 결정에는 힘이 실립니다.
 
 동시에 위와 아래를 함께 바라보는 균형 감각이 있습니다. 회사의 정책이 내려오면 의미를 이해하고, 현장에서 받아들일 수 있는 모습으로 조정합니다. 무조건 밀어붙이기보다 현실 속에서 작동하게 만드는 능력이 뛰어납니다. 그래서 조직은 안정감을 느낍니다.
 
 사람을 대할 때도 섬세합니다. 누가 부담을 느끼는지, 어디에서 막히는지 빨리 알아차립니다. 덕분에 구성원은 보호받고 있다고 느끼며, 리더를 신뢰하게 됩니다. 신뢰가 생기면 실행도 따라옵니다.
 
-실적을 책임지는 자리에서 가장 중요한 것은 방향과 조화인데, 이 지점장님은 두 가지를 동시에 붙잡습니다. 조직은 편안하지만 느슨하지 않고, 규율이 있지만 차갑지 않습니다.
+실적을 책임지는 자리에서 가장 중요한 것은 방향과 조화인데, 이 리더는 두 가지를 동시에 붙잡습니다. 조직은 편안하지만 느슨하지 않고, 규율이 있지만 차갑지 않습니다.
 
 그래서 사람들은 말합니다.
 “우리 리더와 함께라면 길을 잃지 않겠다”고.`,FC_CP:`(FC 자유로운아이 & CP 통제적부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직에 활력을 불어넣으면서도 기준을 분명하게 세우는 리더입니다. 분위기를 밝게 만들고 사람의 마음을 열게 하는 힘이 있습니다. 구성원은 긴장만 하는 조직이 아니라, 도전해 보고 싶어지는 팀에 서 있다고 느낍니다. 웃음과 에너지가 돌면 움직임이 빨라지고, 결국 성과로 이어집니다.
+이 성향의 리더는 조직에 활력을 불어넣으면서도 기준을 분명하게 세우는 리더입니다. 분위기를 밝게 만들고 사람의 마음을 열게 하는 힘이 있습니다. 구성원은 긴장만 하는 조직이 아니라, 도전해 보고 싶어지는 팀에 서 있다고 느낍니다. 웃음과 에너지가 돌면 움직임이 빨라지고, 결국 성과로 이어집니다.
 
 하지만 따뜻함만 있는 리더는 아닙니다. 해야 할 일과 지켜야 할 선에서는 단단합니다. 목표를 흐리지 않고, 약속한 기준을 분명하게 이야기합니다. 그래서 조직은 자유롭지만 방향을 잃지 않습니다. 즐겁게 뛰면서도 어디로 가야 하는지 모두가 알고 있습니다.
 
@@ -1745,7 +1745,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 그래서 사람들은 믿습니다.
 “우리 리더는 즐겁게 만들지만, 결국 우리를 성장시키는 사람이다”라고.`,FC_NP:`(FC 자유로운아이 & NP 자상한부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 사람의 마음을 먼저 따뜻하게 열 줄 아는 리더입니다. 구성원에게 다가갈 때 경직된 지시가 아니라 웃음과 관심으로 시작합니다. 그래서 팀원들은 부담보다 편안함을 먼저 느끼고, 그 편안함 속에서 자연스럽게 움직이게 됩니다. 조직은 명령으로 굴러가기보다 자발성으로 커집니다.
+이 성향의 리더는 사람의 마음을 먼저 따뜻하게 열 줄 아는 리더입니다. 구성원에게 다가갈 때 경직된 지시가 아니라 웃음과 관심으로 시작합니다. 그래서 팀원들은 부담보다 편안함을 먼저 느끼고, 그 편안함 속에서 자연스럽게 움직이게 됩니다. 조직은 명령으로 굴러가기보다 자발성으로 커집니다.
 
 또한 사람을 귀하게 여기는 힘이 큽니다. 누군가 뒤처지면 이유를 먼저 살피고, 부족함을 탓하기보다 가능성을 찾아줍니다. 그래서 팀원들은 ‘혼나는 곳’이 아니라 ‘성장할 수 있는 곳’에 있다고 느낍니다. 이 믿음은 오래가고, 오래가는 마음은 결국 실적으로 돌아옵니다.
 
@@ -1753,9 +1753,9 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 즐거움을 만들고, 사람을 품고, 다시 도전하게 만드는 힘.
 그래서 구성원은 이렇게 생각합니다.
-“우리 지점장님과라면 힘들어도 끝까지 가보고 싶다.”`,FC_A:`(FC 자유로운아이 & A 어른자아가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
+“우리 리더와 함께라면 힘들어도 끝까지 가보고 싶다.”`,FC_A:`(FC 자유로운아이 & A 어른자아가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직에 숨을 불어넣는 활력과 동시에 흔들림 없는 판단을 함께 가진 리더입니다. 분위기를 밝게 만들 줄 알기에 사람들은 가까이 다가오고 싶어 하고, 합리적으로 생각할 줄 알기에 그 결정에 신뢰를 보냅니다. 즐거움과 이성이 함께 존재하기 때문에 팀은 지치지 않으면서도 방향을 잃지 않습니다.
+이 성향의 리더는 조직에 숨을 불어넣는 활력과 동시에 흔들림 없는 판단을 함께 가진 리더입니다. 분위기를 밝게 만들 줄 알기에 사람들은 가까이 다가오고 싶어 하고, 합리적으로 생각할 줄 알기에 그 결정에 신뢰를 보냅니다. 즐거움과 이성이 함께 존재하기 때문에 팀은 지치지 않으면서도 방향을 잃지 않습니다.
 
 기준을 세워야 할 때에는 감정이 아니라 현실을 보고 판단합니다. 무엇이 우리 조직에 필요한지, 무엇이 결과로 이어지는지 차분하게 정리해 제시합니다. 그래서 구성원은 명확함 속에서 움직일 수 있습니다. 방향을 잡아주는 사람이 있다는 안정감은 팀을 단단하게 만듭니다.
 
@@ -1764,16 +1764,16 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 사람들은 이렇게 느낍니다.
 “재미있게 일하지만, 결국 결과를 만드는 리더다.”`,FC_AC:`(FC 자유로운아이 & AC 순응하는아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 사람의 마음을 먼저 움직이게 만드는 힘을 가진 리더입니다. 밝은 에너지로 조직의 분위기를 부드럽게 풀어 주면서도, 상황과 환경을 빠르게 읽고 흐름에 맞추어 움직입니다. 그래서 구성원들은 부담보다 편안함을 느끼고, 통제보다 자발성을 선택하게 됩니다.
+이 성향의 리더는 사람의 마음을 먼저 움직이게 만드는 힘을 가진 리더입니다. 밝은 에너지로 조직의 분위기를 부드럽게 풀어 주면서도, 상황과 환경을 빠르게 읽고 흐름에 맞추어 움직입니다. 그래서 구성원들은 부담보다 편안함을 느끼고, 통제보다 자발성을 선택하게 됩니다.
 
-기준을 세워야 할 때 이 지점장님은 딱딱한 명령 대신 공감으로 설득합니다. “왜 우리가 이 방향으로 가야 하는지”를 이해시키기 때문에 구성원들은 스스로 납득하고 따라옵니다. 방향을 정할 때에도 위에서 밀어붙이는 느낌이 아니라, 함께 합의해 나가는 과정처럼 느끼게 합니다.
+기준을 세워야 할 때 이 리더는 딱딱한 명령 대신 공감으로 설득합니다. “왜 우리가 이 방향으로 가야 하는지”를 이해시키기 때문에 구성원들은 스스로 납득하고 따라옵니다. 방향을 정할 때에도 위에서 밀어붙이는 느낌이 아니라, 함께 합의해 나가는 과정처럼 느끼게 합니다.
 
 실적을 책임지는 자리에서도 분위기를 잃지 않습니다. 팀원들이 위축되지 않게 격려하고, 작은 성취를 발견해 다시 도전할 힘을 줍니다. 동시에 회사의 정책과 흐름을 세심하게 살피며 조직이 어긋나지 않도록 자연스럽게 맞춥니다.
 
 그래서 사람들은 이렇게 말합니다.
 “함께하고 싶고, 그래서 더 잘 해내고 싶어지는 리더다.”`,AC_CP:`(AC 순응하는아이 & CP 통제적부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직의 기대와 기준을 누구보다 정확하게 읽어 내면서도, 반드시 결과로 증명해 내는 리더입니다. 위에서 요구하는 방향이 무엇인지, 회사가 중요하게 보는 가치가 무엇인지 빠르게 파악하고 그것을 현장에 분명한 언어로 전달합니다. 그래서 구성원들은 헷갈리지 않습니다. 어디로 가야 하는지, 무엇을 해야 하는지 또렷하게 보입니다.
+이 성향의 리더는 조직의 기대와 기준을 누구보다 정확하게 읽어 내면서도, 반드시 결과로 증명해 내는 리더입니다. 위에서 요구하는 방향이 무엇인지, 회사가 중요하게 보는 가치가 무엇인지 빠르게 파악하고 그것을 현장에 분명한 언어로 전달합니다. 그래서 구성원들은 헷갈리지 않습니다. 어디로 가야 하는지, 무엇을 해야 하는지 또렷하게 보입니다.
 
 기준을 세울 때 흔들림이 적습니다. 잘되는 방법은 지키고, 부족한 부분은 바로 잡습니다. 그 태도에서 책임감이 느껴지기 때문에 팀원들은 처음에는 긴장해도 결국 신뢰하게 됩니다. “우리 지점은 되는 방식이 있다”는 믿음이 생기기 때문입니다.
 
@@ -1781,7 +1781,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 “우리 조직을 안전하게, 그러나 확실하게 앞으로 가게 만드는 사람이다.”`,AC_NP:`(AC 순응하는아이 & NP 자상한부모가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직의 흐름을 읽는 감각과 사람을 품는 따뜻함을 동시에 갖춘 리더입니다. 위에서 무엇을 요구하는지 빠르게 이해하고, 그 방향을 무리 없이 현장에 스며들게 만드는 힘이 있습니다. 억지로 밀어붙이기보다 사람들이 자연스럽게 따라오게 합니다. 그래서 구성원들은 통제받는 느낌보다 보호받는 느낌을 더 크게 받습니다.
+이 성향의 리더는 조직의 흐름을 읽는 감각과 사람을 품는 따뜻함을 동시에 갖춘 리더입니다. 위에서 무엇을 요구하는지 빠르게 이해하고, 그 방향을 무리 없이 현장에 스며들게 만드는 힘이 있습니다. 억지로 밀어붙이기보다 사람들이 자연스럽게 따라오게 합니다. 그래서 구성원들은 통제받는 느낌보다 보호받는 느낌을 더 크게 받습니다.
 
 실적을 이야기할 때조차 사람을 먼저 생각합니다. “왜 못했나”를 묻기 전에 “무엇이 어려웠나”를 살피고, 해결 방법을 함께 찾습니다. 이 과정에서 팀원들은 존중받고 있다고 느끼며 다시 일어설 용기를 얻습니다. 조직은 이런 리더 밑에서 오래 버티고, 결국 더 크게 성장합니다.
 
@@ -1789,7 +1789,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 “나를 이해해 주면서도 결국 더 나은 곳으로 이끌어 주는 사람이다.”`,AC_A:`(AC 순응하는아이 & A 어른이 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직과 회사의 흐름을 읽는 힘이 뛰어나면서도, 감정이 아닌 사실과 기준으로 판단하는 안정된 리더입니다. 위에서 내려오는 방향을 예민하게 파악하고, 그 의도를 왜 해야 하는지 이해한 뒤 팀이 납득하도록 설명합니다. 그래서 구성원들은 억지로 끌려간다고 느끼기보다, 스스로 방향을 받아들이게 됩니다.
+이 성향의 리더는 조직과 회사의 흐름을 읽는 힘이 뛰어나면서도, 감정이 아닌 사실과 기준으로 판단하는 안정된 리더입니다. 위에서 내려오는 방향을 예민하게 파악하고, 그 의도를 왜 해야 하는지 이해한 뒤 팀이 납득하도록 설명합니다. 그래서 구성원들은 억지로 끌려간다고 느끼기보다, 스스로 방향을 받아들이게 됩니다.
 
 기준을 세울 때에도 목소리를 높이기보다 현실적인 이유를 제시합니다. “이게 맞다”가 아니라 “그래서 이렇게 가는 게 우리에게 가장 도움이 된다”고 말합니다. 그러면 사람들은 자연스럽게 움직입니다. 강압이 아닌 이해로 만드는 실행력, 이것이 가장 큰 힘입니다.
 
@@ -1799,7 +1799,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 “우리 지점은 방향이 분명하고, 그래서 마음이 편하다.”`,AC_FC:`(AC 순응하는아이 & FC 자유로운아이가 각각 첫 번째와 두 번째로 높아 강점으로 발현됨.)
 
-이 성향의 지점장님은 조직의 분위기를 읽는 섬세함과 사람의 마음을 밝히는 따뜻한 에너지를 함께 가진 리더입니다. 위의 흐름을 빠르게 감지해 회사가 원하는 방향을 놓치지 않으면서도, 현장에서는 사람들의 표정과 숨결을 먼저 살핍니다. 그래서 기준을 세울 때도 차갑게 선을 긋기보다, 함께 이해하고 따라올 수 있는 길을 만들어 줍니다.
+이 성향의 리더는 조직의 분위기를 읽는 섬세함과 사람의 마음을 밝히는 따뜻한 에너지를 함께 가진 리더입니다. 위의 흐름을 빠르게 감지해 회사가 원하는 방향을 놓치지 않으면서도, 현장에서는 사람들의 표정과 숨결을 먼저 살핍니다. 그래서 기준을 세울 때도 차갑게 선을 긋기보다, 함께 이해하고 따라올 수 있는 길을 만들어 줍니다.
 
 방향을 정하는 순간에도 이 리더는 말합니다. “우리가 같이 가야 오래 간다.” 그 말 속에는 배려와 현실 감각이 동시에 담겨 있습니다. 구성원은 통제받는 느낌이 아니라 존중받는 느낌을 받습니다. 그러니 움직임이 자발적으로 살아납니다.
 
@@ -1807,10 +1807,10 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 회사 정책 역시 부드럽게 녹여 전달합니다. 딱딱한 지시가 아니라 “우리에게 필요한 변화”로 설명하기에 저항이 줄어듭니다. 그래서 사람들은 이렇게 느끼게 됩니다.
 
-“이 리더와 함께라면 힘들어도 해볼 만하다.”`},cm4_1:{"17-20":{CP:`(원칙이 아주 강하고, 주도권이 강한 성향) 주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`(너무 따뜻해서 설계님 말에  맞춰주는 성향) 탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`(숫자, 사실, 근거를 먼저 보는 강한 이성적 성향) 강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`(면담이 즐겁고 분위기를 스스로 띄우는 성향) 아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`(PA님 반응에 매우 민감한 성향) 순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`(현실적 원칙과 주도성이 균형이 잡힌 성향) 결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`(PA님을 잘 챙기고 사람 냄새 나는 성향) 공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`(감정에 휘둘리지 않고 설명과 판단이 안정적인 성향) 이성적, 균형감, 현실적, 분석적.`,FC:`(PA님이 부담없이 이야기 하도록 분위기를 잘 만드는 성향) 밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`(PA님 상황에 맞게 잘 맞추는 성향) 협조, 적당한 순응 ,적당한 눈치, 조절.`},"11-13":{CP:`(상황에 따라 기준을 조절하는 성향) 균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`(친절하지만 감정에 치우치지 않는 성향) 적당한 친절, 예의 바름, 부담 없음.`,A:`(감정과 논리 사이에서 무난하게 맞추는 성향) 평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`(튀지않고 차분하고 안정적인 설명 중심의 성향) 안정감, 차분한, 균형감, 무난함.`,AC:`(눈치와 주장성이 균형잡힌 상향) 적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`(기준 제시보다 맞춰주는 쪽에 가까운 성향) 완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`(감정 표현은 적고 일은 담백하게 하는 성향) 차분함, 무심해 보임, 실무형, 표현 적음.`,A:`(생각보다 느낌에 따라 말이 먼저 나오는 경우가 많은 성향)
-감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`(신중해서 신뢰를 주지만 표현이 적어 딱딱하게 보일 수 있는 성향) 조용함, 신중함, 진지함, 다소 거리감.`,AC:`(눈치보다는 내 기준이 더 중요한 성향) 독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,NP:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족.`,FC:`(말과 표정이 적어서 PA님이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`(타인의 상황을 잘 못살피는 성향) 단호함,직선적, 눈치 안 봄, 상대를 통제.`}},cm4_2:{"17-20":{CP:`기준이 선명하고 판단이 빠릅니다. PA님은 무엇을 해야 하는지 헷갈리지 않고 방향을 잡기 쉽습니다. 다만 단정이 강해지면 압박이나 지적으로 들릴 수 있으니 왜 필요한지 이유를 설명하고 선택지를 함께 제시하면 수용성과 실행력이 훨씬 높아집니다.`,NP:`코칭이 필요없는 구간`,A:`코칭이 필요없는 구간`,FC:`밝은 에너지와 빠른 친화력으로 조직 분위기를 살리는 힘이 탁월합니다. 구성원들이 편안함을 느끼며 마음을 열게 만드는 큰 장점이 분명합니다. 다만 친근함이 앞서면 메시지가 가볍게 전달될 수 있으니, 중요한 순간에는 핵심과 기준을 한 번 더 또렷하게 정리해 무게를 더하는 연습이 필요합니다.`,AC:`조직과 분위기를 빠르게 읽고 관계의 충돌을 줄이려는 배려가 뛰어납니다. 상대가 편안함을 느끼게 하는 힘 덕분에 PA님들이 마음을 열고 따르려는 장점이 분명합니다. 다만 조율에 집중하다 보면 기준 제시가 약해질 수 있으니, 필요할 때는 방향과 원칙을 분명히 말하는 연습을 더하면 리더십의 무게가 단단해집니다.`},"14-16":{CP:`코칭이 필요없는 구간`,NP:``,A:``,FC:`코칭이 필요없는 구간`,AC:`주변의 분위기와 사람의 마음을 빠르게 읽어 관계를 부드럽게 만드는 능력이 뛰어납니다. 구성원들이 심리적으로 안전함을 느끼며 따르게 되는 안정된 강점이 분명합니다. 다만 조율이 자연스러운 만큼 때로는 방향 제시가 약해질 수 있으니, 필요할 때는 기준과 결론을 한 번 더 분명히 표현하면 리더십의 힘이 더욱 또렷해집니다.`},"11-13":{CP:``,NP:`지금처럼 PA님의 마음을 이해하고 배려하는 태도는 매우 큰 힘입니다. 함께하고 있다는 느낌을 주기 때문에 PA님이 쉽게 따르고 의지합니다. 여기에 공감 뒤에 한 번 더 행동 방향을 정리해 준다면, 따뜻함 속에서도 성장을 이끄는 리더십이 더욱 선명해질 것입니다.`,A:`차분하게 상황을 보고 판단하는 능력이 이미 잘 갖춰져 있습니다. 설명이 안정적이어서 PA님이 믿고 따라오기 좋습니다. 여기에 결론과 우선순위를 조금 더 분명하게 전달한다면, 이해 속도가 빨라지고 실행력까지 함께 올라가는 코칭이 될 것입니다.`,FC:``,AC:`코칭이 필요없는 구간`},"8-10":{CP:`균형을 생각하며 말해 관계가 부드럽게 유지됩니다. PA님은 편안한 분위기에서 조언을 받아들일 수 있습니다. 그러나 리더의 확신이 약하게 들릴 수 있으니 결론과 기준을 먼저 분명히 말하고 따라야 할 우선순위를 또렷하게 잡아주면 행동 속도가 빨라집니다.`,NP:`상대를 배려하는 마음이 있어 PA님이 편안함을 느낍니다. 따뜻한 분위기 덕분에 관계 형성이 자연스럽고 신뢰도도 빠르게 쌓입니다. 다만 공감이 중심이 되다 보면 방향 제시가 약해질 수 있으니 이해 다음에는 무엇을 해야 하는지 행동 기준을 분명히 알려주면 성과가 더 빨리 납니다.`,A:`상황을 나름대로 정리하고 판단하려는 힘이 있습니다. 감정에 흔들리지 않으려는 태도 덕분에 PA님이 안정감을 느낍니다. 다만 확신이 늦어 설명이 길어질 수 있으니 핵심부터 먼저 말하고 이유를 덧붙이는 연습을 하면 전달력이 훨씬 선명해지고 리더십이 더 또렷해집니다.`,FC:`분위기를 편하게 만들 줄 알고 상대를 긴장하지 않게 하는 힘이 있습니다. 함께 있으면 부담이 줄어들어 PA님이 마음을 열기 좋은 환경이 됩니다. 다만 에너지 표현이 조금만 더 커지면 참여도가 훨씬 살아나니 칭찬과 반응을 한 박자 더 크게 보여주면 조직의 활력이 더 빠르게 올라옵니다.`,AC:``},"0-7":{CP:`말이 부드러워 거부감이 적고 PA님이 부담을 느끼지 않습니다. 관계를 해치지 않는 안전한 전달 방식이 강점입니다. 하지만 무엇을 반드시 해야 하는지 흐려질 수 있으니 행동 기준과 마감 시점을 명확히 못 박아 주면 결과 만드는 힘이 훨씬 살아납니다.`,NP:`감정에 치우치지 않아 상황을 객관적으로 볼 수 있습니다. 필요 이상의 위로 대신 현실적인 조언을 할 수 있는 힘이 있습니다. 그러나 PA님은 정서적 지지를 먼저 원할 수 있으니 판단을 말하기 전에 마음을 이해한다는 표현을 한 번 더 넣어 주면 몰입과 따름이 훨씬 좋아집니다.`,A:`사람을 먼저 생각하고 분위기를 해치지 않으려는 배려가 큽니다. PA님은 부담 없이 이야기를 꺼낼 수 있어 편안함을 느낍니다. 그러나 판단이 뒤로 밀리면 방향을 잡기 어려우니 왜 해야 하는지 기준과 근거를 짧게라도 제시하면 PA님의 실행 속도가 분명히 빨라집니다.`,FC:`차분하고 가벼워 보이지 않는 진중함이 있습니다. PA님은 쉽게 흔들리지 않는 안정감을 느끼며 믿고 따르려 합니다. 그러나 표현이 적으면 의지가 약하게 전달될 수 있으니 잘한 점을 바로 말로 꺼내 주고 표정과 목소리에 힘을 조금 더 실으면 동기부여 효과가 크게 높아집니다.`,AC:`눈치를 덜 보기에 판단과 표현이 비교적 솔직하고 빠릅니다. 우유부단하지 않고 결정을 밀고 가는 추진력이 있어 답답함을 줄이지 않는 장점이 있습니다. 다만 상대의 입장을 한 번 더 확인하는 과정이 보완되면 충돌을 줄일 수 있으니, 말하기 전에 상대의 느낌을 묻는 질문을 의식적으로 넣으면 훨씬 성숙한 리더십으로 발전합니다.`}},cm4_3:{all_no_coaching:`다섯 가지 에너지가 한쪽으로 치우치지 않고 상황에 맞게 안정적으로 사용되고 있습니다. 필요할 때는 기준을 세워 방향을 잡고, 또 필요할 때는 사람을 세심하게 살피며, 판단의 순간에는 감정에 흔들리지 않는 균형을 보여 줍니다. 이 모습은 경험 속에서 만들어진 리더의 실력입니다.
+“이 리더와 함께라면 힘들어도 해볼 만하다.”`},cm4_1:{"17-20":{CP:`(원칙이 아주 강하고, 주도권이 강한 성향) 주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`(너무 따뜻해서 구성원들 말에  맞춰주는 성향) 탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`(숫자, 사실, 근거를 먼저 보는 강한 이성적 성향) 강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`(면담이 즐겁고 분위기를 스스로 띄우는 성향) 아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`(구성원들 반응에 매우 민감한 성향) 순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`(현실적 원칙과 주도성이 균형이 잡힌 성향) 결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`(구성원들을 잘 챙기고 사람 냄새 나는 성향) 공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`(감정에 휘둘리지 않고 설명과 판단이 안정적인 성향) 이성적, 균형감, 현실적, 분석적.`,FC:`(구성원들이 부담없이 이야기 하도록 분위기를 잘 만드는 성향) 밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`(구성원들 상황에 맞게 잘 맞추는 성향) 협조, 적당한 순응 ,적당한 눈치, 조절.`},"11-13":{CP:`(상황에 따라 기준을 조절하는 성향) 균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`(친절하지만 감정에 치우치지 않는 성향) 적당한 친절, 예의 바름, 부담 없음.`,A:`(감정과 논리 사이에서 무난하게 맞추는 성향) 평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`(튀지않고 차분하고 안정적인 설명 중심의 성향) 안정감, 차분한, 균형감, 무난함.`,AC:`(눈치와 주장성이 균형잡힌 상향) 적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`(기준 제시보다 맞춰주는 쪽에 가까운 성향) 완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`(감정 표현은 적고 일은 담백하게 하는 성향) 차분함, 무심해 보임, 실무형, 표현 적음.`,A:`(생각보다 느낌에 따라 말이 먼저 나오는 경우가 많은 성향)
+감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`(신중해서 신뢰를 주지만 표현이 적어 딱딱하게 보일 수 있는 성향) 조용함, 신중함, 진지함, 다소 거리감.`,AC:`(눈치보다는 내 기준이 더 중요한 성향) 독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,NP:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 판단과 논리가 조금 부족.`,FC:`(말과 표정이 적어서 구성원들이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`(타인의 상황을 잘 못살피는 성향) 단호함,직선적, 눈치 안 봄, 상대를 통제.`}},cm4_2:{"17-20":{CP:`기준과 방향을 분명하게 제시하는 힘이 강해 구성원들이 무엇을 해야 하는지 빠르게 이해하고 움직일 수 있는 성향입니다. 다만 표현이 강해지면 압박이나 지적으로 느껴질 수 있으므로, “왜 필요한지”를 함께 설명하고 선택지를 열어주는 대화가 중요합니다. 기준은 분명하게 유지하되 말투를 조금만 부드럽게 조율하면 조직의 수용성과 실행력이 더욱 높아질 수 있습니다.`,NP:`코칭이 필요없는 구간`,A:`코칭이 필요없는 구간`,FC:`밝은 에너지와 친화력으로 조직 분위기를 빠르게 편안하게 만드는 강점이 있는 성향입니다. 구성원들이 마음을 열고 따라오기 쉬워 팀 분위기를 살리는 힘이 큽니다. 다만 분위기가 다소 가벼워지면 중요한 메시지의 무게감이 약해질 수 있으므로, 핵심과 기준을 한 번 더 정리해주는 연습이 필요합니다. 친근함 속에 중심까지 함께 잡아주면 조직의 활력과 실행력이 더욱 좋아질 수 있습니다.`,AC:``},"14-16":{CP:``,NP:``,A:``,FC:``,AC:`주변의 분위기와 사람의 마음을 빠르게 읽어 관계를 부드럽게 만드는 능력이 뛰어납니다. 구성원들이 심리적으로 안전함을 느끼며 따르게 되는 안정된 강점이 분명합니다. 다만 조율이 자연스러운 만큼 때로는 방향 제시가 약해질 수 있으니, 필요할 때는 기준과 결론을 한 번 더 분명히 표현하면 리더십의 힘이 더욱 또렷해집니다.`},"11-13":{CP:``,NP:`구성원을 존중하고 기본적인 배려는 갖추고 있지만, 리더 역할에서는 현재보다 공감과 돌봄의 표현을 조금 더 의식적으로 늘려주는 것이 중요합니다. 결과와 방향만 이야기하기보다 “요즘 힘든 부분은 없어요?”처럼 먼저 마음을 살펴주는 대화가 필요합니다. 작은 공감 표현과 따뜻한 관심이 더해지면 구성원의 신뢰와 조직 안정감이 훨씬 좋아질 수 있습니다.`,A:`차분하게 상황을 보고 판단하는 안정감 있는 강점이 있습니다. 구성원들도 설명을 들으면 방향을 이해하고 따라오기 편안함을 느낄 수 있습니다. 다만 리더 역할에서는 현재보다 결론과 우선순위를 조금 더 명확하게 전달하는 연습이 필요합니다. “지금은 이것부터 먼저 갑시다”처럼 기준을 정리해주면 조직의 이해 속도와 실행력이 더욱 안정적으로 올라갈 수 있습니다.`,FC:``,AC:`코칭이 필요없는 구간`},"8-10":{CP:`구성원을 편안하게 대하며 관계를 부드럽게 유지하는 장점이 있는 성향입니다. 다만 리더 역할에서는 기준과 결론이 약하게 전달되면 구성원들이 방향을 헷갈릴 수 있습니다. “지금은 이것부터 먼저 진행합시다”처럼 우선순위와 기준을 조금 더 분명하게 말하는 연습이 필요합니다. 부드러움 속에 기준까지 함께 전달되면 조직의 안정감과 실행력이 더욱 좋아질 수 있습니다.`,NP:`공감과 배려, 돌봄의 표현이 부족하게 보일 수 있어 구성원이 심리적 거리감을 느낄 가능성이 있습니다. 업무 지시와 설명은 분명하지만, 결과보다 먼저 사람의 마음을 살피는 태도를 조금 더 의식적으로 늘려주는 것이 중요합니다. “괜찮아요?”, “힘든 부분은 없었어요?” 같은 짧은 관심 표현만 늘어나도 구성원의 긴장감이 줄고 조직의 신뢰와 몰입도가 더욱 안정적으로 올라갈 수 있습니다.`,A:`구성원의 감정과 분위기를 이해하려는 장점은 있지만, 상황에 따라 판단과 기준이 흔들려 보일 수 있는 구간입니다. 리더 역할에서는 공감만 하기보다 결과와 우선순위를 먼저 정리해 전달하는 연습이 중요합니다. “이번에는 이 방향으로 진행하겠습니다”처럼 결론을 먼저 이야기하면 조직의 혼란이 줄고 안정감과 실행력이 더욱 좋아질 수 있습니다.`,FC:`차분하고 안정감 있는 분위기로 조직을 편안하게 만드는 장점이 있는 성향입니다. 다만 감정 표현과 리액션이 적으면 구성원에게 다소 딱딱하거나 거리감 있게 느껴질 수 있습니다. 의식적으로 미소를 띄고 고개를 끄덕이며 반응을 조금 더 표현해주는 연습이 필요합니다. 작은 표정과 따뜻한 반응이 늘어나면 조직의 분위기와 소통 안정감이 훨씬 좋아질 수 있습니다.`,AC:``},"0-7":{CP:``,NP:``,A:``,FC:``,AC:``}},cm4_3:{all_no_coaching:`다섯 가지 에너지가 한쪽으로 치우치지 않고 상황에 맞게 안정적으로 사용되고 있습니다. 필요할 때는 기준을 세워 방향을 잡고, 또 필요할 때는 사람을 세심하게 살피며, 판단의 순간에는 감정에 흔들리지 않는 균형을 보여 줍니다. 이 모습은 경험 속에서 만들어진 리더의 실력입니다.
 
-지점장님은 이제 더 잘하려 애써야 하는 단계라기보다, 잘하고 있는 방식을 꾸준히 유지하고 팀에 퍼뜨려야 하는 위치에 있습니다. 구성원들은 말보다 태도를 통해 배우기 때문에, 지금의 안정된 모습 자체가 이미 조직의 기준이 됩니다.
+리더는 이제 더 잘하려 애써야 하는 단계라기보다, 잘하고 있는 방식을 꾸준히 유지하고 팀에 퍼뜨려야 하는 위치에 있습니다. 구성원들은 말보다 태도를 통해 배우기 때문에, 지금의 안정된 모습 자체가 이미 조직의 기준이 됩니다.
 
 성과가 오르내려도 크게 흔들리지 않는 무게감은 팀에 확신을 줍니다. 그 확신이 쌓이면 조직은 리더를 믿고 따라옵니다. 이것이 곧 영향력입니다.
 
@@ -1818,961 +1818,1949 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 
 이미 충분히 좋은 자리까지 올라와 있습니다.
 지금처럼만 계속해 주시면 됩니다.
-그 유지가 결국 더 큰 결과를 만듭니다.`,some_coaching:`점수 중 일부가 코칭이 필요한 영역에 있더라도 지금의 위치까지 올라오셨다는 사실은 이미 큰 역량을 증명합니다. 중요한 것은 부족함이 아니라, 자신의 성향을 얼마나 정확히 알고 필요한 순간에 꺼내 쓰느냐입니다. 리더에게는 특히 말의 방향과 표현이 곧 조직의 분위기가 됩니다.
+그 유지가 결국 더 큰 결과를 만듭니다.`,some_coaching:``},cm4_4:{CP:{condition:`0-7`,trait:`(우유부단, 결정회피,관용적, 주장성부족,)의 조율 방법`,coaching:`이 성향은 기준을 분명히 말하지 못해 구성원들이 무엇까지 해야 하는지 헷갈려합니다. 리더는 “알아서 하겠지”라고 생각하지만, 구성원들은 방향을 못 잡고 시간을 흘려보냅니다. 그 결과 약속이 흐려지고, 코칭이 느슨해졌다는 느낌을 받기 쉽습니다.`,script:`“이건 선택이 아니라, 지금 꼭 해야 하는 부분입니다.”
 
-지금부터는 타고난 기질을 바꾸기보다, 상황에 맞는 전달 방식을 의식적으로 반복하는 것이 핵심입니다. 준비된 문장을 기준으로 사용하다 보면 판단은 더 선명해지고, 팀원들이 받아들이는 신뢰 역시 깊어집니다. 말이 정리되면 리더십은 자연스럽게 단단해집니다.
+“이 부분은 기준을 지켜야 합니다.”
 
-지점장님은 이미 충분한 기반 위에 서 있습니다. 여기에 화법 훈련이 더해지면 성장의 밀도는 훨씬 높아질 것입니다.`},cm4_4:{CP:{condition:`0-7`,trait:`(우유부단, 결정회피,관용적, 주장성부족,)의 코칭 방법`,coaching:`기준을 분명히 말하지 못해 PA님이 무엇까지 해야 하는지 헷갈려합니다. 지점장님은 “알아서 하겠지”라고 생각하지만, PA님은 방향을 못 잡고 시간을 흘려보냅니다. 그 결과 약속이 흐려지고, 코칭이 느슨해졌다는 느낌을 받기 쉽습니다.`,script:`👉 문제: 기준을 못 세워주고, 말이 흐려짐
+“제가 책임질 테니까, 이 방향대로 한 번 해봅시다.”`},NP:{condition:`0-7`,trait:`(공감부족,정서둔감,관계의거리감,차가움)의 조율 방법`,coaching:`이 성향은 설명은 잘해도 따뜻한 말이 부족해 구성원들이 “혼자 버티는 느낌”을 받습니다. 리더는 도와주고 있다고 생각하지만, 구성원들은 마음을 열지 못합니다. 그래서 질문을 안 하게 되고, 어려움이 있어도 숨기는 상황이 자주 생깁니다.`,script:`“지금 많이 힘들어 보이는데, 그렇게 느끼는 게 자연스러운 겁니다.”
 
-(고정문장)
+“네 맞는 말씀입니다.” "네 이해가 됩니다." "네 공감이 많이 됩니다."
 
-“이건 선택이 아니라, 지금 꼭 해야 하는 기본이야.”
+“제가 옆에서 같이 볼 테니까, 혼자 버티려고 하지 마십시오.”`},A:{condition:`0-7`,trait:`(비논리,감정적,판단혼란,즉흥성)의 조율 방법`,coaching:`이 성향은 감정이나 경험 위주로 말하다 보니 코칭이 정리되지 않습니다. 구성원들은 “그래서 지금 뭘 해야 하지?”라고 느낍니다. 리더는 열심히 말했는데도 행동이 안 바뀌어 답답해지고, 같은 이야기를 반복하게 되는 경우가 많아집니다.`,script:`“지금 가장 중요한 핵심부터 먼저 정리해드릴게요.”
 
-“잘했고 못했고를 떠나서, 이 부분은 기준을 지켜야 해.”
+“지금은 여러 가지를 한꺼번에 하기보다, 우선순서 하나씩 정리해서 가는 게 중요합니다.”
 
-“내가 책임질 테니까, 이 방향대로 한 번 가보자.”`},NP:{condition:`0-7`,trait:`(공감부족,정서둔감,관계의거리감,차가움)의 코칭 방법`,coaching:`설명은 잘해도 따뜻한 말이 부족해 PA님이 “혼자 버티는 느낌”을 받습니다. 지점장님은 도와주고 있다고 생각하지만, PA님은 마음을 열지 못합니다. 그래서 질문을 안 하게 되고, 어려움이 있어도 숨기는 상황이 자주 생깁니다.`,script:`👉 문제: PA님이 차갑다고 느끼고 마음을 닫음
+“먼저 방향부터 명확히 잡고, 그다음 방법을 함께 맞춰가겠습니다.”`},FC:{condition:`0-7`,trait:`(진지함,절제된 감정, 신중형,비즉흥성)의 조율 방법`,coaching:`이 성향은 말투가 무겁고 딱딱해져 구성원들이 긴장합니다. 리더는 진지하게 도와주고 싶은데, 구성원들은 “괜히 말하면 혼날 것 같다”고 느낍니다. 그래서 표정이 굳고 반응이 줄어들며, 코칭 자리가 부담스러운 시간이 되기 쉽습니다. 그래서 의식적으로라도 미소와 칭찬 그리고 리액션을 할 필요가 있습니다`,script:`“완벽하지 않아도 괜찮아요, 해보는 게 더 중요합니다.”
 
-(고정문장)
+“지금처럼만 해요 생각보다 너무 잘하고 있어요.”
 
-“지금 많이 힘들어 보이는데, 그렇게 느끼는 게 자연스러워.”
+“실수해도 괜찮아요, 지금 충분히 연습해야 성장이 쉬워집니다.”`},AC:{condition:`17-20`,trait:`(과잉순응,눈치과다,결정회피)의 조율 방법`,coaching:`이 성향은 구성원들의 반응과 표정을 지나치게 살피다 보니, 코칭의 중심이 흔들립니다. 리더는 맞춰주고 있다고 느끼지만, 구성원들은 오히려 방향을 잃습니다. 누가 끌어주는지 모르겠다는 느낌을 받아 성장 속도가 느려질 수 있습니다.`,script:`“OO님이 불편할 수는 있지만, 이건 우리 조직에서 꼭 지켜야 하는 기준이입니다.”
 
-“그래도 여기까지 온 건 네가 노력했다는 뜻이야.”
+“지금 상황은 이해해요. 그래도 지금은 이 방향으로 가는 게 맞습니다.”
 
-“내가 옆에서 같이 볼 테니까, 혼자 버티려고 하지 마.”`},A:{condition:`0-7`,trait:`(비논리,감정적,판단혼란,즉흥성)의 코칭 방법`,coaching:`감정이나 경험 위주로 말하다 보니 코칭이 정리되지 않습니다. PA님은 “그래서 지금 뭘 해야 하지?”라고 느낍니다. 지점장님은 열심히 말했는데도 행동이 안 바뀌어 답답해지고, 같은 이야기를 반복하게 되는 경우가 많아집니다.`,script:`👉 문제: 설명이 감정적이거나 두루뭉술함
+“지금 말해주는 게 조직원들한테 더 도움이 될 것 같아서 바로 이야기 할게요.”`}},cm5:{CP_NP_A:{manner:`이 성향의 리더는 조직 안에서 사람을 챙기려는 마음이 강하면서도 조직의 흐름과 운영 방향을 놓치지 않으려는 성향이 강하게 나타납니다.
 
-(고정문장)_
+제일 높은 점수인 CP가 높기 때문에 업무의 흐름과 약속, 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“이 부분은 꼭 맞춰가야 합니다.”
+“여기까지는 같이 해보셔야 합니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
 
-“지금 상황을 한 번 정리해보자. 핵심은 딱 두 가지야.”
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 압박만 주는 방식으로 관리하지 않습니다. 구성원이 힘들어하면 먼저 이유를 들으려 하고, 상황을 이해하려 하며, 오래 함께 가고 싶은 마음이 큽니다. 그래서 구성원 입장에서는
+“나를 이해해주려고 한다.”
+“나를 함부로 몰아붙이지 않는다.”
+“챙겨주려는 마음이 느껴진다.”
+라는 안정감을 느끼게 됩니다.
 
-“이건 느낌이 아니라, 결과로 보면 이렇게 보여.”
+다만 A의 점수가 가장 낮으면 한 가지 아쉬운 부분이 생길 수 있습니다. 리더 본인은 충분히 설명했다고 느끼는데 구성원 입장에서는
+“그래서 지금 무엇부터 해야 하지?”
+“결국 어떤 행동을 먼저 바꾸라는 거지?”
+“우선순위가 잘 정리되지 않는다.”
+처럼 느끼는 경우가 많습니다.
 
-“지금 단계에서 중요한 건 ‘많이’가 아니라 ‘순서’야.”`},FC:{condition:`0-7`,trait:`(진지함,절제된 감정, 신중형,비즉흥성)의 코칭 방법`,coaching:`말투가 무겁고 딱딱해져 PA님이 긴장합니다. 지점장님은 진지하게 도와주고 싶은데, PA님은 “괜히 말하면 혼날 것 같다”고 느낍니다. 그래서 표정이 굳고 반응이 줄어들며, 코칭 자리가 부담스러운 시간이 되기 쉽습니다.`,script:`👉 문제: 코칭이 딱딱하고 무겁게 느껴짐
+즉, 이 성향은 공감과 배려는 충분하지만 실행 정리와 행동 방향이 흐려질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감 뒤에 행동을 남기는 습관이 중요합니다. 위로로 끝나는 것이 아니라 “그래서 지금 무엇을 해야 하는지”를 분명하게 남겨줘야 구성원이 실제로 움직이기 시작합니다.
 
-(고정문장)
+특히 구성원이 힘들어할 때
+“괜찮습니다.”
+“이해합니다.”
+“많이 힘드셨겠어요.”
+이런 말만 하고 끝나면 마음은 편해지지만 행동은 남지 않을 가능성이 있습니다.
 
-“완벽하지 않아도 괜찮아, 해보는 게 더 중요해.”
+그래서 마지막에는 반드시
+ “그럼 오늘은 고객 연락 세 건만 정확하게 해보시죠.”
+ “이번 주는 상담 흐름만 다시 맞춰보시죠.”
+ “지금은 기존 고객 관리부터 다시 정리해보시죠.”
+처럼 행동 문장을 붙여주는 것이 중요합니다.
 
-“지금처럼만 해도 생각보다 잘하고 있어.”
+이 성향은 원래 사람을 오래 데리고 가는 힘이 강한 성향입니다. 여기에 실행 정리와 우선순위 안내가 조금만 더해지면 조직의 움직임 속도와 활동량, 상담 진행률과 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.
 
-“실수해도 괜찮아, 여기서는 연습하는 자리야.”`},AC:{condition:`17-20`,trait:`(순응, 눈치,조심성이 낮고,독립성 단호함이 높음)의 코칭 방법`,coaching:`PA님의 상황을 살피기보다 기준부터 말하게 됩니다. 지점장님은 효율을 생각하지만, PA님은 “내 입장은 안 봐준다”고 느낍니다. 그 결과 눈치를 보며 고개만 끄덕이고, 실제로는 따라오지 않는 일이 반복됩니다.`,script:`👉 문제: PA님이 부담·압박을 크게 느낌
+결국 이 성향의 핵심은 따뜻함 자체가 아니라 따뜻함 뒤에 실행이 남도록 만드는 것입니다. 공감으로 마음을 열고 마지막에는 행동을 남겨야 조직의 생산성과 매출도 함께 올라가게 됩니다.`,improvement:``},CP_NP_FC:{manner:`이 성향의 리더는 조직 안에서 사람을 챙기려는 마음과 운영의 중심을 잡으려는 힘이 함께 강하게 나타나는 성향입니다.
 
-(고정문장)
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“이 부분은 꼭 맞춰가야 합니다.”
+“지금은 이 흐름이 중요합니다.”
+같이 방향을 정리하는 말이 자연스럽게 먼저 나오는 경우가 많습니다.
 
-“네 속도에 맞춰서 같이 조절해도 돼.”
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 강하게 밀어붙이는 방식으로 조직을 운영하지 않습니다. 구성원이 힘들어하면 먼저 이유를 들으려 하고, 상황을 이해하려 하며, 오래 함께 가고 싶은 마음이 큽니다. 그래서 구성원 입장에서는
+“나를 챙겨주려고 한다.”
+“내 상황을 이해하려고 한다.”
+“쉽게 포기하지 않는 리더다.”
+라는 안정감을 느끼게 됩니다.
 
-“지금은 결과보다 적응하는 게 더 중요해.”
+다만 FC의 점수가 가장 낮으면 조직 안에서 한 가지 아쉬운 흐름이 생길 수 있습니다. 리더 본인은 진지하게 이야기하고 있다고 생각하지만 구성원 입장에서는 표정이나 분위기가 다소 무겁게 느껴질 수 있고, 거리감이 생길 수도 있습니다.
 
-“불편한 점 있으면 말해줘도 괜찮아.”`}},cm5:{CP_NP_A:{manner:`PA님을 코칭할 때 말투는 기준은 분명하지만 감정에 많이 기대고, 설명은 부족한 방향으로 나가기 쉽습니다. 이 지점장님은 “이건 꼭 지켜야 해”, “너를 위해서 하는 말이야”처럼 원칙과 배려를 함께 담은 말을 자주 사용합니다. PA님을 아끼는 마음이 크고, 잘 되길 바라는 진심도 분명히 전달됩니다. 그래서 PA님은 “이 지점장님은 나를 챙겨준다”, “관심을 많이 가져준다”는 느낌을 받습니다.
+특히 결과와 실행을 중요하게 생각하는 말이 반복되면 구성원은
+“계속 긴장된다.”
+“잘못하면 혼날 것 같다.”
+“가까이 다가가기 어렵다.”
+라고 느끼는 경우도 생길 수 있습니다.
 
-하지만 A가 낮기 때문에, 왜 이걸 해야 하는지, 지금 무엇을 바꾸면 되는지가 말 속에 구체적으로 담기지 않는 경우가 많습니다. 지점장님 본인은 충분히 설명했다고 느끼지만, PA님은 “그래서 정확히 뭘 하라는 거지?”, “어디부터 바꿔야 하지?” 하고 혼란을 느낄 수 있습니다. 특히 성과가 안 나오는 PA님은 감정적인 격려는 많이 받지만, 행동이 바뀌지 않아 같은 자리에 머무르게 됩니다.
+즉, 이 성향은 조직을 안정적으로 끌고 가는 힘은 강하지만 분위기를 부드럽게 풀어주는 표현과 감정 전달이 부족해질 수 있는 구조입니다.
 
-이 성향의 지점장님은 PA님이 힘들어하면 먼저 공감하고 위로합니다. “요즘 많이 힘들지”, “네 상황 이해해” 같은 말은 잘 나오지만, 그 다음 단계인 정리된 방향 제시가 약해집니다. 그래서 PA님은 마음은 편해지지만, 다음 날 무엇을 어떻게 해야 할지는 여전히 모른 채 출근하게 됩니다. 이때 지점장님은 “왜 그대로지?”라고 답답함을 느끼기 쉽습니다.
+그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는
+ 결과 이야기 전에 먼저 표정을 부드럽게 만드는 습관
+ 실행 점검 전에 공감 한 문장을 먼저 넣는 습관
+ 긴장된 분위기를 너무 오래 끌고 가지 않는 습관
+이 중요합니다.
 
-개선의 핵심은 감정 위로 다음에 반드시 정리된 한 문장을 붙이는 것입니다. 공감은 그대로 두되, 그 뒤에 숫자·순서·기준이 들어간 말을 의식적으로 추가해야 합니다. 예를 들어 “힘들었겠다”로 끝내지 말고, “그래서 내일은 이 세 가지만 해보자”까지 이어가는 연습이 필요합니다.
+특히 FC가 낮은 리더는 의식적으로 미소를 띄고 고개를 끄덕이는 행동만 추가해도 구성원이 느끼는 심리적 압박감이 훨씬 줄어들게 됩니다.
 
-개선 시 사용할 수 있는 고정 멘트는 다음과 같습니다.
-“네 마음은 이해했고, 그래서 오늘은 이것 하나만 정확히 해보자.”
-“다 잘하려고 하지 말고, 지금은 이 순서만 지켜보자.”
-“이건 감이 아니라 기준이야, 이대로만 해도 충분해.”
+이 성향은 원래 조직을 오래 유지하고 사람을 책임감 있게 끌고 가는 힘이 매우 강한 성향입니다. 여기에 분위기를 조금 더 편안하게 만드는 표현이 더해지면 구성원의 활동량과 조직의 움직임이 훨씬 살아나게 됩니다.
 
-이 고정 멘트들은 CP의 기준, NP의 배려, A의 정리를 동시에 살려줍니다. 이렇게 말하면 PA님은 위로받으면서도 방향을 잃지 않고, 지점장님의 말이 실제 행동으로 이어지기 시작합니다.`,improvement:``},CP_NP_FC:{manner:`PA님을 코칭할 때 이 성향은 기준을 분명히 세우면서도 그 기준을 왜 지켜야 하는지 사람의 미래와 연결해 설명합니다. “이건 원칙이야”라고 말하지만 그 속에는 “나는 당신이 무너지지 않게 하려는 거야”라는 보호의 뜻이 함께 담겨 있습니다. 단호함이 먼저 들리지만, 시간이 지나면 진심이 남습니다. 말투에는 책임이 있고, 태도에는 애정이 있습니다. 설계사가 흔들릴 때 잡아 주고, 잘될 때 더 높은 기준을 보여 주는 리더의 모습이 자연스럽게 드러납니다.
+결국 이 성향의 핵심은 강한 책임감과 배려를 가지고 있다는 점입니다. 다만 구성원이 리더를 조금 더 편하게 느끼고 가까이 다가올 수 있도록 분위기를 부드럽게 풀어주는 표현이 함께 들어가야 조직의 생산성과 매출도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_NP_AC:{manner:`이 성향의 리더는 조직 안에서 사람을 챙기면서도 흐트러지지 않게 방향을 잡아주는 힘이 강한 성향입니다.
 
-이 지점장님은 성과를 요구하면서도 혼자 두지 않습니다. “해야 한다”라고 말한 뒤에는 반드시 **“그래서 내가 돕겠다”**가 따라옵니다. 설계사 입장에서는 부담이 아니라 의지가 됩니다. 누군가는 엄격하다고 느끼지만, 시간이 지나면 가장 믿을 수 있는 사람으로 기억됩니다. 기준이 명확하기 때문에 방향이 보이고, 마음이 느껴지기 때문에 따라가게 됩니다.
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름이 중요합니다.”
+“이 부분은 꼭 맞춰가야 합니다.”
+같이 방향을 정리하는 말이 자연스럽게 먼저 나오는 경우가 많습니다.
 
-그래서 조직 안에서는 이런 말이 나옵니다.
-“우리 지점장님 말은 무섭지만 틀린 적이 없다.”
-“혼내도 결국 나를 키우려고 한다.”
-이 신뢰가 쌓이면 팀의 실행력은 강해지고, 버티는 힘이 생깁니다.
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 관리 스타일이 아니라 사람을 오래 데리고 가려는 마음이 큽니다. 구성원이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않으며, 정서적으로 버틸 수 있도록 챙겨주려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“나를 책임감 있게 챙겨주는 리더다.”
+“혼내기보다 같이 가려고 한다.”
+“쉽게 내치지 않는다.”
+라는 안정감을 느끼게 됩니다.
 
-다만 분위기를 가볍게 풀어 주는 표현이나 긴장을 완충하는 말은 부족할 수 있습니다. 메시지가 강한 만큼 어떤 설계사에게는 압박으로 먼저 느껴질 수 있습니다. 이때 따뜻한 한 문장이 추가되면 리더십의 체감 온도는 완전히 달라집니다. 원칙에 온기가 더해지면 사람은 더 오래 갑니다.
+다만 AC의 점수가 가장 낮으면 본인의 말이 상대에게 어떻게 느껴지는지를 놓치는 경우가 생길 수 있습니다. 리더 본인은 조직을 위해 당연한 이야기를 하고 있다고 느끼지만 구성원 입장에서는
+“압박처럼 느껴진다.”
+“내 마음을 충분히 듣기 전에 결론이 나온다.”
+“조금 무섭게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 책임감과 배려는 강하지만 상대의 속도와 부담감을 세밀하게 살피는 부분이 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 “내 말이 상대에게 어떻게 들릴까”를 한 번 더 확인하는 습관이 중요합니다.
 
-특히 아래와 같은 말은 실행력을 높이는 힘이 됩니다.
+특히 AC가 낮은 리더는 결과와 방향을 먼저 이야기하기 전에
+ “지금 이 방향이 부담스럽진 않으신가요?”
+ “코칭속도는 괜찮으신가요?”
+ “지금 가장 막히는 부분이 어떤 건가요?”
+같은 질문을 먼저 넣어주는 것만으로도 구성원의 긴장감이 훨씬 줄어들게 됩니다.
+
+이 성향은 원래 조직을 강하게 끌고 갈 수 있는 힘이 있는 성향입니다. 여기에 상대의 감정과 부담 정도를 한 번 더 살피는 질문이 더해지면 구성원의 활동량과 실행 지속력이 훨씬 안정적으로 올라가게 됩니다.
 
-👉 “나는 당신이 잘될 사람이라는 확신이 있어서 더 말하는 거야.”
-👉 “부담 갖지 마, 방향은 내가 잡을 테니 당신은 움직이기만 해.”
-👉 “끝까지 같이 갈 거니까  나만 믿고 와.”
-
-이 한마디는 설계사의 마음을 붙잡고, 포기 직전에 다시 일어나게 만드는 문장입니다.
-
-이 성향의 지점장님은 이미 기준으로 팀을 세우는 리더입니다. 여기에 마음을 녹이는 표현이 조금만 더해진다면, 사람은 더 깊이 남고 조직은 더 오래 강해집니다. 존경받는 리더에서, 떠나고 싶지 않은 리더로 완성됩니다.`,improvement:``},CP_NP_AC:{manner:`PA님을 코칭할 때의 말투는 전반적으로 단호하고 분명합니다. 이 지점장님은 CP가 가장 높아 기준과 원칙을 중요하게 생각합니다. 그래서 PA님에게 “이건 이렇게 해야 해”, “지금은 이걸 먼저 해야 해”처럼 방향을 바로 제시합니다. 여기에 NP도 높아 PA님을 아끼는 마음이 큽니다. 속으로는 “잘 성장했으면 좋겠다”, “힘들어도 포기하지 않았으면 좋겠다”라고 생각합니다. 하지만 AC가 낮아 PA님의 눈치를 보지는 않습니다. PA님의 표정이나 감정에 맞춰 말을 돌려서 하거나, 상처받을까 봐 말을 줄이지 않습니다. 필요하다고 느끼면 바로 직설적으로 말합니다.
-
-이 말투의 좋은 점은 PA님이 헷갈리지 않는다는 것입니다. 해야 할 일과 하지 말아야 할 일이 분명합니다. PA님은 “지금 뭘 해야 하는지”를 바로 알 수 있습니다. 그래서 행동 속도가 빨라집니다. 하지만 단점도 있습니다. 말이 짧고 단호하다 보니 PA님은 “혼나는 것 같다”, “내 사정을 잘 안 들어주는 것 같다”고 느낄 수 있습니다. 실제로 지점장님은 도와주려고 말한 것인데, PA님은 압박으로 받아들일 수 있습니다.
-
-그래서 이 성향의 지점장님은 말을 부드럽게 바꾸기보다, 말 뒤에 이유를 붙이는 연습이 필요합니다. 단호함은 유지하되, 왜 그렇게 말하는지 한 줄만 설명해 주는 것입니다. 그러면 PA님은 지적이 아니라 도움으로 받아들이게 됩니다.
-
-개선을 위한 고정 멘트는 다음과 같습니다.
-“이건 지금 꼭 해야 해. 이유는 이걸 넘겨야 다음 단계가 열리기 때문이야.”
-“지금 이렇게 말하는 건 혼내려는 게 아니라, 네가 덜 돌아가게 하려는 거야.”
-“내가 단호하게 말하는 건 너를 믿기 때문이야. 할 수 있다고 보니까 말하는 거야.”
-
-이 고정 멘트를 사용하면, 이 지점장님은 자신의 강점인 명확함을 잃지 않으면서도 PA님이 마음으로 따라오게 만들 수 있습니다. 단호함 위에 이유 한 줄을 얹는 것, 이것이 이 성향 지점장님의 가장 중요한 조율 포인트입니다.`,improvement:``},CP_A_NP:{manner:`PA님을 코칭할 때의 말투는 전반적으로 단정하고 이성적이며, 기준과 이유를 또렷하게 설명하는 스타일입니다. 이 지점장님은 CP가 가장 높아 “이건 맞고, 이건 아니다”라는 기준을 분명히 말합니다. 여기에 A도 높기 때문에 감정에 휘둘리지 않고 상황을 차분히 정리해 줍니다. 그래서 PA님에게 “왜 이걸 해야 하는지”, “이 순서로 해야 하는 이유가 뭔지”를 논리적으로 설명하는 데 강점이 있습니다. PA님은 이 지점장님에게서 일의 구조와 기준을 배우기 쉽습니다.
-
-하지만 NP가 가장 낮은 성향이라, PA님의 감정이나 마음 상태를 먼저 살피는 말은 적은 편입니다. PA님이 실적이 안 나서 위축돼 있거나, 실수를 해서 기가 죽어 있어도 “괜찮아, 그럴 수 있어” 같은 말보다는 바로 “이 부분이 문제였고, 다음엔 이렇게 하자”로 들어갑니다. 지점장님 입장에서는 효율적이고 정확한 코칭이지만, PA님 입장에서는 “내 마음은 안 보나?”라고 느낄 수 있습니다. 그래서 이 지점장님은 똑똑하고 믿음직하지만, 다소 차갑게 느껴질 수 있습니다.
-
-이 성향의 가장 큰 강점은 흔들리지 않는 판단력과 정확한 피드백입니다. PA님은 이 지점장님 밑에 있으면 방향을 잃지 않습니다. 무엇을 고쳐야 하는지, 다음 행동이 무엇인지 명확히 알 수 있습니다. 다만 장기적으로 PA님을 키우기 위해서는 마음을 붙잡아 주는 말이 필요합니다. 그래서 이 지점장님에게 필요한 개선은 “기준을 낮추는 것”이 아니라, 말의 순서를 바꾸는 것입니다. 판단과 지적을 하기 전에, PA님의 상태를 한 번 인정해 주는 것입니다.
-
-개선 시 꼭 써야 할 고정 멘트는 다음과 같습니다.
-“지금 많이 부담될 수 있다는 건 이해해.”
-“네가 여기까지 온 것도 쉬운 건 아니야.”
-“실수한 건 맞지만, 그만큼 배우는 단계라는 뜻이야.”
-
-이 고정 멘트를 먼저 말한 뒤에 기존처럼 논리적인 설명과 기준 제시를 하면, PA님은 마음을 닫지 않고 지점장님를 따라오게 됩니다. 이 지점장님은 이미 ‘어떻게 해야 하는지’는 잘 알고 있습니다. 여기에 “네 마음도 보고 있다”는 신호 한 줄만 더해지면, PA님을 오래 붙잡고 크게 키울 수 있는 지점장님가 됩니다. 기준은 분명하게, 시작은 따뜻하게. 이것이 이 성향 지점장님의 가장 중요한 성장 포인트입니다.`,improvement:``},CP_A_FC:{manner:`PA님을 코칭할 때 말투는 기준이 분명하고, 설명은 논리적인데, 분위기가 딱딱하고 재미가 없는 방향으로 흐르기 쉽습니다. 이 지점장님은 “이건 맞고, 이건 틀리다”, “이렇게 하면 효율이 떨어진다”처럼 판단과 기준이 분명한 말을 잘합니다. 또 왜 그렇게 해야 하는지도 이성적으로 잘 설명합니다. 하지만 FC가 낮아 표정, 말의 온도, 가벼운 격려나 웃음이 부족해 PA님은 “말은 맞는데 숨 막힌다”, “실수하면 바로 지적받을 것 같다”고 느끼기 쉽습니다.
-
-이 성향의 지점장님은 PA님을 대할 때 업무 중심, 결과 중심 말투가 기본값이 됩니다. 예를 들면 “그건 비효율적이야”, “그렇게 하면 시간 낭비야”, “다음엔 이렇게 해” 같은 말이 자연스럽게 나옵니다. 문제는 PA님이 아직 긴장하고 있는 상태라면, 이 말투가 차갑고 무섭게 들릴 수 있다는 점입니다. 그래서 의식적으로 기준 제시 전에 분위기를 풀어주는 말을 한 번 넣어야 합니다. 아주 큰 칭찬이 아니어도 괜찮습니다. “그래도 여기까지 온 건 잘한 거야”, “처음치고는 생각보다 괜찮아” 같은 말 한 줄이면 충분합니다.
-
-개선을 위한 핵심은 기준(CP)과 논리(A)는 유지하되, 표현을 조금 부드럽게 만드는 것입니다. PA님을 웃기려고 애쓸 필요는 없지만, 말의 끝을 너무 단정적으로 자르지 않는 연습이 필요합니다. 예를 들어 “이건 틀렸어” 대신 “이 방법보다 더 쉬운 길이 있어”라고 말하면, 같은 내용도 훨씬 편하게 받아들여집니다.
-
-개선 시 사용할 수 있는 고정 멘트는 다음과 같습니다.
-“지금 단계에선 이 정도면 충분히 잘하고 있어.”
-“틀린 게 아니라, 더 쉬운 방법을 배우는 중이야.”
-“너한테 맞게 조금만 바꿔보면 훨씬 편해질 거야.”
-
-이 고정 멘트들은 FC가 낮아 생기는 딱딱함과 긴장감을 완충해 주는 역할을 합니다. 이렇게 말하면 PA님은 실수를 ‘혼나는 일’이 아니라 배우는 과정으로 받아들이게 되고, 지점장님의 기준과 지시도 훨씬 잘 따라오게 됩니다.`,improvement:``},CP_A_AC:{manner:`PA님을 코칭할 때 말투는 기준은 분명하고 설명은 논리적인데, PA님의 반응이나 감정을 거의 고려하지 않는 방향으로 나가기 쉽습니다. 이 지점장님은 “원래 이건 이렇게 하는 거야”, “이게 가장 효율적인 방식이야”처럼 정답과 기준을 먼저 제시하고, 그 이유도 차분하게 설명합니다. 말 자체는 틀리지 않지만, AC가 낮아 상대 입장에서 어떻게 느낄지, 지금 이 말을 들을 준비가 되었는지를 잘 살피지 못하는 경우가 많습니다.
-
-그래서 PA님은 “말이 너무 단정적이다”, “선택권이 없는 느낌이다”, “따르지 않으면 안 될 것 같다”라고 느낄 수 있습니다. 특히 아직 자신감이 부족한 PA님에게는 이 말투가 압박감이나 거리감으로 전달되기 쉽습니다. 지점장님 입장에서는 도와주려고 하는 말인데, PA님 입장에서는 “지시받고 있다”는 느낌이 강해지는 것입니다.
-
-이 성향의 지점장님은 PA님을 설득하려 하기보다 결론을 빠르게 정해주는 말투를 쓰는 경향이 있습니다. “이건 이렇게 하자”, “이 방법이 맞아” 같은 말이 자연스럽게 나옵니다. 문제는 PA님이 스스로 선택하고 있다는 느낌을 못 받으면, 겉으로는 따르지만 속으로는 위축되거나 거리감을 느낀다는 점입니다. 그래서 의식적으로 선택지를 주는 말, 의견을 묻는 한 문장을 넣는 연습이 필요합니다.
-
-개선의 핵심은 기준을 낮추는 것이 아니라, 전달 방식을 바꾸는 것입니다. 같은 내용이라도 “이게 정답이야” 대신 “이 방법이 가장 편한 선택이야”라고 말하면 PA님은 훨씬 덜 부담을 느낍니다. 또 설명 후에는 반드시 PA님의 생각을 한 번 묻는 것이 좋습니다.
-
-개선 시 사용할 수 있는 고정 멘트는 다음과 같습니다.
-“이건 하나의 방법이고, 네가 해보기 편한 쪽으로 가도 괜찮아.”
-“내 기준을 말해준 거고, 네 생각도 한번 들어보고 싶어.”
-“지금은 따라 해보고, 나중에 네 방식으로 바꿔도 돼.”
-
-이 고정 멘트들은 AC가 낮아 생기는 일방적 전달을 줄여주고, PA님이 코칭을 지시가 아니라 도움으로 느끼게 만들어 줍니다. 이렇게 말하면 PA님은 더 편하게 질문하고, 결과적으로 지점장님의 기준도 훨씬 잘 따라오게 됩니다.`,improvement:``},CP_FC_NP:{manner:`PA님을 코칭할 때의 말투는 기준이 분명하고 말이 빠르며, 분위기를 끌어올리는 힘이 강한 방식입니다. “이건 이렇게 해야 돼”, “이 정도는 바로 할 수 있어”처럼 정답을 바로 제시하는 말을 자주 쓰고, 중간중간 농담이나 웃음으로 분위기를 살립니다. 그래서 PA님은 처음에는 “와, 에너지 있고 시원하다”라고 느끼지만, 시간이 지나면 마음이 충분히 이해받고 있다는 느낌은 부족해질 수 있습니다. 이 성향은 성과 중심적이고 추진력이 뛰어나지만, PA님의 감정 상태나 불안, 속도 차이를 세심하게 살피는 말은 상대적으로 적게 나옵니다. 그 결과 PA님은 “못 따라가면 혼날 것 같다”, “질문하면 분위기를 깨는 것 아닐까” 하고 마음을 닫을 수 있습니다.
-
-그래서 이 성향은 의식적으로 공감하는 말을 먼저 꺼내는 조절이 필요합니다. 설명이나 지시 전에 PA님의 마음을 한 번 짚어주면 코칭 효과가 크게 달라집니다. 예를 들어 바로 “이건 이렇게 해”라고 말하기보다, “이 부분이 조금 어려웠을 수 있어”, “처음이면 헷갈리는 게 당연해” 같은 말을 먼저 얹는 것입니다. 이렇게 하면 PA님은 “아, 나를 이해해주는구나”라고 느끼고 다시 집중하게 됩니다.
-
-개선 시 고정멘트는 반복해서 써야 효과가 있습니다. 첫 번째 고정멘트는 **“지금 네가 느끼는 부담부터 말해줘도 괜찮아.”**입니다. 이 말은 PA님의 감정을 밖으로 꺼내게 해 줍니다. 두 번째 고정멘트는 **“기준은 분명하지만, 속도는 네 상황에 맞춰도 돼.”**입니다. 성과 기준을 유지하면서도 압박을 낮춰 줍니다. 세 번째 고정멘트는 **“잘하려는 마음은 이미 충분해, 지금은 하나만 정확히 해보자.”**입니다. 이 말은 PA님의 불안을 줄이고 행동을 단순하게 만듭니다.
-
-이 세 문장을 의식적으로 사용하면, 강한 기준과 밝은 에너지는 그대로 살리면서도 PA님의 마음을 놓치지 않는 코칭이 됩니다. PA님은 “엄격하지만 나를 이해해주는 사람”이라고 느끼게 되고, 결국 더 오래, 더 안정적으로 따라오게 됩니다.`,improvement:``},CP_FC_A:{manner:`PA님을 코칭할 때의 말투는 기준이 분명하고 직설적이면서도 분위기를 살리려는 말투가 자연스럽게 나옵니다. “이건 이렇게 해야 돼”, “여기서 멈추면 안 돼”처럼 정답과 방향을 바로 말하는 힘이 강하고, 동시에 농담이나 웃음, 격려를 섞어 분위기를 끌어올립니다. 그래서 PA님은 처음에 “에너지 넘치고 시원하다”, “같이 있으면 힘이 난다”라고 느낍니다. 다만 이 성향은 차분히 생각하고 정리하는 말, 즉 왜 그런 선택이 필요한지, 지금 상황을 어떻게 판단해야 하는지에 대한 설명은 상대적으로 적게 나옵니다. 말이 빠르고 감정과 기준이 먼저 나가다 보니, PA님은 “따라가긴 하는데 머릿속이 정리되진 않는다”, “왜 이렇게 해야 하는지는 잘 모르겠다”고 느낄 수 있습니다.
-
-이럴 때 PA님은 실수했을 경우 혼난 느낌은 강한데, 무엇을 고쳐야 하는지는 흐릿해질 수 있습니다. 지점장님은 “분명 말해줬다”고 생각하지만, PA님은 감정과 속도에 눌려 핵심 판단을 놓치기 쉽습니다. 그래서 이 성향은 의식적으로 ‘생각을 정리해주는 말’을 추가하는 조율이 꼭 필요합니다. 기준과 에너지를 낮출 필요는 없지만, 그 사이에 정리용 문장을 끼워 넣어야 합니다.
-
-예를 들어 바로 “이건 잘못됐어”라고 말하기보다, “지금 상황을 한 줄로 정리해보면 이거야”, “여기서 우리가 판단해야 할 포인트는 딱 하나야” 같은 말을 먼저 해 주는 것입니다. 이렇게 하면 PA님은 감정에 휩쓸리지 않고, 머릿속에 기준이 잡히기 시작합니다. 그다음에 지시나 격려가 나오면 훨씬 잘 흡수합니다.
-
-개선 시 고정멘트는 다음과 같이 쓰는 것이 좋습니다.
-첫 번째 고정멘트는 **“지금 상황을 차분히 정리해보자, 핵심은 하나야.”**입니다. 이 말은 PA님의 머리를 멈추게 하고 생각을 모아 줍니다.
-두 번째 고정멘트는 **“느낌 말고 기준으로 보면, 선택지는 이쪽이야.”**입니다. 감정과 분위기에 흔들리지 않게 판단의 기준을 세워 줍니다.
-세 번째 고정멘트는 **“왜 이걸 하는지 이해되면, 속도는 자연스럽게 따라와.”**입니다. 빨리하라는 압박 대신 이해를 먼저 줍니다.
-
-이 세 문장을 반복해서 사용하면, 강한 기준과 밝은 에너지는 그대로 유지하면서도 PA님이 스스로 판단하고 성장하는 구조를 만들어 줄 수 있습니다. PA님은 “재미있고 강한데, 머리도 정리해주는 지점장님”라고 느끼게 되고, 단순히 끌려오는 PA님이 아니라 생각하며 따라오는 PA님으로 바뀌게 됩니다.`,improvement:``},CP_FC_AC:{manner:`PA님을 코칭할 때의 말투는 기준이 분명하고 직설적이며, 분위기를 끌어올리는 힘이 강한 말투입니다. “이건 이렇게 하면 돼”, “지금 단계에서는 이 정도는 당연히 해줘야 해”처럼 정답을 바로 제시하는 말이 많고, 중간중간 농담이나 웃음, 칭찬을 섞어 PA님의 기운을 끌어올립니다. 그래서 PA님은 처음에 “말이 시원하고 답이 빨라서 좋다”, “같이 있으면 힘이 난다”라고 느낍니다. 특히 망설이는 PA님에게는 방향을 딱 잡아주기 때문에 초반 추진력이 생깁니다.
-
-다만 이 성향은 PA님의 눈치를 그다지 보지 않는 편이라 말이 강하게 들릴 수 있습니다. AC가 낮기 때문에 상대의 표정이나 속도를 세심하게 맞추기보다는, “될 사람은 따라온다”는 태도로 밀어붙이기 쉽습니다. 그래서 이해 속도가 느린 PA님이나 자신감이 낮은 PA님은 “혼나는 건 아닌데 부담된다”, “질문하기가 조금 무섭다”고 느낄 수 있습니다. 지점장님은 도와준다고 생각하지만, PA님은 마음을 닫고 겉으로만 고개를 끄덕일 가능성이 생깁니다.
-
-이 성향에서 가장 중요한 조율 포인트는 말의 세기를 줄이는 것이 아니라, 말 앞에 안전한 안내문장을 붙이는 것입니다. 단호함과 에너지는 유지하되, PA님이 심리적으로 따라올 수 있게 다리를 놓아줘야 합니다. 예를 들어 바로 지시부터 하지 말고, “이건 누구나 처음엔 헷갈려”, “지금 단계에서 실수하는 건 정상이다” 같은 말을 먼저 건네는 것입니다. 그러면 PA님은 방어를 풀고 말을 들을 준비를 하게 됩니다.
-
-개선 시 고정멘트는 다음과 같이 사용하는 것이 좋습니다.
-첫 번째 고정멘트는 **“지금 이 단계에서는 잘 몰라도 괜찮아, 내가 기준만 잡아줄게.”**입니다. 이 말은 PA님의 긴장을 풀어주면서도 지점장님의 기준을 자연스럽게 전달합니다.
-두 번째 고정멘트는 **“이건 네가 못해서가 아니라, 아직 경험이 없어서 그래.”**입니다. PA님의 자존감을 지켜주면서도 계속 따라오게 만드는 문장입니다.
-세 번째 고정멘트는 **“질문해도 돼, 속도는 내가 책임질게.”**입니다. AC가 낮은 성향에서 부족해지기 쉬운 ‘심리적 안전감’을 보완해 줍니다.
-
-이 세 문장을 의식적으로 반복하면, 지점장님은 여전히 단호하고 에너지 넘치는 리더로 남으면서도, PA님은 “강하지만 나를 버리지 않는 사람”, “따라가도 안전한 지점장님”라고 느끼게 됩니다. 그 결과 PA님은 눈치 보며 따라오는 사람이 아니라, 안심하고 도전하는 PA님으로 성장하게 됩니다.`,improvement:``},CP_AC_NP:{manner:`PA님을 코칭할 때의 말투는 기준과 규칙을 매우 중요하게 여기면서도, 동시에 분위기와 관계를 많이 의식하는 말투입니다. 이 성향은 “이건 원칙이야”, “이 순서는 꼭 지켜야 해”처럼 정해진 기준을 분명히 말하는 힘이 있습니다. 그래서 PA님은 처음에 “이 지점장님은 기준이 뚜렷해서 헷갈리지 않는다”, “뭘 해야 하는지가 명확하다”고 느낍니다. 동시에 AC가 높기 때문에 말할 때 상대의 표정과 반응을 계속 살피며, 너무 세게 나가지는 않으려고 조절합니다.
-
-하지만 NP가 가장 낮기 때문에 공감이나 따뜻한 감정 표현이 부족해질 수 있습니다. 지점장님은 규칙을 잘 설명하고 있다고 생각하지만, PA님은 “맞는 말인데 정이 없다”, “혼나는 느낌이 먼저 든다”고 느끼기 쉽습니다. 특히 잘 따라오지 못하는 PA님에게는 “이건 기본이야”, “다들 이렇게 해” 같은 말이 의도치 않게 상처가 될 수 있습니다. AC가 높아 직접적으로 몰아붙이지는 않지만, 대신 차갑게 선을 긋는 말투가 나와 PA님이 더 위축될 수 있습니다.
-
-이 성향에서 가장 중요한 조율 포인트는 기준을 말하기 전에 마음을 먼저 만져주는 것입니다. 기준을 낮출 필요는 없고, 말의 순서를 바꾸는 것이 핵심입니다. 바로 규칙부터 말하지 말고, 먼저 PA님의 감정을 인정하는 한 문장을 넣어야 합니다. 예를 들어 “이 부분이 생각보다 어려울 수 있어” 또는 “처음이면 당연히 막히는 지점이야” 같은 말입니다. 이 한 문장이 들어가면 같은 지시도 훨씬 덜 차갑게 들립니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 **“지금 속도가 느린 건 네 태도 문제가 아니라, 과정 중 하나야.”**입니다. 이 문장은 NP가 낮아 생길 수 있는 비난 느낌을 줄여 줍니다.
-두 번째 고정멘트는 **“기준은 지켜야 하지만, 이해하는 데 걸리는 시간은 사람마다 달라.”**입니다. 기준 중심 성향을 유지하면서도 PA님을 보호해 줍니다.
-세 번째 고정멘트는 **“내가 기준은 잡아줄 테니, 너는 질문하는 걸 주저하지 마.”**입니다. PA님이 마음을 닫지 않게 만드는 문장입니다.
-
-이 고정멘트들을 의식적으로 쓰면, 이 성향은 차갑고 무서운 지점장님가 아니라 원칙은 분명하지만 사람을 놓치지 않는 지점장님로 바뀝니다. PA님은 “지적만 하는 사람”이 아니라 “기준을 알려주면서도 나를 버리지 않는 사람”으로 지점장님를 인식하게 되고, 그 결과 실행력과 지속력이 함께 올라가게 됩니다.`,improvement:``},CP_AC_A:{manner:`PA님을 코칭할 때의 말투는 기준과 규칙을 분명히 제시하면서도, 동시에 상대의 반응과 분위기를 많이 살피는 말투입니다. 이 성향은 “이건 꼭 지켜야 해”, “이 순서는 이유가 있어서 정해진 거야”처럼 원칙을 명확히 말하는 힘이 매우 강합니다. 그래서 PA님은 처음에 “이 지점장님은 기준이 분명하다”, “헷갈리게 말하지 않는다”는 안정감을 느낍니다. 동시에 AC가 높기 때문에 PA님의 표정, 말투, 반응을 계속 확인하며 혹시 기분이 상하지 않았는지 신경을 씁니다.
-
-하지만 A가 가장 낮기 때문에 왜 이걸 해야 하는지에 대한 논리적 설명이나 정리가 부족해질 수 있습니다. 지점장님은 기준을 잘 전달했다고 생각하지만, PA님은 “왜 그렇게 해야 하는지는 잘 모르겠다”, “그냥 시키는 대로 하라는 느낌이다”라고 느끼기 쉽습니다. 특히 잘 따라오지 못하는 PA님에게는 기준은 들리는데 이해는 따라오지 않아 답답함이 커질 수 있습니다. 이때 AC가 높아 PA님의 눈치를 보다 보니, 설명을 더 하지 않고 말을 줄여버리는 경우도 생깁니다.
-
-이 성향에서 가장 중요한 조율 포인트는 기준 → 이유 → 확인의 순서를 의식적으로 지키는 것입니다. 기준을 먼저 말하는 것은 이 성향의 강점이지만, 바로 끝내지 말고 “왜 그런지”를 한 문장이라도 덧붙여야 합니다. 예를 들어 “이 순서를 지켜야 해” 다음에 “그래야 나중에 고객이 헷갈리지 않거든”처럼 이유를 붙이는 것입니다. 그리고 마지막으로 “이해됐는지 한 번 말로 정리해볼래?”라고 확인하면 PA님의 머리가 정리됩니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 **“이건 규칙이기도 하지만, 너를 덜 힘들게 하려고 만든 방법이야.”**입니다. 기준 중심 말투에 설명과 배려를 더해 줍니다.
-두 번째 고정멘트는 **“지금은 외우지 말고, 왜 필요한지만 먼저 이해하자.”**입니다. A가 낮아 생길 수 있는 이해 부족을 보완해 줍니다.
-세 번째 고정멘트는 **“내가 말한 걸 네 말로 한 번만 다시 설명해줘.”**입니다. PA님의 이해 수준을 점검하면서도 압박을 주지 않는 문장입니다.
-
-이 고정멘트들을 의식적으로 사용하면, 이 성향은 기준만 강조하는 지점장님가 아니라 기준을 설명하고 이해까지 책임지는 지점장님로 바뀝니다. PA님은 “눈치만 보는 사람”이나 “차갑게 지시하는 사람”이 아니라, “규칙을 알려주고 생각까지 정리해주는 사람”으로 지점장님를 신뢰하게 되고, 그 신뢰가 결국 실행력으로 이어지게 됩니다.`,improvement:``},CP_AC_FC:{manner:`PA님을 코칭할 때의 말투는 기준과 규칙을 먼저 분명하게 말하고, 동시에 상대의 반응과 분위기를 계속 살피는 말투입니다. TOP1이 CP이기 때문에 지점장님은 “이건 꼭 지켜야 해”, “이 순서는 바꾸면 안 돼”처럼 원칙과 기준을 분명히 제시합니다. 그래서 PA님은 처음에 “이 지점장님은 기준이 확실하다”, “뭘 해야 하는지가 명확하다”는 느낌을 받습니다. 여기에 TOP2가 AC라서 PA님의 표정, 말투, 태도를 세심하게 관찰하며 혹시 부담을 느끼지는 않는지 계속 신경 씁니다.
-
-하지만 BOTTOM1이 FC이기 때문에 감정을 풀어 주는 말, 가볍게 분위기를 부드럽게 만드는 말은 부족한 편입니다. 지점장님은 진지하고 성실하게 말하지만, 웃거나 공감하는 표현이 적어 PA님 입장에서는 “혼나는 느낌이다”, “차갑게 느껴진다”고 오해할 수 있습니다. 실제로는 관심이 많지만, 그 마음이 말로 잘 드러나지 않는 경우입니다. 특히 잘 따라오지 못하는 PA님은 긴장한 상태가 계속 유지되어 질문을 못 하거나 위축될 수 있습니다.
-
-이 성향에서 가장 중요한 조율 포인트는 기준을 말한 뒤 감정을 한 번 풀어 주는 문장을 의식적으로 넣는 것입니다. 규칙을 말하는 것에서 끝내지 말고, “너를 믿어서 말하는 거야”, “지금은 연습 단계니까 괜찮아” 같은 한 문장을 덧붙이면 PA님의 마음이 훨씬 편해집니다. AC가 높아 PA님의 눈치를 보는 대신, 따뜻한 표현을 먼저 말로 꺼내는 연습이 필요합니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 **“지금 잘하려는 게 보여서 이 기준을 알려주는 거야.”**입니다. 기준 제시와 동시에 PA님의 노력을 인정해 줍니다.
-두 번째 고정멘트는 **“틀려도 괜찮아, 연습 중이니까 여기서 배워가면 돼.”**입니다. FC가 낮아 생기는 긴장감을 풀어 주는 문장입니다.
-세 번째 고정멘트는 **“조금 어렵지? 그래도 네 속도에 맞춰 같이 가면 돼.”**입니다. PA님이 혼자가 아니라는 느낌을 받게 합니다.
-
-이 고정멘트를 의식적으로 사용하면, 이 성향은 차갑게 느껴질 수 있는 지점장님가 아니라 기준은 분명하지만 마음은 따뜻한 지점장님로 바뀝니다. PA님은 “무서운 사람”이 아니라 “나를 챙기면서 이끌어주는 사람”으로 느끼게 되고, 그 안정감이 결국 꾸준한 성장으로 이어지게 됩니다.`,improvement:``},NP_CP_A:{manner:`PA님을 코칭할 때의 말투는 먼저 따뜻하게 감싸 주고, 그 다음에 기준을 분명히 알려주는 말투입니다. TOP1이 NP이기 때문에 이 성향은 PA님을 대할 때 “괜찮아”, “천천히 해도 돼”, “네가 힘들었겠다”처럼 공감과 배려가 먼저 나옵니다. PA님은 이 지점장님를 만나면 “혼내지 않는 사람”, “내 편이 되어주는 사람”이라고 느끼기 쉽고, 마음을 열고 이야기하려는 태도를 보이게 됩니다. 여기에 TOP2가 CP라서, 완전히 느슨해지지는 않고 “이건 꼭 지켜야 해”, “이 부분은 기준이야”처럼 필요한 규칙과 선은 잡아 줍니다.
-
-하지만 BOTTOM1이 A이기 때문에 상황을 차분하게 정리해서 설명하는 말, 왜 이걸 해야 하는지 논리적으로 풀어주는 말이 부족해질 수 있습니다. 그래서 PA님은 “좋은 말은 많이 듣는데, 그래서 정확히 뭘 어떻게 해야 하지?”라는 혼란을 느낄 수 있습니다. 특히 잘 따라오지 못하는 PA님에게는 감정 위로는 충분하지만, 행동 기준이 머릿속에 정리되지 않아 같은 실수를 반복하는 일이 생기기 쉽습니다.
-
-이 성향에서 가장 중요한 조율 포인트는 공감 뒤에 반드시 ‘정리 문장’을 붙이는 것입니다. 위로와 배려에서 끝내지 말고, “그래서 지금 네가 할 건 이거야”처럼 한 번 더 구조를 잡아 주는 말이 필요합니다. 감정은 이미 충분히 살피고 있으므로, 이제는 의식적으로 이유와 순서를 말로 정리해 주는 연습이 중요합니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 **“네 마음은 이해했어, 이제 우리가 해야 할 순서는 이거야.”**입니다. 공감 뒤에 바로 방향을 제시해 줍니다.
-두 번째 고정멘트는 **“이걸 하는 이유는 단순해, 이 단계가 다음으로 가는 준비야.”**입니다. 복잡하지 않게 이유를 설명해 주는 문장입니다.
-세 번째 고정멘트는 **“오늘은 이것 하나만 기억하면 돼, 나머지는 내가 도와줄게.”**입니다. PA님의 머릿속 부담을 줄여 줍니다.
-
-이 고정멘트를 꾸준히 쓰면, 이 성향은 착하기만 한 지점장님가 아니라 따뜻하면서도 방향을 잡아주는 지점장님로 바뀝니다. PA님은 감정적으로 안정감을 느끼는 동시에, 무엇을 어떻게 해야 하는지도 분명히 알게 되고, 그 결과 따라오는 속도와 실행력이 눈에 띄게 좋아지게 됩니다.`,improvement:``},NP_CP_FC:{manner:`PA님을 코칭할 때의 말투는 부드럽고 사람 냄새가 나지만, 말 속에는 분명한 기준이 들어 있는 말투입니다. TOP1이 NP이기 때문에 이 성향은 PA님을 볼 때 먼저 사람으로 바라봅니다. “처음엔 다 어려워”, “너 나이 때 나도 그랬어”, “지금까지 버틴 것만 해도 잘하고 있어”처럼 위로와 인정이 먼저 나오는 말을 자연스럽게 합니다. PA님은 이 지점장님를 만나면 “혼내지 않는다”, “나를 이해해 준다”, “편하게 물어볼 수 있다”고 느끼며 마음을 엽니다.
-
-TOP2가 CP라서, 이 지점장님은 마냥 느슨하지는 않습니다. “이건 기본이야”, “이건 약속이야”, “여기까지는 반드시 지켜야 해”처럼 지켜야 할 선과 기준은 분명히 말해 줍니다. 그래서 PA님은 정서적으로는 안정감을 느끼면서도, 이 지점장님를 가볍게 보지는 않습니다. 다만 문제는 BOTTOM1이 FC라는 점입니다. 이 경우 지점장님은 에너지를 끌어올리는 말, 분위기를 살리는 말, 재미있게 몰아가는 말이 부족할 수 있습니다.
-
-그래서 잘 따라오지 못하는 PA님을 만났을 때, 코칭 분위기가 다소 조용하고 무거워질 수 있습니다. PA님은 “좋은 말은 듣는데 왠지 힘이 안 난다”, “해야 하는 건 알겠는데 신이 안 난다”는 느낌을 받을 수 있습니다. 특히 지치기 쉬운 PA님에게는 동기 자극이 약해질 수 있습니다. 이 성향의 어려움은 틀린 말을 해서가 아니라, 에너지가 덜 실리는 말투에서 생깁니다.
-
-조율의 핵심은 의식적으로 말에 온도와 리듬을 더하는 것입니다. 말의 내용은 충분히 좋은데, 전달할 때 한 번 더 밝게, 한 번 더 살아 있게 말하는 연습이 필요합니다. 표정, 속도, 어조를 조금만 바꿔도 PA님의 반응이 달라집니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 **“지금 네가 하는 건 분명히 잘 가고 있는 과정이야, 그래서 더 기대가 돼.”**입니다. 인정과 기대를 함께 전달해 줍니다.
-두 번째 고정멘트는 **“이건 어렵지만, 이걸 넘기면 확실히 한 단계 올라가.”**입니다. 힘을 주되 부담은 줄이는 말입니다.
-세 번째 고정멘트는 **“지금은 속도보다 방향이 맞아, 우리는 이미 제대로 가고 있어.”**입니다. PA님의 긴장을 풀어 주는 문장입니다.
-
-이 고정멘트를 꾸준히 쓰면, 이 성향은 따뜻하고 기준만 있는 지점장님에서 따뜻하면서도 힘을 실어주는 지점장님로 바뀝니다. PA님은 마음이 편해질 뿐 아니라, 다시 해볼 에너지를 얻게 되고, 자연스럽게 행동량과 지속력이 함께 올라가게 됩니다.`,improvement:``},NP_CP_AC:{manner:`PA님을 코칭할 때의 말투는 따뜻한 배려와 분명한 기준이 함께 나오는 말투입니다. 이 성향의 지점장님은 기본적으로 사람을 아끼는 마음이 크고, PA님이 상처받지 않도록 배려하며 말하려는 경향이 강합니다. 그래서 “괜찮아”, “네가 힘들었을 것 같아”, “그래도 여기까지 온 건 잘한 거야” 같은 공감의 말이 먼저 나옵니다. 동시에 기준과 원칙도 중요하게 여기기 때문에, 어느 순간에는 “이 부분은 꼭 지켜야 해”, “이건 선택이 아니라 기본이야”처럼 분명한 말도 합니다. 다만 AC가 낮은 편이기 때문에 PA님의 반응이나 감정을 세심하게 살피는 데는 조금 약할 수 있습니다. 그래서 코칭이 빠르고 직설적으로 느껴질 수 있고, PA님은 “말은 따뜻한데 결정은 너무 빠른 것 같아”라고 느낄 수도 있습니다. 이때 지점장님은 자신이 차갑게 말하고 있다는 생각보다, 속도가 빠를 수 있다는 점을 의식하는 것이 중요합니다.
-
-이 성향의 지점장님은 PA님을 도와주고 싶은 마음이 커서 대신 고민해주고, 대신 결정해주려는 경향도 있습니다. “이건 내가 봐도 이쪽이 맞아”, “너한테는 이 방법이 제일 좋아”라고 말하며 길을 바로 제시합니다. 이는 PA님에게는 큰 도움이 될 수 있지만, 반복되면 PA님이 스스로 생각하고 판단하는 힘이 자라기 어렵습니다. 그래서 코칭할 때는 설명을 하기 전에 한 번 더 질문을 던지는 습관이 필요합니다. 예를 들어 “내가 보기엔 이게 좋아 보이는데, 너 생각은 어때?”처럼 PA님의 생각을 먼저 묻는 말투를 의식적으로 넣어야 합니다. 그러면 PA님은 존중받는 느낌을 받고, 코칭을 더 잘 따라오게 됩니다.
-
-개선을 위한 고정 멘트는 항상 공감 → 기준 → 선택권의 순서로 말하는 것이 좋습니다. 첫 번째 고정 멘트는
-“네가 여기까지 오느라 얼마나 고민했는지 알아, 그 노력은 분명히 잘한 거야.”
-이 문장은 PA님의 마음을 먼저 안정시켜 줍니다. 두 번째 고정 멘트는
-“다만 이 일에서는 꼭 지켜야 할 기준이 있고, 이 부분은 예외가 아니야.”
-이 말로 지점장님의 기준을 분명히 세웁니다. 세 번째 고정 멘트는
-“이 기준 안에서 어떤 선택을 할지는 네가 정해도 돼, 나는 그 과정을 도와줄게.”
-이 문장은 PA님에게 책임과 주도권을 돌려주는 역할을 합니다.
-
-이 세 문장을 세트처럼 반복해서 사용하면, 코칭이 부드러우면서도 흐트러지지 않습니다. PA님은 “나를 아끼는구나”라는 느낌과 동시에 “그래도 해야 할 건 해야 하는구나”를 자연스럽게 배우게 됩니다. 이 성향의 지점장님은 이미 사람을 살리는 힘이 충분합니다. 여기에 PA님의 반응을 한 박자 더 확인하는 습관만 더해진다면, PA님은 훨씬 안정적으로 성장하고, 지점장님 역시 감정 소모 없이 오래 좋은 코칭을 이어갈 수 있습니다.`,improvement:``},NP_A_CP:{manner:`PA님을 코칭할 때의 말투는 부드럽고 이해해 주는 말이 먼저 나오고, 판단은 차분하지만 기준 제시는 약한 말투입니다. 이 성향의 지점장님은 사람을 먼저 보는 힘이 매우 큽니다. 그래서 PA님이 실수를 하거나 성과가 느릴 때도 “그럴 수 있어”, “처음엔 다 그래”, “너 마음이 어떤지는 이해해”라는 말이 자연스럽게 나옵니다. 또 상황을 논리적으로 정리하는 힘도 있어서, 왜 안 됐는지 차분히 설명해 주고 흐름을 정리해 주는 데는 강합니다. PA님은 이 지점장님를 보며 “말이 편하고, 옆에 있으면 안정된다”는 느낌을 많이 받습니다.
-
-하지만 CP가 낮은 편이기 때문에, 기준을 세우고 단호하게 선을 긋는 말은 상대적으로 약합니다. 그래서 코칭이 길어지거나, 같은 실수가 반복되어도 “다음엔 잘해보자”로 끝나는 경우가 생깁니다. 이때 PA님은 편안함은 느끼지만, 한편으로는 “그래서 정확히 뭘 바꿔야 하지?” 하고 헷갈릴 수 있습니다. 즉, 마음은 따뜻한데 방향표가 약한 코칭이 될 위험이 있습니다.
-
-이 성향의 지점장님은 PA님을 다그치지 않으려는 마음이 강해서, 꼭 해야 할 말도 돌려서 표현하는 경향이 있습니다. “이건 조금 아쉬운 것 같아”, “다음엔 이렇게 해보면 좋을 것 같아”처럼 부드럽게 말하지만, PA님 입장에서는 그 말이 권유인지, 필수인지를 구분하기 어렵습니다. 그래서 코칭을 할 때는 “이건 선택이야”와 “이건 꼭 해야 해”를 말로 명확히 구분해 주는 연습이 필요합니다.
-
-개선을 위한 고정 멘트는 공감 → 사실 → 기준 순서로 말하는 것이 가장 효과적입니다. 첫 번째 고정 멘트는
-“지금까지 노력한 건 분명히 보여, 여기까지 온 것도 쉬운 일은 아니야.”
-이 말로 PA님의 마음을 먼저 지켜줍니다. 두 번째 고정 멘트는
-“다만 지금 방식으로는 결과가 잘 안 나오는 게 사실이야.”
-이 문장은 감정이 아니라 현실을 짚어줍니다. 세 번째 고정 멘트는
-“그래서 이 부분만큼은 이번 주부터 꼭 이렇게 하자, 이건 약속이야.”
-이 말로 기준을 분명히 세웁니다.
-
-이 세 문장을 반복해서 사용하면, 코칭이 여전히 따뜻하면서도 흐려지지 않습니다. PA님은 “이 지점장님은 나를 이해해 주지만, 그냥 넘어가지는 않는구나”라고 느끼게 됩니다. 이 성향의 지점장님은 이미 PA님을 살리는 말의 힘을 가지고 있습니다. 여기에 짧고 분명한 기준 문장만 더해지면, PA님은 훨씬 빠르게 성장하고 코칭의 효과도 눈에 띄게 좋아질 것입니다.`,improvement:``},NP_A_FC:{manner:`PA님을 코칭할 때의 말투는 따뜻하고 배려 깊으며, 설명은 차분하지만 표현은 다소 조용한 말투입니다. 이 성향의 지점장님은 사람을 먼저 생각합니다. PA님이 실수해도 혼내기보다 “괜찮아, 누구나 처음엔 그래”라는 말이 먼저 나오고, PA님의 마음을 다치지 않게 지켜주려는 태도가 분명합니다. 여기에 A가 함께 있어서 감정에만 치우치지 않고, 왜 일이 안 됐는지 이유를 논리적으로 설명해 줍니다. 그래서 PA님은 “이 지점장님은 나를 이해해 주고, 말이 합리적이야”라고 느끼며 신뢰를 갖게 됩니다.
-
-다만 FC가 낮은 편이라 표현이 담백하고 감정 표현이 적은 코칭이 되기 쉽습니다. 칭찬을 해도 크게 드러내지 않고, 잘했을 때도 “응, 괜찮았어” 정도로 지나갈 수 있습니다. 이때 PA님은 혼나지는 않지만, 동시에 “내가 잘하고 있는 건가?”라는 확신을 얻기 어렵습니다. 또 분위기를 살리는 말이나 격려 멘트가 부족해 코칭 시간이 차분하지만 다소 무겁게 느껴질 수도 있습니다. PA님은 안정감은 느끼지만, 에너지가 끌어올려지는 느낌은 적을 수 있습니다.
-
-그래서 이 성향의 지점장님은 의식적으로 표현을 한 단계 더 크게 하는 연습이 필요합니다. 마음속으로만 ‘잘했다’고 생각하지 말고, 말로 꺼내는 것이 중요합니다. 개선을 위한 첫 번째 고정 멘트는
-“지금 한 행동은 분명히 잘한 거야, 그 부분은 나도 만족해.”
-이 문장은 조용한 지점장님의 인정을 PA님이 확실히 느끼게 해줍니다.
-
-두 번째 고정 멘트는
-“내가 보기엔 방향은 맞아, 속도만 조금 더 올리면 돼.”
-이 말은 감정이 아니라 판단으로 격려해 주면서도, PA님에게 희망을 줍니다.
-
-세 번째 고정 멘트는
-“오늘은 여기까지 잘 왔고, 다음 단계로 넘어갈 준비는 됐어.”
-이 문장은 PA님에게 ‘나 지금 성장 중이구나’라는 확신을 줍니다.
-
-이 세 문장을 꾸준히 쓰면, 코칭의 온기는 유지되면서도 부족했던 활력이 채워집니다. PA님은 이 지점장님를 통해 편안함과 방향성, 그리고 조용하지만 분명한 응원을 동시에 느끼게 되고, 그 신뢰는 행동 변화로 자연스럽게 이어지게 됩니다.`,improvement:``},NP_A_AC:{manner:`PA님을 코칭할 때의 말투는 부드럽고 차분하며, 설명은 이성적으로 정리된 말투입니다. 이 성향의 지점장님은 사람을 먼저 배려합니다. NP가 높아 PA님의 마음과 상황을 잘 읽고, “요즘 힘들지?”처럼 감정을 먼저 확인합니다. 여기에 A가 함께 있어 감정에만 머물지 않고, 왜 결과가 나왔는지 원인과 순서를 또박또박 설명해 줍니다. 그래서 PA님은 “이 지점장님은 내 편이면서도 설명이 이해하기 쉬워”라고 느끼며 안정감을 갖습니다.
-
-다만 AC가 낮은 편이라 조직 규칙이나 기준을 말할 때 PA님의 눈치를 다소 보지 않고, 비교적 직설적으로 말하는 경향이 있습니다. 규칙을 어겼을 때 “이건 안 되는 거야”라고 바로 말해 버려, PA님은 기준은 분명히 알지만 마음이 준비되지 않았을 때는 부담을 느낄 수 있습니다. 지점장님 입장에서는 명확함이지만, PA님에게는 “나를 이해해 주긴 하지만 단호하네”라는 인상이 남을 수 있습니다.
-
-그래서 이 성향의 지점장님은 단호함 앞에 한 번의 공감 문장을 의식적으로 붙이는 연습이 필요합니다. 기준을 말하기 전에 감정을 먼저 짚어 주는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네 상황은 이해해, 그래도 이 기준은 같이 지켜야 해.”
-이 문장은 배려와 규칙을 동시에 전달해 줍니다.
-
-두 번째 고정 멘트는
-“지금 마음이 복잡할 수 있지만, 이 순서대로 가는 게 가장 안전해.”
-이 말은 PA님의 감정을 인정하면서도, 이성적인 방향을 제시해 줍니다.
-
-세 번째 고정 멘트는
-“내가 이렇게 말하는 건 혼내려는 게 아니라, 오래 가게 도와주려는 거야.”
-이 문장은 단호한 말의 의도를 분명히 해 PA님의 오해를 줄여 줍니다.
-
-이 세 문장을 반복해 사용하면, 코칭은 여전히 따뜻하지만 기준은 흐려지지 않습니다. PA님은 이 지점장님를 통해 배려받고 있다는 느낌과 함께, 무엇을 지켜야 하는지도 분명히 이해하게 되고, 그 결과 행동 변화가 더 안정적으로 이어지게 됩니다.`,improvement:``},NP_FC_CP:{manner:`PA님을 코칭할 때의 말투는 밝고 부드럽고, 사람을 먼저 살리는 말투입니다. 이 성향은 NP가 가장 높아 PA님의 감정과 상황을 잘 헤아립니다. “오늘 표정이 좀 힘들어 보여”, “요즘 적응하느라 많이 애쓰지?”처럼 마음을 먼저 읽는 말을 자연스럽게 합니다. 여기에 FC가 함께 있어 분위기를 무겁게 만들지 않고, 웃음이나 가벼운 농담으로 긴장을 풀어 줍니다. 그래서 PA님은 이 지점장님와 있으면 “혼날 걱정은 없고, 같이 가는 느낌이 든다”고 느끼며 마음을 엽니다.
-
-하지만 CP가 낮은 편이라 기준과 규칙을 강하게 잡아 주는 데는 어려움이 생기기 쉽습니다. PA님이 약속을 어기거나 준비가 부족해도 “다음엔 잘해보자”로 넘어가는 경우가 많고, 해야 할 말을 마음에 담아두는 일이 생깁니다. 지점장님 입장에서는 관계를 지키려는 배려지만, PA님 입장에서는 “이게 중요한 건지 아닌지 헷갈린다”는 느낌을 받을 수 있습니다. 결국 행동이 느슨해지고, 성장 속도가 더뎌질 위험이 있습니다.
-
-그래서 이 성향의 지점장님은 따뜻함은 유지하되, 기준 문장을 의식적으로 입 밖으로 꺼내는 연습이 꼭 필요합니다. 감정을 살핀 뒤, 기준을 분명히 말하는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네가 노력하는 건 알아, 그래서 더 정확하게 말해줄게.”
-이 말은 배려 다음에 기준이 온다는 신호를 줍니다.
-
-두 번째 고정 멘트는
-“편하게 이야기하는 사이지만, 이건 꼭 지켜야 하는 약속이야.”
-관계는 유지하면서도 선을 분명히 긋는 문장입니다.
-
-세 번째 고정 멘트는
-“지금은 웃으면서 말하지만, 이 부분은 다음엔 꼭 바뀌어야 해.”
-부드러운 분위기 속에서도 행동 변화를 분명히 요구할 수 있습니다.
-
-이 고정 멘트를 반복해 쓰면, 지점장님은 **착한 사람에서 멈추지 않고 ‘믿을 수 있는 기준 있는 사람’**으로 인식됩니다. PA님은 편안함 속에서도 해야 할 일을 분명히 알게 되고, 결국 실천력이 눈에 띄게 좋아지게 됩니다.`,improvement:``},NP_FC_A:{manner:`PA님을 코칭할 때의 말투는 따뜻하고 밝으며, 사람을 편하게 만드는 말투입니다. 이 성향은 NP가 가장 높아 PA님의 마음을 먼저 봅니다. 그래서 “오늘 교육 힘들었지?”, “요즘 적응하느라 많이 애쓰는 거 알아”처럼 감정을 먼저 읽는 말을 자주 합니다. 여기에 FC가 높아 분위기를 무겁게 끌지 않고, 웃음이나 가벼운 말로 긴장을 풀어 줍니다. PA님은 이 지점장님와 있으면 “혼날까 봐 무섭지 않고, 이야기해도 괜찮다”는 느낌을 받습니다. 질문도 많아지고, 실수도 숨기지 않고 말하게 됩니다.
-
-다만 A가 낮아 상황을 차분히 정리하고, 왜 이 행동이 필요한지 논리적으로 설명하는 부분이 약해질 수 있습니다. PA님이 같은 실수를 반복해도 “괜찮아, 누구나 그래”로 넘어가다 보니, PA님 스스로도 무엇을 고쳐야 하는지 정확히 모르고 넘어가는 경우가 생깁니다. 지점장님은 도와준다고 생각하지만, PA님은 “열심히는 하는데 방향이 맞는지는 잘 모르겠다”는 혼란을 느낄 수 있습니다. 결국 노력은 많은데 결과가 늦게 나오는 상황이 생기기 쉽습니다.
-
-그래서 이 성향의 지점장님은 따뜻함은 유지하되, 말 속에 ‘이유와 기준’을 한 줄이라도 꼭 넣는 연습이 필요합니다. 길게 설명할 필요는 없고, 핵심만 짚어 주면 됩니다.
-첫 번째 고정 멘트는
-“지금 이걸 하는 이유는, 나중에 네가 덜 힘들어지기 때문이야.”
-이 말은 행동의 목적을 쉽게 알려 줍니다.
-
-두 번째 고정 멘트는
-“이건 잘했고, 이건 다음에 꼭 바꿔야 해. 이유는 하나야.”
-감정 평가와 행동 평가를 분리해 PA님이 헷갈리지 않게 해 줍니다.
-
-세 번째 고정 멘트는
-“지금 느낌 말고, 결과를 기준으로 한 번만 더 해보자.”
-감정에 치우치지 않고 한 단계 더 나아가게 만드는 문장입니다.
-
-이 고정 멘트를 반복해서 쓰면, 지점장님은 **편한 사람에서 끝나지 않고 ‘방향을 잡아주는 사람’**이 됩니다. PA님은 마음이 안정된 상태에서 무엇을 고쳐야 할지 또렷하게 알게 되고, 행동이 빨라지며 성장 속도도 눈에 띄게 달라집니다.`,improvement:``},NP_FC_AC:{manner:`PA님을 코칭할 때의 말투는 아주 부드럽고, 밝고, 사람을 안심시키는 말투입니다. 이 성향은 NP가 가장 높아 PA님의 감정과 상황을 먼저 살핍니다. 그래서 “요즘 많이 긴장됐지?”, “처음이라 어려운 게 당연해”처럼 공감부터 나옵니다. 여기에 FC가 높아 분위기를 가볍게 만들고, 웃음이나 농담으로 긴장을 풀어 줍니다. PA님은 이 지점장님 앞에서 “혼나지 않을 것 같다”, “실수해도 말해도 된다”는 안정감을 느낍니다. 그래서 질문도 많아지고, 위축되기보다는 편안한 상태로 교육에 참여합니다.
-
-하지만 AC가 가장 낮은 성향이라 조직의 규칙이나 기준을 강하게 강조하지 않고, PA님의 눈치를 조금 덜 보며 말하는 경향이 있습니다. 이 말은 차갑게 군다는 뜻이 아니라, “이건 해야 해”, “이건 지금 넘어가면 안 돼” 같은 단호한 말을 자연스럽게 던진다는 의미입니다. 문제는 이 단호함이 NP·FC의 부드러움과 섞이면서 기준이 흐릿해질 수 있다는 점입니다. 말은 따뜻한데, 규칙은 명확히 남지 않아 PA님이 “어디까지 해도 괜찮은지” 헷갈리는 상황이 생길 수 있습니다.
-
-이 성향의 지점장님은 기분은 살리되, 규칙은 말로 남기는 연습이 필요합니다. 감정 공감 후에 반드시 기준 문장을 붙이는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네 마음은 이해해. 그래도 이건 우리 팀에서 꼭 지키는 약속이야.”
-공감과 규칙을 동시에 전달해 PA님이 거부감 없이 받아들이게 합니다.
-
-두 번째 고정 멘트는
-“지금은 편해도 괜찮아 보이지만, 이 부분은 바로 잡고 가자.”
-지금의 감정과 미래의 결과를 연결해 줍니다.
-
-세 번째 고정 멘트는
-“분위기는 내가 책임질게. 대신 행동은 기준대로 해보자.”
-지점장님의 역할과 PA님의 역할을 분명히 나누는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 지점장님은 **‘착한 지점장님’에서 끝나지 않고 ‘편하지만 기준이 분명한 지점장님’**가 됩니다. PA님은 마음이 편한 상태에서 규칙을 배우고, 조직 안에서 어떻게 행동해야 하는지 빠르게 익히게 됩니다. 그 결과 실수는 줄고, 성장 속도는 훨씬 빨라집니다.`,improvement:``},NP_AC_CP:{manner:`PA님을 코칭할 때의 말투는 아주 다정하고 조심스러운 말투입니다. 이 성향은 NP가 가장 높아 PA님의 기분과 감정을 먼저 살핍니다. 그래서 말의 시작이 항상 “괜찮아”, “처음엔 다 그래”, “네 마음 이해해”처럼 위로와 공감으로 열립니다. 여기에 AC가 높아 상대의 반응을 많이 의식합니다. PA님이 표정이 어두워지거나 말수가 줄면, 바로 말을 누그러뜨리고 속도를 늦춥니다. 그래서 PA님은 “이 지점장님은 나를 배려해 준다”, “압박을 주지 않는다”는 느낌을 강하게 받습니다.
-
-하지만 CP가 가장 낮은 성향이라 기준을 세우는 말, 단호하게 정리하는 말이 약한 편입니다. 해야 할 행동, 지켜야 할 규칙을 알면서도 “혹시 상처받지 않을까” 걱정이 먼저 들어 말을 돌려서 하거나 넘어가는 경우가 생깁니다. 그 결과 PA님은 편안하지만, 무엇이 필수인지 헷갈릴 수 있습니다. “이건 꼭 해야 하는 건지, 선택인지”를 잘 모르게 됩니다.
-
-이 성향의 지점장님은 공감 뒤에 기준 문장을 붙이는 연습이 가장 중요합니다. 마음만 어루만지고 끝내지 말고, 반드시 행동 기준을 말로 남겨야 합니다.
-첫 번째 고정 멘트는
-“네가 힘든 건 이해해. 그래도 이건 우리 팀에서 꼭 지켜야 하는 일이야.”
-공감과 규칙을 한 문장에 담아 PA님이 거부감 없이 듣게 합니다.
-
-두 번째 고정 멘트는
-“지금은 불편해 보여도, 이건 네가 성장하는 데 꼭 필요한 단계야.”
-현재 감정에 머물지 않고 이유를 알려 주는 말입니다.
-
-세 번째 고정 멘트는
-“내가 옆에서 도와줄게. 대신 이 부분은 오늘 꼭 해보자.”
-혼자가 아니라는 안정감과 실행 약속을 동시에 줍니다.
-
-이 고정 멘트를 반복하면, 이 성향의 지점장님은 **‘다정하기만 한 지점장님’가 아니라 ‘따뜻하지만 기준이 분명한 지점장님’**가 됩니다. PA님은 마음은 편한 상태를 유지하면서도, 무엇을 해야 하는지 명확히 알게 됩니다. 그 결과 행동이 빨라지고, 조직에 적응하는 속도도 훨씬 빨라집니다.`,improvement:``},NP_AC_A:{manner:`PA님을 코칭할 때의 말투는 아주 부드럽고 배려가 많은 말투입니다. 이 성향은 NP가 가장 높아 PA님의 감정과 상황을 먼저 살핍니다. 말의 시작이 늘 “괜찮아”, “네 마음 이해해”, “처음이라 그럴 수 있어”처럼 공감으로 열립니다. 여기에 AC가 높아 상대의 반응을 민감하게 느낍니다. PA님의 표정이 굳거나 말수가 줄면, 바로 톤을 낮추고 속도를 늦춥니다. 그래서 PA님은 “이 지점장님은 나를 존중해 준다”, “혼내지 않는다”는 느낌을 강하게 받습니다.
-
-하지만 A가 가장 낮은 성향이라 정리해서 설명하는 말, 판단을 분명히 하는 말이 부족한 편입니다. 무엇을 왜 해야 하는지, 지금 단계에서 무엇이 중요한지 머릿속에서는 알고 있어도 말로 차분히 정리해 주는 데 어려움을 느낍니다. 그래서 코칭이 길어지거나, 이야기는 많은데 핵심이 흐려질 수 있습니다. PA님은 “그래서 내가 지금 뭘 하면 되는 거지?” 하고 헷갈릴 수 있습니다.
-
-이 성향의 지점장님은 공감 뒤에 ‘정리 문장’을 붙이는 연습이 가장 중요합니다. 마음을 먼저 받아준 뒤, 반드시 핵심을 짧게 정리해 주어야 합니다.
-첫 번째 고정 멘트는
-“네가 힘들다는 건 이해해. 그래서 지금은 이 한 가지만 먼저 해보자.”
-공감 다음에 행동 하나를 딱 정해 주는 말입니다.
-
-두 번째 고정 멘트는
-“지금 단계에서는 잘하려고 고민하는 것보다, 이 순서대로 해보는 게 더 중요해.”
-감정이 아니라 기준과 순서를 알려 주는 문장입니다.
-
-세 번째 고정 멘트는
-“내가 옆에서 같이 볼게. 대신 오늘은 이 기준까지만 꼭 해보자.”
-배려와 실행 기준을 동시에 전달합니다.
-
-이 고정 멘트를 반복하면, 이 성향의 지점장님은 **‘착하기만 한 지점장님’에서 ‘따뜻하면서도 방향을 잡아주는 지점장님’**로 바뀝니다. PA님은 감정적으로 안정된 상태를 유지하면서도, 무엇을 해야 하는지 분명히 알게 됩니다. 그 결과 고민에 머무는 시간이 줄고, 행동으로 옮기는 속도가 훨씬 빨라집니다.`,improvement:``},NP_AC_FC:{manner:`PA님을 코칭할 때의 말투는 아주 조심스럽고 배려가 많은 말투입니다. TOP1이 NP라서 PA님의 감정부터 먼저 살피고, TOP2가 AC라서 상대의 눈치와 반응을 빠르게 읽습니다. 그래서 말의 시작은 “괜찮아”, “그럴 수 있어”, “네 입장 이해해”처럼 부드러운 공감으로 열립니다. PA님이 긴장하거나 위축돼 있으면 목소리를 낮추고, 속도를 늦추며, 최대한 부담을 주지 않으려 합니다. 이 덕분에 PA님은 “이 지점장님은 나를 보호해 준다”, “혼내지 않는다”는 안정감을 느낍니다.
-
-하지만 BOTTOM1이 FC라서 분위기를 가볍게 풀어주는 말, 에너지를 끌어올리는 말이 다소 부족한 편입니다. 웃으면서 분위기를 전환하거나, “괜찮아, 해보면 돼”처럼 힘을 주는 말이 자연스럽게 나오지 않습니다. 그래서 코칭 분위기가 조용하고 진지해지기 쉽고, PA님은 편안하긴 하지만 한편으로는 “조금 무거운 느낌”을 받을 수 있습니다. 특히 성과가 안 나는 시기에는 PA님의 표정과 기운이 더 가라앉을 수 있습니다.
-
-이 성향의 지점장님은 의식적으로 분위기를 밝히는 문장을 준비해 두는 것이 중요합니다. 감정 공감만으로 끝내지 말고, 에너지를 한 단계 올려주는 말을 꼭 붙여야 합니다.
-첫 번째 고정 멘트는
-“지금까지 충분히 잘 버텼어. 여기까지 온 것 자체가 쉬운 일이 아니야.”
-노력을 인정하면서 기운을 살리는 문장입니다.
-
-두 번째 고정 멘트는
-“완벽하게 할 필요 없어. 오늘은 70점만 해도 충분해.”
-부담을 낮추고 행동을 쉽게 만드는 말입니다.
-
-세 번째 고정 멘트는
-“우리 분위기 조금만 가볍게 가보자. 하나만 해보고 끝내도 돼.”
-진지함을 풀고 시작 장벽을 낮추는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 지점장님은 **‘배려만 하는 지점장님’에서 ‘따뜻하면서도 기운을 살려주는 지점장님’**로 바뀝니다. PA님은 마음의 안정뿐 아니라 움직일 힘을 함께 얻게 되고, 코칭 현장은 조용하지만 멈추지 않는 흐름을 만들 수 있습니다.`,improvement:``},A_CP_NP:{manner:`PA님을 코칭할 때의 말투는 차분하고 논리적인 설명형 말투입니다. TOP1이 A라서 지점장님은 감정보다 사실과 순서를 먼저 봅니다. “왜 안 됐는지”, “어디서 막혔는지”, “다음에 무엇을 바꿔야 하는지”를 정리해서 말합니다. 여기에 TOP2가 CP라서 말이 또렷하고 단호합니다. “이건 기준을 지켜야 해”, “여기는 반드시 이렇게 해야 해”처럼 규칙과 방향을 분명히 제시합니다. 이 말투 덕분에 PA님은 헷갈리지 않고 구조를 이해하기 쉬운 장점이 있습니다. 무엇을 해야 하고, 무엇을 하면 안 되는지가 명확합니다.
-
-하지만 BOTTOM1이 NP라서 공감과 위로의 말이 상대적으로 적은 편입니다. 지점장님은 도와주려는 마음이 있어도 “힘들었지?”, “마음이 어땠어?” 같은 말이 먼저 나오지 않습니다. 그래서 PA님은 “맞는 말인데 마음이 좀 딱딱하다”, “이해는 되지만 위로받는 느낌은 적다”고 느낄 수 있습니다. 특히 실적이 안 나거나 자존감이 떨어진 PA님에게는 코칭이 ‘정답 설명’처럼 들릴 수 있습니다.
-
-이 성향의 지점장님은 의식적으로 감정 확인 문장을 먼저 꺼내는 연습이 필요합니다. 논리 설명 전에 공감 한 문장을 붙이는 것만으로도 코칭의 전달력이 크게 달라집니다.
-첫 번째 고정 멘트는
-“일단 여기까지 온 것 자체가 쉽지 않았을 거야.”
-PA님의 노력을 먼저 인정하는 문장입니다.
-
-두 번째 고정 멘트는
-“지금 이 결과가 네가 못해서가 아니라, 과정이 아직 익숙하지 않은 거야.”
-문제의 원인을 사람에게 두지 않고 상황에 두는 말입니다.
-
-세 번째 고정 멘트는
-“그럼 이제 하나만 같이 정리해 보자. 내가 옆에서 같이 볼게.”
-단호함 속에 동행의 느낌을 더하는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향은 **차갑게 보일 수 있는 분석형 지점장님에서 ‘믿을 수 있고 함께 가는 지점장님’**로 인식됩니다. PA님은 지적받는 느낌 대신, 정리해 주고 끌어주는 느낌을 받게 되고, 코칭은 부담이 아니라 방향을 잡아주는 시간이 됩니다.`,improvement:``},A_CP_FC:{manner:`PA님을 코칭할 때의 말투는 차분하고 이성적인 설명형 말투입니다. TOP1이 A이기 때문에 이 지점장님은 감정에 휘둘리지 않고 상황을 정리해서 말합니다. “어디에서 막혔는지”, “왜 이 결과가 나왔는지”, “다음에는 무엇을 바꿔야 하는지”를 순서대로 설명합니다. 여기에 TOP2가 CP라서 말이 분명하고 기준이 뚜렷합니다. “이건 반드시 지켜야 해”, “이 단계는 건너뛰면 안 돼”처럼 방향을 명확히 제시합니다. 이 말투 덕분에 PA님은 해야 할 일이 정리되어 보이고, 기준이 분명하다는 안정감을 느낍니다.
-
-하지만 BOTTOM1이 FC라서 밝은 반응이나 감정 표현이 적은 편입니다. 잘했을 때도 “그래, 다음 단계로 가자”라고 넘어가고, 힘들어할 때도 분위기를 풀어주는 말이 잘 나오지 않습니다. 그래서 PA님은 “맞는 말이긴 한데 좀 딱딱하다”, “열심히 했는데 반응이 없는 것 같다”고 느낄 수 있습니다. 특히 처음 일을 배우는 PA님에게는 이 코칭이 차갑게 느껴질 가능성이 있습니다.
-
-이 성향의 지점장님은 의식적으로 감정 반응을 한 박자 더 얹는 연습이 필요합니다. 분석과 지적 전에 짧은 긍정 표현만 추가해도 코칭의 온도가 달라집니다.
-첫 번째 고정 멘트는
-“여기까지 해낸 건 분명 잘한 거야.”
-성과의 크기와 상관없이 노력을 인정해 주는 말입니다.
-
-두 번째 고정 멘트는
-“이 부분은 조금 더 연습하면 충분히 좋아질 수 있어.”
-부족함을 말하면서도 희망을 함께 주는 문장입니다.
-
-세 번째 고정 멘트는
-“지금처럼만 꾸준히 가면 분명 달라질 거야.”
-과정 자체를 믿어주는 말입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 지점장님은 차분하지만 따뜻한 지점장님로 인식됩니다. PA님은 지적만 받는 느낌이 아니라, 잘한 점과 보완할 점을 함께 듣게 되고 코칭 시간이 부담이 아닌 힘을 얻는 시간이 됩니다.`,improvement:``},A_CP_AC:{manner:`PA님을 코칭할 때의 말투는 차분하게 정리하면서도 기준을 분명히 말하는 설명형 말투입니다. TOP1이 A라서 이 지점장님은 감정에 휘둘리지 않고 상황을 차분히 정리해 줍니다. “지금 단계는 어디까지 왔는지”, “왜 이 결과가 나왔는지”, “다음에 무엇을 바꾸면 되는지”를 순서대로 설명합니다. 여기에 TOP2가 CP이기 때문에 말이 또렷하고 기준이 분명합니다. “이건 반드시 지켜야 해”, “이 순서는 건너뛰면 안 돼”처럼 방향을 정확히 제시합니다. 그래서 PA님은 해야 할 일이 명확해지고, 길을 잃지 않는 느낌을 받습니다.
-
-하지만 BOTTOM1이 AC라서 이 지점장님은 PA님의 반응이나 기분을 살피는 말이 다소 적은 편입니다. PA님의 입장을  조금은 덜 살피고 곧바로 본론으로 들어가는 성향에 가깝습니다. 그래서 PA님이 힘들어하거나 위축되어 있어도, 지점장님은 “그건 감정의 문제야”라며 바로 해결 방법부터 말할 수 있습니다. 이때 PA님은 “맞는 말이긴 한데 마음은 잘 안 알아주는 것 같다”고 느낄 수 있습니다.
-
-이 성향의 지점장님은 의식적으로 상대의 상태를 먼저 확인하는 한 문장을 넣는 연습이 필요합니다. 설명과 지적 전에 감정을 짧게 짚어주면 코칭이 훨씬 부드러워집니다.
-첫 번째 고정 멘트는
-“지금 이 상황이 쉽지 않았을 것 같아.”
-PA님의 감정을 먼저 인정해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“네 입장에서는 이렇게 느낄 수 있어.”
-공감의 문장을 먼저 말한 뒤 기준을 설명하는 데 도움이 됩니다.
-
-세 번째 고정 멘트는
-“그래도 우리가 지켜야 할 기준은 이거야.”
-공감 뒤에 방향을 분명히 제시하는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 지점장님은 차분하고 논리적이면서도 사람을 배려하는 지점장님로 보이게 됩니다. PA님은 지적만 받는 느낌이 아니라, 이해받으면서도 분명한 방향을 안내받는다고 느끼게 됩니다.`,improvement:``},A_NP_CP:{manner:`PA님을 코칭할 때의 말투는 차분하고 따뜻하게 설명하면서, 사람을 먼저 생각하는 말투입니다. TOP1이 A라서 이 성향은 감정에 휘둘리지 않고 상황을 정리해 주는 힘이 있습니다. 무엇이 문제인지, 왜 이런 결과가 나왔는지를 논리적으로 풀어 설명합니다. 여기에 TOP2가 NP라서 말 속에 배려와 응원이 자연스럽게 담깁니다. “괜찮아, 누구나 이 단계에서는 헷갈려”, “지금까지 잘해 온 부분도 분명히 있어”처럼 PA님을 안심시키는 말을 자주 합니다. 그래서 PA님은 이 지점장님를 편하고 믿을 수 있는 사람, 나를 이해해 주는 멘토로 느끼게 됩니다.
-
-하지만 BOTTOM1이 CP이기 때문에 이 성향은 기준을 강하게 세우거나 단호하게 말하는 힘이 약한 편입니다. PA님이 약속을 지키지 않거나, 같은 실수를 반복해도 “그럴 수도 있지”라며 넘어가는 경우가 생길 수 있습니다. 이러다 보면 PA님은 편안함은 느끼지만, 무엇을 반드시 지켜야 하는지는 헷갈릴 수 있습니다. 즉, 따뜻하지만 기준이 흐릿한 코칭으로 받아들여질 위험이 있습니다.
-
-이 성향의 지점장님은 의식적으로 기준을 말로 꺼내는 연습이 꼭 필요합니다. 화를 내거나 강하게 말할 필요는 없습니다. 다만, 부드러운 말투 안에 분명한 기준을 넣는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네 마음은 이해하지만, 이 부분은 꼭 지켜야 해.”
-공감과 기준을 동시에 담은 문장입니다.
-
-두 번째 고정 멘트는
-“지금까지는 괜찮았지만, 다음부터는 이 방식으로 가야 해.”
-과거를 탓하지 않으면서 방향을 정리해 주는 말입니다.
-
-세 번째 고정 멘트는
-“도와줄 수는 있지만, 이건 네가 반드시 해줘야 하는 부분이야.”
-책임의 경계를 분명히 해 주는 문장입니다.
-
-이 고정 멘트를 반복해서 사용하면, 이 성향은 따뜻함은 유지하면서도 중심이 서 있는 지점장님로 성장할 수 있습니다. PA님은 보호받는 느낌과 동시에, 무엇을 해야 하는지가 분명해져 더 안정적으로 따라오게 됩니다.`,improvement:``},A_NP_FC:{manner:`PA님을 코칭할 때의 말투는 차분하고 설명이 분명하면서도 따뜻하게 안심시켜 주는 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 휘둘리지 않고 상황을 정리해서 설명하는 힘이 큽니다. “지금 상황을 하나씩 정리해 보자”, “이 단계에서는 이걸 먼저 하면 돼”처럼 복잡한 일을 순서대로 풀어 말합니다. 여기에 TOP2가 NP라서 말 속에 배려와 공감이 자연스럽게 섞입니다. “처음이라 헷갈릴 수 있어”, “여기까지 온 것도 충분히 잘한 거야” 같은 말로 PA님의 마음을 먼저 편하게 만듭니다. 그래서 PA님은 이 지점장님를 침착하고 믿을 수 있는 사람, 나를 존중해 주는 어른으로 느끼게 됩니다.
-
-하지만 BOTTOM1이 FC이기 때문에 이 성향은 밝은 에너지 표현이나 분위기를 살리는 말이 부족한 편입니다. 칭찬을 마음속으로는 하고 있어도 말로 잘 드러내지 않거나, 표정과 톤이 무덤덤해 보일 수 있습니다. 그 결과 PA님은 “이 지점장님가 나를 좋게 보고 있는 걸까?” 하고 헷갈릴 수 있고, 잘해도 반응이 적다고 느껴 의욕이 떨어질 수 있습니다. 즉, 설명은 잘 들리지만 재미와 활력이 부족한 코칭으로 받아들여질 가능성이 있습니다.
-
-이 성향의 지점장님은 의식적으로 밝은 반응을 말로 표현하는 연습이 꼭 필요합니다. 과장되게 웃거나 억지로 분위기를 띄울 필요는 없습니다. 다만, 잘한 행동에 즉각적으로 짧은 긍정 표현을 붙이는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“지금 이건 정말 잘했어, 방향이 딱 맞아.”
-행동을 정확히 짚어 주며 칭찬하는 말입니다.
-
-두 번째 고정 멘트는
-“이 부분은 생각보다 훨씬 빨리 좋아지고 있어.”
-변화를 느끼게 해 주는 말입니다.
-
-세 번째 고정 멘트는
-“이 정도면 충분히 기대해도 돼.”
-PA님의 자신감을 끌어올려 주는 문장입니다.
-
-이 고정 멘트를 자주 사용하면, 이 성향은 정리 잘해 주는 지점장님를 넘어 기분까지 살려주는 지점장님로 인식됩니다. PA님은 안정감과 함께 즐겁게 배우게 되고, 행동도 훨씬 적극적으로 바뀌게 됩니다.`,improvement:``},A_NP_AC:{manner:`PA님을 코칭할 때의 말투는 차분하고 논리적으로 설명하면서도, 사람을 먼저 존중하는 부드러운 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 휩쓸리지 않고 상황을 객관적으로 바라보며 “왜 이게 필요한지”, “지금 뭘 먼저 해야 하는지”를 또렷하게 설명합니다. 말이 복잡하지 않고 순서가 있어서 PA님은 “이 지점장님은 생각이 정리돼 있다”는 느낌을 받습니다. 여기에 TOP2가 NP라서 말속에는 배려와 보호의 메시지가 자연스럽게 담깁니다. “처음엔 누구나 헷갈려”, “지금 속도면 괜찮아” 같은 말로 PA님의 마음을 먼저 안정시켜 줍니다. 그래서 PA님은 이 성향을 이해해 주고 믿어주는 지점장님로 느끼게 됩니다.
-
-다만 BOTTOM1이 AC이기 때문에, 이 성향은 PA님의 표정이나 감정 변화에 조금은 둔감해 보일 수 있습니다. 일부러 차갑게 대하는 것은 아니지만, 기준과 설명을 우선하다 보니 PA님이 긴장하거나 부담을 느끼는 신호를 놓칠 때가 있습니다. 그 결과 PA님은 “틀리면 바로 지적받을 것 같다”, “내 기분보다는 결과가 더 중요해 보인다”라고 느낄 수 있습니다. 즉, 말은 친절하지만 심리적인 거리감이 생길 수 있는 구조입니다.
-
-그래서 이 성향은 코칭할 때 감정 확인 문장을 의식적으로 넣는 것이 매우 중요합니다. 설명을 시작하기 전이나 마무리할 때, PA님의 마음 상태를 먼저 짚어 주는 말이 필요합니다.
-첫 번째 고정 멘트는
-“이 이야기 들으면서 부담되지는 않는지 먼저 확인하고 싶어.”
-PA님의 감정을 존중해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“지금 표정 보니까 조금 긴장한 것 같아, 맞을까?”
-눈치를 보는 대신 직접 확인하는 방식입니다.
-
-세 번째 고정 멘트는
-“결과보다 지금 느끼는 게 더 중요해, 편하게 말해도 돼.”
-안전한 분위기를 만들어 주는 말입니다.
-
-이 고정 멘트를 꾸준히 사용하면, 이 성향은 논리적이고 따뜻한 지점장님로 완성됩니다. PA님은 지적받는 느낌보다 함께 정리해 나가는 느낌을 받게 되고, 코칭에 더 솔직하게 반응하며 성장 속도도 훨씬 빨라집니다.`,improvement:``},A_FC_CP:{manner:`PA님을 코칭할 때의 말투는 차분하고 논리적인 설명을 기본으로 하면서, 분위기는 비교적 밝고 편안한 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 치우치기보다 “왜 이걸 해야 하는지”, “지금 단계에서 무엇이 중요한지”를 순서 있게 설명합니다. 말이 정리되어 있어 PA님은 “이 지점장님은 생각이 명확하다”는 느낌을 받습니다. 여기에 TOP2가 FC라서 말투가 딱딱하지 않고 중간중간 웃음이나 가벼운 표현이 섞입니다. “이건 게임처럼 생각해보자”, “여기까지 온 것도 꽤 잘한 거야” 같은 말로 긴장을 풀어 줍니다. 그래서 PA님은 이 지점장님를 편하게 질문할 수 있는 사람으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 CP이기 때문에, 이 성향은 기준을 분명히 말하거나 단호하게 방향을 잡아주는 데 다소 약한 모습이 나타날 수 있습니다. PA님이 흐트러지거나 같은 실수를 반복해도 “괜찮아, 다음에 하면 돼”로 넘어가 버리기 쉬워, PA님은 “어디까지가 괜찮고 어디부터는 고쳐야 하는지” 헷갈릴 수 있습니다. 분위기는 좋은데 기준이 보이지 않으면, PA님은 노력의 방향을 잃고 속도가 느려질 수 있습니다.
-
-그래서 이 성향은 코칭할 때 기준을 짧고 분명하게 말하는 문장을 의식적으로 사용해야 합니다.
-첫 번째 고정 멘트는
-“여기까지는 잘했고, 여기부터는 꼭 바꿔야 하는 기준이야.”
-잘한 점과 기준을 동시에 전달하는 문장입니다.
-
-두 번째 고정 멘트는
-“이건 선택이 아니라 지금 단계에서 반드시 해야 하는 부분이야.”
-흔들리지 않는 방향을 제시해 줍니다.
-
-세 번째 고정 멘트는
-“지금은 편함보다 기본을 먼저 잡는 시기야.”
-따뜻하지만 분명한 메시지입니다.
-
-이 고정 멘트를 반복해서 사용하면, 이 성향은 재미있지만 느슨하지 않은 지점장님로 자리 잡게 됩니다. PA님은 편안함 속에서도 명확한 기준을 느끼게 되고, 무엇을 고쳐야 성장하는지 분명히 알게 되어 코칭 효과가 크게 높아집니다.`,improvement:``},A_FC_NP:{manner:`PA님을 코칭할 때의 말투는 차분하고 이성적인 설명을 기본으로 하면서, 분위기는 밝고 부드러운 말투입니다. TOP1이 A이기 때문에 이 성향의 지점장님은 감정에 휩쓸리지 않고 “지금 상황이 왜 이런지”, “다음에 무엇을 하면 되는지”를 순서대로 설명합니다. 말이 정리되어 있어 PA님은 “이 지점장님은 생각이 명확하고 논리적이다”라고 느낍니다. 여기에 TOP2가 FC라서 표정과 말투가 가볍고 친근합니다. “이건 너무 어렵게 생각 안 해도 돼”, “여기까지 온 것도 충분히 잘했어” 같은 말로 긴장을 풀어 주며, PA님이 위축되지 않게 돕습니다.
-
-하지만 BOTTOM1이 NP이기 때문에, 이 성향은 PA님의 감정을 깊게 공감하거나 정서적으로 안아주는 표현이 부족해질 수 있습니다. 지점장님은 설명은 잘해주지만, PA님은 “내 마음을 이해해주는 느낌은 조금 부족하다”고 느낄 수 있습니다. 특히 잘 못 따라오는 PA님에게는 “논리는 알겠는데 마음이 힘들다”는 상태가 생길 수 있습니다. 이 경우 PA님은 스스로 위축되거나, 혼자 버티려고 하다 지칠 가능성이 있습니다.
-
-그래서 이 성향은 코칭할 때 공감 문장을 의식적으로 먼저 넣는 습관이 필요합니다. 설명보다 공감을 한 박자 먼저 주는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“이 속도에서 답답한 마음이 드는 게 너무 자연스러워.”
-PA님의 감정을 먼저 인정해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“네가 느끼는 부담을 내가 이해하고 있다는 걸 먼저 말해주고 싶어.”
-PA님이 혼자가 아니라는 느낌을 줍니다.
-
-세 번째 고정 멘트는
-“잘 못하는 게 아니라, 지금 배우는 중이라서 그런 거야.”
-PA님의 자존감을 지켜주는 문장입니다.
-
-이 고정 멘트를 설명 앞에 항상 붙이면, 이 성향은 논리도 있고 분위기도 좋으며, 마음까지 챙겨주는 지점장님로 변합니다. PA님은 안전하다고 느끼고 질문을 더 많이 하게 되며, 결과적으로 성장 속도도 훨씬 빨라집니다.`,improvement:``},A_FC_AC:{manner:`PA님을 코칭할 때의 말투는 차분하고 논리적인 설명을 중심으로 하면서, 분위기는 밝고 편안하게 풀어주는 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 휘둘리지 않고 “왜 이걸 해야 하는지”, “어떤 순서로 하면 되는지”를 또렷하게 설명합니다. 말이 정리되어 있어 PA님은 방향을 잃지 않습니다. TOP2가 FC라서 표정과 말투가 가볍고 유연합니다. “지금 단계는 연습 구간이야”, “실수해도 괜찮아, 여기서 배우면 돼”처럼 긴장을 풀어 주며 코칭 분위기를 부드럽게 만듭니다.
-
-다만 BOTTOM1이 AC라서 상대의 눈치나 분위기를 다소 덜 의식하는 경향이 나타날 수 있습니다. 그래서 설명이 정확해도 PA님은 “조금 빠르다”, “나한테 맞춘 느낌은 덜하다”고 느낄 수 있습니다. 특히 잘 못 따라오는 PA님에게는 지점장님의 말이 정답처럼 들려 부담이 될 수 있습니다. PA님은 이해는 하지만 스스로 질문하기를 망설이게 됩니다.
-
-이 성향의 핵심 보완은 속도를 낮추고 선택권을 주는 말을 의식적으로 사용하는 것입니다. 정답을 바로 제시하기보다 “어떻게 느끼는지”를 먼저 묻는 한 문장이 큰 차이를 만듭니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 설명이 빠르게 느껴질 수 있어, 여기서 멈추고 네 생각부터 들어볼게.”
-PA님의 속도를 존중하는 문장입니다.
-
-두 번째 고정 멘트는
-“이 방법 말고도 선택지는 있어, 너한테 편한 쪽을 같이 정해보자.”
-PA님에게 주도권을 나눠주는 말입니다.
-
-세 번째 고정 멘트는
-“틀려도 괜찮아, 지금은 맞추는 단계가 아니라 익히는 단계야.”
-부담을 낮추고 도전을 돕는 문장입니다.
-
-이 세 문장을 설명 앞에 붙이면, 이 성향은 논리적이면서도 따뜻하고, PA님의 리듬을 존중하는 지점장님가 됩니다. PA님은 안정감을 느끼고 질문이 늘어나며, 결과적으로 코칭 효과가 훨씬 좋아집니다.`,improvement:``},A_AC_CP:{manner:`PA님을 코칭할 때의 말투는 차분하고 이성적으로 설명하면서도, 상대의 반응을 계속 살피는 말투입니다. TOP1이 A라서 이 성향은 감정에 휘둘리지 않고 상황을 정리해 설명합니다. “지금 단계에서는 이 순서가 좋아”, “이렇게 하면 실수가 줄어들어”처럼 이유와 근거를 붙여 말합니다. TOP2가 AC이기 때문에 PA님의 표정, 말투, 반응을 잘 살피며 “혹시 부담되면 말해도 돼”, “지금 이 속도 괜찮아?” 같은 배려의 말이 자연스럽게 나옵니다. 그래서 PA님은 이 지점장님를 차분하고 친절하며, 나를 신경 써주는 사람으로 느낍니다.
-
-다만 BOTTOM1이 CP라서 기준을 세우고 단호하게 말하는 힘이 약한 편입니다. 이로 인해 코칭에서 “해도 되고 안 해도 되는 느낌”, “지금 당장 해야 하는지 잘 모르겠는 느낌”을 줄 수 있습니다. 특히 잘 못 따라오는 PA님에게는 배려는 많은데 방향과 기준이 흐려져, 오히려 더 헷갈릴 수 있습니다. PA님은 “편하긴 한데, 정확히 뭘 해야 하는지는 모르겠다”고 느낄 가능성이 있습니다.
-
-이 성향의 핵심 보완은 기준을 먼저 말하고, 그 다음에 배려를 붙이는 순서를 의식하는 것입니다. 단호함을 키운다고 해서 무섭게 말할 필요는 없습니다. “지금은 이걸 해야 하는 시점이야”라는 기준 한 문장만 분명히 해도 코칭의 힘이 달라집니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 단계에서는 이 행동이 꼭 필요해, 이건 선택이 아니라 기본이야.”
-부드럽지만 기준을 분명히 세우는 문장입니다.
-
-두 번째 고정 멘트는
-“어렵게 느껴질 수는 있어도, 오늘은 여기까지는 반드시 가보자.”
-배려 속에 단호함을 담은 말입니다.
-
-세 번째 고정 멘트는
-“내가 옆에서 도울게, 대신 이 부분은 오늘 꼭 해보자.”
-PA님을 지지하면서도 책임을 분명히 하는 문장입니다.
-
-이 고정 멘트를 사용하면 이 성향은 배려만 많은 지점장님가 아니라, 방향과 기준을 잡아주는 믿음직한 지점장님가 됩니다. PA님은 안정감과 함께 “지금 내가 뭘 해야 하는지”를 분명히 알게 되고, 행동으로 옮길 힘이 생깁니다.`,improvement:``},A_AC_NP:{manner:`PA님을 코칭할 때의 말투는 차분하고 이성적으로 설명하면서, PA님의 반응을 세심하게 살피는 말투입니다. TOP1이 A이기 때문에 감정보다는 사실과 순서를 중심으로 말합니다. “지금 상황을 보면 먼저 이걸 하는 게 좋아”, “이 단계에서는 이렇게 움직이는 게 효율적이야”처럼 이유와 구조를 분명히 설명합니다. TOP2가 AC라서 PA님의 표정, 말투, 눈빛을 잘 보고 “지금 너무 빠르지 않아?”, “이 정도면 괜찮아?”처럼 부담을 줄이려는 말도 자주 합니다. 그래서 PA님은 이 지점장님를 논리적이고 신중하며, 나를 불편하게 하지 않으려는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 NP라서 따뜻한 공감과 감정적인 지지가 부족하게 느껴질 수 있습니다. 이 성향은 마음으로 다독이는 말보다, 상황 설명과 해결 방법을 먼저 꺼냅니다. 그래서 잘 못 따라오는 PA님은 “틀린 건 아닌데, 좀 차갑게 느껴져”, “이해는 되는데 마음이 힘들다”고 느낄 수 있습니다. 지점장님은 배려하고 있다고 생각하지만, PA님은 정서적인 응원을 충분히 받지 못했다고 느낄 가능성이 있습니다.
-
-이 성향의 핵심 보완은 설명 전에 공감 한 문장을 먼저 말하는 것입니다. 길게 위로할 필요는 없고, 짧은 감정 인정만 있어도 코칭의 온도가 달라집니다. “힘들겠다”, “여기서 막히는 게 당연해” 같은 말이 먼저 나오면, 뒤에 오는 논리가 훨씬 잘 전달됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“여기서 헷갈리는 거 정말 자연스러워, 많은 사람들이 이 단계에서 멈춰.”
-PA님의 감정을 먼저 인정해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“잘 안 되는 게 네가 부족해서가 아니라, 과정이 원래 어려워서 그래.”
-PA님의 자책을 줄여주는 말입니다.
-
-세 번째 고정 멘트는
-“지금까지 여기까지 온 것만 해도 충분히 잘하고 있어, 이제 다음 단계만 같이 보자.”
-정서적 지지 뒤에 방향을 제시하는 문장입니다.
-
-이 고정 멘트를 사용하면 이 성향은 차갑게 느껴질 수 있는 논리형 지점장님에서, 이성과 배려, 따뜻함이 균형 잡힌 지점장님로 바뀝니다. PA님은 마음이 먼저 안정되고, 그 다음에 설명을 받아들이게 되며, 포기하지 않고 계속 따라올 힘을 얻게 됩니다.`,improvement:``},A_AC_FC:{manner:`PA님을 코칭할 때의 말투는 차분하고 이성적이면서도, 상대의 반응을 살피는 조심스러운 말투입니다. TOP1이 A라서 감정에 휘둘리기보다는 사실과 순서를 중심으로 설명합니다. “지금은 이 순서로 가는 게 좋아”, “이 단계에서 이걸 먼저 하면 실수가 줄어들어”처럼 이유와 구조를 분명히 말합니다. TOP2가 AC라서 PA님의 표정과 분위기를 잘 보고, 부담을 주지 않으려는 말도 곁들입니다. “너무 빠르면 말해도 돼”, “이 정도 속도 괜찮아?”처럼 상대를 배려하는 표현이 자연스럽게 나옵니다.
-
-하지만 BOTTOM1이 FC라서 밝은 감정 표현이나 응원, 분위기를 띄우는 말이 부족해 보일 수 있습니다. 지점장님은 진지하게 도와주고 있다고 생각하지만, PA님은 “설명은 잘 해주는데 재미가 없다”, “맞는 말인데 기운이 안 난다”고 느낄 수 있습니다. 특히 잘 못 따라오는 PA님은 이미 위축돼 있는데, 말투가 차분하고 진지하다 보니 더 긴장하거나 스스로를 딱딱한 사람으로 느끼게 될 수 있습니다.
-
-이 성향의 지점장님은 일부러라도 감정 표현을 한 단계 더 보태는 연습이 필요합니다. 크게 웃거나 과하게 칭찬할 필요는 없고, 짧고 분명한 긍정 표현만 추가해도 충분합니다. 설명만 바로 들어가기보다, 먼저 분위기를 풀어주는 한 문장을 얹는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“여기까지 온 거 보면 생각보다 잘하고 있어, 속도는 조금만 같이 맞춰보자.”
-PA님의 긴장을 낮추면서 방향을 잡아주는 말입니다.
-
-두 번째 고정 멘트는
-“완벽할 필요 없어, 지금은 연습 단계니까 편하게 해도 돼.”
-진지함 속에서 부담을 덜어주는 문장입니다.
-
-세 번째 고정 멘트는
-“이건 누구나 처음엔 막혀, 그래도 네가 포기 안 하고 있는 게 좋아.”
-감정적인 응원을 짧게 담은 말입니다.
-
-이 고정 멘트를 사용하면 이 성향은 차분하고 배려 깊은 지점장님에 따뜻함이 더해진 모습이 됩니다. PA님은 안전하다고 느끼고, 마음이 풀리면서 설명을 더 잘 받아들이게 됩니다. 그 결과, 잘 못 따라오던 PA님도 부담을 덜고 다시 시도할 힘을 얻게 됩니다.`,improvement:``},FC_CP_NP:{manner:`PA님을 코칭할 때의 말투는 밝고 에너지 넘치면서도 기준이 분명한 말투입니다. TOP1이 FC라서 지점장님은 분위기를 살리고, 말에 감정과 리듬이 살아 있습니다. “괜찮아, 다시 해보자!”, “이건 생각보다 잘했어!”처럼 즉각적인 반응과 표정이 함께 나옵니다. PA님은 처음엔 이 말투 덕분에 긴장이 풀리고, 지점장님와 대화하는 것이 편하다고 느낍니다. 여기에 TOP2가 CP라서 장난만 치지는 않습니다. “이건 꼭 지켜야 해”, “여기서는 이렇게 해야 돼”처럼 기준과 규칙을 분명하게 제시합니다. 그래서 이 성향의 지점장님은 재미있지만 흐트러지지 않는 지도자로 보입니다.
-
-하지만 BOTTOM1이 NP라서 PA님의 감정이나 사정을 충분히 헤아리는 말이 부족해질 수 있습니다. 지점장님은 “분위기도 살려주고, 기준도 알려줬으니 충분히 도와줬다”고 느끼지만, 잘 못 따라오는 PA님은 “내 마음은 잘 안 물어봐 주는 것 같다”, “힘든 이유를 말할 틈이 없다”고 느낄 수 있습니다. 특히 이 성향은 PA님이 힘들어 보일 때도 “에이, 이 정도는 다 해”, “웃으면서 해보자”처럼 넘겨버리는 말이 나오기 쉬워, PA님은 혼자 버티는 느낌을 받을 수 있습니다.
-
-그래서 이 성향의 지점장님은 밝은 말과 기준 제시에 앞서, PA님의 상태를 한 번 짚는 말을 의식적으로 넣어야 합니다. 긴 상담이 필요한 것은 아니고, 짧은 공감 문장 하나면 충분합니다. 이 한 문장이 들어가면 PA님은 “나를 보고 있구나”라고 느끼게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 표정 보니까 조금 버거운 것 같아, 어디가 제일 어려워?”
-PA님의 감정을 먼저 확인하는 말입니다.
-
-두 번째 고정 멘트는
-“못해서가 아니라 아직 익숙하지 않은 거야, 천천히 가도 괜찮아.”
-PA님의 자존감을 지켜주는 문장입니다.
-
-세 번째 고정 멘트는
-“네 입장에서는 이 부분이 힘들 수 있어, 그래도 내가 옆에서 같이 볼게.”
-혼자가 아니라는 메시지를 주는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 밝음과 기준에 따뜻한 배려가 더해진 지점장님가 됩니다. PA님은 더 이상 웃음과 기준에 밀리지 않고, 마음을 열고 질문하게 됩니다. 그 결과, 잘 못 따라오던 PA님도 감정적으로 안정되고, 코칭을 오래 버틸 힘을 갖게 됩니다.`,improvement:``},FC_CP_A:{manner:`PA님을 코칭할 때의 말투는 밝고 감정이 살아 있으면서도 기준이 분명한 말투입니다. TOP1이 FC라서 지점장님은 표정과 말에 에너지가 있고, “괜찮아!”, “다시 해보면 돼!”처럼 분위기를 살리는 말을 자주 씁니다. PA님은 처음에 이 말투 덕분에 긴장이 풀리고, 지점장님가 친근하다고 느낍니다. 여기에 TOP2가 CP라서 “이건 반드시 지켜야 해”, “여기서는 이렇게 해야 해”처럼 규칙과 기준을 분명히 말합니다. 그래서 이 성향은 재미있지만 느슨하지 않은 지점장님로 보입니다.
-
-하지만 BOTTOM1이 A라서 차분하게 상황을 정리하고 이유를 설명하는 말이 부족해지기 쉽습니다. 지점장님은 감정과 기준으로 빠르게 말하지만, PA님은 “왜 이렇게 해야 하는지”, “지금 내가 어디서 막힌 건지”를 충분히 이해하지 못할 수 있습니다. 그 결과, PA님은 혼란스러워지고 “열심히 하라는 말은 많은데 정리가 안 된다”고 느낄 수 있습니다. 특히 잘 못 따라오는 PA님에게는 감정적인 격려와 단호한 지시가 오히려 부담이 될 수 있습니다.
-
-그래서 이 성향의 지점장님은 말을 하기 전에 한 번 멈추고 정리하는 문장을 의식적으로 넣어야 합니다. 길게 설명할 필요는 없고, 핵심만 짚어주는 말이면 충분합니다. 이 한 문장이 들어가면 PA님은 머릿속이 정리되고, 행동으로 옮기기 쉬워집니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 단계에서 해야 할 건 딱 한 가지야, 이것부터 해보자.”
-복잡함을 줄여주는 말입니다.
-
-두 번째 고정 멘트는
-“왜 이걸 하는지부터 말해줄게, 이게 되면 다음이 쉬워져.”
-이유를 알려주는 문장입니다.
-
-세 번째 고정 멘트는
-“지금은 속도보다 순서가 중요해, 순서만 맞추면 충분해.”
-PA님의 불안을 낮춰주는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 밝음과 기준 위에 정리가 더해진 지점장님가 됩니다. PA님은 감정에 휩쓸리지 않고 상황을 이해하게 되고, 잘 못 따라오던 PA님도 “이제 뭘 해야 할지 알겠다”는 느낌을 받게 됩니다. 그 결과 코칭은 훨씬 안정적으로 이어집니다.`,improvement:``},FC_CP_AC:{manner:`PA님을 코칭할 때의 말투는 밝고 에너지가 있으면서도 기준이 분명한 말투입니다. TOP1이 FC라서 지점장님은 표정과 목소리에 힘이 있고, “괜찮아, 다시 해보자”, “지금 분위기 좋아”처럼 감정을 살리는 말을 자주 씁니다. 이 덕분에 PA님은 처음엔 긴장이 풀리고, 지점장님가 친근하고 재미있다고 느낍니다. 여기에 TOP2가 CP라서 “이건 꼭 지켜야 해”, “여기서는 이렇게 해야 해”처럼 규칙과 기준을 또렷하게 말합니다. 그래서 이 성향은 분위기는 살리되 기준은 흐리지 않는 지점장님로 보입니다.
-
-하지만 BOTTOM1이 AC라서 PA님의 반응이나 눈치를 다소 덜 살피고, 말이 단호하고 직설적으로 나갈 때가 있습니다. 지점장님은 “지금 이건 아니야”, “그렇게 하면 안 돼”라고 빠르게 말하지만, PA님은 마음의 준비가 덜 된 상태일 수 있습니다. 그러면 PA님은 “혼난 느낌”, “말할 틈이 없는 느낌”을 받을 수 있고, 질문을 참고 따라오기만 하게 됩니다. 특히 잘 못 따라오는 PA님에게는 이 말투가 부담이 되어 위축될 수 있습니다.
-
-그래서 이 성향의 지점장님은 단호한 말 앞이나 뒤에 한 문장의 완충 표현을 의식적으로 넣는 것이 중요합니다. 기준은 그대로 유지하되, PA님의 마음을 먼저 한 번 확인해 주는 말이 필요합니다. 이렇게 하면 단호함이 차가움으로 느껴지지 않습니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 이 부분은 기준상 안 맞아, 대신 이렇게 하면 바로 좋아질 거야.”
-단호함과 대안을 함께 주는 말입니다.
-
-두 번째 고정 멘트는
-“내가 지금은 분명하게 말할게, 너를 돕기 위해서야.”
-직설적인 말을 받아들이기 쉽게 만드는 문장입니다.
-
-세 번째 고정 멘트는
-“어려울 수 있어, 그래도 이건 꼭 넘어가야 하는 단계야.”
-PA님의 감정을 인정하면서 기준을 지키는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 밝음과 기준에 배려가 더해진 지점장님가 됩니다. PA님은 “엄격하지만 나를 생각해준다”고 느끼고, 잘 못 따라오던 PA님도 위축되지 않고 다시 시도할 용기를 얻게 됩니다. 결국 코칭은 더 오래, 더 안정적으로 이어집니다.`,improvement:``},FC_NP_CP:{manner:`PA님을 코칭할 때의 말투는 밝고 부드러우며 정서적으로 안전한 말투입니다. TOP1이 FC라서 지점장님은 표정과 목소리에 에너지가 있고, “괜찮아”, “지금도 충분히 잘하고 있어” 같은 말을 자주 합니다. 분위기를 살리고 긴장을 풀어 주는 데 능숙해 PA님은 지점장님와 있으면 편하다고 느낍니다. 여기에 TOP2가 NP라서 “힘들지?”, “천천히 가도 돼”, “네 입장 이해해”처럼 공감과 배려의 말이 자연스럽게 나옵니다. 그래서 이 성향의 지점장님은 다정하고 따뜻한 사람으로 인식됩니다.
-
-하지만 BOTTOM1이 CP라서 기준과 원칙을 분명하게 말하는 데는 다소 약한 편입니다. PA님이 과제를 미루거나 규칙을 어겨도 “괜찮아, 다음에 하면 돼”라고 넘기기 쉽고, 잘못된 부분을 바로 잡기보다는 위로를 먼저 하게 됩니다. 그 결과 PA님은 마음은 편하지만, “어디까지가 기준인지”, “지금 뭘 꼭 해야 하는지”를 헷갈릴 수 있습니다. 잘 못 따라오는 PA님은 오히려 방향을 잃고 제자리걸음을 하게 됩니다.
-
-그래서 이 성향의 지점장님은 따뜻한 말 뒤에 기준을 한 문장으로 붙이는 연습이 필요합니다. 공감은 유지하되, 행동 기준을 분명히 말해야 PA님이 성장합니다. 감정과 기준을 함께 주는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“힘든 건 이해해, 그래도 오늘은 여기까지는 꼭 해보자.”
-공감 뒤에 행동 기준을 붙이는 말입니다.
-
-두 번째 고정 멘트는
-“괜찮다고 말해주고 싶지만, 이건 지금 바로 고쳐야 해.”
-다정함 속에 분명함을 담은 문장입니다.
-
-세 번째 고정 멘트는
-“네 편이지만, 이 규칙은 지켜야 더 오래 갈 수 있어.”
-관계와 원칙을 동시에 지키는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 따뜻하지만 흐리지 않은 지점장님가 됩니다. PA님은 “편한데도 방향이 보인다”고 느끼고, 잘 못 따라오던 PA님도 무엇을 고쳐야 하는지 명확히 알게 됩니다. 그 결과 코칭은 감정 위로에 머물지 않고 실제 성장을 만들어 냅니다.`,improvement:``},FC_NP_A:{manner:`인을 코칭할 때의 말투는 밝고 부드럽고 감정 중심적인 말투입니다. TOP1이 FC라서 지점장님은 표정이 밝고 말에 에너지가 있습니다. “괜찮아, 다시 하면 돼”, “지금도 열심히 하고 있어”처럼 분위기를 살리는 말을 자주 쓰고, PA님이 긴장하지 않도록 웃으며 말을 건넵니다. TOP2가 NP이기 때문에 상대 마음을 먼저 살피며 “힘들지?”, “네 마음 이해해” 같은 공감 표현이 자연스럽습니다. 그래서 PA님은 이 지점장님를 편하고 따뜻한 사람, 나를 지켜주는 어른처럼 느낍니다.
-
-하지만 BOTTOM1이 A라서 상황을 차분히 정리해서 설명하거나, 왜 이걸 해야 하는지 논리적으로 말하는 데는 약한 편입니다. PA님이 일을 잘 못 따라오면 “괜찮아, 마음 쓰지 마”라고 말해주지만, 무엇이 문제인지, 다음에 뭘 바꿔야 하는지는 분명히 정리해 주지 못하는 경우가 생깁니다. 그러다 보니 PA님은 위로는 받았지만 “그래서 내가 다음에 뭘 해야 하지?” 하고 헷갈릴 수 있습니다. 감정은 안정되지만 방향이 흐려지는 것입니다.
-
-그래서 이 성향의 지점장님은 공감 뒤에 꼭 한 번은 정리해서 말하는 연습이 필요합니다. 길게 설명할 필요는 없고, 핵심만 차분히 붙이면 충분합니다. 감정 → 정리 → 다음 행동, 이 순서를 의식하는 것이 중요합니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 마음이 힘든 건 이해해, 그래서 정리하면 오늘은 이 한 가지만 해보자.”
-공감 후에 행동을 정리해 주는 말입니다.
-
-두 번째 고정 멘트는
-“괜찮아라고 말해주고 싶고, 동시에 지금 이 부분은 다시 연습해야 해.”
-위로와 판단을 함께 담은 문장입니다.
-
-세 번째 고정 멘트는
-“천천히 가도 돼, 대신 오늘 목표는 여기까지야.”
-속도는 배려하되 기준은 분명히 하는 말입니다.
-
-이 고정 멘트를 반복하면 이 성향은 따뜻하면서도 방향을 잡아주는 지점장님로 바뀝니다. PA님은 감정적으로 보호받으면서도, 다음 행동을 분명히 알게 되고 잘 못 따라오던 PA님도 점점 안정적으로 성장하게 됩니다.`,improvement:``},FC_NP_AC:{manner:`PA님을 코칭할 때의 말투는 밝고 부드럽지만, 생각보다 직설적인 말투입니다. TOP1이 FC라서 지점장님은 표정이 밝고 말에 에너지가 있으며, 분위기를 무겁게 만들지 않습니다. “괜찮아, 다시 해보자”, “지금도 충분히 잘하고 있어”처럼 PA님의 긴장을 풀어주는 말을 자연스럽게 씁니다. TOP2가 NP이기 때문에 PA님의 마음을 먼저 살피고, 감정을 공감해 주는 말도 많습니다. 그래서 PA님은 이 지점장님를 편하고 따뜻한 사람, 이야기해도 안전한 어른으로 느낍니다.
-
-하지만 BOTTOM1이 AC라서 PA님의 눈치를 다소 덜 보며, 규칙이나 기준을 말할 때는 생각보다 단호해질 수 있습니다. 감정적으로는 따뜻하지만, “이건 안 되는 거야”, “그렇게 하면 안 돼” 같은 말이 갑자기 튀어나와 PA님이 놀랄 수 있습니다. 지점장님 입장에서는 솔직하고 분명하게 말한 것인데, PA님에게는 마음의 준비 없이 맞는 말처럼 느껴질 수 있습니다. 그래서 PA님은 “좋은 사람인데, 가끔 말이 갑자기 세다”라고 느끼기도 합니다.
-
-이 성향의 지점장님은 공감 → 기준 → 선택권의 순서를 의식적으로 지키는 것이 중요합니다. 먼저 마음을 충분히 받아주고, 그 다음에 기준을 말하며, 마지막에는 PA님이 따라올 수 있는 여지를 주어야 합니다. 기준만 말하고 끝내면 PA님은 위축되고, 공감만 하면 행동이 바뀌지 않습니다. 이 균형이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“네가 힘든 건 이해해, 그래도 이 부분은 우리가 지켜야 하는 기준이야.”
-공감과 기준을 함께 담은 문장입니다.
-
-두 번째 고정 멘트는
-“지금은 감정이 먼저일 수 있어, 그래서 선택지는 두 가지야. 같이 정해보자.”
-단호함을 부드럽게 바꾸는 말입니다.
-
-세 번째 고정 멘트는
-“나는 너 편이야, 그래서 이건 분명히 말해줄게.”
-따뜻함 속에서 직설을 전달하는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향은 밝고 따뜻하지만 무섭지 않은 지점장님로 바뀝니다. PA님은 마음의 안정감을 느끼면서도 기준을 이해하게 되고, 잘 못 따라오던 PA님도 “그래도 이 지점장님은 나를 믿고 말해준다”는 신뢰 속에서 성장하게 됩니다.`,improvement:``},FC_A_CP:{manner:`PA님을 코칭할 때의 말투는 부드럽고 차분하며, 분위기를 편안하게 만드는 말투입니다. TOP1이 FC라서 지점장님은 표정과 말이 밝고 친근합니다. PA님이 긴장하면 먼저 웃어 주고, “괜찮아, 처음엔 다 그래”처럼 부담을 낮춰 줍니다. TOP2가 A이기 때문에 감정에만 끌려가지 않고, 상황을 정리해서 설명합니다. “지금 단계는 이거고, 다음은 이거야”처럼 순서를 잡아 주며 논리적으로 말합니다. 그래서 PA님은 이 지점장님를 편하고 이해 잘 해주는 사람으로 느끼고, 질문하기도 어렵지 않습니다.
-
-하지만 BOTTOM1이 CP라서 기준을 세우고 단호하게 말하는 힘이 약한 편입니다. 규칙을 어겼을 때도 “다음엔 좀 더 신경 써보자”처럼 부드럽게 넘기기 쉬워, PA님은 “이 정도는 괜찮은가 보다”라고 오해할 수 있습니다. 지점장님은 분위기를 깨고 싶지 않아 강한 말을 아끼지만, 그 결과 기준이 흐려질 수 있습니다. 이때 PA님은 편안함은 느끼지만, 무엇이 맞고 틀린지는 헷갈릴 수 있습니다.
-
-그래서 이 성향의 지점장님은 밝음과 논리 위에 ‘분명한 기준 한 문장’을 얹는 연습이 필요합니다. 감정 공감과 설명은 이미 충분하니, 마지막에 기준을 또렷하게 말해 주는 것이 핵심입니다. 화를 낼 필요는 없고, 짧고 분명하면 됩니다. 말의 톤은 그대로 두고, 내용만 분명하게 하면 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“분위기는 괜찮아, 다만 이건 우리 팀 기준이라 꼭 지켜야 해.”
-
-두 번째 고정 멘트는
-“지금 상황은 이해했어, 그리고 이 부분은 예외 없이 이렇게 가는 거야.”
-
-세 번째 고정 멘트는
-“편하게 가도 돼, 대신 이 기준만큼은 꼭 기억하자.”
-
-이 고정 멘트를 반복하면, 이 성향은 편안하지만 흐리지 않은 지점장님가 됩니다. PA님은 마음 놓고 질문하면서도, 어디까지가 허용이고 어디부터가 기준인지 분명히 알게 됩니다. 그 결과 잘 못 따라오던 PA님도 방향을 잃지 않고, 안정적으로 성장하게 됩니다.`,improvement:``},FC_A_NP:{manner:`PA님을 코칭할 때의 말투는 밝고 부드러우며 차분한 설명형 말투입니다. TOP1이 FC라서 지점장님은 표정이 밝고 말에 온기가 있습니다. PA님이 실수해도 먼저 웃으며 분위기를 풀고, “처음엔 누구나 헷갈릴 수 있어”처럼 긴장을 낮춰 줍니다. 덕분에 PA님은 이 지점장님 앞에서 위축되지 않고 질문도 비교적 편하게 합니다. TOP2가 A이기 때문에 말이 감정에만 흐르지 않고, 상황을 정리해서 설명해 줍니다. “지금 단계에서는 이걸 먼저 하고, 그다음에 이걸 하면 돼”처럼 순서를 잡아 주는 말이 많아 이해가 쉽습니다.
-
-하지만 BOTTOM1이 NP라서 공감과 감정 다독임이 부족하게 느껴질 수 있습니다. 지점장님은 친절하고 밝지만, PA님의 마음 상태를 깊게 살피며 “지금 마음이 어때?”라고 묻는 말은 상대적으로 적습니다. 그래서 PA님은 “잘 설명해 주긴 하는데, 내 마음까지 이해받는 느낌은 조금 부족하다”고 느낄 수 있습니다. 특히 실적이 안 나오거나 자신감이 떨어진 PA님에게는, 논리적인 설명만으로는 위로가 충분하지 않을 수 있습니다.
-
-이 성향의 지점장님은 밝음과 논리 사이에 ‘짧은 공감 한 문장’을 의식적으로 넣는 것이 중요합니다. 길게 위로할 필요는 없고, 먼저 마음을 인정해 주는 말 한마디만 있어도 PA님의 반응이 달라집니다. 예를 들어 설명을 시작하기 전에 “요즘 마음이 좀 힘들었겠다” 같은 말을 먼저 건네는 것입니다. 그러면 PA님은 “이 지점장님가 나를 사람으로 보고 있구나”라고 느끼게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 결과가 안 나와서 속상할 수 있어, 그 마음은 충분히 이해해.”
-
-두 번째 고정 멘트는
-“네가 여기까지 온 것만 해도 쉽지 않았어, 그 점은 분명히 잘한 거야.”
-
-세 번째 고정 멘트는
-“마음이 흔들릴 수 있는 시기야, 그래도 내가 옆에서 같이 볼게.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향은 밝고 설명 잘하는 지점장님에서, 마음까지 챙겨주는 지점장님로 바뀝니다. PA님은 부담 없이 다가오면서도, 감정적으로 혼자가 아니라는 느낌을 받게 됩니다. 그 결과 잘 못 따라오던 PA님도 다시 힘을 얻고, 포기하지 않고 한 걸음씩 나아갈 수 있게 됩니다.`,improvement:``},FC_A_AC:{manner:`PA님을 코칭할 때의 말투는 부드럽고 친근하지만, 말의 내용은 차분하고 이성적인 설명형 말투입니다. TOP1이 FC라서 지점장님은 표정이 밝고 분위기를 편안하게 만듭니다. PA님이 긴장해 있으면 먼저 웃으며 말을 걸고, “괜찮아, 누구나 처음엔 헷갈려” 같은 말로 부담을 낮춰 줍니다. 그래서 PA님은 이 지점장님 앞에서 비교적 편하게 질문하고, 실수를 숨기지 않고 말하려는 태도를 보입니다. TOP2가 A이기 때문에 말이 감정적으로 흐르지 않고, “지금은 이 단계야”, “이건 이렇게 하면 돼”처럼 상황을 정리해 주는 설명이 많아 이해도 잘 됩니다.
-
-하지만 BOTTOM1이 AC라서 조직의 규칙이나 기준을 분명하게 밀어붙이는 힘은 다소 약한 편입니다. 지점장님은 PA님이 규칙을 어기거나 루틴을 지키지 않아도, 분위기를 깨고 싶지 않아서 강하게 말하지 못할 때가 있습니다. 그래서 말투는 부드럽지만, PA님 입장에서는 “이건 꼭 지켜야 하는 건지, 선택인 건지”가 헷갈릴 수 있습니다. 특히 자기관리나 행동 기준이 약한 PA님은 이 틈을 느끼고 흐트러질 가능성도 있습니다.
-
-이 성향의 지점장님은 밝음과 논리 위에 ‘기준을 분명히 말하는 한 문장’을 의식적으로 얹는 것이 중요합니다. 화를 낼 필요도 없고 딱딱해질 필요도 없습니다. 대신 웃는 얼굴로라도 “이건 선택이 아니라 약속이야”라는 말을 분명히 해야 합니다. 그러면 PA님은 무섭지 않게, 하지만 명확하게 기준을 인식하게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“편하게 하되, 이 부분만큼은 꼭 지켜야 하는 약속이야.”
-
-두 번째 고정 멘트는
-“분위기는 부드러워도, 이 행동 기준은 모두에게 동일해.”
-
-세 번째 고정 멘트는
-“웃으면서 말하지만, 이건 정말 중요해서 다시 한 번 강조할게.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향은 좋은 분위기만 만드는 지점장님가 아니라, 편안하지만 흔들리지 않는 지점장님로 바뀝니다. PA님은 부담 없이 다가오면서도, 어디까지가 허용이고 어디부터가 기준인지 명확히 알게 됩니다. 그 결과 잘 따라오지 못하던 PA님도 행동의 선이 잡히고, 조직 안에서 안정적으로 성장할 수 있게 됩니다.`,improvement:``},FC_AC_CP:{manner:`PA님을 코칭할 때의 말투는 아주 친절하고 공감이 많은 말투입니다. TOP1이 FC라서 지점장님은 표정이 밝고 말이 부드러우며, PA님이 긴장하거나 실수했을 때 먼저 분위기를 풀어 줍니다. “괜찮아, 처음엔 다 그래”, “지금 단계에선 이 정도면 잘하고 있어”처럼 감정을 다독이는 말이 자연스럽게 나옵니다. TOP2가 AC이기 때문에 PA님의 표정과 반응을 잘 살피며, 상처받지 않도록 말의 수위를 조절합니다. 그래서 PA님은 이 지점장님를 편하고 따뜻한 사람, 내 편이 되어주는 사람으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 CP라서 기준을 세우고 단호하게 말하는 힘이 약한 편입니다. PA님이 약속을 어기거나, 루틴을 건너뛰거나, 같은 실수를 반복해도 “다음엔 잘하자” 정도로 넘어갈 때가 많습니다. 지점장님은 분위기가 깨질까 봐, PA님이 멀어질까 봐 강하게 말하지 못합니다. 그 결과 PA님은 “이건 꼭 지켜야 하는 건가?”, “조금 늦어도 괜찮은 건가?” 하고 기준을 헷갈릴 수 있습니다. 착하고 성실한 PA님에게는 문제가 없지만, 자기 관리가 약한 PA님에게는 성장 속도가 느려질 위험이 있습니다.
-
-이 성향의 지점장님은 따뜻함 위에 ‘명확한 기준 한 문장’을 의식적으로 올려야 합니다. 목소리를 높일 필요도 없고 무섭게 말할 필요도 없습니다. 다정한 말투 그대로, 하지만 기준만큼은 분명히 말하는 연습이 필요합니다. “미안하지만”, “혹시” 같은 완충어를 줄이고, 짧고 분명한 문장을 쓰는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“나는 너를 아끼지만, 이 기준은 꼭 지켜야 해.”
-
-두 번째 고정 멘트는
-“기분 상하게 하려는 건 아니고, 이건 우리 팀의 약속이야.”
-
-세 번째 고정 멘트는
-“괜찮다고 넘기고 싶지만, 너 성장을 위해서는 여기서 선을 지켜야 해.”
-
-이 고정 멘트를 반복해서 사용하면, 이 성향의 지점장님은 좋은 사람에서 끝나는 지점장님가 아니라, 따뜻하지만 중심이 있는 지점장님가 됩니다. PA님은 사랑받는 느낌을 유지하면서도, 어디까지가 허용이고 어디부터가 반드시 지켜야 할 기준인지 분명히 알게 됩니다. 그 순간 PA님의 행동이 안정되고, 성장 속도도 눈에 띄게 달라집니다.`,improvement:``},FC_AC_NP:{manner:`PA님을 코칭할 때의 말투는 아주 부드럽고 조심스러운 말투입니다. TOP1이 FC라서 지점장님은 표정이 밝고 분위기를 잘 살리며, PA님이 긴장하지 않도록 먼저 웃어 주고 말을 쉽게 꺼냅니다. “괜찮아, 천천히 해도 돼”, “지금도 충분히 잘하고 있어” 같은 말이 자연스럽게 나옵니다. TOP2가 AC이기 때문에 PA님의 눈빛과 표정, 말투 변화에 민감합니다. 혹시 상처받지 않을까, 기분이 상하지 않을까를 계속 살피며 말을 고릅니다. 그래서 PA님은 이 지점장님를 편하고 다정한 사람, 나를 이해해 주는 어른으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 NP라서 따뜻하게 감싸 주는 말과 응원의 말이 부족해지기 쉬운 성향입니다. 겉으로는 웃고 있지만, 진심으로 “너를 믿는다”, “너라서 괜찮다”는 메시지가 자주 전달되지 않을 수 있습니다. 지점장님은 행동과 분위기로는 배려를 하지만, 말로 마음을 안아 주는 표현은 상대적으로 적습니다. 그래서 PA님 중에는 “나를 싫어하는 건 아닌데, 진짜 응원받고 있는지는 잘 모르겠다”라고 느끼는 경우도 생길 수 있습니다.
-
-이 성향의 지점장님은 이미 충분히 친절하고 예의 바르기 때문에, 더 잘하려면 의식적으로 ‘따뜻한 말 한 문장’을 추가해야 합니다. 길게 설명할 필요도 없고 감정적인 연설을 할 필요도 없습니다. 짧고 분명한 인정의 말, PA님의 편이라는 메시지를 자주 말로 표현하는 것이 중요합니다. FC와 AC가 이미 관계를 부드럽게 만들어 주고 있으므로, NP 한 문장만 더해도 코칭의 온도가 크게 올라갑니다.
-
-개선 시 고정 멘트 첫 번째는
-“나는 네가 잘해낼 거라고 진심으로 믿어.”
-
-두 번째 고정 멘트는
-“속도가 조금 느려도 괜찮아, 지금 방향은 맞아.”
-
-세 번째 고정 멘트는
-“네가 여기까지 온 것만 봐도 충분히 잘하고 있어.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향의 지점장님은 편한 사람을 넘어 마음을 지지해 주는 지점장님가 됩니다. PA님은 눈치 보지 않고 질문할 수 있고, 실수해도 다시 도전할 용기를 얻게 됩니다. 그 결과 PA님은 더 오래 버티고, 더 안정적으로 성장하게 됩니다.`,improvement:``},FC_AC_A:{manner:`PA님을 코칭할 때의 말투는 아주 부드럽고 조심스러운 말투입니다. TOP1이 FC라서 지점장님은 밝은 표정과 친근한 분위기를 잘 만듭니다. PA님이 긴장하면 먼저 웃어 주고, 말이 막히면 “괜찮아, 편하게 말해도 돼”라고 분위기를 풀어 줍니다. TOP2가 AC이기 때문에 PA님의 표정, 말투, 반응을 계속 살피며 말을 고릅니다. 혹시 상처받지 않을지, 부담을 느끼지 않을지를 먼저 생각합니다. 그래서 말투는 전반적으로 둥글고 부드럽고 배려 중심적입니다. PA님은 이 지점장님를 “편한 사람”, “나를 이해해 주는 어른”으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 A라서 논리적으로 정리해 주는 말, 기준을 잡아 주는 설명이 부족해지기 쉬운 성향입니다. 공감은 많은데, “그래서 지금 뭘 하면 되는지”, “다음 단계는 무엇인지”가 명확하지 않을 수 있습니다. 지점장님은 마음을 먼저 헤아리다 보니 결론을 흐리게 말하거나, 판단을 PA님에게 맡겨 버리는 경우도 생깁니다. 그 결과 PA님은 “위로는 되는데, 정확히 뭘 해야 할지는 헷갈린다”고 느낄 수 있습니다.
-
-이 성향의 지점장님은 이미 관계 형성과 정서적 안정에는 강점이 있으므로, 의식적으로 ‘정리된 한 문장’을 추가하는 것이 핵심 보완 포인트입니다. 감정을 더 얹을 필요는 없고, 이미 충분합니다. 대신 지금 상황을 한 줄로 정리하고, 다음 행동을 분명히 말해 주는 연습이 필요합니다. 부드러운 말투는 그대로 유지하되, 결론만 또렷하게 말하면 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 상황을 정리하면, 오늘은 이 한 가지만 하면 돼.”
-
-두 번째 고정 멘트는
-“여기까지는 잘 왔고, 다음 단계는 이거야.”
-
-세 번째 고정 멘트는
-“네 마음은 이해했고, 그래서 선택은 이렇게 하자.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향의 지점장님은 다정하면서도 방향을 잡아 주는 지점장님로 바뀝니다. PA님은 감정적으로 안정감을 느끼면서도, 무엇을 해야 할지 명확히 알게 됩니다. 그 결과 망설임이 줄고 실행력이 높아지며, 코칭에 대한 신뢰도도 함께 올라가게 됩니다.`,improvement:``},AC_CP_NP:{manner:`PA님을 코칭할 때의 말투는 조심스럽지만 단호함이 섞인 말투입니다. TOP1이 AC라서 지점장님은 PA님의 표정과 반응을 먼저 살핍니다. 말 한마디가 PA님에게 부담이 되지는 않을지, 기분이 상하지는 않을지 자연스럽게 신경을 씁니다. 그래서 말투는 공격적이지 않고 비교적 차분합니다. 다만 TOP2가 CP이기 때문에, 기준과 규칙이 분명한 부분에서는 생각보다 직설적으로 말이 나옵니다. “이건 원칙이야”, “이건 꼭 지켜야 해”라는 말이 비교적 쉽게 나옵니다. PA님은 이 지점장님를 보며 “배려는 있는데 기준이 분명한 사람”이라고 느끼게 됩니다.
-
-하지만 BOTTOM1이 NP라서 따뜻하게 감싸 주는 말, 괜찮다고 다독이는 말이 부족해지기 쉬운 성향입니다. 지점장님은 PA님의 어려움을 이해하고 있으면서도, 그것을 말로 충분히 표현하지 못합니다. 그래서 PA님은 “맞는 말이긴 한데 마음이 좀 차갑게 느껴진다”, “혼나는 느낌이 든다”고 받아들일 수 있습니다. 특히 성과가 안 나는 시기에는, PA님이 정서적으로 위축되기 쉽습니다.
-
-이 성향의 지점장님은 이미 규칙과 방향 제시는 잘하고 있으므로, 의식적으로 ‘따뜻한 한 문장’을 먼저 꺼내는 연습이 필요합니다. 기준을 말하기 전에 감정을 한 번 받아 주는 것만으로도 코칭의 분위기가 크게 달라집니다. 단호함을 줄일 필요는 없고, 순서를 바꾸는 것이 핵심입니다. 공감 → 기준 → 행동 순서로 말하면 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“네가 어려운 상황이라는 건 진심으로 이해해, ”
-
-두 번째 고정 멘트는
-“그래도 우리 팀 기준에서는 이건 꼭 지켜야 해.”
-
-세 번째 고정 멘트는
-“내가 너를 믿기 때문에 이 기준을 말하는 거야.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 지점장님은 차갑게 느껴질 수 있는 단호함을 신뢰로 바꿀 수 있습니다. PA님은 “나를 혼내는 게 아니라 키우려는 말이구나”라고 느끼게 되고, 지적을 방어하지 않고 받아들이게 됩니다. 그 결과 코칭이 잔소리가 아니라 성장의 안내로 작동하게 됩니다.`,improvement:``},AC_CP_A:{manner:`PA님을 코칭할 때의 말투는 조심스럽고 배려가 많지만, 기준을 말할 때는 딱 잘라 말하는 말투입니다. TOP1이 AC이기 때문에 지점장님은 PA님의 표정, 말투, 분위기를 먼저 느낍니다. “지금 이 말이 부담이 되지는 않을까?”, “기분이 상하지는 않을까?”를 자연스럽게 생각합니다. 그래서 처음 말은 부드럽고 낮은 톤으로 시작하는 경우가 많습니다. 하지만 TOP2가 CP라서, 기준이나 규칙을 이야기할 때는 생각보다 단호해집니다. “이건 꼭 지켜야 해”, “이건 선택이 아니야” 같은 말이 분명하게 나옵니다. PA님은 이 지점장님를 보며 “배려는 있는데 기준이 확실한 사람”이라고 느낍니다.
-
-다만 BOTTOM1이 A이기 때문에 이 상황을 왜 해야 하는지, 어떤 이유로 중요한지 논리적으로 풀어주는 설명이 부족해지기 쉽습니다. 지점장님은 기준을 제시하지만, 그 기준의 이유를 충분히 설명하지 않고 넘어가는 경우가 많습니다. 그래서 PA님은 “왜 그런지는 잘 모르겠는데 그냥 하라고 하네”라고 느낄 수 있습니다. 이때 PA님이 이해가 느리거나 질문이 많으면, 지점장님은 속으로 답답함을 느끼면서도 겉으로는 참고 넘기는 경우가 많습니다.
-
-이 성향의 지점장님은 단호함을 줄일 필요는 없고, 기준 앞에 ‘이유 한 줄’을 붙이는 연습이 필요합니다. 감정 배려는 이미 잘하고 있으므로, 여기에 짧은 설명만 더해도 코칭의 설득력이 크게 올라갑니다. 길게 설명할 필요는 없고, 중학생도 이해할 수 있는 한 문장이면 충분합니다.
-
-개선 시 고정 멘트 첫 번째는
-“이걸 지키는 이유는 네가 더 빨리 성장할 수 있기 때문이야.”
-
-두 번째 고정 멘트는
-“지금은 불편할 수 있지만, 나중에 너 스스로를 지켜주는 기준이야.”
-
-세 번째 고정 멘트는
-“그냥 하라는 말이 아니라, 너에게 꼭 필요한 과정이야.”
-
-이 고정 멘트를 사용하면, 이 지점장님은 배려 많은 사람에서 ‘이해시키는 리더’로 인식이 바뀝니다. PA님은 기준을 강요로 느끼지 않고, “아, 이건 나를 위한 말이구나”라고 받아들이게 됩니다. 그 결과 코칭이 지시가 아니라 납득과 행동으로 이어지게 됩니다.`,improvement:``},AC_CP_FC:{manner:`PA님을 코칭할 때의 말투는 전체적으로 차분하고 조심스럽지만, 기준을 말할 때는 분명히 선을 긋는 말투입니다. TOP1이 AC이기 때문에 이 지점장님은 PA님의 표정, 말투, 반응을 매우 잘 살핍니다. “지금 이 말이 부담되지는 않을까?”, “혹시 상처받지 않을까?”를 먼저 느끼며 말을 고릅니다. 그래서 처음 이야기를 꺼낼 때는 목소리가 크지 않고, 속도를 늦추며 부드럽게 시작합니다. 다만 TOP2가 CP이기 때문에, 해야 할 일과 하지 말아야 할 일에 대해서는 분명한 기준을 제시합니다. “이건 반드시 지켜야 해”, “이건 넘어갈 수 없어” 같은 말이 비교적 또렷하게 나옵니다. PA님은 이 지점장님를 보며 “배려는 많지만 기준은 확실한 사람”이라고 느낍니다.
-
-하지만 BOTTOM1이 FC이기 때문에 밝은 격려, 분위기를 살리는 말, 감정적으로 에너지를 올려주는 표현이 부족해지기 쉽습니다. 지점장님은 진지하고 성실한 코칭은 잘하지만, PA님을 가볍게 웃게 하거나 “잘하고 있어!”, “생각보다 괜찮아!” 같은 감정적 응원을 자주 쓰지 못하는 편입니다. 그래서 PA님은 “틀린 말은 아닌데, 좀 딱딱하다”, “잘하고 있는지 잘 모르겠다”라고 느낄 수 있습니다. 특히 지치거나 자신감이 떨어진 PA님에게는 지점장님의 말이 맞아도 힘이 덜 전달될 수 있습니다.
-
-이 성향의 지점장님은 기준을 낮출 필요는 전혀 없고, 말의 끝에 감정을 살짝 얹는 연습이 필요합니다. 길게 칭찬할 필요도, 과하게 웃을 필요도 없습니다. 짧은 한마디만 더해도 PA님의 에너지가 달라집니다. 핵심은 “맞다”와 “괜찮다”를 말로 표현해 주는 것입니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 방향은 맞아, 그래서 계속 가면 돼.”
-
-두 번째 고정 멘트는
-“완벽하진 않아도, 여기까지 온 건 분명 잘한 거야.”
-
-세 번째 고정 멘트는
-“네가 생각하는 것보다 지금 훨씬 괜찮아.”
-
-이 고정 멘트를 사용하면, 이 지점장님은 차갑게 보일 수 있는 리더에서 믿고 따라갈 수 있는 리더로 인식이 바뀝니다. PA님은 기준을 지키면서도 정서적으로 안정감을 느끼게 되고, 코칭이 부담이 아니라 힘이 되는 시간으로 받아들여집니다. 결과적으로 PA님의 지속력과 몰입도가 함께 올라가게 됩니다.`,improvement:``},AC_NP_CP:{manner:`PA님을 코칭할 때의 말투는 아주 부드럽고 조심스러우며, 상대 마음을 먼저 살피는 말투입니다. TOP1이 AC이기 때문에 이 지점장님은 PA님의 표정, 말의 뉘앙스, 분위기 변화를 빠르게 알아차립니다. “지금 이 말이 부담되지 않을까?”, “혹시 기분 상하지 않을까?”를 먼저 느끼며 말을 꺼냅니다. 그래서 코칭을 시작할 때도 명령형보다는 질문형이 많고, 속도를 늦춰 차분하게 설명합니다. 여기에 TOP2가 NP이기 때문에 말투에는 따뜻함과 공감이 자연스럽게 묻어납니다. “그럴 수 있어”, “처음엔 다 그래”, “네 입장도 이해돼” 같은 말이 자주 나옵니다. PA님은 이 지점장님를 보며 “나를 이해해 주는 사람”, “편하게 이야기할 수 있는 사람”이라고 느낍니다.
-
-하지만 BOTTOM1이 CP이기 때문에 기준을 세우는 말, 선을 긋는 말, 단호한 표현이 약해지기 쉽습니다. PA님이 약속을 어기거나 같은 실수를 반복해도, 마음이 상할까 봐 강하게 말하지 못하고 넘어가는 경우가 생깁니다. 그래서 PA님은 어느 순간 “조금 느슨해도 괜찮은가 보다”, “이건 꼭 안 지켜도 되는구나”라고 오해할 수 있습니다. 지점장님은 분명 좋은 의도로 배려하지만, 기준이 말로 또렷하게 전달되지 않으면 코칭의 힘이 약해집니다.
-
-이 성향의 지점장님은 차갑게 말할 필요는 전혀 없고, 부드러운 말 안에 기준을 담는 연습이 필요합니다. 목소리를 높이거나 무섭게 말하는 것이 아니라, 짧고 분명한 문장을 추가하는 것이 핵심입니다. “이해해” 다음에 “그래도 이건 지켜야 해”를 붙이는 연습입니다.
-
-개선 시 고정 멘트 첫 번째는
-“네 상황은 이해해, 그래도 이건 꼭 지켜야 해.”
-
-두 번째 고정 멘트는
-“힘든 건 알아, 하지만 이 부분은 약속이야.”
-
-세 번째 고정 멘트는
-“괜찮다고 넘어갈 수는 없어, 여기까지는 기준이야.”
-
-이 고정 멘트를 쓰기 시작하면, 이 지점장님은 착하기만 한 지점장님가 아니라 신뢰할 수 있는 지점장님로 인식됩니다. PA님은 보호받는 느낌과 함께 방향을 분명히 알게 되고, 조직의 규칙과 기대치를 자연스럽게 받아들이게 됩니다. 결과적으로 코칭은 더 안정되고, PA님의 성장 속도도 빨라집니다.`,improvement:``},AC_NP_A:{manner:`PA님을 코칭할 때의 말투는 아주 조심스럽고 배려가 많으며, 먼저 마음을 다독이는 말투입니다. TOP1이 AC이기 때문에 이 지점장님은 PA님의 표정과 분위기에 민감하고, 말 한마디가 상처가 될까 늘 살핍니다. TOP2가 NP라서 따뜻한 공감이 자연스럽게 따라옵니다. “그럴 수 있어”, “처음엔 다 헷갈려”, “네 마음 이해해” 같은 말이 먼저 나오고, PA님은 이 지점장님를 편안하고 안전한 사람으로 느낍니다. 질문도 부드럽고 속도도 느려서, PA님이 긴장하지 않고 이야기를 꺼내기 좋습니다.
-
-하지만 BOTTOM1이 A이기 때문에 정리된 기준과 이유 설명, 선택의 우선순위를 말로 구조화하는 힘이 약해지기 쉽습니다. 공감은 충분한데, “그래서 다음에 정확히 뭐부터 할까?”, “이건 왜 중요한가?” 같은 판단 질문이 빠질 수 있습니다. 그러다 보니 PA님은 위로는 받지만 행동이 또렷해지지 않거나, 다음 단계가 모호해질 수 있습니다. 이 성향의 지점장님은 PA님을 배려하다가 결론을 흐리게 만드는 경우가 생깁니다.
-
-개선의 핵심은 공감 뒤에 짧은 정리 문장을 붙이는 것입니다. 길게 설명할 필요는 없고, 한 문장으로 방향만 또렷하게 잡아주면 됩니다. 차갑게 말할 필요도 없습니다. 따뜻함을 유지한 채, 판단의 기준을 덧붙이는 연습이 중요합니다.
-
-개선 시 고정 멘트 첫 번째는
-“네 마음은 이해해, 그래서 지금은 이 한 가지만 하자.”
-
-두 번째 고정 멘트는
-“힘든 건 알겠어, 하지만 오늘의 우선순위는 이거야.”
-
-세 번째 고정 멘트는
-“괜찮아, 다만 다음 단계는 이렇게 가는 게 맞아.”
-
-이 고정 멘트를 사용하면, 이 지점장님은 배려만 하는 지점장님가 아니라 길을 보여주는 지점장님가 됩니다. PA님은 감정적으로 안정된 상태에서 해야 할 행동을 명확히 알게 되고, 혼란이 줄어듭니다. 결과적으로 코칭은 더 분명해지고, PA님의 실행력도 자연스럽게 올라갑니다.`,improvement:``},AC_NP_FC:{manner:`PA님을 코칭할 때의 말투는 차분하고 조심스러우며, 상대의 반응을 살피는 말투입니다. TOP1이 AC라서 이 지점장님은 PA님의 표정과 말투 변화에 민감하고, 말이 강해질까 봐 한 번 더 고르고 말합니다. 규칙과 절차를 중요하게 여기고, “이건 이렇게 하는 게 맞아”, “회사 기준은 이거야”처럼 질서를 지키는 방향으로 이야기합니다. TOP2가 NP이기 때문에 말의 시작은 늘 따뜻합니다. “괜찮아”, “처음이라 그럴 수 있어”, “네 입장 이해해” 같은 말이 먼저 나오고, PA님은 이 지점장님를 믿을 수 있고 착한 사람으로 느낍니다.
-
-하지만 BOTTOM1이 FC라서 밝은 에너지, 표정, 분위기를 살리는 말이 부족해지기 쉽습니다. 코칭이 지나치게 조용해지거나, 분위기가 무거워질 수 있습니다. PA님이 잘한 부분이 있어도 “좋았어!”보다는 “문제는 없었어” 정도로 지나가 버리기 쉽고, 웃음이나 리액션이 적어 PA님은 “내가 잘하고 있는 건가?” 하고 헷갈릴 수 있습니다. 이 성향의 지점장님은 PA님을 존중하지만, 응원받는 느낌은 약해질 수 있습니다.
-
-그래서 개선의 핵심은 의식적으로 밝은 말과 반응을 더하는 것입니다. 성격을 바꾸라는 게 아니라, 말의 온도만 조금 올리는 연습입니다. 짧은 칭찬, 가벼운 웃음, 감탄 한마디만 추가해도 충분합니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 이 부분은 정말 잘했어, 생각보다 훨씬 좋아.”
-
-두 번째 고정 멘트는
-“완벽하진 않아도, 오늘 여기까지 온 건 분명한 성과야.”
-
-세 번째 고정 멘트는
-“조금씩 늘고 있어, 이 흐름이면 충분히 해낼 수 있어.”
-
-이 고정 멘트를 쓰기 시작하면, 이 지점장님은 질서와 배려를 지키면서도 분위기를 살리는 지점장님가 됩니다. PA님은 혼나지 않는다는 안정감에 더해, “나 잘하고 있구나”라는 힘을 얻습니다. 그 힘이 쌓이면 행동 속도가 빨라지고, 코칭 현장은 훨씬 살아 움직이게 됩니다.`,improvement:``},AC_A_CP:{manner:`PA님을 코칭할 때의 말투는 조심스럽고 차분하며, 이성적으로 설명하려는 말투입니다. TOP1이 AC라서 이 성향은 먼저 PA님의 눈빛과 표정을 살피고, 말이 상처가 되지 않을지를 한 번 더 고민합니다. “괜찮아?”, “너무 힘들진 않아?” 같은 말이 먼저 나오고, PA님이 불편해할 수 있는 표현은 최대한 피하려고 합니다. TOP2가 A이기 때문에 감정적으로 몰아붙이기보다는 “이 상황을 보면”, “지금 결과를 기준으로 보면”처럼 이유와 근거를 설명하는 방식으로 말합니다. PA님은 이 지점장님를 차분하고 논리적인 사람, 그리고 불필요한 감정 기복이 없는 안정적인 어른으로 느낍니다.
-
-하지만 BOTTOM1이 CP라서 기준을 분명하게 세우는 말, 단호하게 끊어주는 말, 행동을 바로잡는 말이 부족해지기 쉽습니다. PA님이 약속을 지키지 않거나 같은 실수를 반복해도, “다음엔 잘하면 돼”, “사정이 있었겠지” 하고 넘어가 버릴 수 있습니다. 이 지점장님은 규칙을 몰라서 못 말하는 게 아니라, 말을 꺼내는 순간 PA님이 상처받을까 봐 망설이는 성향입니다. 그 결과 PA님은 편안함은 느끼지만, 어디까지가 허용이고 어디부터가 안 되는지 헷갈릴 수 있습니다. 시간이 지나면 “이 정도는 괜찮겠지”라는 느슨함이 생길 위험도 있습니다.
-
-그래서 이 성향의 개선 포인트는 차갑게 혼내는 것이 아니라, 기준을 말로 분명히 꺼내는 연습입니다. 감정을 억누르거나 성격을 바꾸는 게 아니라, 기준을 문장으로 꺼내는 훈련입니다. 말투는 여전히 부드러워도 괜찮습니다. 대신 내용은 명확해야 합니다.
-
-개선 시 고정 멘트 첫 번째는
-“이건 네가 잘하고 못하고의 문제가 아니라, 우리가 꼭 지켜야 하는 기준이야.”
-
-두 번째 고정 멘트는
-“사정은 이해하지만, 이 부분은 다음에도 같으면 안 돼.”
-
-세 번째 고정 멘트는
-“여기까지는 괜찮고, 여기부터는 분명히 고쳐야 해.”
-
-이 고정 멘트를 꾸준히 쓰면, 이 지점장님은 배려만 있는 지점장님가 아니라 기준까지 세워주는 지점장님가 됩니다. PA님은 혼났다는 느낌보다 “아, 여기 선은 넘으면 안 되는구나”를 배우게 됩니다. 그 순간부터 코칭은 더 안정되고, PA님의 성장 속도도 훨씬 빨라집니다.`,improvement:``},AC_A_NP:{manner:`PA님을 코칭할 때의 말투는 조심스럽고 부드러우며, 상황을 먼저 살피는 말투입니다. TOP1이 AC라서 이 지점장님은 말을 꺼내기 전에 항상 PA님의 표정과 반응을 봅니다. “지금 말해도 괜찮을까?”, “혹시 부담되진 않을까?”를 먼저 생각하며, 강한 표현보다는 완곡한 표현을 씁니다. TOP2가 A이기 때문에 감정에 휩쓸려 말하기보다는 “지금 결과를 보면”, “이 과정을 기준으로 보면”처럼 이유와 근거를 들어 설명하는 말투를 사용합니다. 그래서 PA님은 이 지점장님를 차분하고 이성적인 사람, 말을 함부로 하지 않는 어른으로 느끼게 됩니다.
-
-하지만 BOTTOM1이 NP라서 공감과 정서적인 격려가 말로 잘 나오지 않는 편입니다. 마음속으로는 PA님을 걱정하고 응원하지만, “힘들었겠다”, “그래도 여기까지 온 게 대단해” 같은 말이 자연스럽게 나오지 않습니다. 대신 해결 방법이나 구조부터 설명하려다 보니, PA님은 “맞는 말이긴 한데 마음은 잘 안 알아주는 것 같다”고 느낄 수 있습니다. 이 지점장님은 차갑게 굴려고 하는 게 아니라, 어떻게 위로의 말을 해야 하는지 잘 몰라서 건너뛰는 경우가 많습니다.
-
-그래서 이 성향의 지점장님은 공감의 말을 의식적으로 먼저 꺼내는 연습이 필요합니다. 길게 위로할 필요는 없습니다. 짧아도 괜찮지만, 순서는 꼭 지켜야 합니다. 설명보다 공감이 먼저입니다. 그래야 PA님은 마음을 닫지 않고 말을 듣게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“일단 여기까지 온 것 자체가 쉬운 건 아니야.”
-
-두 번째 고정 멘트는
-“이 부분에서 막히는 건 누구나 한 번쯤 겪는 거야.”
-
-세 번째 고정 멘트는
-“힘들었을 텐데도 계속 해보려는 건 분명 장점이야.”
-
-이 고정 멘트를 먼저 말한 뒤에, 그 다음에 구조와 방법을 설명하면 됩니다. 그러면 이 지점장님은 눈치를 보느라 말 못 하는 지점장님가 아니라, 공감으로 문을 열고 이성으로 방향을 잡아주는 지점장님가 됩니다. PA님은 “이 사람은 나를 이해하면서도 기준을 잃지 않는구나”라고 느끼게 되고, 코칭에 대한 신뢰도 훨씬 높아집니다.`,improvement:``},AC_A_FC:{manner:`PA님을 코칭할 때의 말투는 조용하고 차분하며, PA님의 반응을 많이 살피는 말투입니다. TOP1이 AC인 이 지점장님은 PA님을 대할 때 항상 “이 말을 해도 괜찮을까?”, “기분 상하지 않을까?”를 먼저 생각합니다. 그래서 말이 부드럽고 공격적인 표현을 거의 쓰지 않습니다. 명령형보다는 “이렇게 해보는 건 어때요?”, “이 방법도 한 번 생각해볼 수 있어요”처럼 제안형 말투를 자주 사용합니다. TOP2가 A이기 때문에 감정적으로 몰아붙이기보다는 “지금 상황을 보면”, “과정상 여기에서 막히는 게 자연스러워요”처럼 이유와 흐름을 설명하는 말을 곁들입니다. PA님은 이 지점장님를 차분하고 이성적이며, 함부로 혼내지 않는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 FC라서 밝은 격려, 분위기를 살리는 말, 가볍게 웃어주는 표현이 부족한 편입니다. 이 지점장님은 진지하게 돕고 싶어 하지만 표정이 굳어 있거나 말투가 너무 차분해서, PA님은 “혼나는 건 아닌데 왠지 무겁다”, “분위기가 딱딱해서 더 긴장된다”고 느낄 수 있습니다. 즐겁게 해도 되는 상황에서도 지나치게 진지해져서, PA님의 긴장을 풀어주지 못하는 경우가 생깁니다. 이건 관심이 없어서가 아니라, 어떻게 밝게 풀어야 할지 익숙하지 않아서입니다.
-
-그래서 이 성향의 지점장님은 의식적으로 분위기를 가볍게 만드는 말을 연습해야 합니다. 크게 웃거나 농담을 잘할 필요는 없습니다. 짧고 소소한 긍정 표현이면 충분합니다. PA님이 숨을 쉴 수 있는 여지를 먼저 만들어줘야 합니다. 그 다음에 설명을 해도 늦지 않습니다.
-
-개선 시 고정 멘트 첫 번째는
-“처음 치고는 여기까지 온 거면 꽤 잘한 거야.”
-
-두 번째 고정 멘트는
-“지금은 완벽하지 않아도 괜찮아, 연습하는 단계니까.”
-
-세 번째 고정 멘트는
-“이건 너무 심각하게 볼 일은 아니고, 한 단계씩 가면 돼.”
-
-이 고정 멘트를 먼저 던져주면 PA님의 얼굴이 풀립니다. 그 다음에 이 지점장님가 가진 A의 강점으로 차분하게 방향과 기준을 설명하면 됩니다. 그러면 이 지점장님은 눈치를 보느라 말 못 하는 지점장님가 아니라, 분위기를 안정시키고 PA님을 편하게 만든 뒤 이성적으로 이끌어주는 지점장님가 됩니다. PA님은 “이 사람 앞에서는 실수해도 괜찮다”고 느끼게 되고, 그 순간부터 행동 속도가 훨씬 빨라집니다.`,improvement:``},AC_FC_CP:{manner:`PA님을 코칭할 때의 말투는 부드럽고 친근하며, 분위기를 살리는 말투입니다. TOP1이 AC인 이 성향은 기본적으로 상대의 표정과 기분을 먼저 살피는 말투를 씁니다. 그래서 PA님이 긴장하면 바로 느끼고, 말의 강도를 낮추며 “괜찮아?”, “너무 부담 갖지 않아도 돼” 같은 말을 자연스럽게 건넵니다. TOP2가 FC이기 때문에 웃음, 농담, 가벼운 공감 표현도 많습니다. “이건 다들 한 번씩 겪어”, “나도 처음엔 더 심했어” 같은 말로 PA님의 마음을 풀어줍니다. PA님은 이 지점장님를 편하고 다가가기 쉬운 사람, 혼내지 않는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 CP라서 기준을 분명히 말하는 힘, 단호하게 정리해주는 말이 부족한 편입니다. 규칙을 어겼을 때도 “다음엔 조심하자” 정도로 넘어가거나, 성과가 안 나와도 “요즘 좀 힘들지?”로 끝나는 경우가 많습니다. 이러다 보면 PA님은 편해지지만, 어디까지가 괜찮고 어디부터는 안 되는지를 헷갈리게 됩니다. 그 결과, 행동이 느려지고 같은 실수가 반복됩니다. 이 지점장님은 PA님을 싫어해서가 아니라, 상처 줄까 봐 기준을 말하지 못하는 경우가 많습니다.
-
-그래서 이 성향의 지점장님은 부드러움을 유지한 채 기준을 말하는 연습이 꼭 필요합니다. 화를 낼 필요도, 목소리를 높일 필요도 없습니다. 다만 “이건 명확히 지켜야 해”라는 문장을 말로 꺼내는 연습이 필요합니다.
-
-개선 시 고정 멘트 첫 번째는
-“편하게 해도 되지만, 이건 반드시 지켜야 하는 약속이야.”
-
-두 번째 고정 멘트는
-“기분은 이해하지만, 이 부분은 다음엔 꼭 바꿔보자.”
-
-세 번째 고정 멘트는
-“지금은 웃으면서 말하지만, 이건 중요한 기준이야.”
-
-이 고정 멘트를 쓰면, PA님은 혼나는 느낌 없이도 선을 인식하게 됩니다. 그러면 이 지점장님은 착한 지점장님를 넘어서 편하지만 흐트러지지 않는 지점장님가 됩니다. PA님은 “이 사람은 나를 이해해주면서도 방향은 분명히 알려준다”고 느끼게 되고, 그때부터 행동이 훨씬 안정되고 빨라집니다.`,improvement:``},AC_FC_NP:{manner:`PA님을 코칭할 때의 말투는 아주 부드럽고 친근하며, 분위기를 먼저 살리는 말투입니다. TOP1이 AC인 이 성향은 기본적으로 상대의 눈치와 반응을 먼저 살피는 말투를 씁니다. PA님이 표정이 어두우면 바로 말을 멈추고, 부담스러워 보이면 “괜찮아, 천천히 해도 돼”라고 말합니다. TOP2가 FC이기 때문에 말투에는 웃음과 농담이 섞여 있고, 분위기를 가볍게 만드는 표현이 많습니다. “이 정도면 잘하고 있어”, “처음엔 다 이래” 같은 말로 PA님을 편하게 만듭니다. 그래서 PA님은 이 지점장님를 편하고 재미있는 사람, 무서움이 없는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 NP라서 진짜로 마음을 붙잡아 주는 말, 깊게 공감해 주는 말이 부족한 편입니다. 겉으로는 웃고 괜찮다고 말하지만, PA님의 속마음까지 천천히 들어주거나 “네가 왜 힘든지 이해한다”는 말을 충분히 하지 못하는 경우가 있습니다. 그 결과 PA님은 겉으로는 편하지만, 속으로는 “내 마음을 진짜 알아주는 건가?”라는 느낌을 받을 수 있습니다. 또 AC가 높아 다소 PA님의 눈치를 보게 되면서, 힘들어 보이면 기준을 낮추거나 중요한 이야기를 미루는 경우도 생깁니다.
-
-이 성향의 지점장님은 분위기를 살리는 장점은 그대로 두고, 공감의 말을 의식적으로 늘리는 연습이 필요합니다. 웃어 넘기지 말고, PA님의 감정을 한 번 더 말로 확인해 주는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 웃고 있지만, 네가 이 부분에서 힘들 수 있다는 건 이해해.”
-
-두 번째 고정 멘트는
-“괜찮다고 말해도, 네 입장에선 쉽지 않았을 것 같아.”
-
-세 번째 고정 멘트는
-“편하게 하자는 말과 별개로, 네 마음은 내가 제대로 듣고 싶어.”
-
-이 고정 멘트를 쓰면 PA님은 가볍게 넘겨지는 사람이 아니라, 존중받고 있다고 느끼게 됩니다. 그러면 이 지점장님은 단순히 재미있는 지점장님를 넘어서, 편안하면서도 믿을 수 있는 지점장님가 됩니다. PA님은 마음을 숨기지 않게 되고, 코칭의 깊이가 자연스럽게 깊어집니다.`,improvement:``},AC_FC_A:{manner:`PA님을 코칭할 때의 말투는 아주 부드럽고 친근하며, 분위기를 먼저 편안하게 만드는 말투입니다. TOP1이 AC라서 상대의 표정과 반응을 먼저 살피며 말을 꺼냅니다. PA님이 긴장하면 목소리를 낮추고, 부담스러워 보이면 “괜찮아, 천천히 해도 돼”라고 먼저 안심시킵니다. TOP2가 FC이기 때문에 말투에는 웃음, 공감, 가벼운 농담이 섞여 있습니다. “처음엔 다 헷갈려”, “이 정도면 꽤 잘했어” 같은 말로 분위기를 밝게 만들고, PA님이 웃으면 함께 웃어 줍니다. 그래서 PA님은 이 지점장님를 편하고 재미있는 사람, 무섭지 않은 사람으로 느낍니다.
-
-하지만 BOTTOM1이 A라서 정리된 설명, 이유를 차분히 알려주는 말이 부족해질 수 있습니다. 분위기를 살리느라 “느낌상 이렇게 하면 돼”처럼 감각적인 말이 많아지고, 왜 그렇게 해야 하는지, 다음에 무엇을 하면 되는지에 대한 구조적인 안내가 약해질 수 있습니다. 그 결과 PA님은 기분은 좋지만 “그래서 정확히 뭘 해야 하지?”라는 혼란을 느낄 수 있습니다. 또한 AC가 높아 다소 PA님의 반응을 의식하다 보니, 꼭 짚어야 할 기준이나 피드백을 부드럽게만 넘길 위험도 있습니다.
-
-이 성향의 지점장님은 편안함은 유지하되, 설명을 한 단계 더 정리해서 말하는 연습이 필요합니다. 웃으며 말하되, 핵심을 짧게 정리해 주는 것이 중요합니다. 말의 끝에 ‘이유’와 ‘다음 행동’을 붙이는 습관을 들이면 좋습니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금은 편하게 말할게, 그런데 이유를 하나만 짚어보자.”
-
-두 번째 고정 멘트는
-“느낌은 괜찮은데, 정리하면 이렇게 하면 더 좋아.”
-
-세 번째 고정 멘트는
-“지금 단계에서는 이 한 가지만 기억하면 돼.”
-
-이 고정 멘트를 쓰면 PA님은 편안함 속에서도 방향을 잃지 않게 됩니다. 그러면 이 지점장님은 재미있는 지점장님를 넘어서, 편안하면서도 믿고 따라갈 수 있는 지점장님가 됩니다. PA님은 무엇을 왜 해야 하는지 이해하게 되고, 코칭의 속도와 안정감이 함께 올라가게 됩니다.`,improvement:``}},cm6:{},cm7:{CP_NP_A:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
+결국 이 성향의 핵심은 강한 책임감과 따뜻함입니다. 다만 상대의 부담과 감정 속도를 한 번 더 확인하는 질문이 함께 들어가야 조직의 생산성과 매출도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_A_NP:{manner:`이 성향의 리더는 조직 안에서 방향을 잡고 흐름을 정리하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 운영 흐름과 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 부분을 먼저 맞춰야 합니다.”
+“여기서는 흐름이 흔들리면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 상황을 정리하고 분석하려는 힘이 강합니다. 구성원의 활동량, 상담 흐름, 고객 반응, 실적 흐름을 비교적 냉정하게 보려고 하며 문제를 발견하면 빠르게 정리해서 해결 방향을 잡으려 합니다. 그래서 조직원 입장에서는
+“판단이 빠르고 정확하다.”
+“흐름을 잘 정리해준다.”
+“문제가 생겨도 중심을 잃지 않는다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 충분히 살피기 전에 해결과 수정 방향이 먼저 나오는 경우가 생길 수 있습니다. 리더 본인은 조직을 위해 필요한 말을 한다고 느끼지만 구성원 입장에서는
+“결과만 중요하게 보는 것 같다.”
+“내 마음은 충분히 이해받지 못한 느낌이다.”
+“실수하면 바로 지적받을 것 같다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 흐름을 안정적으로 끌고 가는 힘은 매우 강하지만 구성원의 감정과 긴장 상태를 풀어주는 표현이 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 문제를 바로 수정하려 하기 전에 먼저 구성원의 상황과 마음 상태를 한 번 들어주는 습관이 중요합니다.
+
+특히 NP가 낮은 리더는
+ “요즘 가장 힘든 부분이 어떤 건가요?”
+ “지금 계속 움직이고 계신 건 정말 잘하고 계십니다.”
+ “혼자 너무 오래 끌고 가지 마시고 중간에 꼭 이야기해주세요.”
+같은 공감 문장을 의식적으로 먼저 사용하는 것만으로도 구성원의 심리적 거리감이 크게 줄어들게 됩니다.
+
+이 성향은 원래 조직을 안정적으로 끌고 갈 수 있는 힘이 매우 강한 성향입니다. 여기에 따뜻한 인정과 공감 표현이 조금만 더해지면 구성원의 활동 지속력과 조직의 분위기가 훨씬 좋아지고 매출 흐름도 더 안정적으로 올라가게 됩니다.
+
+결국 이 성향의 핵심은 강한 책임감과 상황 정리 능력입니다. 다만 구성원이 ‘이 리더는 내 상황도 이해하려고 한다’라는 느낌을 받을 수 있도록 공감의 표현을 조금 더 의식적으로 사용해야 조직의 생산성과 매출도 더 오래 안정적으로 유지될 수 있습니다.`,improvement:``},CP_A_FC:{manner:`이 성향의 리더는 조직 안에서 방향을 잡고 흐름을 정리하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 운영 흐름과 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 부분을 먼저 맞춰야 합니다.”
+“여기서는 흐름이 흔들리면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 상황을 정리하고 분석하려는 힘이 강합니다. 구성원의 활동량, 상담 흐름, 고객 반응, 실적 흐름을 비교적 냉정하게 보려고 하며 문제를 발견하면 빠르게 정리해서 해결 방향을 잡으려 합니다. 그래서 조직원 입장에서는
+“판단이 빠르고 정확하다.”
+“흐름을 잘 정리해준다.”
+“문제가 생겨도 중심을 잃지 않는다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현이 부족해질 수 있습니다. 리더 본인은 진지하게 이야기하고 있다고 느끼지만 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“가까이 다가가기 쉽지 않다.”
+“계속 긴장하게 된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 방향과 실행 흐름을 안정적으로 끌고 가는 힘은 매우 강하지만, 구성원의 긴장감을 풀어주고 편하게 움직이게 만드는 표현이 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 결과 점검만 하는 것이 아니라 구성원이 심리적으로 편안하게 움직일 수 있는 분위기를 함께 만들어주는 것이 중요합니다.
+
+특히 FC가 낮은 리더는 의식적으로
+ 미소를 띄고 고개를 끄덕이는 반응을 보여주고
+ 결과 이야기 전에 인정하는 말을 먼저 넣어주고
+ 무거운 분위기를 너무 오래 끌고 가지 않는 습관
+이 중요합니다.
+
+이 성향은 원래 조직을 오래 안정적으로 운영할 수 있는 힘이 매우 강한 성향입니다. 여기에 분위기를 조금 더 편안하게 만드는 표현이 더해지면 구성원의 활동량과 상담 움직임, 조직의 에너지와 매출 흐름이 훨씬 살아나게 됩니다.
+
+결국 이 성향의 핵심은 강한 책임감과 상황 정리 능력입니다. 다만 구성원이 긴장만 하기보다 편하게 움직일 수 있도록 분위기를 조금 더 부드럽게 만들어줘야 조직의 생산성과 매출도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_A_AC:{manner:`이 성향의 리더는 조직 안에서 방향을 잡고 흐름을 안정적으로 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 운영 흐름과 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 실행 움직임이 중요합니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 상황을 정리하고 분석하려는 힘이 강합니다. 구성원의 활동량, 고객 흐름, 상담 진행률, 계약 흐름 등을 비교적 객관적으로 보려고 하며 문제가 생기면 빠르게 원인을 찾고 해결 방향을 정리하려 합니다. 그래서 구성원 입장에서는
+“판단이 빠르다.”
+“흐름 정리가 명확하다.”
+“조직 운영이 안정적이다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 상태와 부담 정도를 세밀하게 살피는 부분이 부족해질 수 있습니다. 리더 본인은 조직을 위해 필요한 이야기를 하고 있다고 느끼지만 구성원 입장에서는
+“말이 조금 강하게 느껴진다.”
+“결론이 너무 빨리 나온다.”
+“내 상황을 충분히 설명하기 어렵다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 끌고 가는 힘은 매우 강하지만 구성원의 현재 상태와 부담 정도를 확인하는 질문이 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 실행 방향을 이야기하기 전에 상대의 현재 흐름을 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는 결과와 행동을 먼저 이야기하기 전에
+“지금 코칭속도는 괜찮으신가요?”
+“요즘 가장 버거운 부분은 어떤 건가요?”
+“이 방향이 부담스럽게 느껴지진 않으신가요?”
+같은 질문을 먼저 넣어주는 것만으로도 구성원의 긴장감과 거리감이 크게 줄어들게 됩니다.
+
+또한 구성원이 실적이 떨어졌을 때 바로 수정 방향부터 이야기하면 구성원은 자신이 이해받지 못한다고 느끼기 쉽습니다. 그래서 먼저 현재 상황을 듣고 난 뒤 행동 방향을 정리해주는 순서가 중요합니다. 공감 없이 바로 결론으로 들어가면 구성원은 움직이기보다 방어적으로 변할 가능성이 높아집니다.
+
+그래서 이 성향의 리더는
+“무엇을 바꿀 것인가”보다
+“지금 어떤 상태인가”를 먼저 묻는 습관이 중요합니다.
+
+이 성향은 원래 조직을 강하게 끌고 갈 수 있는 힘이 매우 뛰어난 성향입니다. 여기에 구성원의 감정과 부담을 한 번 더 확인하는 표현이 더해지면 활동량과 상담 움직임, 조직의 실행 지속력이 훨씬 안정적으로 살아나게 됩니다.`,improvement:``},CP_FC_NP:{manner:`이 성향의 리더는 조직 안에서 실행력과 분위기를 동시에 끌고 가는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 실행 움직임이 중요합니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 상담 현장이나 회의 분위기가 너무 가라앉지 않도록 에너지를 살리려는 모습도 강하게 나타납니다. 그래서 구성원 입장에서는
+“분위기를 답답하지 않게 만든다.”
+“조직 안의 에너지를 살린다.”
+“같이 움직이면 힘이 난다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태와 속마음을 깊게 공감해주는 부분이 부족해질 수 있습니다. 리더 본인은 분위기도 좋고 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결국 결과 중심으로 느껴질 때가 있다.”
+“힘든 상황을 길게 이야기하기 어렵다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 움직임과 분위기를 끌어올리는 힘은 강하지만 구성원의 감정을 오래 들어주고 공감하는 부분이 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기를 살리는 것만으로 끝나는 것이 아니라 구성원의 현재 상태를 차분하게 들어주는 시간이 함께 필요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 다시 해보면 됩니다.”
+라고 빠르게 넘어가기보다
+“지금 어떤 부분이 가장 힘드셨나요?”
+“최근에 마음이 가장 무거웠던 순간이 언제였나요?”
+처럼 현재 감정 상태를 먼저 물어보는 습관이 중요합니다.
+
+또한 FC가 높은 리더는 조직 분위기를 밝게 만들려는 힘이 강하기 때문에 구성원이 보내는 무거운 신호를 가볍게 넘길 가능성도 있습니다. 그래서 분위기를 올리는 말 뒤에는 반드시 현재 상태를 확인하는 질문이 함께 들어가야 구성원이 심리적으로 더 오래 버틸 수 있게 됩니다.
+
+이 성향은 원래 조직의 활동량과 움직임을 끌어올리는 힘이 매우 좋은 성향입니다. 여기에 공감과 경청이 조금 더해지면 구성원의 안정감과 조직의 유지력이 훨씬 좋아지고 생산성과 매출 흐름도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_FC_A:{manner:`이 성향의 리더는 조직 안에서 실행력과 분위기를 동시에 끌고 가는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 현장 분위기가 처지지 않도록 에너지를 끌어올리는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“분위기를 답답하지 않게 만든다.”
+“같이 움직이면 힘이 난다.”
+“조직 안에 에너지가 살아 있다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 끌고 가다가도 실제 문제 원인이나 숫자 흐름을 차분하게 정리하는 부분이 부족해질 수 있습니다. 리더 본인은 열심히 독려하고 분위기를 살리고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 정리해야 하는지 헷갈린다.”
+“구체적인 우선순위가 부족하다.”
+“열심히는 하는데 방향이 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 활동량과 분위기를 끌어올리는 힘은 매우 강하지만 실행의 우선순위와 현실적인 정리 부분이 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기를 올리는 것과 동시에 “지금 가장 먼저 해야 할 한 가지”를 명확하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“열심히 해봅시다.”
+라는 독려만 반복하기보다
+“오늘 가장 먼저 해야 하는 건 고객 연락 3건입니다.”
+“이번 주는 상담 약속 확보에 집중해보시죠.”
+처럼 행동 순서를 구체적으로 정리해주는 것이 중요합니다.
+
+또한 FC가 높은 리더는 조직 분위기를 살리는 힘이 좋은 대신 구성원의 어려움을 가볍게 넘기거나 현실적인 문제를 정확히 짚지 못하는 경우도 생길 수 있습니다. 그래서 격려 이후에는 반드시 현재 숫자 흐름과 행동량을 차분하게 확인하는 과정이 함께 들어가야 합니다.
+
+이 성향은 원래 조직의 에너지와 활동량을 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 우선순위를 정리해주는 습관과 현실적인 점검이 더해지면 조직의 생산성과 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},CP_FC_AC:{manner:`이 성향의 리더는 조직 안에서 실행력과 분위기를 동시에 끌고 가는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 움직임을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 현장 분위기가 처지지 않도록 에너지를 끌어올리는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“현장 에너지가 살아 있다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 상태와 부담 정도를 세밀하게 살피는 부분이 부족해질 수 있습니다. 리더 본인은 분위기도 좋고 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“조금 압박처럼 느껴질 때가 있다.”
+“결론이 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 활동량과 분위기를 끌어올리는 힘은 매우 강하지만 구성원의 현재 상태와 부담 정도를 세밀하게 확인하는 질문이 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기를 살리는 것만으로 끝나는 것이 아니라 상대의 현재 상태를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는 분위기를 밝게 만들면서도 중간중간
+“지금 코칭속도는 괜찮으신가요?”
+“요즘 가장 버거운 부분은 어떤 건가요?”
+“지금 이 흐름이 부담스럽게 느껴지진 않으신가요?”
+같은 질문을 함께 넣어주는 것이 중요합니다.
+
+또한 FC가 높은 리더는 조직 분위기를 끌어올리는 힘이 강하기 때문에 구성원의 힘든 신호를 가볍게 넘길 가능성도 있습니다. 그래서 격려와 독려 이후에는 반드시 현재 상태와 부담 정도를 차분하게 확인하는 과정이 함께 들어가야 구성원이 더 오래 안정적으로 움직이게 됩니다.
+
+이 성향은 원래 조직의 에너지와 실행 움직임을 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 감정과 부담을 한 번 더 살피는 질문이 더해지면 조직의 생산성과 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},CP_AC_NP:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하고 구성원을 관리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 방향과 실행 움직임을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 비교적 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고, 조직 안에서 충돌이 커지지 않도록 중간에서 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기를 안정적으로 유지하려고 한다.”
+“강하게 밀어붙이기보다 조율하려 한다.”
+“함부로 부담 주는 말을 하지 않는다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 배려하고 있다고 느끼지만 구성원 입장에서는
+“정은 있지만 따뜻한 공감은 부족하다.”
+“내 마음을 깊게 이해받는 느낌은 아니다.”
+“결국 실행 이야기로 빨리 넘어간다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 운영하고 흐름을 유지하는 힘은 좋지만 구성원의 감정을 깊게 공감하고 심리적으로 안아주는 표현은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 결과와 실행 방향을 이야기하기 전에 구성원의 현재 감정 상태를 먼저 들어주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“왜 이것밖에 안 됐을까요?”
+보다
+“요즘 가장 힘든 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 AC가 높은 리더는 조직 분위기를 맞추려는 힘이 있기 때문에 속으로 답답함이 있어도 직접 표현하지 못하고 혼자 끌어안는 경우도 있습니다. 그러다 어느 순간 말이 차갑게 나오거나 거리감이 생길 수 있기 때문에 평소 작은 공감 표현을 자주 사용하는 것이 중요합니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지할 수 있는 힘이 좋은 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 구성원의 심리적 안정감과 조직의 유지력이 훨씬 좋아지고 생산성과 매출 흐름도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_AC_A:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하고 구성원을 책임감 있게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 방향과 실행 움직임을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고, 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기를 안정적으로 유지하려고 한다.”
+“말을 함부로 강하게 하지 않는다.”
+“조율하면서 같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 운영하다가도 실제 문제 원인과 우선순위를 차분하게 정리하는 부분이 부족해질 수 있습니다. 리더 본인은 충분히 노력하고 챙기고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 할지 헷갈린다.”
+“이야기는 많은데 정리가 안 되는 느낌이다.”
+“실행 순서가 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 유지하고 관계 흐름을 맞추는 힘은 좋지만 실제 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만으로 끝나는 것이 아니라 “지금 가장 먼저 해야 하는 한 가지”를 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“열심히 해봅시다.”
+라는 격려만 반복하기보다
+“오늘 가장 먼저 해야 하는 건 고객 연락 3건입니다.”
+“이번 주는 상담 약속 확보에 집중해보시죠.”
+처럼 행동 순서를 구체적으로 정리해주는 것이 중요합니다.
+
+또한 AC가 높은 리더는 상대 눈치를 많이 보다가 정작 꼭 해야 하는 말을 늦게 꺼내는 경우도 있습니다. 그러다 어느 순간 답답함이 쌓이면 말이 갑자기 강하게 나올 수 있기 때문에 평소 짧고 분명하게 방향을 정리해주는 습관이 중요합니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지할 수 있는 힘이 좋은 성향입니다. 여기에 실행 우선순위를 명확하게 정리하는 습관이 더해지면 조직의 활동량과 생산성, 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},CP_AC_FC:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하고 구성원을 책임감 있게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 방향과 실행 움직임을 중요하게 생각합니다. 그래서 구성원에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고, 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기를 안정적으로 유지하려고 한다.”
+“말을 함부로 강하게 하지 않는다.”
+“조율하면서 같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현이 부족해질 수 있습니다. 리더 본인은 충분히 배려하면서 이야기하고 있다고 느끼지만 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“가까이 다가가기 쉽지 않다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 유지하고 흐름을 관리하는 힘은 좋지만 구성원이 심리적으로 편하게 움직일 수 있도록 분위기를 풀어주는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 실행 방향과 조율만 하는 것이 아니라 구성원이 편하게 이야기할 수 있는 분위기를 만드는 습관이 중요합니다.
+
+특히 이 성향의 리더는 결과와 움직임을 이야기하기 전에
+“요즘 많이 지치진 않으신가요?”
+“지금 코칭속도는 괜찮으신가요?”
+“혼자 너무 무겁게 끌고 가고 계시진 않으신가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 FC가 낮은 리더는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 구성원은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지할 수 있는 힘이 매우 좋은 성향입니다. 여기에 구성원이 심리적으로 편하게 움직일 수 있는 분위기와 따뜻한 반응이 더해지면 조직의 활동량과 생산성, 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_CP_A:{manner:`이 성향의 리더는 조직 안에서 사람을 챙기고 보호하려는 마음이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 구성원이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“쉽게 포기하지 않고 끝까지 챙겨준다.”
+“사람을 중요하게 생각한다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 따뜻하기만 한 리더가 아니라 조직의 방향과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고, 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 구성원 입장에서는
+“따뜻하지만 중심은 있는 리더다.”
+“조직 흐름을 놓치지 않는다.”
+“결국은 움직이게 만든다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 운영하다가도 실제 문제 원인과 실행 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 챙기고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈린다.”
+“위로는 되는데 정리가 부족하다.”
+“방향이 조금 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 관계를 안정적으로 유지하는 힘은 매우 좋지만 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 격려만으로 끝나는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 명확하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 잘하실 수 있습니다.”
+라는 위로만 반복하기보다
+“오늘 가장 먼저 해야 하는 건 고객 연락 3건입니다.”
+“이번 주는 상담 약속 확보 하나에 집중해보시죠.”
+처럼 행동 순서를 구체적으로 정리해주는 것이 중요합니다.
+
+또한 NP가 높은 리더는 구성원이 힘들어하면 너무 오래 감정을 들어주다가 실행 흐름이 늦어지는 경우도 생길 수 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 방향을 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 움직임과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 순서를 명확하게 정리하는 힘이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_CP_FC:{manner:`이 성향의 리더는 조직 안에서 사람을 챙기고 보호하려는 마음이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 구성원이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“쉽게 포기하지 않고 끝까지 챙겨준다.”
+“사람을 중요하게 생각한다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 따뜻하기만 한 리더가 아니라 조직의 방향과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고, 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 구성원 입장에서는
+“따뜻하지만 중심은 있는 리더다.”
+“조직 흐름을 놓치지 않는다.”
+“결국은 움직이게 만든다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현은 부족해질 수 있습니다. 리더 본인은 충분히 배려하고 있다고 느끼지만 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있도록 분위기를 풀어주는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 실행 방향만 이야기하는 것이 아니라 구성원이 편하게 움직일 수 있는 분위기를 함께 만들어주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 중요합니다.
+
+또한 FC가 낮은 리더는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 구성원은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지하고 구성원을 지켜주는 힘이 매우 좋은 성향입니다. 여기에 밝은 반응과 편안한 분위기가 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_CP_AC:{manner:`이 성향의 리더는 조직 안에서 사람을 챙기고 보호하려는 마음이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 구성원이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“쉽게 포기하지 않고 끝까지 챙겨준다.”
+“사람을 중요하게 생각한다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 따뜻하기만 한 리더가 아니라 조직의 방향과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고, 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 구성원 입장에서는
+“따뜻하지만 조직 흐름은 놓치지 않는다.”
+“사람을 챙기면서도 실행 움직임은 관리한다.”
+“결국은 다시 움직이게 만든다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 챙기고 배려하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“조금 압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 구성원의 현재 부담과 심리 상태를 세밀하게 확인하는 질문은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 격려만 하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 다시 해보면 됩니다.”
+라고 바로 정리하기보다
+“지금 가장 버거운 부분은 어떤 건가요?”
+“요즘 코칭속도는 괜찮으신가요?”
+“지금 어떤 부분에서 가장 부담을 느끼고 계신가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 NP가 높은 리더는 구성원을 오래 챙기려는 마음이 강하기 때문에 속으로 답답함이 있어도 참고 넘어가는 경우도 있습니다. 그러다가 어느 순간 말이 갑자기 강하게 나오면 구성원은 더 크게 위축될 수 있습니다. 그래서 평소 짧고 부드럽게 현재 상태를 확인하는 습관이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 상대의 부담과 현재 흐름을 한 번 더 확인하는 질문이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_A_CP:{manner:`이 성향의 리더는 조직 안에서 사람을 안정적으로 챙기고 구성원의 감정 흐름을 세밀하게 살피려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원이 힘들어하면 먼저 이유를 들으려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“압박보다 안정감을 준다.”
+“사람을 중요하게 생각한다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 감정적으로만 조직을 운영하는 것이 아니라 현실적인 흐름과 숫자도 같이 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 차분하게 정리하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“차분하게 상황을 정리해준다.”
+“무리하게 몰아가지 않는다.”
+“이야기를 들은 뒤 현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 공감하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“움직임을 강하게 끌어주는 느낌은 부족하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 안정감을 유지하는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 이해만으로 끝나는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 천천히 해봅시다.”
+라는 말만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP가 높은 리더는 구성원이 힘들어하면 너무 오래 감정을 들어주다가 실제 행동 흐름이 늦어지는 경우도 생길 수 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 방향을 짧게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 움직임을 조금 더 분명하게 끌어주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_A_FC:{manner:`이 성향의 리더는 조직 안에서 사람을 안정적으로 챙기고 구성원의 감정 흐름을 세밀하게 살피려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원이 힘들어하면 먼저 이유를 들으려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“압박보다 안정감을 준다.”
+“사람을 중요하게 생각한다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 감정적으로만 조직을 운영하는 것이 아니라 현실적인 흐름과 숫자도 같이 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 차분하게 정리하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“차분하게 상황을 정리해준다.”
+“무리하게 몰아가지 않는다.”
+“이야기를 들은 뒤 현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현은 부족해질 수 있습니다. 리더 본인은 충분히 배려하고 차분하게 이야기하고 있다고 느끼지만 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 현실적인 정리만 하는 것이 아니라 구성원이 “편하게 움직일 수 있는 분위기”를 함께 만들어주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 중요합니다.
+
+또한 FC가 낮은 리더는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 구성원은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 밝은 반응과 편안한 분위기가 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_A_AC:{manner:`이 성향의 리더는 조직 안에서 사람을 안정적으로 챙기고 구성원의 감정 흐름을 세밀하게 살피려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원이 힘들어하면 먼저 이유를 들으려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“압박보다 안정감을 준다.”
+“사람을 중요하게 생각한다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 감정적으로만 조직을 운영하는 것이 아니라 현실적인 흐름과 숫자도 같이 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 차분하게 정리하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“차분하게 상황을 정리해준다.”
+“무리하게 몰아가지 않는다.”
+“이야기를 들은 뒤 현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 배려하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“조금 압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 안정감을 유지하는 힘은 매우 좋지만 구성원의 현재 부담과 심리 상태를 세밀하게 확인하는 질문은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 현실적인 정리만 하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 다시 해보면 됩니다.”
+라고 바로 정리하기보다
+“지금 가장 버거운 부분은 어떤 건가요?”
+“요즘 코칭속도는 괜찮으신가요?”
+“지금 어떤 부분에서 가장 부담을 느끼고 계신가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 NP가 높은 리더는 구성원을 오래 챙기려는 마음이 강하기 때문에 속으로 답답함이 있어도 참고 넘어가는 경우도 있습니다. 그러다가 어느 순간 말이 갑자기 강하게 나오면 구성원은 더 크게 위축될 수 있습니다. 그래서 평소 짧고 부드럽게 현재 상태를 확인하는 습관이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 상대의 부담과 현재 흐름을 한 번 더 확인하는 질문이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_FC_CP:{manner:`이 성향의 리더는 조직 안에서 사람을 편안하게 만들고 분위기를 밝게 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“정서적으로 안정감을 준다.”
+“사람을 진심으로 챙긴다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 공감하고 격려하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 느슨해질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 잘될 겁니다.”
+라는 격려만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP와 FC가 함께 높은 리더는 구성원과 관계가 좋아지는 대신 분위기가 너무 편안해져 실행 긴장감이 약해질 가능성도 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 명확하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 움직임을 조금 더 분명하게 끌어주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_FC_A:{manner:`이 성향의 리더는 조직 안에서 사람을 편안하게 만들고 분위기를 밝게 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“정서적으로 안정감을 준다.”
+“사람을 진심으로 챙긴다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 감정 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 공감하고 격려하고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈린다.”
+“위로는 되는데 정리가 부족하다.”
+“열심히는 하는데 방향이 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력은 매우 좋지만 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 잘될 겁니다.”
+라는 격려만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP와 FC가 함께 높은 리더는 구성원과 관계가 좋아지는 대신 분위기가 너무 편안해져 실행 긴장감이 약해질 가능성도 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 명확하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 우선순위를 정리해주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_FC_AC:{manner:`이 성향의 리더는 조직 안에서 사람을 편안하게 만들고 분위기를 밝게 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“정서적으로 안정감을 준다.”
+“사람을 진심으로 챙긴다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 공감하고 편안한 분위기를 만들고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“좋은 분위기인데도 압박처럼느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력은 매우 좋지만 구성원의 현재 부담과 심리 상태를 세밀하게 확인하는 질문은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+
+또한 NP와 FC가 함께 높은 리더는 조직 분위기를 너무 편안하게 유지하려다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 어느 순간 답답함이 쌓이면 말이 갑자기 강하게 나올 수 있기 때문에 평소 짧고 부드럽게 현재 상태를 확인하면서도 실행 움직임은 분명하게 정리해주는 습관이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 상대의 부담과 현재 흐름을 한 번 더 확인하는 질문이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_AC_CP:{manner:`조합의 리더는 조직 안에서 사람을 안정적으로 챙기고 구성원의 감정 흐름과 조직 분위기를 부드럽게 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 챙기고 배려하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만으로 끝나는 것이 아니라 “지금 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“괜찮습니다. 천천히 해봅시다.”
+라는 말만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP와 AC가 함께 높은 리더는 구성원의 부담을 너무 배려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 조직 분위기가 느슨해지면 활동량과 상담 움직임도 함께 떨어질 가능성이 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 움직임을 조금 더 분명하게 끌어주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_AC_A:{manner:`이 성향의 리더는 조직 안에서 사람을 안정적으로 챙기고 구성원의 감정 흐름과 조직 분위기를 부드럽게 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 그래서 구성원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 챙기고 배려하고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈린다.”
+“좋은 분위기인데 방향이 흐려질 때가 있다.”
+“위로는 되는데 정리가 부족하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만 하는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 너무 오래 위로와 공감만 이어가기보다, 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“지금 여러 가지를 한꺼번에 하려고 하기보다 이번 주는 상담 약속 확보 하나에 집중해보시지요.”
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 NP와 AC가 함께 높은 리더는 구성원의 부담을 너무 배려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 조직 분위기가 느슨해지면 활동량과 상담 움직임도 함께 떨어질 가능성이 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 우선순위를 정리해주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_AC_FC:{manner:`이 성향의 리더는 조직 안에서 사람을 안정적으로 챙기고 구성원의 감정 흐름과 조직 분위기를 부드럽게 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 조직원 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현은 부족해질 수 있습니다. 리더 본인은 충분히 배려하고 조심해서 이야기하고 있다고 느끼지만 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만 하는 것이 아니라 구성원이 “편하게 움직일 수 있는 반응과 표현”을 의식적으로 자주 사용하는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 차분하게 듣기만 하기보다
+“고생 많으셨습니다.”
+“계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 자주 넣어주는 것이 중요합니다.
+
+또한 FC가 낮은 리더는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 구성원은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 NP와 AC가 함께 높은 리더는 구성원의 부담을 너무 배려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그래서 충분히 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 함께 정리해주는 것이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 밝은 반응과 편안한 분위기가 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_CP_NP:{manner:`이 성향의 리더는 조직 안에서 흐름을 차분하게 정리하고 현실적으로 움직임을 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 조직의 실행 움직임과 운영 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 구성원 입장에서는
+“조직 흐름을 놓치지 않는다.”
+“결국 움직이게 만든다.”
+“성과 방향이 분명하다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“조금 차갑게 느껴질 때가 있다.”
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결론이 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 생산성을 안정적으로 끌고 가는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“지금 왜 안 되고 있을까요?”
+라고 바로 원인을 정리하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 CP가 함께 높은 리더는 문제를 빨리 해결하려는 힘이 강하기 때문에 구성원이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 그러다 보면 구성원은 “내 마음은 이해받지 못했다”라고 느끼면서 움직임까지 줄어들 가능성이 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 생산성을 안정적으로 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_CP_FC:{manner:`이 성향의 리더는 조직 안에서 흐름을 차분하게 정리하고 현실적으로 움직임을 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 조직의 실행 움직임과 운영 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 구성원 입장에서는
+“조직 흐름을 놓치지 않는다.”
+“결국 움직이게 만든다.”
+“성과 방향이 분명하다.”
+라는 느낌을 받게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주거나 감정을 편안하게 표현하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 생산성을 안정적으로 끌고 가는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 구성원이 편하게 움직일 수 있는 반응과 표현을 의식적으로 자주 사용하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이 부분은 이렇게 정리하겠습니다.”
+처럼 결론 중심으로만 이야기하기보다
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 자주 넣어주는 것이 중요합니다.
+
+또한 A와 CP가 함께 높은 리더는 문제를 빨리 해결하려는 힘이 강하기 때문에 구성원이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 거기에 FC까지 낮아지면 말투와 분위기가 더 단단하게 전달될 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 분위기를 편안하게 만든 뒤에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 생산성을 안정적으로 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 부드러운 반응과 따뜻한 표현이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_CP_AC:{manner:`이 성향의 리더는 조직 안에서 흐름을 차분하게 정리하고 현실적으로 움직임을 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 조직의 실행 움직임과 운영 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 구성원 입장에서는
+“조직 흐름을 놓치지 않는다.”
+“결국 움직이게 만든다.”
+“성과 방향이 분명하다.”
+라는 느낌을 받게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 생산성을 안정적으로 끌고 가는 힘은 매우 좋지만 구성원의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이 부분은 이렇게 정리하겠습니다.”
+라고 바로 결론부터 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 CP가 함께 높은 리더는 문제를 빨리 해결하려는 힘이 강하기 때문에 구성원이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 거기에 AC까지 낮아지면 상대 입장에서는 “내 상황은 충분히 이해받지 못했다”라고 느끼면서 움직임이 위축될 가능성도 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 생산성을 안정적으로 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 부담과 감정 상태를 한 번 더 확인해주는 부드러운 접근이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_NP_CP:{manner:`이 성향의 리더는 조직 안에서 상황을 차분하게 정리하고 구성원을 안정적으로 챙기려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 리더가 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“내 이야기를 들어주려고 한다.”
+“사람을 함부로 대하지 않는다.”
+“결과만 보는 사람이 아니다.”
+라는 안정감을 느끼게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 공감하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 방향 설명은 있는데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 공감만으로 끝나는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“지금 상황은 이해했습니다.”
+라고 정리만 하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 A와 NP가 함께 높은 리더는 구성원의 감정과 현실 상황을 모두 이해하려는 힘이 좋기 때문에 오히려 결론을 늦게 내리는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+그리고 이 성향은 조직을 안정적으로 유지하는 힘이 매우 좋은 성향이기 때문에 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_NP_FC:{manner:`이 성향의 리더는 조직 안에서 상황을 차분하게 정리하고 구성원을 안정적으로 챙기려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 리더가 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“내 이야기를 들어주려고 한다.”
+“사람을 함부로 대하지 않는다.”
+“결과만 보는 사람이 아니다.”
+라는 안정감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주거나 감정을 편안하게 표현하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 공감하고 있다고 느끼지만 구성원 입장에서는
+“조금 어렵게 느껴질 때가 있다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 공감만 하는 것이 아니라 구성원이 편하게 움직일 수 있는 반응과 표현을 의식적으로 자주 사용하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이 부분은 이렇게 정리하겠습니다.”
+처럼 결론 중심으로만 이야기하기보다
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 자주 넣어주는 것이 중요합니다.
+
+또한 A와 NP가 함께 높은 리더는 문제를 빨리 정리하면서도 구성원을 챙기려는 마음이 함께 있기 때문에 속으로는 배려하고 있어도 표정과 반응은 차분하게 유지되는 경우가 많습니다. 거기에 FC까지 낮아지면 구성원 입장에서는 “혼나고 있는 건가?”라고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘도 좋은 편이기 때문에 분위기를 안정적으로 만든 뒤에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 안정감을 함께 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_NP_AC:{manner:`이 성향의 리더는 조직 안에서 상황을 차분하게 정리하고 구성원을 안정적으로 챙기려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 리더가 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“내 이야기를 들어주려고 한다.”
+“사람을 함부로 대하지 않는다.”
+“결과만 보는 사람이 아니다.”
+라는 안정감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 공감하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 안정감을 함께 끌고 가는 힘은 매우 좋지만 구성원의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이 부분은 이렇게 정리하겠습니다.”
+라고 바로 결론부터 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 NP가 함께 높은 리더는 문제를 빨리 정리하면서도 구성원을 챙기려는 마음이 함께 있기 때문에 속으로는 배려하고 있어도 행동 속도가 빨라지는 경우가 많습니다. 거기에 AC까지 낮아지면 구성원 입장에서는 “내 상황을 충분히 설명하기 전에 결론이 나온다”라고 느끼면서 심리적으로 위축될 가능성도 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 안정감을 함께 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 감정 속도와 부담을 한 번 더 확인해주는 부드러운 접근이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_FC_CP:{manner:`이 성향의 리더는 조직 안에서 상황을 빠르게 정리하고 활동 분위기를 살리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 분위기도 좋게 만들고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 활동성을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 공감만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 A와 FC가 함께 높은 리더는 상황 판단과 분위기 조성은 좋은 편이지만 조직 분위기가 너무 편안해지면 실행 긴장감이 약해질 가능성도 있습니다. 그러다 보면 활동량은 바쁜데 실제 계약 흐름은 약해지는 상황도 생길 수 있습니다. 그래서 충분히 분위기를 살려준 뒤에는 반드시 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+그리고 이 성향은 조직 분위기를 살리면서도 흐름을 현실적으로 정리하는 힘이 좋은 성향이기 때문에 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_FC_NP:{manner:`이 성향의 리더는 조직 안에서 상황을 빠르게 정리하고 활동 분위기를 살리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 분위기도 좋게 만들고 있다고 느끼지만 구성원 입장에서는
+“조금 차갑게 느껴질 때가 있다.”
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결론이 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 활동성을 만드는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 결과만 이야기하는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 FC가 함께 높은 리더는 상황 판단과 분위기 조성은 좋은 편이지만 문제를 빨리 정리하려는 힘도 강하기 때문에 구성원이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 그러다 보면 구성원은 “내 마음은 충분히 이해받지 못했다”라고 느끼면서 움직임까지 줄어들 가능성이 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘도 좋은 편이기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기를 살리면서도 흐름을 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_FC_AC:{manner:`이 성향의 리더는 조직 안에서 상황을 빠르게 정리하고 활동 분위기를 살리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 구성원 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 분위기도 좋게 만들고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 활동성을 만드는 힘은 매우 좋지만 구성원의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 결과만 이야기하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 FC가 함께 높은 리더는 상황 판단과 분위기 조성은 좋은 편이지만 움직임 속도가 빨라지는 경우도 많습니다. 거기에 AC까지 낮아지면 구성원 입장에서는 “내 상황을 충분히 설명하기 전에 결론이 나온다”라고 느끼면서 심리적으로 위축될 가능성도 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘도 좋은 편이기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기를 살리면서도 흐름을 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 감정 속도와 부담을 한 번 더 확인해주는 부드러운 접근이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다`,improvement:``},A_AC_CP:{manner:`이 성향의 리더는 조직 안에서 흐름을 현실적으로 정리하고 조직 전체 움직임을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 조율하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“움직임을 강하게 끌어주는 느낌은 부족하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 조율만으로 끝나는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 너무 오래 설명과 조율만 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 A와 AC가 함께 높은 리더는 조직 흐름을 안정적으로 유지하려는 힘이 좋은 대신 구성원의 부담을 너무 고려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+그리고 이 성향은 원래 조직을 안정적으로 유지하고 문제를 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_AC_NP:{manner:`이 성향의 리더는 조직 안에서 흐름을 현실적으로 정리하고 조직 전체 움직임을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 구성원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 설명하고 조율하고 있다고 느끼지만 구성원 입장에서는
+“조금 차갑게 느껴질 때가 있다.”
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결론이 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 부족해질 수 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 조율만 하는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이 부분은 이렇게 정리하겠습니다.”
+라고 바로 결론부터 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 AC가 함께 높은 리더는 조직 흐름을 안정적으로 유지하려는 힘이 좋은 대신 구성원의 부담을 너무 고려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+그리고 이 성향은 원래 조직을 안정적으로 유지하고 문제를 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_AC_FC:{manner:`이 성향의 리더는 조직 안에서 흐름을 현실적으로 정리하고 조직 전체 움직임을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 흐름이 흔들리지 않도록 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“함께 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 조율만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 A와 AC가 함께 높은 리더는 조직 흐름을 안정적으로 유지하려는 힘이 좋은 대신 분위기를 너무 조용하게 끌고 갈 수도 있습니다. 그러다 보면 조직 전체 에너지가 차분해지면서 활동량까지 함께 내려갈 가능성도 있습니다. 그래서 현실적인 방향 정리 이후에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 문제를 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_CP_NP:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들고 움직임 에너지를 끌어올리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 활동량이 떨어질 때는 다시 흐름을 끌어올리려는 힘도 있습니다. 그래서 구성원 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 분위기도 좋게 만들고 실행 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 실행 에너지를 끌어올리는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 실행만 강조하는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이번 주는 조금 더 움직여보시지요.”
+라고 바로 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 CP가 함께 높은 리더는 분위기를 살리면서도 실행 움직임을 강하게 끌어가는 힘이 좋기 때문에 조직 에너지를 빠르게 끌어올리는 장점이 있습니다. 다만 활동 흐름에 집중하다 보면 구성원이 지치고 있는 신호를 놓칠 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 실행 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 따뜻한 공감과 감정 확인이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_CP_A:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들고 실행 에너지를 끌어올리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 활동량이 떨어질 때는 다시 흐름을 끌어올리려는 힘도 있습니다. 그래서 구성원 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 실행 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 만들고 움직임도 끌어가고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“분위기에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 실행 에너지를 끌어올리는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 실행만 강조하는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“일단 많이 움직여보시지요.”
+라고 넓게 이야기하기보다
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 우선순위를 짧고 명확하게 정리해주는 것이 좋습니다.
+
+또한 FC와 CP가 함께 높은 리더는 조직 에너지를 빠르게 끌어올리는 장점이 매우 강합니다. 다만 분위기와 추진력이 강해질수록 구성원이 여러 가지를 동시에 하려다 흐름이 분산될 가능성도 있습니다. 그래서 활동량을 늘리는 것과 동시에 “지금 가장 중요한 한 가지”를 반복해서 정리해주는 과정이 함께 들어가야 조직의 생산성과 매출 흐름이 더 안정적으로 올라가게 됩니다.
+
+그리고 이 성향은 원래 조직 분위기와 실행 움직임을 강하게 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 우선순위 정리와 흐름 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_CP_AC:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들고 실행 에너지를 끌어올리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 활동량이 떨어질 때는 다시 흐름을 끌어올리려는 힘도 있습니다. 그래서 구성원 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 분위기도 좋게 만들고 실행 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빠르게 느껴질 때가 있다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 실행 에너지를 끌어올리는 힘은 매우 좋지만 구성원의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 실행만 강조하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향을 이야기하기 전에
+“지금 가장 부담되는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 막히는 부분은 어떤 건가요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 CP가 함께 높은 리더는 조직 에너지를 빠르게 끌어올리는 장점이 매우 강합니다. 다만 분위기와 추진력이 강해질수록 구성원이 따라오는 속도까지 세밀하게 살피지 못할 가능성도 있습니다. 그러다 보면 조직 안에서 활동량은 늘어나지만 심리적으로 지치는 구성원이 생길 수도 있습니다. 그래서 충분히 듣고 난 뒤
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 실행 움직임을 강하게 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 속도와 부담을 한 번 더 확인해주는 조율이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_NP_CP:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들고 사람의 마음을 편안하게 움직이게 하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 구성원도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 NP가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 구성원이 힘들어할 때 너무 이해하고 배려만 하다 보면 활동량 관리가 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_NP_A:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들고 사람의 마음을 편안하게 움직이게 하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 공감 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 구성원도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“분위기에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 NP가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 활동 방향이 흐려질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_NP_AC:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들고 사람의 마음을 편안하게 움직이게 하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 구성원도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빠르게 느껴질 때가 있다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 구성원의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감만 오래 이어가기보다 현재 부담되는 부분을 먼저 확인한 뒤 행동 방향을 함께 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“지금 가장 부담되는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 막히는 부분은 어떤 건가요?”
+처럼 먼저 듣고 난 뒤
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결해주는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 NP가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 속도와 부담을 한 번 더 확인해주는 조율이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다。`,improvement:``},FC_A_CP:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들면서도 현실적인 흐름을 빠르게 정리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 좋은 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 조직원 입장에서는
+“현실적으로 방향을 잡아준다.”
+“상황 정리가 빠르다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 현실적인 정리도 잘하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 활동 에너지를 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 설명만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“잘하고 계십니다.”
+라고 격려만 이어가기보다
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 A가 함께 높은 리더는 조직 분위기를 밝게 유지하면서도 흐름 정리를 잘하는 장점이 있습니다. 다만 분위기가 좋아질수록 실행 긴장감까지 함께 약해질 가능성도 있습니다. 그래서 활동 방향과 우선순위를 짧고 반복적으로 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 활동 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_A_NP:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들면서도 현실적인 흐름을 빠르게 정리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 좋은 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 조직원 입장에서는
+“현실적으로 방향을 잡아준다.”
+“상황 정리가 빠르다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 현실적인 정리도 잘하고 있다고 느끼지만 구성원 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 활동 에너지를 만드는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 설명만 만드는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 A가 함께 높은 리더는 조직 분위기를 밝게 유지하면서도 흐름 정리를 잘하는 장점이 있습니다. 다만 분위기와 활동 흐름에 집중하다 보면 구성원이 지치고 있는 신호를 놓칠 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 활동 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_A_AC:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝게 만들면서도 현실적인 흐름을 빠르게 정리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 좋은 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 조직원 입장에서는
+“현실적으로 방향을 잡아준다.”
+“상황 정리가 빠르다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 현실적인 정리도 잘하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 빠르게 느껴질 때가 있다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 활동 에너지를 만드는 힘은 매우 좋지만 구성원의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 설명만 만드는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“지금 가장 부담되는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 막히는 부분은 어떤 건가요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 A가 함께 높은 리더는 조직 분위기를 밝게 유지하면서도 흐름 정리를 잘하는 장점이 있습니다. 다만 분위기와 활동 흐름에 집중하다 보면 구성원이 따라오는 속도까지 세밀하게 살피지 못할 가능성도 있습니다. 그래서 충분히 듣고 난 뒤
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 활동 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 속도와 부담을 한 번 더 확인해주는 조율이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_AC_CP:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝고 편안하게 만들면서 사람 간의 관계 흐름을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 AC가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_AC_NP:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝고 편안하게 만들면서 사람 간의 관계 흐름을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다. 그리고 충분히 들은 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+또한 FC와 AC가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 현실적인 행동 정리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_AC_A:{manner:`이 성향의 리더는 조직 안에서 분위기를 밝고 편안하게 만들면서 관계 흐름을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 관계 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“분위기에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 AC가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_CP_NP:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하면서도 실행 움직임을 놓치지 않으려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 활동량이 떨어질 때는 다시 흐름을 끌어올리려 하고 해야 할 부분은 비교적 분명하게 정리하려는 힘도 있습니다. 그래서 조직원 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 조율하고 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 실행 흐름을 만드는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 조율과 방향 정리만 하는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 AC와 CP가 함께 높은 리더는 조직 흐름을 안정적으로 유지하면서도 실행 움직임을 끌어가는 힘이 좋은 편입니다. 다만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하면서도 실행 흐름을 끌어가는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_CP_A:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하면서도 실행 움직임을 놓치지 않으려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 활동량이 떨어질 때는 다시 흐름을 끌어올리려 하고 해야 할 부분은 비교적 분명하게 정리하려는 힘도 있습니다. 그래서 조직원 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 관계 흐름 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 조율하고 방향도 잘 잡아주고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“상황에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 실행 흐름을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 조율과 분위기만 유지하는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감과 조율만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 CP가 함께 높은 리더는 조직 흐름을 안정적으로 유지하면서도 실행 움직임을 끌어가는 힘이 좋은 편입니다. 다만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하면서도 실행 흐름을 끌어가는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_CP_FC:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하면서도 실행 움직임을 놓치지 않으려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 활동량이 떨어질 때는 다시 흐름을 끌어올리려 하고 해야 할 부분은 비교적 분명하게 정리하려는 힘도 있습니다. 그래서 조직원 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 실행 흐름을 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 조율과 방향 정리만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 AC와 CP가 함께 높은 리더는 조직 흐름을 안정적으로 유지하면서도 실행 움직임을 끌어가는 힘이 좋은 편입니다. 다만 분위기를 너무 차분하게 유지하다 보면 조직 전체 에너지가 함께 내려갈 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하면서도 실행 흐름을 끌어가는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_NP_CP:{manner:`이 성향의 리더는 조직 안에서 관계 흐름을 안정적으로 유지하면서 구성원을 편안하게 이끌어가려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 유지하는 것이 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 조율하고 구성원도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 관계 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 조율만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 NP가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_NP_A:{manner:`이 성향의 리더는 조직 안에서 관계 흐름을 안정적으로 유지하면서 구성원을 편안하게 이끌어가려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 유지하는 것이 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 공감 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 조율하고 구성원도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“상황에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 관계 유지력을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 조율만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 NP가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_NP_FC:{manner:`이 성향의 리더는 조직 안에서 관계 흐름을 안정적으로 유지하면서 구성원을 편안하게 이끌어가려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 유지하는 것이 아니라 구성원의 감정 상태와 어려움도 함께 보려고 합니다. 구성원이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 관계 유지력을 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 조율만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 AC와 NP가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기를 너무 차분하게 유지하다 보면 조직 전체 에너지가 함께 내려갈 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 충분히 듣고 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_A_CP:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하면서도 전체 움직임을 차분하게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 조율하고 흐름도 잘 관리하고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 조율과 설명만 하는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 충분히 듣고 조율해준 뒤에는 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 A가 함께 높은 리더는 조직 흐름을 안정적으로 유지하고 문제를 차분하게 정리하는 힘이 매우 좋은 편입니다. 다만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 흐름을 현실적으로 관리하는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_A_NP:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하면서도 전체 움직임을 차분하게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 조율하고 흐름도 잘 관리하고 있다고 느끼지만 구성원 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 조율과 설명만 하는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 AC와 A가 함께 높은 리더는 조직 흐름을 안정적으로 유지하고 문제를 차분하게 정리하는 힘이 매우 좋은 편입니다. 다만 분위기를 너무 안정적으로 유지하려다 보면 조직 전체 에너지가 조용해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 흐름을 현실적으로 관리하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_A_FC:{manner:`이 성향의 리더는 조직 안에서 흐름을 안정적으로 유지하면서도 전체 움직임을 차분하게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 구성원의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 조직원 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 구성원 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 구성원이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 조율과 설명만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 AC와 A가 함께 높은 리더는 조직 흐름을 안정적으로 유지하고 문제를 차분하게 정리하는 힘이 매우 좋은 편입니다. 다만 분위기를 너무 차분하게 유지하다 보면 조직 전체 에너지가 함께 내려갈 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 흐름을 현실적으로 관리하는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_FC_CP:{manner:`이 성향의 리더는 조직 안에서 분위기를 편안하게 유지하면서 관계 흐름을 안정적으로 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 느낌을 받게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 분위기를 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 FC가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_FC_NP:{manner:`이 성향의 리더는 조직 안에서 분위기를 편안하게 유지하면서 관계 흐름을 안정적으로 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 구성원의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 분위기를 만드는 힘은 매우 좋지만 구성원의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 현재 구성원의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다. 그리고 충분히 들은 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+또한 AC와 FC가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 구성원의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 현실적인 행동 정리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_FC_A:{manner:`이 성향의 리더는 조직 안에서 분위기를 편안하게 유지하면서 관계 흐름을 안정적으로 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 구성원이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 조직원 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 구성원과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 조직원 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 관계 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 리더 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 구성원 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“상황에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 분위기를 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 조직의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 리더는 구성원이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 FC가 함께 높은 리더는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``}},cm6:{},cm7:{CP_NP_A:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -2807,7 +3795,7 @@ PA님의 감정을 인정하면서 기준을 지키는 말입니다.
 
 이렇게 균형이 맞춰지면 후보자는 이렇게 느낍니다.
 “이 사람은 나를 성장시킬 기준이 있고, 동시에 나를 끝까지 책임져 줄 사람이다.”
-확신이 생기고 마음이 열립니다.`,CP_A_NP:`인 리크루팅의 가장 중요한 요소는 세 가지입니다.
+확신이 생기고 마음이 열립니다.`,CP_A_NP:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -2944,7 +3932,7 @@ PA님의 감정을 인정하면서 기준을 지키는 말입니다.
 
 이렇게 균형을 맞추면 후보자는 이렇게 느끼게 됩니다.
 “내 마음을 이해해 주면서도 현실적인 답을 알려주는 믿을 만한 사람.”
-편안함과 전문성을 동시에 가진 선배로 기억될 것입니다.`,NP_A_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
+편안함과 전문성을 동시에 가진 리더로 기억될 것입니다.`,NP_A_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -3233,7 +4221,7 @@ PA님의 감정을 인정하면서 기준을 지키는 말입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
-이 성향은 사람을 만났을 때 밝은 분위기를 만들고 에너지를 전달하는 힘이 큽니다. 이야기를 재미있게 풀어가며 상대가 지루하지 않게 듣도록 만드는 재능이 있습니다. 거기에 기준과 방향을 또렷하게 말해 주기 때문에 리더처럼 보이기도 합니다. 그래서 설명력과 존재감, 추진력에서는 강점을 보일 가능성이 큽니다.
+이 성향은 사람을 만났을 때 밝은 분위기를 만들고 에너지를 전달하는 힘이 큽니다. 이야기를 재미있게 풀어가며 상대가 지루하지 않게 듣도록 만드는 재능이 있습니다. 거기에 기준과 방향을 또렷하게 말해 주기 때문에 설명력과 존재감, 추진력에서는\\ 강점을 보이는 멋진 리더로 보일 가능성이 큽니다.
 
 다만 숫자와 현실 조건을 차분하게 따져 주는 부분은 조금 더 보완하면 좋습니다. 열정과 확신은 충분한데, 상대는 “그래서 내가 구체적으로 어떻게 시작하지?”라는 질문을 마음속에 가질 수 있습니다. 순서, 방법, 준비 과정 같은 현실적인 그림을 천천히 정리해 주면 불안이 크게 줄어듭니다.
 
@@ -3254,7 +4242,7 @@ PA님의 감정을 인정하면서 기준을 지키는 말입니다.
 
 그렇게 되면 후보자는 이렇게 느끼게 됩니다.
 “밝고 힘이 있고 믿음직한데, 내 마음도 살펴주는 사람이구나.”
-따라가 보고 싶은 리더, 나를 존중해 주는 선배라는 인상이 자연스럽게 만들어집니다.`,FC_NP_CP:`신인 리크루팅의 가장 중요한 요소 세가지
+따라가 보고 싶은 리더, 나를 존중해 주는 리더라는 인상이 자연스럽게 만들어집니다.`,FC_NP_CP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -3269,7 +4257,7 @@ PA님의 감정을 인정하면서 기준을 지키는 말입니다.
 
 이 균형이 만들어지면 후보자는 이렇게 받아들입니다.
 “다정하고 편한데, 믿고 따라가도 되는 사람이다.”
-좋은 형, 좋은 선배, 나를 챙겨 줄 리더처럼 보이게 됩니다.`,FC_NP_A:`신인 리크루팅의 가장 중요한 요소 세가지
+좋은 리더, 나를 챙겨 줄 리더처럼 보이게 됩니다.`,FC_NP_A:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -3651,1187 +4639,2175 @@ PA님의 감정을 인정하면서 기준을 지키는 말입니다.
 
 감정을 억누르는 힘보다, 표현하는 용기가 더 필요하다
 의미- 감정 표현의 두려움을 낮춤
--브레네 브라운`}}},Wc={job_type:`coach`,job_label:`코치/멘토`,cm1:{"17-20":{CP:`주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`이성적, 균형감, 현실적, 분석적.`,FC:`밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`협조, 적당한 순응, 적당한 눈치, 조율.`},"11-13":{CP:`균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`적당한 친절, 예의 바름, 부담 없음.`,A:`평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`안정감, 차분한, 균형감, 무난함.`,AC:`적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`차분함, 무심해 보임, 실무형, 표현 적음.`,A:`감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`조용함, 신중함, 진지함, 다소 거리감`,AC:`독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`우유부단, 착함,  결정 어려움, 말을 아낌.`,NP:`무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족 .`,FC:`무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`단호함, 직선적, 눈치 안 봄, 상대를 통제.`}},cm2:{"17-20":{CP:`기준과 원칙이 아주 분명합니다. 상담 자리에서 말과 자세가 단정하고 자신감이 있습니다. “이 부분은 꼭 필요합니다”, “이 선택이 가장 안전합니다”처럼 단호하게 말합니다. 신인이 망설이면 방향을 잡아 주려는 마음이 강합니다. 다만 너무 확신에 찬 말투 때문에 신인이 압박을 느낄 수 있습니다.`,NP:`신인을 향한 마음의 온도가 매우 높습니다. 신인의 말을 들으면 먼저 이해하려 하고, 판단보다 공감을 앞세웁니다. 그래서 신인은 이분과 상담할 때 편안함을 느끼고, 자신의 이야기를 솔직하게 꺼내도 괜찮겠다는 신뢰를 갖게 됩니다. 힘든 상황에서도 끝까지 함께해 줄 사람이라는 확신을 주는, 관계의 기반을 만드는 따뜻한 힘이 있습니다.`,A:`신인과의 상담에서 감정에 치우치지 않고 사실과 흐름을 차분히 정리하는 능력이 뛰어납니다. 복잡한 조건 속에서도 핵심을 잡아 주기 때문에 신인은 방향을 잃지 않습니다. 설명은 명확하고 판단은 균형 잡혀 있어, 신인에게 안정감과 전문성을 동시에 느끼게 합니다. 믿고 맡길 수 있는 사람이라는 확신을 만드는 힘입니다.`,FC:`사람을 만나는 걸 정말 즐깁니다. 상담할 때 표정이 밝고 마음이 열려 있으며, 먼저 웃으며 말을 겁니다. 신인 이야기에 고개를 끄덕이고 반응이 빠릅니다. 말투는 부드럽고 친근해서 “아, 그런 상황이셨군요”처럼 공감부터 합니다. 분위기를 편안하게 풀어 주는 힘이 있어 신인이 긴장을 빨리 내려놓고, 핵심 메시지를 열린 마음으로 받아들이게 만드는 탁월한 장점이 있습니다.`,AC:`신인의 표정과 말투를 아주 민감하게 살핍니다. 신인이 불편해할까 봐 먼저 조심하고, 맞춰 주는 태도가 강합니다. 말할 때도 “괜찮으시면요”, “부담되시면 안 하셔도 돼요” 같은 표현을 자주 씁니다. 신인 기분은 잘 읽지만, 본인 의견을 끝까지 말하지 못해 설명이 흐려질 수 있습니다.`},"14-16":{CP:`책임감 있고 믿음직한 태도를 보입니다. 상담할 때 흐트러짐 없이 차분하게 설명하고, 중요한 포인트를 분명히 짚어 줍니다. 말투는 또렷하지만 공격적이지 않고 “이 기준으로 보시면 이해가 쉬워요”처럼 안내합니다. 신인은 코치를 통해 안정감과 신뢰를 느끼기 쉽습니다.`,NP:`따뜻하면서도 안정감 있게 신인을 대합니다. 신인 이야기를 잘 들어주고 고개를 끄덕이며 공감해 줍니다. 말투는 부드럽고 “그렇게 느끼실 수 있어요”, “많이 고민되셨죠” 같은 표현을 자연스럽게 씁니다. 필요할 때는 조심스럽게 방향을 제시해 신인이 혼자 결정한다고 느끼게 해줍니다. 신뢰받기 쉬운 태도입니다.`,A:`감정보다 이성과 논리로 코칭합니다. 신인의 이야기를 차분히 듣고, 필요한 정보만 골라 쉽게 코칭합니다. “걱정되실 수 있어요. 그래서 이 상황에서는 이렇게 해 봅시다”처럼 짧게 공감을 한 후에 코칭을 합니다. 말투가 안정적이고 판단이 흔들리지 않아 신인이 신뢰하기 쉽습니다. 가장 이상적인 면담 태도입니다.`,FC:`편안한 분위기를 자연스럽게 만듭니다. 자세는 안정적이고 표정도 부드러워 신인이 긴장을 풀기 쉽습니다. 말할 때는 웃음과 공감을 섞어 “편하게 생각하셔도 됩니다”라고 말합니다. 분위기는 밝고 과하지 않아 상담이 부담스럽지 않습니다.`,AC:`상황을 보며 말을 고르는 편입니다. 신인 반응을 보면서 속도를 조절하고, 무리하게 밀지 않습니다. “이 부분은 신인 상황에 맞춰 생각해 보셔도 돼요”처럼 부드럽게 말합니다. 배려와 안정감은 주지만, 결정이 늦어질 수 있습니다.`},"11-13":{CP:`상황에 맞게 유연하게 대응합니다. 자기 의견도 있지만 신인 말도 잘 듣습니다. 상담에서는 “제 생각은 이렇지만, 신인 상황도 중요합니다”처럼 균형 잡힌 말을 합니다. 강하게 밀어붙이지도, 너무 물러서지도 않아 편안한 상담이 됩니다. 신인은 부담 없이 설명을 받아들입니다.`,NP:`친절하지만 감정에 너무 치우치지는 않습니다. 신인에게 예의 있게 대하고 필요한 설명을 차분히 합니다. 말은 짧고 정리되어 있으며 “이 부분은 이렇게 보시면 돼요”처럼 담백한 표현을 씁니다. 신인은 부담 없이 설명을 듣는 느낌을 받습니다. 다만 공감하는 표현을 조금만 더 한다면 신인의 만족도는 더 상승합니다.`,A:`상황에 따라 감정과 논리를 오가며 상담합니다. 신인 반응을 보며 설명을 조절하고, 너무 딱딱하지도 너무 감정적이지도 않습니다. “이렇게 생각하실 수 있는데, 현실적으로 보면 이 선택이 좋아요”처럼 말합니다. 무난하지만 결정이 조금 늦어질 수 있어 정리 멘트가 필요합니다.`,FC:`무난하고 차분한 태도를 보입니다. 자세는 바르고 표정은 안정적입니다. 말투는 또렷하지만 감정 표현은 많지 않습니다. “이 부분을 설명드리겠습니다”처럼 설명 중심으로 말합니다. 편하지도 불편하지도 않은 느낌을 주며, 신인은 안정감을 느낍니다. 다만 의식적으로 밝음이 다소 필요합니다.`,AC:`신인 눈치도 보고 자기 생각도 말할 줄 압니다. 분위기가 무겁지 않게 유지하면서도 필요한 설명은 분명히 합니다. “이건 장단점이 있어요. 신인께 맞는 쪽을 같이 보죠”처럼 균형 잡힌 말투를 씁니다. 신인도 부담 없이 듣습니다.`},"8-10":{CP:`신인을 존중하면서도 자기 생각을 조금씩 말할 수 있습니다. 상담할 때 “제 경험으로 보면 이 방법이 더 안전해요”처럼 조심스럽게 방향을 제시합니다. 신인을 몰아붙이지는 않지만, 완전히 맡기지도 않습니다. 다만 확신이 조금은 약해 보여서 신인이 결정을 미루는 경우가 가끔 생기기도 합니다.`,NP:`배려하는 표현이 다소 적은 편입니다. 신인을 존중하긴 하지만 말수가 많지 않습니다. 상담에서는 설명 위주로 말하며 “이 상품은 이런 구조입니다”처럼 사실 중심으로 이야기합니다. 공감 표현은 적어 다소 차갑게 느껴질 수 있지만, 일은 또렷하게 진행됩니다. 신인에 따라 거리감이 느껴질 수 있습니다.`,A:`느낌을 먼저 받아들이고 나중에 생각합니다. 신인 말에 공감은 잘하지만 설명이 정리되지 않을 때가 있습니다. “괜찮을 것 같아요” 같은 표현이 많고, 이유 설명은 약합니다. 말투는 부드럽지만 판단력이 약해 보일 수 있어, 미리 준비한 설명을 쓰는 연습이 필요합니다.`,FC:`조용하고 진지한 모습이 강합니다. 상담 중 말수가 적고 표정 변화도 크지 않습니다. 자세는 단정하지만 다소 굳어 보일 수 있습니다. 말할 때는 필요한 말만 짧게 하며 감정 표현이 거의 없습니다. 신인은 신뢰는 느끼지만 “조금 신중하다”고 느낄 수 있습니다.`,AC:`신인 반응에 크게 흔들리지 않습니다. 자기 기준으로 차분하게 설명하고, 필요하면 직설적으로 말합니다. “이 상품은 이런 분께 맞습니다”처럼 간단히 말합니다. 솔직해서 신뢰는 주지만, 예민한 신인에게는 조금은 차갑게 느껴질 수 있습니다.`},"0-7":{CP:`자기 기준을 강하게 내세우지 않습니다. 상담할 때 신인 말을 먼저 듣고, 웬만하면 반대하지 않습니다. “신인 생각이 맞아요”, “원하시는 대로 하셔도 됩니다”라는 말을 자주 합니다. 분위기는 편하지만, 신인이 “그래서 뭘 선택해야 하지?” 하고 헷갈릴 수 있습니다. 방향을 잡아주는 힘은 약한 편입니다.`,NP:`상대가 느끼기에 다소 차갑게 보일 수 있습니다. 상담할 때도 바로 본론으로 들어가며 “필요한 것만 말씀드리겠습니다”라는 식의 말투를 씁니다. 위로나 공감보다는 정보 전달이 중심입니다. 신인은 정확하다고 느낄 수 있지만, 마음을 이해받는 느낌은 적을 수 있습니다. 친절해 보이지 않는다는 오해를 받을 수 있습니다.`,A:`상담 중 감정에 많이 휘둘립니다. 신인 표정이나 말에 따라 말이 바뀌고, 설명보다 반응이 먼저 나옵니다. “아… 그러면 안 하셔도 돼요”처럼 쉽게 물러납니다. 친절해 보이지만 전문가로서의 신뢰는 떨어질 수 있어, 말하기 전 잠깐 생각하는 습관이 꼭 필요합니다.`,FC:`감정을 거의 드러내지 않습니다. 표정이 굳어 있고 몸도 긴장돼 보일 수 있습니다. 말투는 건조하고 설명 위주이며 공감 표현이 적습니다. 신인이 말을 해도 반응이 적어 “내 말이 전달됐나?”라고 느낄 수 있습니다. 신뢰는 줄 수 있지만 거리감이 커질 가능성이 있습니다.`,AC:`남의 시선을 크게 신경 쓰지 않습니다. 신인 눈치를 거의 보지 않고 자기 생각대로 말합니다. “이게 제일 합리적입니다”처럼 단정적인 표현이 많습니다. 자신감은 느껴지지만, 신인이 압박을 느끼는 경우가 발생할 수 있습니다.`}},cm3:{CP_NP:`(CP 통제적 부모 & NP 자상한 부모가 TOP1과 TOP2로 자리한 코치님은, 기준과 보호를 동시에 갖춘 가장 믿을 수 있는 어른의 모습입니다.)
+-브레네 브라운`}}},Wc={job_type:`coach`,job_label:`코치/멘토`,cm1:{"17-20":{CP:`주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`이성적, 균형감, 현실적, 분석적.`,FC:`밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`협조, 적당한 순응, 적당한 눈치, 조율.`},"11-13":{CP:`균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`적당한 친절, 예의 바름, 부담 없음.`,A:`평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`안정감, 차분한, 균형감, 무난함.`,AC:`적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`차분함, 무심해 보임, 실무형, 표현 적음.`,A:`감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`조용함, 신중함, 진지함, 다소 거리감`,AC:`독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`우유부단, 착함,  결정 어려움, 말을 아낌.`,NP:`무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족 .`,FC:`무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`단호함, 직선적, 눈치 안 봄, 상대를 통제.`}},cm2:{"17-20":{CP:`기준과 원칙이 아주 분명합니다. 상담 자리에서 말과 자세가 단정하고 자신감이 있습니다. “이 부분은 꼭 필요합니다”, “이 선택이 가장 안전합니다”처럼 단호하게 말합니다. 신인이 망설이면 방향을 잡아 주려는 마음이 강합니다. 다만 너무 확신에 찬 말투 때문에 신인이 압박을 느낄 수 있습니다.`,NP:`신인을 향한 마음의 온도가 매우 높습니다. 신인의 말을 들으면 먼저 이해하려 하고, 판단보다 공감을 앞세웁니다. 그래서 신인은 이분과 상담할 때 편안함을 느끼고, 자신의 이야기를 솔직하게 꺼내도 괜찮겠다는 신뢰를 갖게 됩니다. 힘든 상황에서도 끝까지 함께해 줄 사람이라는 확신을 주는, 관계의 기반을 만드는 따뜻한 힘이 있습니다.`,A:`신인과의 상담에서 감정에 치우치지 않고 사실과 흐름을 차분히 정리하는 능력이 뛰어납니다. 복잡한 조건 속에서도 핵심을 잡아 주기 때문에 신인은 방향을 잃지 않습니다. 설명은 명확하고 판단은 균형 잡혀 있어, 신인에게 안정감과 전문성을 동시에 느끼게 합니다. 믿고 맡길 수 있는 사람이라는 확신을 만드는 힘입니다.`,FC:`사람을 만나는 걸 정말 즐깁니다. 상담할 때 표정이 밝고 마음이 열려 있으며, 먼저 웃으며 말을 겁니다. 신인 이야기에 고개를 끄덕이고 반응이 빠릅니다. 말투는 부드럽고 친근해서 “아, 그런 상황이셨군요”처럼 공감부터 합니다. 분위기를 편안하게 풀어 주는 힘이 있어 신인이 긴장을 빨리 내려놓고, 핵심 메시지를 열린 마음으로 받아들이게 만드는 탁월한 장점이 있습니다.`,AC:`신인의 표정과 말투를 아주 민감하게 살핍니다. 신인이 불편해할까 봐 먼저 조심하고, 맞춰 주는 태도가 강합니다. 말할 때도 “괜찮으시면요”, “부담되시면 안 하셔도 돼요” 같은 표현을 자주 씁니다. 신인 기분은 잘 읽지만, 본인 의견을 끝까지 말하지 못해 설명이 흐려질 수 있습니다.`},"14-16":{CP:`책임감 있고 믿음직한 태도를 보입니다. 상담할 때 흐트러짐 없이 차분하게 설명하고, 중요한 포인트를 분명히 짚어 줍니다. 말투는 또렷하지만 공격적이지 않고 “이 기준으로 보시면 이해가 쉬워요”처럼 안내합니다. 신인은 코치를 통해 안정감과 신뢰를 느끼기 쉽습니다.`,NP:`따뜻하면서도 안정감 있게 신인을 대합니다. 신인 이야기를 잘 들어주고 고개를 끄덕이며 공감해 줍니다. 말투는 부드럽고 “그렇게 느끼실 수 있어요”, “많이 고민되셨죠” 같은 표현을 자연스럽게 씁니다. 필요할 때는 조심스럽게 방향을 제시해 신인이 혼자 결정한다고 느끼게 해줍니다. 신뢰받기 쉬운 태도입니다.`,A:`감정보다 이성과 논리로 코칭합니다. 신인의 이야기를 차분히 듣고, 필요한 정보만 골라 쉽게 코칭합니다. “걱정되실 수 있어요. 그래서 이 상황에서는 이렇게 해 봅시다”처럼 짧게 공감을 한 후에 코칭을 합니다. 말투가 안정적이고 판단이 흔들리지 않아 신인이 신뢰하기 쉽습니다. 가장 이상적인 면담 태도입니다.`,FC:`편안한 분위기를 자연스럽게 만듭니다. 자세는 안정적이고 표정도 부드러워 신인이 긴장을 풀기 쉽습니다. 말할 때는 웃음과 공감을 섞어 “편하게 생각하셔도 됩니다”라고 말합니다. 분위기는 밝고 과하지 않아 상담이 부담스럽지 않습니다.`,AC:`상황을 보며 말을 고르는 편입니다. 신인 반응을 보면서 속도를 조절하고, 무리하게 밀지 않습니다. “이 부분은 신인 상황에 맞춰 생각해 보셔도 돼요”처럼 부드럽게 말합니다. 배려와 안정감은 주지만, 결정이 늦어질 수 있습니다.`},"11-13":{CP:`상황에 맞게 유연하게 대응합니다. 자기 의견도 있지만 신인 말도 잘 듣습니다. 상담에서는 “제 생각은 이렇지만, 신인 상황도 중요합니다”처럼 균형 잡힌 말을 합니다. 강하게 밀어붙이지도, 너무 물러서지도 않아 편안한 상담이 됩니다. 신인은 부담 없이 설명을 받아들입니다.`,NP:`친절하지만 감정에 너무 치우치지는 않습니다. 신인에게 예의 있게 대하고 필요한 설명을 차분히 합니다. 말은 짧고 정리되어 있으며 “이 부분은 이렇게 보시면 돼요”처럼 담백한 표현을 씁니다. 신인은 부담 없이 설명을 듣는 느낌을 받습니다. 다만 공감하는 표현을 조금만 더 한다면 신인의 만족도는 더 상승합니다.`,A:`상황에 따라 감정과 논리를 오가며 상담합니다. 신인 반응을 보며 설명을 조절하고, 너무 딱딱하지도 너무 감정적이지도 않습니다. “이렇게 생각하실 수 있는데, 현실적으로 보면 이 선택이 좋아요”처럼 말합니다. 무난하지만 결정이 조금 늦어질 수 있어 정리 멘트가 필요합니다.`,FC:`무난하고 차분한 태도를 보입니다. 자세는 바르고 표정은 안정적입니다. 말투는 또렷하지만 감정 표현은 많지 않습니다. “이 부분을 설명드리겠습니다”처럼 설명 중심으로 말합니다. 편하지도 불편하지도 않은 느낌을 주며, 신인은 안정감을 느낍니다. 다만 의식적으로 밝음이 다소 필요합니다.`,AC:`신인 눈치도 보고 자기 생각도 말할 줄 압니다. 분위기가 무겁지 않게 유지하면서도 필요한 설명은 분명히 합니다. “이건 장단점이 있어요. 신인께 맞는 쪽을 같이 보죠”처럼 균형 잡힌 말투를 씁니다. 신인도 부담 없이 듣습니다.`},"8-10":{CP:`신인을 존중하면서도 자기 생각을 조금씩 말할 수 있습니다. 상담할 때 “제 경험으로 보면 이 방법이 더 안전해요”처럼 조심스럽게 방향을 제시합니다. 신인을 몰아붙이지는 않지만, 완전히 맡기지도 않습니다. 다만 확신이 조금은 약해 보여서 신인이 결정을 미루는 경우가 가끔 생기기도 합니다.`,NP:`배려하는 표현이 다소 적은 편입니다. 신인을 존중하긴 하지만 말수가 많지 않습니다. 상담에서는 설명 위주로 말하며 “이 상품은 이런 구조입니다”처럼 사실 중심으로 이야기합니다. 공감 표현은 적어 다소 차갑게 느껴질 수 있지만, 일은 또렷하게 진행됩니다. 신인에 따라 거리감이 느껴질 수 있습니다.`,A:`느낌을 먼저 받아들이고 나중에 생각합니다. 신인 말에 공감은 잘하지만 설명이 정리되지 않을 때가 있습니다. “괜찮을 것 같아요” 같은 표현이 많고, 이유 설명은 약합니다. 말투는 부드럽지만 판단력이 약해 보일 수 있어, 미리 준비한 설명을 쓰는 연습이 필요합니다.`,FC:`조용하고 진지한 모습이 강합니다. 상담 중 말수가 적고 표정 변화도 크지 않습니다. 자세는 단정하지만 다소 굳어 보일 수 있습니다. 말할 때는 필요한 말만 짧게 하며 감정 표현이 거의 없습니다. 신인은 신뢰는 느끼지만 “조금 신중하다”고 느낄 수 있습니다.`,AC:`신인 반응에 크게 흔들리지 않습니다. 자기 기준으로 차분하게 설명하고, 필요하면 직설적으로 말합니다. “이 상품은 이런 분께 맞습니다”처럼 간단히 말합니다. 솔직해서 신뢰는 주지만, 예민한 신인에게는 조금은 차갑게 느껴질 수 있습니다.`},"0-7":{CP:`자기 기준을 강하게 내세우지 않습니다. 상담할 때 신인 말을 먼저 듣고, 웬만하면 반대하지 않습니다. “신인 생각이 맞아요”, “원하시는 대로 하셔도 됩니다”라는 말을 자주 합니다. 분위기는 편하지만, 신인이 “그래서 뭘 선택해야 하지?” 하고 헷갈릴 수 있습니다. 방향을 잡아주는 힘은 약한 편입니다.`,NP:`상대가 느끼기에 다소 차갑게 보일 수 있습니다. 상담할 때도 바로 본론으로 들어가며 “필요한 것만 말씀드리겠습니다”라는 식의 말투를 씁니다. 위로나 공감보다는 정보 전달이 중심입니다. 신인은 정확하다고 느낄 수 있지만, 마음을 이해받는 느낌은 적을 수 있습니다. 친절해 보이지 않는다는 오해를 받을 수 있습니다.`,A:`상담 중 감정에 많이 휘둘립니다. 신인 표정이나 말에 따라 말이 바뀌고, 설명보다 반응이 먼저 나옵니다. “아… 그러면 안 하셔도 돼요”처럼 쉽게 물러납니다. 친절해 보이지만 전문가로서의 신뢰는 떨어질 수 있어, 말하기 전 잠깐 생각하는 습관이 꼭 필요합니다.`,FC:`감정을 거의 드러내지 않습니다. 표정이 굳어 있고 몸도 긴장돼 보일 수 있습니다. 말투는 건조하고 설명 위주이며 공감 표현이 적습니다. 신인이 말을 해도 반응이 적어 “내 말이 전달됐나?”라고 느낄 수 있습니다. 신뢰는 줄 수 있지만 거리감이 커질 가능성이 있습니다.`,AC:`남의 시선을 크게 신경 쓰지 않습니다. 신인 눈치를 거의 보지 않고 자기 생각대로 말합니다. “이게 제일 합리적입니다”처럼 단정적인 표현이 많습니다. 자신감은 느껴지지만, 신인이 압박을 느끼는 경우가 발생할 수 있습니다.`}},cm3:{CP_NP:`(CP 통제적 부모 & NP 자상한 부모가 TOP1과 TOP2로 자리한 코치는, 기준과 보호를 동시에 갖춘 가장 믿을 수 있는 어른의 모습입니다.)
 
-이 성향의 코치님은 말보다 행동으로 기준을 보여주는 힘을 가지고 있습니다. 원칙이 분명해 신인PA은 무엇을 해야 하는지 혼란스럽지 않습니다. 동시에 사람을 향한 따뜻함이 있어, 부족하다고 밀어내기보다 끝까지 곁에 둡니다. 그래서 신인PA은 “지적받아도 버려지지는 않겠구나”라는 깊은 신뢰를 느끼게 됩니다.
+이 성향의 코치는 말보다 행동으로 기준을 보여주는 힘을 가지고 있습니다. 원칙이 분명해 신인은 무엇을 해야 하는지 혼란스럽지 않습니다. 동시에 사람을 향한 따뜻함이 있어, 부족하다고 밀어내기보다 끝까지 곁에 둡니다. 그래서 신인은 “지적받아도 버려지지는 않겠구나”라는 깊은 신뢰를 느끼게 됩니다.
 
-CP의 힘은 방향을 잡아 줍니다. 지금 무엇을 먼저 해야 하는지, 오늘 어디까지 가야 하는지를 분명히 알려줍니다. 여기에 NP의 따뜻함이 더해지면, 그 방향은 압박이 아니라 안심이 됩니다. 신인PA은 통제당한다고 느끼지 않고, 보호받고 있다고 느끼며 움직입니다. 이 조합이 만들어내는 분위기는 “엄격하지만 안전한 공간”입니다.
+CP의 힘은 방향을 잡아 줍니다. 지금 무엇을 먼저 해야 하는지, 오늘 어디까지 가야 하는지를 분명히 알려줍니다. 여기에 NP의 따뜻함이 더해지면, 그 방향은 압박이 아니라 안심이 됩니다. 신인은 통제당한다고 느끼지 않고, 보호받고 있다고 느끼며 움직입니다. 이 조합이 만들어내는 분위기는 “엄격하지만 안전한 공간”입니다.
 
-또한 이 코치님은 결과 앞에서 책임지는 사람입니다. 성과가 나올 때만 옆에 서는 사람이 아니라, 잘 안 될 때 더 가까이 다가옵니다. 실수가 반복돼도 포기하지 않고, 속도가 느려도 기다릴 줄 압니다. 그 과정에서 신인PA은 자연스럽게 자신감을 회복하고 다시 도전할 힘을 얻습니다.
+또한 이 코치는 결과 앞에서 책임지는 사람입니다. 성과가 나올 때만 옆에 서는 사람이 아니라, 잘 안 될 때 더 가까이 다가옵니다. 실수가 반복돼도 포기하지 않고, 속도가 느려도 기다릴 줄 압니다. 그 과정에서 신인은 자연스럽게 자신감을 회복하고 다시 도전할 힘을 얻습니다.
 
 시간이 흐를수록 팀원들의 마음속에는 한 문장이 남습니다.
 “이 사람은 나를 키우는 사람이다.”
-이 믿음이 생길 때, 신인PA은 스스로 성장하려 하고 조직은 흔들리지 않는 힘을 갖게 됩니다.`,CP_A:`(CP 통제적 부모 & A 어른이 TOP1과 TOP2로 자리한 코치님은, 원칙을 세우고 현실로 증명하는 냉정한 책임자의 모습입니다.)
+이 믿음이 생길 때, 신인은 스스로 성장하려 하고 조직은 흔들리지 않는 힘을 갖게 됩니다.`,CP_A:`(CP 통제적 부모 & A 어른이 TOP1과 TOP2로 자리한 코치는, 원칙을 세우고 현실로 증명하는 냉정한 책임자의 모습입니다.)
 
-이 성향의 코치님은 기준을 말로 설명하는 데서 멈추지 않습니다. 왜 그 기준이 필요한지, 지키면 어떤 결과가 생기는지를 차분하게 보여줍니다. 신인PA은 감정이 아니라 납득으로 움직이게 됩니다. 그래서 흔들림이 적고, 한 번 이해한 원칙은 오래 갑니다.
+이 성향의 코치는 기준을 말로 설명하는 데서 멈추지 않습니다. 왜 그 기준이 필요한지, 지키면 어떤 결과가 생기는지를 차분하게 보여줍니다. 신인은 감정이 아니라 납득으로 움직이게 됩니다. 그래서 흔들림이 적고, 한 번 이해한 원칙은 오래 갑니다.
 
-CP의 힘은 방향을 명확하게 만듭니다. 해야 할 것과 하지 말아야 할 것을 분명히 가릅니다. 여기에 A의 힘이 더해지면 판단이 감정에 휘둘리지 않습니다. 상황을 보고, 수치를 보고, 가능성을 계산하며 가장 현실적인 길을 안내합니다. 신인PA은 그 모습에서 “따라가면 된다”는 확신을 얻게 됩니다.
+CP의 힘은 방향을 명확하게 만듭니다. 해야 할 것과 하지 말아야 할 것을 분명히 가릅니다. 여기에 A의 힘이 더해지면 판단이 감정에 휘둘리지 않습니다. 상황을 보고, 수치를 보고, 가능성을 계산하며 가장 현실적인 길을 안내합니다. 신인은 그 모습에서 “따라가면 된다”는 확신을 얻게 됩니다.
 
-또한 이 코치님은 결과 앞에서 도망가지 않습니다. 성과가 부족하면 이유를 찾고, 방법을 바꾸고, 다시 시도합니다. 변명 대신 해결을 선택하는 태도는 조직 전체를 단단하게 만듭니다. 신인PA은 점점 감정적인 위로보다 정확한 해답을 주는 리더를 신뢰하게 됩니다.
+또한 이 코치는 결과 앞에서 도망가지 않습니다. 성과가 부족하면 이유를 찾고, 방법을 바꾸고, 다시 시도합니다. 변명 대신 해결을 선택하는 태도는 조직 전체를 단단하게 만듭니다. 신인은 점점 감정적인 위로보다 정확한 해답을 주는 코치를 신뢰하게 됩니다.
 
 시간이 지나면 팀원들의 마음속에는 이런 믿음이 자리 잡습니다.
 “이 사람은 우리를 성공하게 만들 사람이다.”
-그 확신이 생기는 순간, 조직은 말이 아니라 실행으로 움직이기 시작합니다.`,CP_FC:`(CP 통제적 부모 & FC 자유로운 아이가 TOP1과 TOP2로 자리한 코치님은, 기준을 세우면서도 분위기로 사람을 움직이는 리더입니다.)
+그 확신이 생기는 순간, 조직은 말이 아니라 실행으로 움직이기 시작합니다.`,CP_FC:`(CP 통제적 부모 & FC 자유로운 아이가 TOP1과 TOP2로 자리한 코치는, 기준을 세우면서도 분위기로 사람을 움직이는 코치입니다.)
 
-이 성향의 코치님은 무엇이 맞고 무엇이 틀린지를 분명하게 이야기합니다. 해야 할 일과 멈춰야 할 일을 또렷하게 구분해 주기 때문에 신인PA은 길을 잃지 않습니다. 그런데 그 전달 방식이 딱딱하지 않습니다. FC의 밝음과 에너지가 더해져, 말이 부담이 아니라 힘이 됩니다. 그래서 신인PA은 지적을 받아도 기가 죽기보다 다시 해보려는 용기를 냅니다.
+이 성향의 코치는 무엇이 맞고 무엇이 틀린지를 분명하게 이야기합니다. 해야 할 일과 멈춰야 할 일을 또렷하게 구분해 주기 때문에 신인은 길을 잃지 않습니다. 그런데 그 전달 방식이 딱딱하지 않습니다. FC의 밝음과 에너지가 더해져, 말이 부담이 아니라 힘이 됩니다. 그래서 신인은 지적을 받아도 기가 죽기보다 다시 해보려는 용기를 냅니다.
 
 CP는 팀을 단단하게 세웁니다. 흐트러짐을 그냥 넘기지 않고, 약속과 책임을 중요하게 여깁니다. 덕분에 조직에는 기본기가 만들어집니다. 여기에 FC가 더해지면, 어려운 상황에서도 분위기가 무너지지 않습니다. 웃으면서 다시 도전하게 만들고, “우리 한번 더 해보자”라는 말을 자연스럽게 끌어냅니다.
 
-이 코치님은 압박으로 끌고 가지 않습니다. 기준은 높게, 마음은 뜨겁게 가져갑니다. 신인PA은 그 모습에서 이상한 안정감을 느낍니다. 엄격한데 이상하게 따뜻하고, 부담스러운데 또 가까이 가고 싶은 사람. 그래서 어느 순간 이런 마음이 생깁니다.
+이 코치는 압박으로 끌고 가지 않습니다. 기준은 높게, 마음은 뜨겁게 가져갑니다. 신인은 그 모습에서 이상한 안정감을 느낍니다. 엄격한데 이상하게 따뜻하고, 부담스러운데 또 가까이 가고 싶은 사람. 그래서 어느 순간 이런 마음이 생깁니다.
 
-“저 코치님과 함께라면 힘들어도 끝까지 가보고 싶다.”
-그 마음이 팀을 성장시키는 가장 큰 연료가 됩니다.`,CP_AC:`(CP 통제적 부모 &  AC 순응하는 아이 자아가 함께 높은 코치님은 기준을 세우면서도 조직의 흐름을 읽을 줄 아는 균형 잡힌 리더입니다.)
+“이 코치와 함께라면 힘들어도 끝까지 가보고 싶다.”
+그 마음이 팀을 성장시키는 가장 큰 연료가 됩니다.`,CP_AC:`(CP 통제적 부모 &  AC 순응하는 아이 자아가 함께 높은 코치는 기준을 세우면서도 조직의 흐름을 읽을 줄 아는 균형 잡힌 코치입니다.)
 
 이 조합은 단순히 엄격한 사람이 아닙니다. 무엇이 옳은지, 어디로 가야 하는지를 분명히 말할 수 있는 힘이 있으면서도, 동시에 사람과 조직의 분위기를 살피며 움직입니다. 그래서 원칙을 밀어붙이되 무리하게 다치게 하지는 않습니다. 방향을 제시하면서도 함께 가는 길을 선택합니다.
 
-구성원들은 이 모습에서 안정감을 느낍니다. 흔들리지 않는 기준이 있어 의지할 수 있고, 또 자신들의 상황을 이해받고 있다고 느끼기 때문입니다. “우리를 이끌어 주는 사람”, “그래도 우리 편인 사람”이라는 신뢰가 자연스럽게 만들어집니다.
+신인들은 이 모습에서 안정감을 느낍니다. 흔들리지 않는 기준이 있어 의지할 수 있고, 또 자신들의 상황을 이해받고 있다고 느끼기 때문입니다. “우리를 이끌어 주는 사람”, “그래도 우리 편인 사람”이라는 신뢰가 자연스럽게 만들어집니다.
 
 또한 회사의 정책과 큰 흐름을 존중하며 움직이기 때문에 조직 전체로 보았을 때도 매우 믿음직한 존재가 됩니다. 위로는 신뢰를 얻고, 아래로는 따르는 마음을 얻는 자리. 바로 그 중심에 설 수 있는 힘이 여기에서 나옵니다.
 
 시간이 흐를수록 사람들은 깨닫게 됩니다.
 강한 기준 뒤에 따뜻한 배려가 있다는 것을.
-그리고 그 배려가 있기에 더 멀리 갈 수 있다는 것을.`,NP_CP:`(NP 자상한 부모 & CP 통제적 부모가 TOP1과 TOP2로 자리한 코치님은, 사람을 품으면서도 기준을 놓치지 않는 든든한 울타리 같은 존재입니다.)
+그리고 그 배려가 있기에 더 멀리 갈 수 있다는 것을.`,NP_CP:`(NP 자상한 부모 & CP 통제적 부모가 TOP1과 TOP2로 자리한 코치는, 사람을 품으면서도 기준을 놓치지 않는 든든한 울타리 같은 존재입니다.)
 
-이 성향의 가장 큰 힘은 따뜻함과 원칙이 함께 움직인다는 점입니다. 누군가를 이해하고 감싸 주는 마음이 기본이 되기 때문에 신인PA은 쉽게 마음을 엽니다. 실수했을 때도 야단을 맞는 기분보다 보호받는 느낌을 먼저 받습니다. “괜찮아, 다시 해보자”라는 분위기 속에서 다시 일어날 용기를 얻습니다.
+이 성향의 가장 큰 힘은 따뜻함과 원칙이 함께 움직인다는 점입니다. 누군가를 이해하고 감싸 주는 마음이 기본이 되기 때문에 신인은 쉽게 마음을 엽니다. 실수했을 때도 야단을 맞는 기분보다 보호받는 느낌을 먼저 받습니다. “괜찮아, 다시 해보자”라는 분위기 속에서 다시 일어날 용기를 얻습니다.
 
-하지만 부드럽기만 하다면 성장 속도는 더딜 수 있습니다. 여기서 CP의 힘이 살아납니다. 해야 할 일은 해야 한다고, 준비가 부족하면 다시 하자고 분명히 말해 줍니다. 방향이 흐려질 때는 선을 다시 그어 줍니다. 그래서 신인PA은 알게 됩니다.
-“이 코치님은 나를 좋아만 하는 분이 아니라, 나를 제대로 키우려는 분이구나.”
+하지만 부드럽기만 하다면 성장 속도는 더딜 수 있습니다. 여기서 CP의 힘이 살아납니다. 해야 할 일은 해야 한다고, 준비가 부족하면 다시 하자고 분명히 말해 줍니다. 방향이 흐려질 때는 선을 다시 그어 줍니다. 그래서 신인은 알게 됩니다.
+“이 코치는 나를 좋아만 하는 분이 아니라, 나를 제대로 키우려는 분이구나.”
 
-따뜻하게 안아 주면서도 기준을 세워 주는 지도는 오래 갑니다. 감정에 기대는 관계가 아니라, 성장으로 증명되는 관계가 되기 때문입니다. 신인PA은 힘들 때 기대고, 흔들릴 때 바로 잡힙니다. 그 반복 속에서 실력이 만들어집니다.
+따뜻하게 안아 주면서도 기준을 세워 주는 지도는 오래 갑니다. 감정에 기대는 관계가 아니라, 성장으로 증명되는 관계가 되기 때문입니다. 신인은 힘들 때 기대고, 흔들릴 때 바로 잡힙니다. 그 반복 속에서 실력이 만들어집니다.
 
 결국 이 코치의 주변에는 사람이 남습니다. 남은 사람이 성장하고, 성장한 사람이 또 다른 사람을 살립니다. 그래서 조직은 시간이 갈수록 더 단단해집니다.
 
-신인PA은 마음속으로 이렇게 말합니다.
-“혼날 때도 믿음이 생기는 사람, 그래서 떠나고 싶지 않은 리더.”`,NP_A:`(NP 자상한 부모 & A 어른이 가장 높은 자리에 있는 코치님은, 사람을 이해하는 마음과 냉정한 판단을 동시에 갖춘 균형 잡힌 안내자입니다.)
+신인은 마음속으로 이렇게 말합니다.
+“혼날 때도 믿음이 생기는 사람, 그래서 떠나고 싶지 않은 코치.”`,NP_A:`(NP 자상한 부모 & A 어른이 가장 높은 자리에 있는 코치는, 사람을 이해하는 마음과 냉정한 판단을 동시에 갖춘 균형 잡힌 안내자입니다.)
 
-이 성향의 힘은 따뜻함이 감정에만 머물지 않는다는 데 있습니다. 신인PA이 힘들어하면 먼저 이유를 들어 주고, 마음을 살핍니다. 함부로 판단하지 않고, 충분히 공감합니다. 그래서 신인PA은 ‘이 사람에게는 이야기해도 되겠다’라는 안전함을 느낍니다.
+이 성향의 힘은 따뜻함이 감정에만 머물지 않는다는 데 있습니다. 신인이 힘들어하면 먼저 이유를 들어 주고, 마음을 살핍니다. 함부로 판단하지 않고, 충분히 공감합니다. 그래서 신인은 ‘이 사람에게는 이야기해도 되겠다’라는 안전함을 느낍니다.
 
-그리고 그 다음에 A의 힘이 움직입니다. 위로로 끝나지 않습니다. 상황을 정리하고, 무엇이 문제였는지 차분하게 짚어 줍니다. 감정에 휩쓸리지 않고 현실적인 방법을 찾아 줍니다. 신인PA은 혼나지 않았는데도 스스로 고치고 싶어집니다. 왜냐하면 이해받았고, 동시에 길을 보았기 때문입니다.
+그리고 그 다음에 A의 힘이 움직입니다. 위로로 끝나지 않습니다. 상황을 정리하고, 무엇이 문제였는지 차분하게 짚어 줍니다. 감정에 휩쓸리지 않고 현실적인 방법을 찾아 줍니다. 신인은 혼나지 않았는데도 스스로 고치고 싶어집니다. 왜냐하면 이해받았고, 동시에 길을 보았기 때문입니다.
 
-이 코치님은 소리를 높이지 않아도 방향을 세웁니다. 강하게 밀지 않아도 스스로 걷게 만듭니다. 억지로 끌려가는 성장이 아니라, 납득하고 움직이는 성장을 만들기 때문입니다. 그래서 시간이 지날수록 신인PA은 더 단단해집니다.
+이 코치는 소리를 높이지 않아도 방향을 세웁니다. 강하게 밀지 않아도 스스로 걷게 만듭니다. 억지로 끌려가는 성장이 아니라, 납득하고 움직이는 성장을 만들기 때문입니다. 그래서 시간이 지날수록 신인은 더 단단해집니다.
 
-결국 조직은 이런 리더를 오래 기억합니다.
-“내 마음을 알아주면서도, 결국 나를 성장하게 만든 사람.”`,NP_FC:`(NP 자상한 부모 & FC 자유로운 아이가 가장 높은 자리에 있는 코치님은, 사람을 품는 따뜻함과 분위기를 밝히는 생동감을 동시에 가진 존재입니다.)
+결국 조직은 이런 코치를 오래 기억합니다.
+“내 마음을 알아주면서도, 결국 나를 성장하게 만든 사람.”`,NP_FC:`(NP 자상한 부모 & FC 자유로운 아이가 가장 높은 자리에 있는 코치는, 사람을 품는 따뜻함과 분위기를 밝히는 생동감을 동시에 가진 존재입니다.)
 
-이 성향의 강점은 신인PA이 마음을 닫을 틈을 주지 않는다는 데 있습니다. 먼저 다가가 말을 걸고, 표정을 읽고, 긴장을 풀어 줍니다. 처음 조직에 들어온 사람은 늘 어색하고 두렵습니다. 그런데 이 코치 앞에서는 웃게 됩니다. 굳어 있던 어깨가 내려가고, “여기 있어도 되겠다”는 마음이 생깁니다.
+이 성향의 강점은 신인이 마음을 닫을 틈을 주지 않는다는 데 있습니다. 먼저 다가가 말을 걸고, 표정을 읽고, 긴장을 풀어 줍니다. 처음 조직에 들어온 사람은 늘 어색하고 두렵습니다. 그런데 이 코치 앞에서는 웃게 됩니다. 굳어 있던 어깨가 내려가고, “여기 있어도 되겠다”는 마음이 생깁니다.
 
-따뜻함은 신뢰를 만들고, 밝음은 용기를 만듭니다. 혼내기 전에 이해하고, 지적하기 전에 격려합니다. 그래서 신인PA은 실수를 숨기지 않습니다. 오히려 먼저 와서 말합니다. 그 순간부터 진짜 성장이 시작됩니다.
+따뜻함은 신뢰를 만들고, 밝음은 용기를 만듭니다. 혼내기 전에 이해하고, 지적하기 전에 격려합니다. 그래서 신인은 실수를 숨기지 않습니다. 오히려 먼저 와서 말합니다. 그 순간부터 진짜 성장이 시작됩니다.
 
-이 코치님은 무거운 책임을 가르치면서도 분위기를 무겁게 만들지 않습니다. 힘든 과정 속에서도 웃음을 잃지 않게 해 줍니다. 사람을 남게 하는 힘, 오래 버티게 하는 힘, 다시 도전하게 만드는 힘이 바로 여기에서 나옵니다.
+이 코치는 무거운 책임을 가르치면서도 분위기를 무겁게 만들지 않습니다. 힘든 과정 속에서도 웃음을 잃지 않게 해 줍니다. 사람을 남게 하는 힘, 오래 버티게 하는 힘, 다시 도전하게 만드는 힘이 바로 여기에서 나옵니다.
 
-시간이 지나면 신인PA들은 이렇게 말합니다.
-“나를 믿어주고, 다시 해볼 힘을 준 사람이었다.”`,NP_AC:`(NP 자상한 부모 & AC 순응하는 아이가 가장 높은 자리에 있는 코치님은, 사람의 마음을 먼저 살피고 조직의 흐름을 존중하는 따뜻한 연결자입니다.)
+시간이 지나면 신인들은 이렇게 말합니다.
+“나를 믿어주고, 다시 해볼 힘을 준 사람이었다.”`,NP_AC:`(NP 자상한 부모 & AC 순응하는 아이가 가장 높은 자리에 있는 코치는, 사람의 마음을 먼저 살피고 조직의 흐름을 존중하는 따뜻한 연결자입니다.)
 
-이 조합이 주는 힘은 배려와 안정감입니다. 신인PA은 새로운 환경에서 늘 긴장합니다. 내가 잘하고 있는지, 혹시 민폐가 되지는 않는지 끊임없이 눈치를 봅니다. 그런데 이 코치 앞에 서면 마음이 조금씩 풀립니다. 나를 이해해 주는 표정, 기다려 주는 태도, 그리고 조직 안에서 안전하게 자리 잡을 수 있도록 길을 열어 주는 분위기를 느끼기 때문입니다.
+이 조합이 주는 힘은 배려와 안정감입니다. 신인은 새로운 환경에서 늘 긴장합니다. 내가 잘하고 있는지, 혹시 민폐가 되지는 않는지 끊임없이 눈치를 봅니다. 그런데 이 코치 앞에 서면 마음이 조금씩 풀립니다. 나를 이해해 주는 표정, 기다려 주는 태도, 그리고 조직 안에서 안전하게 자리 잡을 수 있도록 길을 열어 주는 분위기를 느끼기 때문입니다.
 
-사람을 품으면서도 제도와 방향을 벗어나지 않게 안내합니다. 무조건 감싸기만 하지 않고, 팀이 가야 할 길을 함께 보게 합니다. 그래서 신인PA은 혼자가 아니라 보호받는 느낌 속에서 성장합니다. 억지로 끌려가는 것이 아니라, 스스로 따라가고 싶어집니다.
+사람을 품으면서도 제도와 방향을 벗어나지 않게 안내합니다. 무조건 감싸기만 하지 않고, 팀이 가야 할 길을 함께 보게 합니다. 그래서 신인은 혼자가 아니라 보호받는 느낌 속에서 성장합니다. 억지로 끌려가는 것이 아니라, 스스로 따라가고 싶어집니다.
 
-또한 이 코치님은 갈등을 크게 만들지 않습니다. 누군가 실수했을 때도 관계가 상처받지 않도록 표현을 고르고, 조직이 흔들리지 않도록 균형을 잡습니다. 그 덕분에 팀 분위기는 부드럽게 유지되고, 사람들은 오래 남습니다.
+또한 이 코치는 갈등을 크게 만들지 않습니다. 누군가 실수했을 때도 관계가 상처받지 않도록 표현을 고르고, 조직이 흔들리지 않도록 균형을 잡습니다. 그 덕분에 팀 분위기는 부드럽게 유지되고, 사람들은 오래 남습니다.
 
-시간이 지나면 신인PA들은 이렇게 기억합니다.
-“나를 이해해 주면서도, 이 조직 안에서 잘 해낼 수 있게 도와준 사람이었다.”`,A_CP:`(A 어른 자아 & CP 통제적 부모 자아가 가장 높은 자리에 있는 코치님은, 원칙 위에 현실을 세우고 책임으로 사람을 성장시키는 리더입니다.)
+시간이 지나면 신인들은 이렇게 기억합니다.
+“나를 이해해 주면서도, 이 조직 안에서 잘 해낼 수 있게 도와준 사람이었다.”`,A_CP:`(A 어른 자아 & CP 통제적 부모 자아가 가장 높은 자리에 있는 코치는, 원칙 위에 현실을 세우고 책임으로 사람을 성장시키는 코치입니다.)
 
-이 조합의 힘은 ‘흔들리지 않는 기준’입니다. 팀이 어려운 상황에 놓여도 감정에 끌려 급하게 판단하지 않습니다. 무엇이 맞는지, 무엇이 팀에 도움이 되는지를 차분하게 따져 본 뒤 결정합니다. 그래서 구성원들은 압박 속에서도 방향을 잃지 않습니다. “저 사람이 결정했다면 이유가 있을 것이다.”라는 신뢰가 자연스럽게 만들어집니다.
+이 조합의 힘은 ‘흔들리지 않는 기준’입니다. 팀이 어려운 상황에 놓여도 감정에 끌려 급하게 판단하지 않습니다. 무엇이 맞는지, 무엇이 팀에 도움이 되는지를 차분하게 따져 본 뒤 결정합니다. 그래서 신인들은 압박 속에서도 방향을 잃지 않습니다. “저 사람이 결정했다면 이유가 있을 것이다.”라는 신뢰가 자연스럽게 만들어집니다.
 
-또한 이 코치님은 해야 할 말과 하지 말아야 할 말을 분명히 구분합니다. 잘한 부분은 정확히 인정하고, 부족한 부분은 피하지 않고 알려 줍니다. 그렇다고 차갑게 밀어붙이지는 않습니다. 왜 필요한지, 지금 고치면 어떤 미래가 열리는지 논리적으로 설명합니다. 듣는 사람은 순간 뜨끔할 수 있어도, 시간이 지나면 고마움을 느끼게 됩니다.
+또한 이 코치는 해야 할 말과 하지 말아야 할 말을 분명히 구분합니다. 잘한 부분은 정확히 인정하고, 부족한 부분은 피하지 않고 알려 줍니다. 그렇다고 차갑게 밀어붙이지는 않습니다. 왜 필요한지, 지금 고치면 어떤 미래가 열리는지 논리적으로 설명합니다. 듣는 사람은 순간 뜨끔할 수 있어도, 시간이 지나면 고마움을 느끼게 됩니다.
 
-팀원 입장에서 보면 든든한 기둥과 같습니다. 감정에 따라 흔들리지 않고, 기준을 낮추지 않으며, 모두가 더 높은 곳으로 올라가게 만들기 때문입니다. 그래서 이 코치님과 함께 일하면 힘들어도 성장합니다. 버티는 시간이 실력이 되고, 그 과정이 결국 자부심이 됩니다.
+팀원 입장에서 보면 든든한 기둥과 같습니다. 감정에 따라 흔들리지 않고, 기준을 낮추지 않으며, 모두가 더 높은 곳으로 올라가게 만들기 때문입니다. 그래서 이 코치와 함께 일하면 힘들어도 성장합니다. 버티는 시간이 실력이 되고, 그 과정이 결국 자부심이 됩니다.
 
 사람들은 결국 이렇게 말하게 됩니다.
-“쉽게 가게 하지는 않았지만, 가장 빨리 강해지게 만든 사람이었다.”`,A_NP:`(A 어른 자아 & NP 자상한 부모가 가장 높게 자리한 코치님은, 사람을 이해하는 따뜻함 위에 정확한 판단을 더하는 지도자입니다.)
+“쉽게 가게 하지는 않았지만, 가장 빨리 강해지게 만든 사람이었다.”`,A_NP:`(A 어른 자아 & NP 자상한 부모가 가장 높게 자리한 코치는, 사람을 이해하는 따뜻함 위에 정확한 판단을 더하는 지도자입니다.)
 
 이 성향의 힘은 균형에서 나옵니다. 누군가 실수를 했을 때 감정적으로 먼저 반응하기보다, 왜 그런 선택이 나왔는지부터 살펴봅니다. 그리고 그 사람의 마음이 다치지 않도록 배려하면서도, 다음에는 더 나아질 수 있는 길을 분명하게 보여 줍니다. 그래서 팀원은 혼나기보다 배우고 있다고 느끼게 됩니다.
 
-또한 이 코치님과 이야기하면 마음이 안정됩니다. 판단이 흔들리지 않기 때문에 믿을 수 있고, 동시에 자신을 존중받고 있다고 느끼기 때문입니다. 누군가는 힘들었던 하루를 정리받고 돌아가고, 누군가는 포기하려던 순간 다시 용기를 얻습니다. 단순한 업무 지시가 아니라, 사람을 다시 일으켜 세우는 말이 오가기 때문입니다.
+또한 이 코치와 이야기하면 마음이 안정됩니다. 판단이 흔들리지 않기 때문에 믿을 수 있고, 동시에 자신을 존중받고 있다고 느끼기 때문입니다. 누군가는 힘들었던 하루를 정리받고 돌아가고, 누군가는 포기하려던 순간 다시 용기를 얻습니다. 단순한 업무 지시가 아니라, 사람을 다시 일으켜 세우는 말이 오가기 때문입니다.
 
-시간이 지나면 구성원들의 마음속에 이런 생각이 남습니다.
+시간이 지나면 신인들의 마음속에 이런 생각이 남습니다.
 “나를 이해해 주면서도, 내가 더 잘할 수 있다고 믿어 준 사람.”
 그 믿음은 결국 책임감으로 바뀌고, 책임감은 성과로 이어집니다.
 
-이 코치님이 만드는 조직은 빠르기보다 오래 갑니다. 서로가 서로를 신뢰하고, 어려움이 와도 무너지지 않는 단단함이 자라기 때문입니다. 따뜻하지만 흐트러지지 않는 리더, 바로 그 모습이 이 성향이 가진 가장 큰 감동입니다.`,A_FC:`(A 어른 자아 & FC 자유로운 아이가 가장 높게 자리한 코치님은, 정확한 판단 위에 생동감을 더해 팀을 살아 움직이게 만드는 사람입니다.)
+이 코치가 만드는 조직은 빠르기보다 오래 갑니다. 서로가 서로를 신뢰하고, 어려움이 와도 무너지지 않는 단단함이 자라기 때문입니다. 따뜻하지만 흐트러지지 않는 코치, 바로 그 모습이 이 성향이 가진 가장 큰 감동입니다.`,A_FC:`(A 어른 자아 & FC 자유로운 아이가 가장 높게 자리한 코치는, 정확한 판단 위에 생동감을 더해 팀을 살아 움직이게 만드는 사람입니다.)
 
-이 성향의 특별함은 차갑지 않은 이성에 있습니다. 상황을 분석하고 우선순위를 정하는 힘이 분명하기 때문에 방향이 흔들리지 않습니다. 그런데 그 전달 방식이 딱딱하지 않습니다. 표정과 말에 에너지가 있고, 분위기를 밝게 만들 줄 압니다. 그래서 구성원은 “해야 한다”는 압박보다 “해보고 싶다”는 마음으로 움직이게 됩니다.
+이 성향의 특별함은 차갑지 않은 이성에 있습니다. 상황을 분석하고 우선순위를 정하는 힘이 분명하기 때문에 방향이 흔들리지 않습니다. 그런데 그 전달 방식이 딱딱하지 않습니다. 표정과 말에 에너지가 있고, 분위기를 밝게 만들 줄 압니다. 그래서 신인은 “해야 한다”는 압박보다 “해보고 싶다”는 마음으로 움직이게 됩니다.
 
-무언가를 설명할 때도 복잡하게 말하지 않습니다. 핵심을 짚어 주면서도 이해하기 쉽게 풀어 주고, 긴장이 도는 순간에는 농담과 여유로 공기를 바꿉니다. 덕분에 사람들은 이 코치님과 함께 있으면 부담이 줄어들고, 대신 집중력은 더 또렷해집니다.
+무언가를 설명할 때도 복잡하게 말하지 않습니다. 핵심을 짚어 주면서도 이해하기 쉽게 풀어 주고, 긴장이 도는 순간에는 농담과 여유로 공기를 바꿉니다. 덕분에 사람들은 이 코치와 함께 있으면 부담이 줄어들고, 대신 집중력은 더 또렷해집니다.
 
 시간이 지나면 이런 평가가 따라옵니다.
-“현실을 정확히 보면서도, 사람을 숨 쉬게 해 주는 리더.”
+“현실을 정확히 보면서도, 사람을 숨 쉬게 해 주는 코치.”
 
-이 신뢰는 자연스럽게 몰입으로 이어집니다. 구성원은 혼나는 자리가 아니라 성장하는 자리에 와 있다고 느끼고, 스스로 더 잘해 보고 싶다는 의지가 생깁니다. 판단은 명확하고, 분위기는 살아 있고, 사람은 지치지 않는 구조. 바로 그 균형이 이 성향이 만들어 내는 감동의 힘입니다.`,A_AC:`(A 어른 자아 & AC 순응하는 아이가 가장 높게 자리한 코치님은, 조직의 방향을 정확히 읽으면서도 사람의 흐름을 세심하게 살피는 균형의 리더입니다.)
+이 신뢰는 자연스럽게 몰입으로 이어집니다. 신인은 혼나는 자리가 아니라 성장하는 자리에 와 있다고 느끼고, 스스로 더 잘해 보고 싶다는 의지가 생깁니다. 판단은 명확하고, 분위기는 살아 있고, 사람은 지치지 않는 구조. 바로 그 균형이 이 성향이 만들어 내는 감동의 힘입니다.`,A_AC:`(A 어른 자아 & AC 순응하는 아이가 가장 높게 자리한 코치는, 조직의 방향을 정확히 읽으면서도 사람의 흐름을 세심하게 살피는 균형의 코치입니다.)
 
-이 성향의 가장 큰 힘은 ‘맞추는 능력’입니다. 무엇이 옳은지 계산하고, 무엇이 필요한지 판단하고, 그 기준을 조직의 흐름과 연결합니다. 그래서 위에서는 신뢰를 받고, 아래에서는 안정감을 줍니다. 원칙을 이해한 상태에서 움직이기 때문에 불필요한 충돌이 줄어들고, 구성원들은 안전한 울타리 안에서 성장한다는 느낌을 받습니다.
+이 성향의 가장 큰 힘은 ‘맞추는 능력’입니다. 무엇이 옳은지 계산하고, 무엇이 필요한지 판단하고, 그 기준을 조직의 흐름과 연결합니다. 그래서 위에서는 신뢰를 받고, 아래에서는 안정감을 줍니다. 원칙을 이해한 상태에서 움직이기 때문에 불필요한 충돌이 줄어들고, 신인들은 안전한 울타리 안에서 성장한다는 느낌을 받습니다.
 
 누군가 어려움을 겪을 때도 감정으로 먼저 흔들리기보다 상황을 파악하고 해결의 순서를 잡습니다. 그리고 그 과정에서 상대의 입장을 놓치지 않습니다. “왜 안 했어?”가 아니라 “어디가 막혔어?”라고 묻는 태도, 이것이 사람을 다시 일어서게 합니다.
 
 팀원들은 이렇게 말하게 됩니다.
 “나를 몰아붙이기보다 이해해 주면서도, 결국 갈 길을 보여주는 사람이다.”
 
-조직을 따르되 사람을 잃지 않고, 사람을 배려하되 방향을 놓치지 않는 힘. 조용하지만 오래 가는 리더십이 바로 여기에서 나옵니다. 화려하게 앞에 서기보다 뒤에서 균형을 잡아 주는 존재이기에, 시간이 흐를수록 더 크게 인정받는 코치님이 됩니다.`,FC_CP:`(FC 자유로운 아이 & CP 통제적 부모가 가장 높게 자리한 코치님은, 따뜻한 열정과 분명한 기준을 동시에 들고 현장을 이끄는 사람입니다.)
+조직을 따르되 사람을 잃지 않고, 사람을 배려하되 방향을 놓치지 않는 힘. 조용하지만 오래 가는 코치십이 바로 여기에서 나옵니다. 화려하게 앞에 서기보다 뒤에서 균형을 잡아 주는 존재이기에, 시간이 흐를수록 더 크게 인정받는 코치가 됩니다.`,FC_CP:`(FC 자유로운 아이 & CP 통제적 부모가 가장 높게 자리한 코치는, 따뜻한 열정과 분명한 기준을 동시에 들고 현장을 이끄는 사람입니다.)
 
-이 조합은 보기 드문 힘을 만듭니다. 마음은 뜨겁게 뛰지만 방향은 흐트러지지 않습니다. 사람을 좋아하고 분위기를 살리며 팀에 활기를 넣으면서도, 해야 할 일과 지켜야 할 선을 분명하게 알려 줍니다. 그래서 구성원은 즐겁게 따라오면서도 느슨해지지 않습니다. 웃음 속에 규칙이 있고, 자유 속에 책임이 있는 리더십입니다.
+이 조합은 보기 드문 힘을 만듭니다. 마음은 뜨겁게 뛰지만 방향은 흐트러지지 않습니다. 사람을 좋아하고 분위기를 살리며 팀에 활기를 넣으면서도, 해야 할 일과 지켜야 할 선을 분명하게 알려 줍니다. 그래서 신인은 즐겁게 따라오면서도 느슨해지지 않습니다. 웃음 속에 규칙이 있고, 자유 속에 책임이 있는 코치십입니다.
 
-이 성향의 코치님은 신인PA을 볼 때 가능성을 먼저 발견합니다. “잘할 수 있어!”라고 힘을 넣어 주고, 동시에 “이 기준은 꼭 지키자”라고 길을 세워 줍니다. 그래서 신인PA은 보호받는 느낌과 함께 성장의 압박을 건강하게 받습니다. 혼나는 것이 아니라 기대받는 느낌을 받게 되는 것이죠.
+이 성향의 코치는 신인을 볼 때 가능성을 먼저 발견합니다. “잘할 수 있어!”라고 힘을 넣어 주고, 동시에 “이 기준은 꼭 지키자”라고 길을 세워 줍니다. 그래서 신인은 보호받는 느낌과 함께 성장의 압박을 건강하게 받습니다. 혼나는 것이 아니라 기대받는 느낌을 받게 되는 것이죠.
 
 팀원들은 시간이 지나며 이렇게 말합니다.
 “나를 믿어 주는데, 그래서 더 제대로 해내고 싶다.”
 
 현장은 결국 사람의 에너지로 움직입니다. 그 에너지를 살리는 밝음과, 흔들리지 않게 잡아 주는 기준이 함께 있을 때 조직은 오래 갑니다. 즐거움이 동력이 되고, 원칙이 방향이 되며, 그 사이에서 사람들은 실력을 키웁니다.
 
-이 리더 밑에서 자란 사람은 어디를 가도 무너지지 않습니다. 왜냐하면 기분만 좋았던 경험이 아니라, 성장의 구조를 함께 배웠기 때문입니다.`,FC_NP:`(FC 자유로운 아이 & NP 자상한 부모가 가장 높게 자리한 코치님은, 사람의 마음을 살리고 용기를 키워 주는 힘을 타고난 존재입니다.)
+이 코치 밑에서 자란 사람은 어디를 가도 무너지지 않습니다. 왜냐하면 기분만 좋았던 경험이 아니라, 성장의 구조를 함께 배웠기 때문입니다.`,FC_NP:`(FC 자유로운 아이 & NP 자상한 부모가 가장 높게 자리한 코치는, 사람의 마음을 살리고 용기를 키워 주는 힘을 타고난 존재입니다.)
 
-이 성향이 함께 움직일 때 현장은 따뜻해집니다. 밝은 에너지로 분위기를 부드럽게 만들고, 상대가 긴장을 풀 수 있게 웃음을 건넵니다. 그런데 그 웃음은 가벼움이 아니라 배려에서 나옵니다. “괜찮아, 다시 하면 돼”, “처음인데 잘하고 있어” 같은 말이 자연스럽게 나오기 때문입니다. 신인PA은 혼나지 않을까 걱정하기보다, 해보고 싶다는 마음을 먼저 갖게 됩니다.
+이 성향이 함께 움직일 때 현장은 따뜻해집니다. 밝은 에너지로 분위기를 부드럽게 만들고, 상대가 긴장을 풀 수 있게 웃음을 건넵니다. 그런데 그 웃음은 가벼움이 아니라 배려에서 나옵니다. “괜찮아, 다시 하면 돼”, “처음인데 잘하고 있어” 같은 말이 자연스럽게 나오기 때문입니다. 신인은 혼나지 않을까 걱정하기보다, 해보고 싶다는 마음을 먼저 갖게 됩니다.
 
-이 코치님과 이야기하면 마음이 열립니다. 실수를 숨기기보다 먼저 말하게 되고, 부족함을 감추기보다 도움을 요청하게 됩니다. 왜냐하면 나를 평가하는 사람이 아니라 나를 도와주는 사람으로 느껴지기 때문입니다. 그래서 관계는 빨리 가까워지고, 배우는 속도도 빨라집니다.
+이 코치와 이야기하면 마음이 열립니다. 실수를 숨기기보다 먼저 말하게 되고, 부족함을 감추기보다 도움을 요청하게 됩니다. 왜냐하면 나를 평가하는 사람이 아니라 나를 도와주는 사람으로 느껴지기 때문입니다. 그래서 관계는 빨리 가까워지고, 배우는 속도도 빨라집니다.
 
 팀원들은 시간이 지나면 이렇게 말합니다.
 “내가 힘들 때 가장 먼저 생각나는 사람이다.”
 
-가르침이 강압이 되지 않고, 응원이 빈말이 되지 않습니다. 진심으로 믿어 주고, 진심으로 기다려 주기 때문입니다. 그러니 신인PA은 넘어져도 다시 일어납니다. 혼자라면 포기했을 순간에도, 나를 믿어 주는 사람이 있다는 기억이 발걸음을 다시 움직이게 합니다.
+가르침이 강압이 되지 않고, 응원이 빈말이 되지 않습니다. 진심으로 믿어 주고, 진심으로 기다려 주기 때문입니다. 그러니 신인은 넘어져도 다시 일어납니다. 혼자라면 포기했을 순간에도, 나를 믿어 주는 사람이 있다는 기억이 발걸음을 다시 움직이게 합니다.
 
-이 리더 밑에서 자란 사람은 자신감이 생깁니다. 실력이 늘어서만이 아니라, 존중받았던 경험이 마음에 남기 때문입니다. 그리고 그 따뜻함은 또 다른 사람을 키우는 힘으로 이어집니다.`,FC_A:`(FC 자유로운 아이 & A 어른 자아가 가장 높게 자리한 코치님은, 밝은 에너지와 냉정한 판단을 함께 사용하는 균형 잡힌 리더입니다.)
+이 코치 밑에서 자란 사람은 자신감이 생깁니다. 실력이 늘어서만이 아니라, 존중받았던 경험이 마음에 남기 때문입니다. 그리고 그 따뜻함은 또 다른 사람을 키우는 힘으로 이어집니다.`,FC_A:`(FC 자유로운 아이 & A 어른 자아가 가장 높게 자리한 코치는, 밝은 에너지와 냉정한 판단을 함께 사용하는 균형 잡힌 코치입니다.)
 
 이 두 힘이 만나면 분위기와 방향이 동시에 살아납니다. 먼저 사람을 편안하게 만드는 친근함이 있습니다. 웃으며 다가가고, 긴장을 풀어 주고, “해볼 수 있다”는 기운을 넣어 줍니다. 그런데 거기서 끝나지 않습니다. 따뜻하게 시작하지만 결론은 분명합니다. 무엇을 해야 하는지, 왜 해야 하는지, 지금 가장 중요한 것이 무엇인지 또렷하게 정리해 줍니다.
 
-그래서 신인PA은 혼란스럽지 않습니다. 재미있고 좋지만, 동시에 배울 것이 명확합니다. 감정만 남는 시간이 아니라 실력이 쌓이는 시간이 됩니다. 이 코치님과 함께 있으면 마음은 가벼운데 머리는 정리가 됩니다. 웃으면서도 성장합니다.
+그래서 신인은 혼란스럽지 않습니다. 재미있고 좋지만, 동시에 배울 것이 명확합니다. 감정만 남는 시간이 아니라 실력이 쌓이는 시간이 됩니다. 이 코치와 함께 있으면 마음은 가벼운데 머리는 정리가 됩니다. 웃으면서도 성장합니다.
 
 팀원들은 시간이 지나면 이런 고백을 합니다.
 “편해서 좋았는데, 돌아보니 내가 정말 많이 늘어 있었다.”
 
 칭찬할 때는 크게 칭찬하고, 고칠 때는 이유를 알려 주며 이해시킵니다. 무조건 하라고 밀어붙이지 않고, 스스로 납득하게 만들기 때문에 변화가 오래갑니다. 분위기를 살리는 힘과 결과를 만드는 힘을 동시에 가지고 있기 때문입니다.
 
-결국 이 리더와 함께한 사람들은 단순히 즐거운 기억만 남지 않습니다. ‘내가 해냈다’는 경험을 얻게 됩니다. 그리고 그 경험은 다음 도전을 향해 다시 움직이게 하는 가장 큰 연료가 됩니다.`,FC_AC:`(FC 자유로운 아이 & AC 순응하는 아이가 함께 높게 자리한 코치님은, 사람의 마음을 먼저 읽고 분위기를 안전하게 만드는 힘을 가진 리더입니다.)
+결국 이 코치와 함께한 사람들은 단순히 즐거운 기억만 남지 않습니다. ‘내가 해냈다’는 경험을 얻게 됩니다. 그리고 그 경험은 다음 도전을 향해 다시 움직이게 하는 가장 큰 연료가 됩니다.`,FC_AC:`(FC 자유로운 아이 & AC 순응하는 아이가 함께 높게 자리한 코치는, 사람의 마음을 먼저 읽고 분위기를 안전하게 만드는 힘을 가진 코치입니다.)
 
-이 조합의 가장 큰 힘은 “함께 가고 있다”는 느낌을 주는 능력입니다. 먼저 다가갈 때 표정이 밝고, 말투가 부드럽습니다. 그래서 신인PA은 긴장을 내려놓습니다. 혼날까 봐 숨는 분위기가 아니라, 털어놓고 싶어지는 분위기가 됩니다. 코치 앞에서는 실수를 숨기기보다 이야기하게 되고, 모르는 것을 아는 척하기보다 배우려고 합니다.
+이 조합의 가장 큰 힘은 “함께 가고 있다”는 느낌을 주는 능력입니다. 먼저 다가갈 때 표정이 밝고, 말투가 부드럽습니다. 그래서 신인은 긴장을 내려놓습니다. 혼날까 봐 숨는 분위기가 아니라, 털어놓고 싶어지는 분위기가 됩니다. 코치 앞에서는 실수를 숨기기보다 이야기하게 되고, 모르는 것을 아는 척하기보다 배우려고 합니다.
 
-또한 이 코치님은 상대의 표정과 반응을 매우 잘 살핍니다. 힘들어 보이면 속도를 조절해 주고, 자신감이 떨어져 보이면 옆에서 다시 기운을 넣어 줍니다. 억지로 끌고 가지 않고, 함께 걷는 느낌을 줍니다. 그래서 신인PA은 버텨 냅니다. 포기하지 않습니다.
+또한 이 코치는 상대의 표정과 반응을 매우 잘 살핍니다. 힘들어 보이면 속도를 조절해 주고, 자신감이 떨어져 보이면 옆에서 다시 기운을 넣어 줍니다. 억지로 끌고 가지 않고, 함께 걷는 느낌을 줍니다. 그래서 신인은 버텨 냅니다. 포기하지 않습니다.
 
 시간이 흐르면 이런 말이 자연스럽게 나옵니다.
 “저 사람은 나를 이해해 준다.”
 “혼자가 아니라 같이 간다.”
 
-조직에서 이런 믿음을 만들어 내는 리더는 쉽게 나오지 않습니다. 실적 이전에 사람을 남기고, 성과 이전에 마음을 남깁니다. 그리고 바로 그 마음이 결국 다시 움직이게 하는 힘이 됩니다.
+조직에서 이런 믿음을 만들어 내는 코치는 쉽게 나오지 않습니다. 실적 이전에 사람을 남기고, 성과 이전에 마음을 남깁니다. 그리고 바로 그 마음이 결국 다시 움직이게 하는 힘이 됩니다.
 
-편안함 속에서 성장하게 만드는 리더.
+편안함 속에서 성장하게 만드는 코치.
 그것이 이 성향이 가진 깊은 가치입니다.`,AC_CP:`(AC 순응하는 아이 & CP 통제적 부모가 함께 높은 성향은 조직의 흐름을 존중하면서도 분명한 기준을 세울 수 있는 힘으로 나타납니다.)
 
-이 조합은 위와 아래를 동시에 바라볼 수 있는 드문 균형을 만듭니다. 무엇이 필요한지, 지금 조직이 어디로 가야 하는지 빠르게 읽어내면서도, 흔들리지 않는 원칙으로 방향을 잡습니다. 그래서 사람들은 이 리더를 보며 “따라가면 안전하다”는 느낌을 받습니다.
+이 조합은 위와 아래를 동시에 바라볼 수 있는 드문 균형을 만듭니다. 무엇이 필요한지, 지금 조직이 어디로 가야 하는지 빠르게 읽어내면서도, 흔들리지 않는 원칙으로 방향을 잡습니다. 그래서 사람들은 이 코치를 보며 “따라가면 안전하다”는 느낌을 받습니다.
 
 정책을 존중하고 체계를 이해하기 때문에 조직 전체의 신뢰를 얻고, 동시에 해야 할 말은 또렷하게 전달하기 때문에 실행력이 살아납니다. 눈치를 보는 사람이 아니라 분위기를 읽는 사람, 강압적인 사람이 아니라 기준을 세워 주는 사람으로 기억됩니다.
 
-구성원 입장에서는 더욱 든든합니다. 무리한 요구가 아니라 현실을 반영한 판단을 내려주고, 노력하면 인정받을 수 있는 구조를 만들어 주기 때문입니다. 그래서 시간이 지날수록 존경이 쌓이고, 그 존경이 곧 영향력이 됩니다.
+신인 입장에서는 더욱 든든합니다. 무리한 요구가 아니라 현실을 반영한 판단을 내려주고, 노력하면 인정받을 수 있는 구조를 만들어 주기 때문입니다. 그래서 시간이 지날수록 존경이 쌓이고, 그 존경이 곧 영향력이 됩니다.
 
-결국 이 성향은 사람을 지키면서 성과를 만드는 리더의 힘입니다.
+결국 이 성향은 사람을 지키면서 성과를 만드는 코치의 힘입니다.
 함께 가지만 느슨하지 않고, 단호하지만 차갑지 않습니다.
-그래서 많은 사람들이 마음으로 따르게 됩니다.`,AC_NP:`(AC 순응하는 아이 & NP 자상한 부모가 함께 높게 나타나는 성향은 사람의 마음을 먼저 이해하고 관계 속에서 힘을 만들어내는 따뜻한 리더십으로 드러납니다.)
+그래서 많은 사람들이 마음으로 따르게 됩니다.`,AC_NP:`(AC 순응하는 아이 & NP 자상한 부모가 함께 높게 나타나는 성향은 사람의 마음을 먼저 이해하고 관계 속에서 힘을 만들어내는 따뜻한 코치십으로 드러납니다.)
 
 이 조합은 누군가를 움직이게 하기 전에 먼저 공감합니다. 상대의 입장에서 생각하고, 무엇이 힘들지, 어디에서 막히는지, 어떤 말이 용기가 될지를 자연스럽게 느낍니다. 그래서 함께 일하는 사람들은 지시를 받는 느낌보다 보호받고 있다는 안정감을 경험합니다.
 
 분위기를 읽는 감각이 뛰어나 조직의 흐름을 부드럽게 만들고, 갈등이 생기기 전에 완충 역할을 해냅니다. 누군가 실수하더라도 먼저 이유를 묻고 다시 일어설 수 있도록 손을 내밉니다. 그 손길이 반복되면서 사람들은 점점 마음을 열고, 결국 자발적으로 따르게 됩니다.
 
-이 리더 곁에 있으면 괜히 더 잘하고 싶어집니다. 혼나서가 아니라 기대를 저버리고 싶지 않아서입니다. 존중받는 경험이 쌓이면 책임감이 커지고, 책임감이 커지면 성과가 따라옵니다.
+이 코치 곁에 있으면 괜히 더 잘하고 싶어집니다. 혼나서가 아니라 기대를 저버리고 싶지 않아서입니다. 존중받는 경험이 쌓이면 책임감이 커지고, 책임감이 커지면 성과가 따라옵니다.
 
 결국 이 성향의 힘은 사람을 남게 만드는 힘입니다.
 곁에 있고 싶게 만들고, 계속 함께 가고 싶게 만드는 힘.
-그래서 시간이 갈수록 더 많은 이들이 마음으로 모입니다.`,AC_A:`(AC 순응하는 아이 & A 어른 자아가 함께 높은 코치님은, 상황을 정확히 읽으면서도 사람을 안전하게 지켜 주는 균형 잡힌 리더입니다.)
+그래서 시간이 갈수록 더 많은 이들이 마음으로 모입니다.`,AC_A:`(AC 순응하는 아이 & A 어른 자아가 함께 높은 코치는, 상황을 정확히 읽으면서도 사람을 안전하게 지켜 주는 균형 잡힌 코치입니다.)
 
-이 조합은 감정과 현실을 동시에 다루는 힘을 만듭니다. 상대의 표정과 분위기를 섬세하게 느끼기 때문에 무리하게 밀어붙이지 않습니다. 대신 무엇이 필요한지 파악하고, 지금 할 수 있는 가장 현실적인 방법을 제시합니다. 그래서 신인PA은 혼란 대신 방향을 얻습니다.
+이 조합은 감정과 현실을 동시에 다루는 힘을 만듭니다. 상대의 표정과 분위기를 섬세하게 느끼기 때문에 무리하게 밀어붙이지 않습니다. 대신 무엇이 필요한지 파악하고, 지금 할 수 있는 가장 현실적인 방법을 제시합니다. 그래서 신인은 혼란 대신 방향을 얻습니다.
 
 또 하나의 큰 장점은 차분함입니다. 문제가 생겨도 감정적으로 흔들리기보다, 사실을 정리하고 해결 순서를 알려 줍니다. 옆에 있는 사람은 자연스럽게 안정감을 느끼고 “이 사람을 따라가면 되겠다”는 마음이 생깁니다.
 
 조직에서도 신뢰를 받습니다. 기준을 무조건 강요하기보다 상황을 이해한 뒤 합리적인 길을 찾기 때문입니다. 위와 아래를 연결하고, 사람과 결과를 함께 지켜 냅니다.
 
-시간이 흐르면 구성원들은 이렇게 말합니다.
+시간이 흐르면 신인들은 이렇게 말합니다.
 “복잡할 때 가장 믿고 찾는 사람.”
-“나를 존중하면서 성장하게 해 준 리더.”
+“나를 존중하면서 성장하게 해 준 코치.”
 
-따뜻함과 이성, 배려와 판단이 함께 움직일 때 팀은 오래 갑니다. 이 성향은 조용하지만 단단한 힘으로 사람을 앞으로 걷게 만듭니다.`,AC_FC:`(AC 순응하는 아이 & FC 자유로운 아이가 함께 높은 코치님은 사람의 마음을 읽고 분위기를 살려 내는 특별한 힘을 가진 리더입니다.)
+따뜻함과 이성, 배려와 판단이 함께 움직일 때 팀은 오래 갑니다. 이 성향은 조용하지만 단단한 힘으로 사람을 앞으로 걷게 만듭니다.`,AC_FC:`(AC 순응하는 아이 & FC 자유로운 아이가 함께 높은 코치는 사람의 마음을 읽고 분위기를 살려 내는 특별한 힘을 가진 코치입니다.)
 
-이 조합은 딱딱한 지시보다 관계의 온도로 움직이게 만듭니다. 상대가 무엇을 부담스러워하는지, 어디에서 용기가 필요한지 자연스럽게 알아차립니다. 그리고 무거운 공기를 웃음과 격려로 풀어 주며 다시 도전할 수 있는 마음을 만들어 줍니다. 그래서 신인PA은 “혼나는 자리”가 아니라 “다시 해 볼 수 있는 자리”라고 느끼게 됩니다.
+이 조합은 딱딱한 지시보다 관계의 온도로 움직이게 만듭니다. 상대가 무엇을 부담스러워하는지, 어디에서 용기가 필요한지 자연스럽게 알아차립니다. 그리고 무거운 공기를 웃음과 격려로 풀어 주며 다시 도전할 수 있는 마음을 만들어 줍니다. 그래서 신인은 “혼나는 자리”가 아니라 “다시 해 볼 수 있는 자리”라고 느끼게 됩니다.
 
 또한 이 성향은 눈치를 세심하게 살피면서도 현장을 밝게 만듭니다. 누구 하나 소외되지 않도록 손을 내밀고, 작은 성과에도 진심으로 기뻐해 줍니다. 그 순간 사람은 인정받는 느낌을 받고, 그 인정이 다시 움직일 힘이 됩니다.
 
-시간이 지나면 구성원들의 기억에는 이런 모습이 남습니다.
+시간이 지나면 신인들의 기억에는 이런 모습이 남습니다.
 “나를 편하게 해 준 사람.”
 “포기하고 싶을 때 웃으며 다시 세워 준 사람.”
 
 사람을 긴장시키기보다 안심시키고, 압박하기보다 가능성을 보게 하는 힘. 이 따뜻한 에너지가 모이면 조직은 오래가고, 사람은 스스로 더 높은 목표를 향해 걷게 됩니다.`},cm4_1:{"17-20":{CP:`(원칙이 아주 강하고, 주도권이 강한 성향) 주장이 강함, 단호함, 책임감 강함, 밀어붙임, 기준과 통제가 높음.`,NP:`(너무 따뜻해서 신인 말에 맞춰주는 성향) 탁월한 공감능력, 강한 배려심, 보호본능, 신뢰형성`,A:`(숫자, 사실, 근거를 먼저 보는 강한 이성적 성향) 강한 분석력과 판단력, 명확성, 객관성, 높은 이성`,FC:`(상담이 즐겁고 분위기를 스스로 띄우는 성향) 아주 밝음, 활발함, 표현 풍부, 친근함, 에너지, 다소 가벼움`,AC:`(신인 반응에 매우 민감한 성향) 순응, 눈치, 조심, 맞춤형, 불안.`},"14-16":{CP:`(현실적 원칙과 주도성이 균형이 잡힌 성향) 결정력 있음, 믿음직한, 판단이 빠름, 기준과 통제가 있음.`,NP:`(신인을 잘 챙기고 사람 냄새 나는 성향) 공감 잘함, 배려 깊음, 따뜻함, 신뢰감 있음, 안정적.`,A:`(감정에 휘둘리지 않고 설명과 판단이 안정적인 성향) 이성적, 균형감, 현실적, 분석적.`,FC:`(신인이 부담없이 이야기 하도록 분위기를 잘 만드는 성향) 밝음, 친화력, 유연함, 편안함, 자연스러움.`,AC:`(신인 상황에 맞게 잘 맞추는 성향) 협조, 적당한 순응 ,적당한 눈치, 조절.`},"11-13":{CP:`(상황에 따라 기준을 조절하는 성향) 균형감 있는 결정력, 유연한 기준과 통제, 보통의 주장성.`,NP:`(친절하지만 감정에 치우치지 않는 성향) 적당한 친절, 예의 바름, 부담 없음.`,A:`(감정과 논리 사이에서 무난하게 맞추는 성향) 평균적 분석, 보통의 현실감각, 보통의 이성과 상황 판단.`,FC:`(튀지않고 차분하고 안정적인 설명 중심의 성향) 안정감, 차분한, 균형감, 무난함.`,AC:`(눈치와 주장성이 균형잡힌 상향) 적응력, 균형감, 무난함, 순응과 직설의 중용.`},"8-10":{CP:`(기준 제시보다 맞춰주는 쪽에 가까운 성향) 완화된 결정력과 주장성, 조금 망설임, 조율함.`,NP:`(감정 표현은 적고 일은 담백하게 하는 성향) 차분함, 무심해 보임, 실무형, 표현 적음.`,A:`(생각보다 느낌에 따라 말이 먼저 나오는 경우가 많은 성향)
-감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`(신중해서 신뢰를 주지만 표현이 적어 딱딱하게 보일 수 있는 성향) 조용함, 신중함, 진지함, 다소 거리감.`,AC:`(눈치보다는 내 기준이 더 중요한 성향) 독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,NP:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 예술적, 판단과 논리가 조금 부족.`,FC:`(말과 표정이 적어서 신인이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`(타인의 상황을 잘 못살피는 성향) 단호함,직선적, 눈치 안 봄, 상대를 통제.`}},cm4_2:{"17-20":{CP:`기준이 선명하고 판단이 빠릅니다. 신인은 무엇을 해야 하는지 헷갈리지 않고 방향을 잡기 쉽습니다. 다만 단정이 강해지면 압박이나 지적으로 들릴 수 있으니 왜 필요한지 이유를 설명하고 선택지를 함께 제시하면 수용성과 실행력이 훨씬 높아집니다.`,NP:`코칭이 필요없는 구간`,A:`코칭이 필요없는 구간`,FC:`밝은 에너지와 친근한 표현력이 좋아 신인이 빠르게 마음을 열게 됩니다. 코치님과 함께 있으면 분위기가 부드러워지고 긴장이 풀려 배우고 싶다는 생각이 자연스럽게 생깁니다. 다만 분위기가 너무 편안해지면 기준과 방향이 약해질 수 있으니, 웃음과 격려 속에서도 해야 할 일과 목표를 분명하게 짚어주면 실행력이 더욱 높아집니다.`,AC:`조직과 분위기를 빠르게 읽고 관계의 충돌을 줄이려는 배려가 뛰어납니다. 상대가 편안함을 느끼게 하는 힘 덕분에 신인들이 마음을 열고 따르려는 장점이 분명합니다. 다만 조율에 집중하다 보면 기준 제시가 약해질 수 있으니, 필요할 때는 방향과 원칙을 분명히 말하는 연습을 더하면 리더십의 무게가 단단해집니다.`},"14-16":{CP:`코칭이 필요없는 구간`,NP:``,A:``,FC:`코칭이 필요없는 구간`,AC:`코칭이 필요없는 구간`},"11-13":{CP:``,NP:`지금처럼 신인의 마음을 이해하고 배려하는 태도는 매우 큰 힘입니다. 함께하고 있다는 느낌을 주기 때문에 신인이 쉽게 따르고 의지합니다. 여기에 공감 뒤에 한 번 더 행동 방향을 정리해 준다면, 따뜻함 속에서도 성장을 이끄는 리더십이 더욱 선명해질 것입니다.`,A:``,FC:``,AC:``},"8-10":{CP:`균형을 생각하며 말해 관계가 부드럽게 유지됩니다. 신인은 편안한 분위기에서 조언을 받아들일 수 있습니다. 그러나 리더의 확신이 약하게 들릴 수 있으니 결론과 기준을 먼저 분명히 말하고 따라야 할 우선순위를 또렷하게 잡아주면 행동 속도가 빨라집니다.`,NP:`상대를 배려하는 마음이 있어 신인이 편안함을 느낍니다. 따뜻한 분위기 덕분에 관계 형성이 자연스럽고 신뢰도도 빠르게 쌓입니다. 다만 공감이 중심이 되다 보면 방향 제시가 약해질 수 있으니 이해 다음에는 무엇을 해야 하는지 행동 기준을 분명히 알려주면 성과가 더 빨리 납니다.`,A:`상황을 나름대로 정리하고 판단하려는 힘이 있습니다. 감정에 흔들리지 않으려는 태도 덕분에 신인이 안정감을 느낍니다. 다만 확신이 늦어 설명이 길어질 수 있으니 핵심부터 먼저 말하고 이유를 덧붙이는 연습을 하면 전달력이 훨씬 선명해지고 리더십이 더 또렷해집니다.`,FC:`분위기를 편하게 만들 줄 알고 상대를 긴장하지 않게 하는 힘이 있습니다. 함께 있으면 부담이 줄어들어 신인이 마음을 열기 좋은 환경이 됩니다. 다만 에너지 표현이 조금만 더 커지면 참여도가 훨씬 살아나니 칭찬과 반응을 한 박자 더 크게 보여주면 조직의 활력이 더 빠르게 올라옵니다.`,AC:`자기 생각이 분명하고 말해야 할 순간에 표현할 줄 아는 힘이 있습니다. 눈치를 지나치게 보지 않기 때문에 결정과 진행이 빠르고, 조직에 답답함을 남기지 않는 시원함이 분명한 장점입니다. 다만 표현이 조금 직선적으로 전달될 수 있으니, 한 문장을 덧붙여 상대의 감정을 살피는 말까지 함께 전하면 리더로서의 신뢰와 따름이 훨씬 커집니다.`},"0-7":{CP:`말이 부드러워 거부감이 적고 신인이 부담을 느끼지 않습니다. 관계를 해치지 않는 안전한 전달 방식이 강점입니다. 하지만 무엇을 반드시 해야 하는지 흐려질 수 있으니 행동 기준과 마감 시점을 명확히 못 박아 주면 결과 만드는 힘이 훨씬 살아납니다.`,NP:`감정에 치우치지 않아 상황을 객관적으로 볼 수 있습니다. 필요 이상의 위로 대신 현실적인 조언을 할 수 있는 힘이 있습니다. 그러나 신인은 정서적 지지를 먼저 원할 수 있으니 판단을 말하기 전에 마음을 이해한다는 표현을 한 번 더 넣어 주면 몰입과 따름이 훨씬 좋아집니다.`,A:`사람을 먼저 생각하고 분위기를 해치지 않으려는 배려가 큽니다. 신인은 부담 없이 이야기를 꺼낼 수 있어 편안함을 느낍니다. 그러나 판단이 뒤로 밀리면 방향을 잡기 어려우니 왜 해야 하는지 기준과 근거를 짧게라도 제시하면 신인의 실행 속도가 분명히 빨라집니다.`,FC:`차분하고 가벼워 보이지 않는 진중함이 있습니다. 신인은 쉽게 흔들리지 않는 안정감을 느끼며 믿고 따르려 합니다. 그러나 표현이 적으면 의지가 약하게 전달될 수 있으니 잘한 점을 바로 말로 꺼내 주고 표정과 목소리에 힘을 조금 더 실으면 동기부여 효과가 크게 높아집니다.`,AC:`눈치를 덜 보기에 판단과 표현이 비교적 솔직하고 빠릅니다. 우유부단하지 않고 결정을 밀고 가는 추진력이 있어 답답함을 줄이지 않는 장점이 있습니다. 다만 상대의 입장을 한 번 더 확인하는 과정이 보완되면 충돌을 줄일 수 있으니, 말하기 전에 상대의 느낌을 묻는 질문을 의식적으로 넣으면 훨씬 성숙한 리더십으로 발전합니다.`}},cm4_3:{all_no_coaching:`다섯 가지 에너지가 한쪽으로 치우치지 않고 상황에 맞게 안정적으로 쓰이고 있습니다. 필요할 때는 기준과 결단을 보여 주고, 또 필요할 때는 사람의 마음을 세심하게 살필 줄 압니다. 흔들리지 않으면서도 차갑지 않은 균형을 이미 습관처럼 사용하고 있는 단계입니다. 이것은 타고난 기질이라기보다 경험을 통해 만들어진 프로의 힘입니다.
+감정이 우선, 계산이 다소 약함, 판단이 조금 흔들림.`,FC:`(신중해서 신뢰를 주지만 표현이 적어 딱딱하게 보일 수 있는 성향) 조용함, 신중함, 진지함, 다소 거리감.`,AC:`(눈치보다는 내 기준이 더 중요한 성향) 독립적, 솔직함, 직설적, 자기 기준.`},"0-7":{CP:`(자기 기준과 주장 표현이 약한 성향) 우유부단, 착함, 결정 어려움, 말을 아낌.`,NP:`(설명은 잘하지만 마음을 잘 안 보여주는 성향) 무뚝뚝함, 공감 부족, 차갑게 보임.`,A:`(생각보다 기분과 분위기에 이끌림) 감정 몰임, 즉각 반응, 판단과 논리가 조금 부족.`,FC:`(말과 표정이 적어서 신인이 차갑게 느낄 수 있는 성향) 무표정, 감정 절제, 경직됨, 딱딱함.`,AC:`(타인의 상황을 잘 못살피는 성향) 단호함,직선적, 눈치 안 봄, 상대를 통제.`}},cm4_2:{"17-20":{CP:`기준과 방향을 분명하게 제시하는 힘이 강해 신인이 무엇을 해야 하는지 빠르게 이해하고 움직일 수 있는 성향입니다. 다만 표현이 강해지면 신인이 압박이나 지적으로 느낄 수 있으므로, 먼저 이유를 설명하고 선택지를 함께 제시하는 대화가 중요합니다. “왜 필요한지”를 이해시키며 코칭하면 신인의 수용성과 실행력이 더욱 안정적으로 높아질 수 있습니다.`,NP:`코칭이 필요없는 구간`,A:`코칭이 필요없는 구간`,FC:`밝은 에너지와 친근한 표현력이 좋아 신인이 빠르게 마음을 열게 됩니다. 코치와 함께 있으면 분위기가 부드러워지고 긴장이 풀려 배우고 싶다는 생각이 자연스럽게 생깁니다. 다만 분위기가 너무 편안해지면 기준과 방향이 약해질 수 있으니, 웃음과 격려 속에서도 해야 할 일과 목표를 분명하게 짚어주면 실행력이 더욱 높아집니다.`,AC:``},"14-16":{CP:`코칭이 필요없는 구간`,NP:``,A:``,FC:`코칭이 필요없는 구간`,AC:`코칭이 필요없는 구간`},"11-13":{CP:``,NP:`신인의 이야기를 차분히 들어주고 존중하는 기본적인 안정감은 갖추고 있습니다. 다만 코칭할 때는 현재보다 공감과 배려의 표현을 조금 더 의식적으로 늘려주는 것이 중요합니다. 먼저 신인의 마음을 공감해주고 “처음이면 충분히 그럴 수 있어요”처럼 이해의 말을 건넨 뒤 방향을 제시하면, 신인의 긴장감이 줄어들고 코칭에 대한 신뢰와 실행력이 더욱 높아질 수 있습니다.`,A:``,FC:``,AC:``},"8-10":{CP:`신인에게 부드럽고 편안하게 이야기하는 장점이 있어 부담감 없이 코칭을 받아들이게 만드는 힘이 있습니다. 다만 기준과 방향 제시가 약하면 신인이 무엇을 먼저 해야 하는지 헷갈릴 수 있습니다. “지금은 이것부터 먼저 해봅시다”처럼 우선순위와 기준을 조금 더 분명하게 전달하면 신인의 행동 속도와 실행력이 훨씬 안정적으로 올라갈 수 있습니다.`,NP:`배려와 공감의 표현이 다소 적어 신인에게 차갑거나 거리감 있게 느껴질 수 있는 성향입니다. 설명은 정확하고 일의 진행도 분명하지만, 먼저 “어려운 부분은 없었어요?”처럼 신인의 마음을 확인하는 질문을 한 번 더 건네는 연습이 필요합니다. 작은 공감 표현과 부드러운 말투를 의식적으로 늘리면 신인의 긴장감이 줄고 신뢰와 실행력이 훨씬 안정적으로 올라갈 수 있습니다.`,A:`신인의 감정과 분위기를 먼저 받아들이는 따뜻함은 있지만, 설명과 판단 기준이 다소 흔들릴 수 있는 성향입니다. 코칭할 때는 공감만 하고 끝내지 말고 “지금은 이 순서대로 해보는 게 좋겠습니다”처럼 이유와 방향을 함께 정리해주는 연습이 필요합니다. 차분하게 핵심을 정리해주면 신인의 혼란이 줄고 실행력과 신뢰감이 더욱 안정적으로 올라갈 수 있습니다.`,FC:`분위기를 편하게 만들 줄 알고 상대를 긴장하지 않게 하는 힘이 있습니다. 다만 조금 무거운 분위기가 있을 수 있습니다. 에너지 표현, 즉 미소와 고개 끄덕이기를 조금만 더 의식적으로 실천해 보면 분위기가 훨씬 살아나고 칭찬과 리액션을 한 박자 더 크게 보여주면 조직의 활력이 더 빠르게 올라옵니다.`,AC:`자기 생각이 분명하고 말해야 할 순간에 표현할 줄 아는 힘이 있습니다. 눈치를 지나치게 보지 않기 때문에 결정과 진행이 빠르고, 조직에 답답함을 남기지 않는 시원함이 분명한 장점입니다. 다만 표현이 조금 직선적으로 전달될 수 있으니, 한 문장을 덧붙여 상대의 감정을 살피는 말까지 함께 전하면 코치로서의 신뢰와 따름이 훨씬 커집니다.`},"0-7":{CP:``,NP:``,A:``,FC:``,AC:``}},cm4_3:{all_no_coaching:`다섯 가지 에너지가 한쪽으로 치우치지 않고 상황에 맞게 안정적으로 쓰이고 있습니다. 필요할 때는 기준과 결단을 보여 주고, 또 필요할 때는 사람의 마음을 세심하게 살필 줄 압니다. 흔들리지 않으면서도 차갑지 않은 균형을 이미 습관처럼 사용하고 있는 단계입니다. 이것은 타고난 기질이라기보다 경험을 통해 만들어진 프로의 힘입니다.
 
-이 위치에 있는 코치님은 크게 바꿔야 할 대상이 아닙니다. 이미 만들어진 좋은 상태를 얼마나 꾸준히 유지하느냐가 더 중요합니다. 그래서 앞으로의 핵심 과제는 변화보다 지속성입니다. 컨디션이 좋을 때의 나를 기준으로 삼고, 흔들릴 때 다시 그 자리로 돌아오는 힘을 키우는 것입니다.
+이 위치에 있는 코치는 크게 바꿔야 할 대상이 아닙니다. 이미 만들어진 좋은 상태를 얼마나 꾸준히 유지하느냐가 더 중요합니다. 그래서 앞으로의 핵심 과제는 변화보다 지속성입니다. 컨디션이 좋을 때의 나를 기준으로 삼고, 흔들릴 때 다시 그 자리로 돌아오는 힘을 키우는 것입니다.
 
-주변은 이미 코치님을 신뢰합니다. 고객은 안심하고, 동료와 후배는 방향을 봅니다. 이제는 개인 성과를 넘어 영향을 주는 단계에 들어와 있습니다.
+주변은 이미 코치을 신뢰합니다. 이제는 개인 성과를 넘어 영향을 주는 단계에 들어와 있습니다.
 
 지금 잘하고 있는 방식을 계속 반복하면 됩니다. 그러면 실력은 우연이 아니라 구조가 되고, 결과는 기복이 아니라 흐름이 됩니다.
-지금처럼만 유지해도 충분히 훌륭합니다. 그리고 그 안정감을 오래 이어 간다면 더 큰 자리에서도 자연스럽게 인정받게 될 것입니다.`,some_coaching:`점수 중 한 부분이 코칭 영역에 있더라도 코치님의 영향력이 줄어드는 것은 아닙니다. 오히려 자신의 성향을 알고 조절하려는 순간부터 리더의 깊이는 더 커집니다. 코칭의 힘은 완벽함이 아니라, 상황에 맞게 어떤 말을 선택하느냐에서 나옵니다.
+지금처럼만 유지해도 충분히 훌륭합니다. 그리고 그 안정감을 오래 이어 간다면 더 큰 자리에서도 자연스럽게 인정받게 될 것입니다.`,some_coaching:``},cm4_4:{CP:{condition:`0-7`,trait:`(우유부단, 결정회피,관용적, 주장성부족)`,coaching:`이 성향은 사람을 존중하며 조심스럽게 접근하는 태도가 매우 좋습니다. 신인이 부담을 느끼지 않도록 기다려 주고 들어주는 힘이 크기 때문에 함께 일하면 편안함을 느끼게 됩니다. 이 관계 형성 능력은 큰 자산입니다.
 
-지금 단계에서 가장 빠른 성장은 새로운 능력을 만드는 것이 아니라, 검증된 표현을 몸에 익히는 것입니다. 스크립트를 기준으로 반복하다 보면 말의 흔들림이 줄고, 팀원들이 느끼는 안정감과 신뢰는 훨씬 커집니다. 코치님의 한 문장은 누군가의 방향을 바꾸는 힘이 있기 때문입니다.
-
-이미 좋은 토대 위에 서 있습니다. 여기에 전달력이 더해지면 성장 속도는 분명히 달라질 것입니다.`},cm4_4:{CP:{condition:`0-7`,trait:`(우유부단, 결정회피,관용적, 주장성부족)`,coaching:`코치님은 사람을 존중하며 조심스럽게 접근하는 태도가 매우 좋습니다. 신인이 부담을 느끼지 않도록 기다려 주고 들어주는 힘이 크기 때문에 함께 일하면 편안함을 느끼게 됩니다. 이 관계 형성 능력은 큰 자산입니다.
-
-다만 방향을 잡아줘야 할 순간에도 배려가 앞서면 신인은 무엇을 먼저 해야 할지 헷갈릴 수 있습니다. 선택을 열어 둔 채 마무리되면 실행이 늦어지고, 시간이 지나도 변화가 적어 답답함이 반복될 수 있습니다. 따뜻함에 기준과 결론을 조금만 더 얹으면 코칭의 속도가 훨씬 빨라집니다.`,script:`“지금은 이 순서로 진행하겠습니다.”
-
-“이 부분은 꼭 해주셔야 합니다.”
+다만 방향을 잡아줘야 할 순간에도 배려가 앞서면 신인은 무엇을 먼저 해야 할지 헷갈릴 수 있습니다. 선택을 열어 둔 채 마무리되면 실행이 늦어지고, 시간이 지나도 변화가 적어 답답함이 반복될 수 있습니다. 따뜻함에 기준과 결론을 조금만 더 얹으면 코칭의 속도가 훨씬 빨라집니다.`,script:`“이 부분은 꼭 해주셔야 합니다.”
 
 “우선 해보시고, 이후에 조정하겠습니다.”
 
-“여기서는 제가 방향을 정하겠습니다.”
-
-“제가 책임질 테니 그대로 해보시죠.”`},NP:{condition:`0-7`,trait:`(공감부족,정서둔감,관계의거리감,차가움)`,coaching:`코치님은 감정에 휘둘리지 않고 일의 핵심을 보려는 힘이 좋습니다. 상황을 냉정하게 바라보고 해결 방향을 찾으려 하기 때문에 기준이 분명하고 효율적인 코칭이 가능합니다. 이런 태도 덕분에 원칙과 결과 중심의 리드는 분명한 강점입니다.
+“제가 책임질 테니 그대로 해보시죠.”`},NP:{condition:`0-7`,trait:`(공감부족,정서둔감,관계의거리감,차가움)`,coaching:`이 성향은 감정에 휘둘리지 않고 일의 핵심을 보려는 힘이 좋습니다. 상황을 냉정하게 바라보고 해결 방향을 찾으려 하기 때문에 기준이 분명하고 효율적인 코칭이 가능합니다. 이런 태도 덕분에 원칙과 결과 중심의 리드는 분명한 강점입니다.
 
 하지만 따뜻한 표현이 적으면 신인은 도움을 받고 있으면서도 정서적으로는 혼자라고 느낄 수 있습니다. 설명은 이해했지만 마음이 움직이지 않아 실행이 늦어지는 모습이 생길 수 있습니다. 공감을 잘하라는 뜻이 아니라, 이해받고 있다는 신호를 먼저 주는 한마디가 추가되면 코칭의 흡수력이 훨씬 높아집니다.`,script:`“많이 부담되셨을 것 같습니다.”
 
 “충분히 그렇게 느끼실 수 있습니다.”
 
-“그래도 여기까지 해내신 건 정말 잘하신 겁니다.”
-
-“제가 옆에서 함께 돕겠습니다.”
-
-“혼자가 아니라는 것만 기억해 주세요.”`},A:{condition:`0-7`,trait:`(비논리,감정적,판단혼란,즉흥성)`,coaching:`코치님은 사람의 마음을 먼저 읽고 관계를 부드럽게 만들 줄 아는 따뜻함이 있습니다. 신인의 긴장을 풀어 주고 분위기를 편안하게 만드는 힘이 좋기 때문에 처음 만나는 사람도 마음의 문을 빨리 엽니다. 이 점은 코치로서 아주 소중한 장점입니다.
+“그래도 여기까지 해내신 건 정말 잘하신 겁니다.”`},A:{condition:`0-7`,trait:`(비논리,감정적,판단혼란,즉흥성)`,coaching:`이 성향은 사람의 마음을 먼저 읽고 관계를 부드럽게 만들 줄 아는 따뜻함이 있습니다. 신인의 긴장을 풀어 주고 분위기를 편안하게 만드는 힘이 좋기 때문에 처음 만나는 사람도 마음의 문을 빨리 엽니다. 이 점은 코치로서 아주 소중한 장점입니다.
 
 다만 기준과 판단의 언어가 부족해지면 신인은 “그래서 어떻게 해야 하지?”라는 상태에 머물 수 있습니다. 방향이 명확하지 않으면 실행력이 떨어지고 성장 속도가 늦어질 수 있습니다. 공감 뒤에 정리된 결론 한 문장이 더해지면 코칭의 힘이 훨씬 강해집니다.`,script:`“그래서 지금은 이렇게 정리하시면 좋겠습니다.”
 
 “지금 상황에서 가장 중요한 한 가지는 이것입니다.”
 
-“우선순위를 여기부터 잡아 보시죠.”
-
-“이 방법으로 가면 결과가 훨씬 좋아집니다.”
-
-“제가 기준을 잡아 드리겠습니다.”`},FC:{condition:`0-7`,trait:`(진지함,절제된 감정, 신중형,비즉흥성)`,coaching:`코치님은 가볍지 않고 진중한 분위기를 만들 줄 아는 안정감이 있습니다. 말 한마디를 쉽게 하지 않기 때문에 신인은 코치님의 조언을 무게 있게 받아들입니다. 이 신뢰감은 쉽게 가질 수 없는 큰 장점입니다.
+“제가 기준을 잡아 드리겠습니다.”`},FC:{condition:`0-7`,trait:`(진지함,절제된 감정, 신중형,비즉흥성)`,coaching:`이 성향은 가볍지 않고 진중한 분위기를 만들 줄 아는 안정감이 있습니다. 말 한마디를 쉽게 하지 않기 때문에 신인은 코치의 조언을 무게 있게 받아들입니다. 이 신뢰감은 쉽게 가질 수 없는 큰 장점입니다.
 
 하지만 표정과 반응이 절제되면 신인은 “내가 잘하고 있나?”를 느끼기 어려워질 수 있습니다. 응원과 에너지 표현이 부족하면 동기부여가 약해질 수 있습니다. 따뜻한 반응이 조금만 더해지면 신인은 훨씬 빠르게 살아납니다.`,script:`“지금 방향 아주 좋습니다.”
 
 “이 부분 정말 잘하고 계십니다.”
 
-“계속 이렇게 하시면 분명히 성장하십니다.”
+“계속 이렇게 하시면 분명히 성장하십니다.”`},AC:{condition:`17-20`,trait:`(과잉순응,눈치과다,결정회피)`,coaching:`이 성향은 상대의 표정과 반응을 빠르게 알아차리고 분위기를 부드럽게 만드는 능력이 탁월합니다. 신인이 부담을 느끼지 않도록 배려하고 관계를 깨지 않으려는 마음이 크기 때문에 편안한 코칭 환경을 만드는 데 큰 장점이 있습니다.
 
-“저는 충분히 가능하다고 봅니다.”
+하지만 혹시 상처받을까 걱정되어 꼭 해야 할 피드백이나 기준 제시가 약해지면, 신인은 방향을 명확히 잡기 어려울 수 있습니다. 편안함 위에 분명한 기준을 더해 줄 때 성장이 빨라집니다.`,script:`“편하게 말씀드리지만, 기준은 분명히 잡겠습니다.”
 
-“지금처럼만 가시면 됩니다.”`},AC:{condition:`17-20`,trait:`(순응, 눈치,조심성이 낮고,독립성 단호함이 높음)`,coaching:`코치님은 기준이 분명하고 스스로 결정하며 밀고 가는 추진력이 뛰어납니다. 눈치 보기보다 옳다고 생각하는 방향을 말해 주기 때문에 신인은 명확한 길을 빠르게 알 수 있습니다. 이러한 단호함은 성장 속도를 올리는 힘입니다.
+“이 부분은 꼭 필요합니다.”
 
-하지만 신인의 마음 상태나 준비 정도를 살피는 과정이 부족해 보이면 부담이나 거리감이 생길 수 있습니다. 속도를 맞추는 배려가 조금 더해지면 전달력은 훨씬 강해집니다.`,script:`“혹시 어려운 부분은 없으셨습니까?”
+“제가 책임지고 이 방향으로 이끌겠습니다.”`}},cm5:{CP_NP_A:{manner:`이 성향의 코치는 조직 안에서 사람을 챙기려는 마음이 강하면서도 조직의 흐름과 운영 방향을 놓치지 않으려는 성향이 강하게 나타납니다.
 
-“지금 설명 속도 괜찮으십니까?”
+제일 높은 점수인 CP가 높기 때문에 업무의 흐름과 약속, 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“이 부분은 꼭 맞춰가야 합니다.”
+“여기까지는 같이 해보셔야 합니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
 
-“이해되실 때까지 함께 보겠습니다.”
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 압박만 주는 방식으로 관리하지 않습니다. 신인이 힘들어하면 먼저 이유를 들으려 하고, 상황을 이해하려 하며, 오래 함께 가고 싶은 마음이 큽니다. 그래서 신인 입장에서는
+“나를 이해해주려고 한다.”
+“나를 함부로 몰아붙이지 않는다.”
+“챙겨주려는 마음이 느껴진다.”
+라는 안정감을 느끼게 됩니다.
 
-“부담되시면 말씀해 주셔도 괜찮습니다.”
+다만 A의 점수가 가장 낮으면 한 가지 아쉬운 부분이 생길 수 있습니다. 코치 본인은 충분히 설명했다고 느끼는데 신인 입장에서는
+“그래서 지금 무엇부터 해야 하지?”
+“결국 어떤 행동을 먼저 바꾸라는 거지?”
+“우선순위가 잘 정리되지 않는다.”
+처럼 느끼는 경우가 많습니다.
 
-“제가 도와드리겠습니다.”`}},cm5:{CP_NP_A:{manner:`신인을 코칭할 때 말투는 기준은 분명하지만 감정에 많이 기대고, 설명은 부족한 방향으로 나가기 쉽습니다. 이 코치님은 “이건 꼭 지켜야 해”, “너를 위해서 하는 말이야”처럼 원칙과 배려를 함께 담은 말을 자주 사용합니다. 신인을 아끼는 마음이 크고, 잘 되길 바라는 진심도 분명히 전달됩니다. 그래서 신인은 “이 코치님은 나를 챙겨준다”, “관심을 많이 가져준다”는 느낌을 받습니다.
+즉, 이 성향은 공감과 배려는 충분하지만 실행 정리와 행동 방향이 흐려질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감 뒤에 행동을 남기는 습관이 중요합니다. 위로로 끝나는 것이 아니라 “그래서 지금 무엇을 해야 하는지”를 분명하게 남겨줘야 신인이 실제로 움직이기 시작합니다.
 
-하지만 A가 낮기 때문에, 왜 이걸 해야 하는지, 지금 무엇을 바꾸면 되는지가 말 속에 구체적으로 담기지 않는 경우가 많습니다. 코치님 본인은 충분히 설명했다고 느끼지만, 신인은 “그래서 정확히 뭘 하라는 거지?”, “어디부터 바꿔야 하지?” 하고 혼란을 느낄 수 있습니다. 특히 성과가 안 나오는 신인은 감정적인 격려는 많이 받지만, 행동이 바뀌지 않아 같은 자리에 머무르게 됩니다.
+특히 신인이 힘들어할 때
+“괜찮습니다.”
+“이해합니다.”
+“많이 힘드셨겠어요.”
+이런 말만 하고 끝나면 마음은 편해지지만 행동은 남지 않을 가능성이 있습니다.
 
-이 성향의 코치님은 신인이 힘들어하면 먼저 공감하고 위로합니다. “요즘 많이 힘들지”, “네 상황 이해해” 같은 말은 잘 나오지만, 그 다음 단계인 정리된 방향 제시가 약해집니다. 그래서 신인은 마음은 편해지지만, 다음 날 무엇을 어떻게 해야 할지는 여전히 모른 채 출근하게 됩니다. 이때 코치님은 “왜 그대로지?”라고 답답함을 느끼기 쉽습니다.
+그래서 마지막에는 반드시
+ “그럼 오늘은 고객 연락 세 건만 정확하게 해보시죠.”
+ "오늘은 상담 프로세스를 다시 점검해 보시죠."
+ “지금은 기존 고객 관리부터 다시 정리해보시죠.”
+처럼 행동 문장을 붙여주는 것이 중요합니다.
 
-개선의 핵심은 감정 위로 다음에 반드시 정리된 한 문장을 붙이는 것입니다. 공감은 그대로 두되, 그 뒤에 숫자·순서·기준이 들어간 말을 의식적으로 추가해야 합니다. 예를 들어 “힘들었겠다”로 끝내지 말고, “그래서 내일은 이 세 가지만 해보자”까지 이어가는 연습이 필요합니다.
+이 성향은 원래 사람을 오래 데리고 가는 힘이 강한 성향입니다. 여기에 실행 정리와 우선순위 안내가 조금만 더해지면 조직의 움직임 속도와 활동량, 상담 진행률과 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.
 
-개선 시 사용할 수 있는 고정 멘트는 다음과 같습니다.
-“네 마음은 이해했고, 그래서 오늘은 이것 하나만 정확히 해보자.”
-“다 잘하려고 하지 말고, 지금은 이 순서만 지켜보자.”
-“이건 감이 아니라 기준이야, 이대로만 해도 충분해.”
+결국 이 성향의 핵심은 따뜻함 자체가 아니라 따뜻함 뒤에 실행이 남도록 만드는 것입니다. 공감으로 마음을 열고 마지막에는 행동을 남겨야 신인의 생산성과 매출도 함께 올라가게 됩니다.`,improvement:``},CP_NP_FC:{manner:`이 성향의 코치는 조직 안에서 사람을 챙기려는 마음과 운영의 중심을 잡으려는 힘이 함께 강하게 나타나는 성향입니다.
 
-이 고정 멘트들은 CP의 기준, NP의 배려, A의 정리를 동시에 살려줍니다. 이렇게 말하면 신인은 위로받으면서도 방향을 잃지 않고, 코치님의 말이 실제 행동으로 이어지기 시작합니다.`,improvement:``},CP_NP_FC:{manner:`신인을 코칭할 때 이 성향은 기준을 분명히 세우면서도 그 기준을 왜 지켜야 하는지 사람의 미래와 연결해 설명합니다. “이건 원칙이야”라고 말하지만 그 속에는 “나는 당신이 무너지지 않게 하려는 거야”라는 보호의 뜻이 함께 담겨 있습니다. 단호함이 먼저 들리지만, 시간이 지나면 진심이 남습니다. 말투에는 책임이 있고, 태도에는 애정이 있습니다. 설계사가 흔들릴 때 잡아 주고, 잘될 때 더 높은 기준을 보여 주는 리더의 모습이 자연스럽게 드러납니다.
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“이 부분은 꼭 맞춰가야 합니다.”
+“지금은 이 흐름이 중요합니다.”
+같이 방향을 정리하는 말이 자연스럽게 먼저 나오는 경우가 많습니다.
 
-이 코치님은 성과를 요구하면서도 혼자 두지 않습니다. “해야 한다”라고 말한 뒤에는 반드시 “그래서 내가 돕겠다”가 따라옵니다. 설계사 입장에서는 부담이 아니라 의지가 됩니다. 누군가는 엄격하다고 느끼지만, 시간이 지나면 가장 믿을 수 있는 사람으로 기억됩니다. 기준이 명확하기 때문에 방향이 보이고, 마음이 느껴지기 때문에 따라가게 됩니다.
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 강하게 밀어붙이는 방식으로 조직을 운영하지 않습니다. 신인이 힘들어하면 먼저 이유를 들으려 하고, 상황을 이해하려 하며, 오래 함께 가고 싶은 마음이 큽니다. 그래서 신인 입장에서는
+“나를 챙겨주려고 한다.”
+“내 상황을 이해하려고 한다.”
+“쉽게 포기하지 않는 코치다.”
+라는 안정감을 느끼게 됩니다.
 
-그래서 조직 안에서는 이런 말이 나옵니다.
-“우리 코치님 말은 무섭지만 틀린 적이 없다.”
-“혼내도 결국 나를 키우려고 한다.”
-이 신뢰가 쌓이면 팀의 실행력은 강해지고, 버티는 힘이 생깁니다.
+다만 FC의 점수가 가장 낮으면 조직 안에서 한 가지 아쉬운 흐름이 생길 수 있습니다. 코치 본인은 진지하게 이야기하고 있다고 생각하지만 신인 입장에서는 표정이나 분위기가 다소 무겁게 느껴질 수 있고, 거리감이 생길 수도 있습니다.
 
-다만 분위기를 가볍게 풀어 주는 표현이나 긴장을 완충하는 말은 부족할 수 있습니다. 메시지가 강한 만큼 어떤 설계사에게는 압박으로 먼저 느껴질 수 있습니다. 이때 따뜻한 한 문장이 추가되면 리더십의 체감 온도는 완전히 달라집니다. 원칙에 온기가 더해지면 사람은 더 오래 갑니다.
+특히 결과와 실행을 중요하게 생각하는 말이 반복되면 신인은
+“계속 긴장된다.”
+“잘못하면 혼날 것 같다.”
+“가까이 다가가기 어렵다.”
+라고 느끼는 경우도 생길 수 있습니다.
 
-특히 아래와 같은 말은 실행력을 높이는 힘이 됩니다.
+즉, 이 성향은 조직을 안정적으로 끌고 가는 힘은 강하지만 분위기를 부드럽게 풀어주는 표현과 감정 전달이 부족해질 수 있는 구조입니다.
 
-👉 “나는 당신이 잘될 사람이라는 확신이 있어서 더 말하는 거야.”
-👉 “부담 갖지 마, 방향은 내가 잡을 테니 당신은 움직이기만 해.”
-👉 “끝까지 같이 갈 거니까  나만 믿고 와.”
+그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는
+ 결과 이야기 전에 먼저 표정을 부드럽게 만드는 습관
+ 실행 점검 전에 공감 한 문장을 먼저 넣는 습관
+ 긴장된 분위기를 너무 오래 끌고 가지 않는 습관
+이 중요합니다.
 
-이 한마디는 설계사의 마음을 붙잡고, 포기 직전에 다시 일어나게 만드는 문장입니다.
+특히 FC가 낮은 코치는 의식적으로 미소를 띄고 고개를 끄덕이는 행동만 추가해도 신인이 느끼는 심리적 압박감이 훨씬 줄어들게 됩니다.
 
-이 성향의 코치님은 이미 기준으로 팀을 세우는 리더입니다. 여기에 마음을 녹이는 표현이 조금만 더해진다면, 사람은 더 깊이 남고 조직은 더 오래 강해집니다. 존경받는 리더에서, 떠나고 싶지 않은 리더로 완성됩니다.`,improvement:``},CP_NP_AC:{manner:`신인을 코칭할 때의 말투는 전반적으로 단호하고 분명합니다. 이 코치님은 CP가 가장 높아 기준과 원칙을 중요하게 생각합니다. 그래서 신인에게 “이건 이렇게 해야 해”, “지금은 이걸 먼저 해야 해”처럼 방향을 바로 제시합니다. 여기에 NP도 높아 신인을 아끼는 마음이 큽니다. 속으로는 “잘 성장했으면 좋겠다”, “힘들어도 포기하지 않았으면 좋겠다”라고 생각합니다. 하지만 AC가 낮아 신인의 눈치를 보지는 않습니다. 신인의 표정이나 감정에 맞춰 말을 돌려서 하거나, 상처받을까 봐 말을 줄이지 않습니다. 필요하다고 느끼면 바로 직설적으로 말합니다.
+이 성향은 원래 조직을 오래 유지하고 사람을 책임감 있게 끌고 가는 힘이 매우 강한 성향입니다. 여기에 분위기를 조금 더 편안하게 만드는 표현이 더해지면 신인의 활동량과 조직의 움직임이 훨씬 살아나게 됩니다.
+
+결국 이 성향의 핵심은 강한 책임감과 배려를 가지고 있다는 점입니다. 다만 신인이 코치를 조금 더 편하게 느끼고 가까이 다가올 수 있도록 분위기를 부드럽게 풀어주는 표현이 함께 들어가야 신인의 생산성과 매출도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_NP_AC:{manner:`이 성향의 코치는 조직 안에서 사람을 챙기면서도 흐트러지지 않게 방향을 잡아주는 힘이 강한 성향입니다.
 
-이 말투의 좋은 점은 신인이 헷갈리지 않는다는 것입니다. 해야 할 일과 하지 말아야 할 일이 분명합니다. 신인은 “지금 뭘 해야 하는지”를 바로 알 수 있습니다. 그래서 행동 속도가 빨라집니다. 하지만 단점도 있습니다. 말이 짧고 단호하다 보니 신인은 “혼나는 것 같다”, “내 사정을 잘 안 들어주는 것 같다”고 느낄 수 있습니다. 실제로 코치님은 도와주려고 말한 것인데, 신인은 압박으로 받아들일 수 있습니다.
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름이 중요합니다.”
+“이 부분은 꼭 맞춰가야 합니다.”
+같이 방향을 정리하는 말이 자연스럽게 먼저 나오는 경우가 많습니다.
 
-그래서 이 성향의 코치님은 말을 부드럽게 바꾸기보다, 말 뒤에 이유를 붙이는 연습이 필요합니다. 단호함은 유지하되, 왜 그렇게 말하는지 한 줄만 설명해 주는 것입니다. 그러면 신인은 지적이 아니라 도움으로 받아들이게 됩니다.
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 관리 스타일이 아니라 사람을 오래 데리고 가려는 마음이 큽니다. 신인이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않으며, 정서적으로 버틸 수 있도록 챙겨주려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“나를 책임감 있게 챙겨주는 코치다.”
+“혼내기보다 같이 가려고 한다.”
+“쉽게 내치지 않는다.”
+라는 안정감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 본인의 말이 상대에게 어떻게 느껴지는지를 놓치는 경우가 생길 수 있습니다. 코치 본인은 조직을 위해 당연한 이야기를 하고 있다고 느끼지만 신인 입장에서는
+“압박처럼 느껴진다.”
+“내 마음을 충분히 듣기 전에 결론이 나온다.”
+“조금 무섭게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
 
-개선을 위한 고정 멘트는 다음과 같습니다.
-“이건 지금 꼭 해야 해. 이유는 이걸 넘겨야 다음 단계가 열리기 때문이야.”
-“지금 이렇게 말하는 건 혼내려는 게 아니라, 네가 덜 돌아가게 하려는 거야.”
-“내가 단호하게 말하는 건 너를 믿기 때문이야. 할 수 있다고 보니까 말하는 거야.”
+즉, 이 성향은 책임감과 배려는 강하지만 상대의 속도와 부담감을 세밀하게 살피는 부분이 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 “내 말이 상대에게 어떻게 들릴까”를 한 번 더 확인하는 습관이 중요합니다.
 
-이 고정 멘트를 사용하면, 이 코치님은 자신의 강점인 명확함을 잃지 않으면서도 신인이 마음으로 따라오게 만들 수 있습니다. 단호함 위에 이유 한 줄을 얹는 것, 이것이 이 성향 코치님의 가장 중요한 조율 포인트입니다.`,improvement:``},CP_A_NP:{manner:`신인을 코칭할 때의 말투는 전반적으로 단정하고 이성적이며, 기준과 이유를 또렷하게 설명하는 스타일입니다. 이 코치님은 CP가 가장 높아 “이건 맞고, 이건 아니다”라는 기준을 분명히 말합니다. 여기에 A도 높기 때문에 감정에 휘둘리지 않고 상황을 차분히 정리해 줍니다. 그래서 신인에게 “왜 이걸 해야 하는지”, “이 순서로 해야 하는 이유가 뭔지”를 논리적으로 설명하는 데 강점이 있습니다. 신인은 이 코치님에게서 일의 구조와 기준을 배우기 쉽습니다.
+특히 AC가 낮은 코치는 결과와 방향을 먼저 이야기하기 전에
+ “지금 이 방향이 부담스럽진 않으신가요?”
+ “코칭속도는 괜찮으신가요?”
+ “지금 가장 막히는 부분이 어떤 건가요?”
+같은 질문을 먼저 넣어주는 것만으로도 신인의 긴장감이 훨씬 줄어들게 됩니다.
 
-하지만 NP가 가장 낮은 성향이라, 신인의 감정이나 마음 상태를 먼저 살피는 말은 적은 편입니다. 신인이 실적이 안 나서 위축돼 있거나, 실수를 해서 기가 죽어 있어도 “괜찮아, 그럴 수 있어” 같은 말보다는 바로 “이 부분이 문제였고, 다음엔 이렇게 하자”로 들어갑니다. 코치님 입장에서는 효율적이고 정확한 코칭이지만, 신인 입장에서는 “내 마음은 안 보나?”라고 느낄 수 있습니다. 그래서 이 코치님은 똑똑하고 믿음직하지만, 다소 차갑게 느껴질 수 있습니다.
+이 성향은 원래 조직을 강하게 끌고 갈 수 있는 힘이 있는 성향입니다. 여기에 상대의 감정과 부담 정도를 한 번 더 살피는 질문이 더해지면 신인의 활동량과 실행 지속력이 훨씬 안정적으로 올라가게 됩니다.
 
-이 성향의 가장 큰 강점은 흔들리지 않는 판단력과 정확한 피드백입니다. 신인은 이 코치님 밑에 있으면 방향을 잃지 않습니다. 무엇을 고쳐야 하는지, 다음 행동이 무엇인지 명확히 알 수 있습니다. 다만 장기적으로 신인을 키우기 위해서는 마음을 붙잡아 주는 말이 필요합니다. 그래서 이 코치님에게 필요한 개선은 “기준을 낮추는 것”이 아니라, 말의 순서를 바꾸는 것입니다. 판단과 지적을 하기 전에, 신인의 상태를 한 번 인정해 주는 것입니다.
+결국 이 성향의 핵심은 강한 책임감과 따뜻함입니다. 다만 상대의 부담과 감정 속도를 한 번 더 확인하는 질문이 함께 들어가야 신인의 생산성과 매출도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_A_NP:{manner:`이 성향의 코치는 조직 안에서 방향을 잡고 흐름을 정리하는 힘이 매우 강한 성향입니다.
 
-개선 시 꼭 써야 할 고정 멘트는 다음과 같습니다.
-“지금 많이 부담될 수 있다는 건 이해해.”
-“네가 여기까지 온 것도 쉬운 건 아니야.”
-“실수한 건 맞지만, 그만큼 배우는 단계라는 뜻이야.”
+제일 높은 점수인 CP가 높기 때문에 조직의 운영 흐름과 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 부분을 먼저 맞춰야 합니다.”
+“여기서는 흐름이 흔들리면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 상황을 정리하고 분석하려는 힘이 강합니다. 신인의 활동량, 상담 흐름, 고객 반응, 실적 흐름을 비교적 냉정하게 보려고 하며 문제를 발견하면 빠르게 정리해서 해결 방향을 잡으려 합니다. 그래서 신인 입장에서는
+“판단이 빠르고 정확하다.”
+“흐름을 잘 정리해준다.”
+“문제가 생겨도 중심을 잃지 않는다.”
+라는 신뢰감을 느끼게 됩니다.
 
-이 고정 멘트를 먼저 말한 뒤에 기존처럼 논리적인 설명과 기준 제시를 하면, 신인은 마음을 닫지 않고 코치님를 따라오게 됩니다. 이 코치님은 이미 ‘어떻게 해야 하는지’는 잘 알고 있습니다. 여기에 “네 마음도 보고 있다”는 신호 한 줄만 더해지면, 신인을 오래 붙잡고 크게 키울 수 있는 코치님가 됩니다. 기준은 분명하게, 시작은 따뜻하게. 이것이 이 성향 코치님의 가장 중요한 성장 포인트입니다.`,improvement:``},CP_A_FC:{manner:`신인을 코칭할 때 말투는 기준이 분명하고, 설명은 논리적인데, 분위기가 딱딱하고 재미가 없는 방향으로 흐르기 쉽습니다. 이 코치님은 “이건 맞고, 이건 틀리다”, “이렇게 하면 효율이 떨어진다”처럼 판단과 기준이 분명한 말을 잘합니다. 또 왜 그렇게 해야 하는지도 이성적으로 잘 설명합니다. 하지만 FC가 낮아 표정, 말의 온도, 가벼운 격려나 웃음이 부족해 신인은 “말은 맞는데 숨 막힌다”, “실수하면 바로 지적받을 것 같다”고 느끼기 쉽습니다.
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 충분히 살피기 전에 해결과 수정 방향이 먼저 나오는 경우가 생길 수 있습니다. 코치 본인은 조직을 위해 필요한 말을 한다고 느끼지만 신인 입장에서는
+“결과만 중요하게 보는 것 같다.”
+“내 마음은 충분히 이해받지 못한 느낌이다.”
+“실수하면 바로 지적받을 것 같다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 흐름을 안정적으로 끌고 가는 힘은 매우 강하지만 신인의 감정과 긴장 상태를 풀어주는 표현이 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 문제를 바로 수정하려 하기 전에 먼저 신인의 상황과 마음 상태를 한 번 들어주는 습관이 중요합니다.
+
+특히 NP가 낮은 코치는
+ “요즘 가장 힘든 부분이 어떤 건가요?”
+ “지금 계속 움직이고 계신 건 정말 잘하고 계십니다.”
+ “혼자 너무 오래 끌고 가지 마시고 중간에 꼭 이야기해주세요.”
+같은 공감 문장을 의식적으로 먼저 사용하는 것만으로도 신인의 심리적 거리감이 크게 줄어들게 됩니다.
+
+이 성향은 원래 조직을 안정적으로 끌고 갈 수 있는 힘이 매우 강한 성향입니다. 여기에 따뜻한 인정과 공감 표현이 조금만 더해지면 신인의 활동 지속력과 조직의 분위기가 훨씬 좋아지고 매출 흐름도 더 안정적으로 올라가게 됩니다.
 
-이 성향의 코치님은 신인을 대할 때 업무 중심, 결과 중심 말투가 기본값이 됩니다. 예를 들면 “그건 비효율적이야”, “그렇게 하면 시간 낭비야”, “다음엔 이렇게 해” 같은 말이 자연스럽게 나옵니다. 문제는 신인이 아직 긴장하고 있는 상태라면, 이 말투가 차갑고 무섭게 들릴 수 있다는 점입니다. 그래서 의식적으로 기준 제시 전에 분위기를 풀어주는 말을 한 번 넣어야 합니다. 아주 큰 칭찬이 아니어도 괜찮습니다. “그래도 여기까지 온 건 잘한 거야”, “처음치고는 생각보다 괜찮아” 같은 말 한 줄이면 충분합니다.
-
-개선을 위한 핵심은 기준(CP)과 논리(A)는 유지하되, 표현을 조금 부드럽게 만드는 것입니다. 신인을 웃기려고 애쓸 필요는 없지만, 말의 끝을 너무 단정적으로 자르지 않는 연습이 필요합니다. 예를 들어 “이건 틀렸어” 대신 “이 방법보다 더 쉬운 길이 있어”라고 말하면, 같은 내용도 훨씬 편하게 받아들여집니다.
-
-개선 시 사용할 수 있는 고정 멘트는 다음과 같습니다.
-“지금 단계에선 이 정도면 충분히 잘하고 있어.”
-“틀린 게 아니라, 더 쉬운 방법을 배우는 중이야.”
-“너한테 맞게 조금만 바꿔보면 훨씬 편해질 거야.”
-
-이 고정 멘트들은 FC가 낮아 생기는 딱딱함과 긴장감을 완충해 주는 역할을 합니다. 이렇게 말하면 신인은 실수를 ‘혼나는 일’이 아니라 배우는 과정으로 받아들이게 되고, 코치님의 기준과 지시도 훨씬 잘 따라오게 됩니다.`,improvement:``},CP_A_AC:{manner:`신인을 코칭할 때 말투는 기준은 분명하고 설명은 논리적인데, 신인의 반응이나 감정을 거의 고려하지 않는 방향으로 나가기 쉽습니다. 이 코치님은 “원래 이건 이렇게 하는 거야”, “이게 가장 효율적인 방식이야”처럼 정답과 기준을 먼저 제시하고, 그 이유도 차분하게 설명합니다. 말 자체는 틀리지 않지만, AC가 낮아 상대 입장에서 어떻게 느낄지, 지금 이 말을 들을 준비가 되었는지를 잘 살피지 못하는 경우가 많습니다.
-
-그래서 신인은 “말이 너무 단정적이다”, “선택권이 없는 느낌이다”, “따르지 않으면 안 될 것 같다”라고 느낄 수 있습니다. 특히 아직 자신감이 부족한 신인에게는 이 말투가 압박감이나 거리감으로 전달되기 쉽습니다. 코치님 입장에서는 도와주려고 하는 말인데, 신인 입장에서는 “지시받고 있다”는 느낌이 강해지는 것입니다.
-
-이 성향의 코치님은 신인을 설득하려 하기보다 결론을 빠르게 정해주는 말투를 쓰는 경향이 있습니다. “이건 이렇게 하자”, “이 방법이 맞아” 같은 말이 자연스럽게 나옵니다. 문제는 신인이 스스로 선택하고 있다는 느낌을 못 받으면, 겉으로는 따르지만 속으로는 위축되거나 거리감을 느낀다는 점입니다. 그래서 의식적으로 선택지를 주는 말, 의견을 묻는 한 문장을 넣는 연습이 필요합니다.
-
-개선의 핵심은 기준을 낮추는 것이 아니라, 전달 방식을 바꾸는 것입니다. 같은 내용이라도 “이게 정답이야” 대신 “이 방법이 가장 편한 선택이야”라고 말하면 신인은 훨씬 덜 부담을 느낍니다. 또 설명 후에는 반드시 신인의 생각을 한 번 묻는 것이 좋습니다.
-
-개선 시 사용할 수 있는 고정 멘트는 다음과 같습니다.
-“이건 하나의 방법이고, 네가 해보기 편한 쪽으로 가도 괜찮아.”
-“내 기준을 말해준 거고, 네 생각도 한번 들어보고 싶어.”
-“지금은 따라 해보고, 나중에 네 방식으로 바꿔도 돼.”
-
-이 고정 멘트들은 AC가 낮아 생기는 일방적 전달을 줄여주고, 신인이 코칭을 지시가 아니라 도움으로 느끼게 만들어 줍니다. 이렇게 말하면 신인은 더 편하게 질문하고, 결과적으로 코치님의 기준도 훨씬 잘 따라오게 됩니다.`,improvement:``},CP_FC_NP:{manner:`신인을 코칭할 때의 말투는 기준이 분명하고 말이 빠르며, 분위기를 끌어올리는 힘이 강한 방식입니다. “이건 이렇게 해야 돼”, “이 정도는 바로 할 수 있어”처럼 정답을 바로 제시하는 말을 자주 쓰고, 중간중간 농담이나 웃음으로 분위기를 살립니다. 그래서 신인은 처음에는 “와, 에너지 있고 시원하다”라고 느끼지만, 시간이 지나면 마음이 충분히 이해받고 있다는 느낌은 부족해질 수 있습니다. 이 성향은 성과 중심적이고 추진력이 뛰어나지만, 신인의 감정 상태나 불안, 속도 차이를 세심하게 살피는 말은 상대적으로 적게 나옵니다. 그 결과 신인은 “못 따라가면 혼날 것 같다”, “질문하면 분위기를 깨는 것 아닐까” 하고 마음을 닫을 수 있습니다.
-
-그래서 이 성향은 의식적으로 공감하는 말을 먼저 꺼내는 조절이 필요합니다. 설명이나 지시 전에 신인의 마음을 한 번 짚어주면 코칭 효과가 크게 달라집니다. 예를 들어 바로 “이건 이렇게 해”라고 말하기보다, “이 부분이 조금 어려웠을 수 있어”, “처음이면 헷갈리는 게 당연해” 같은 말을 먼저 얹는 것입니다. 이렇게 하면 신인은 “아, 나를 이해해주는구나”라고 느끼고 다시 집중하게 됩니다.
-
-개선 시 고정멘트는 반복해서 써야 효과가 있습니다. 첫 번째 고정멘트는 “지금 네가 느끼는 부담부터 말해줘도 괜찮아.”입니다. 이 말은 신인의 감정을 밖으로 꺼내게 해 줍니다. 두 번째 고정멘트는 “기준은 분명하지만, 속도는 네 상황에 맞춰도 돼.”입니다. 성과 기준을 유지하면서도 압박을 낮춰 줍니다. 세 번째 고정멘트는 “잘하려는 마음은 이미 충분해, 지금은 하나만 정확히 해보자.”입니다. 이 말은 신인의 불안을 줄이고 행동을 단순하게 만듭니다.
-
-이 세 문장을 의식적으로 사용하면, 강한 기준과 밝은 에너지는 그대로 살리면서도 신인의 마음을 놓치지 않는 코칭이 됩니다. 신인은 “엄격하지만 나를 이해해주는 사람”이라고 느끼게 되고, 결국 더 오래, 더 안정적으로 따라오게 됩니다.`,improvement:``},CP_FC_A:{manner:`신인을 코칭할 때의 말투는 기준이 분명하고 직설적이면서도 분위기를 살리려는 말투가 자연스럽게 나옵니다. “이건 이렇게 해야 돼”, “여기서 멈추면 안 돼”처럼 정답과 방향을 바로 말하는 힘이 강하고, 동시에 농담이나 웃음, 격려를 섞어 분위기를 끌어올립니다. 그래서 신인은 처음에 “에너지 넘치고 시원하다”, “같이 있으면 힘이 난다”라고 느낍니다. 다만 이 성향은 차분히 생각하고 정리하는 말, 즉 왜 그런 선택이 필요한지, 지금 상황을 어떻게 판단해야 하는지에 대한 설명은 상대적으로 적게 나옵니다. 말이 빠르고 감정과 기준이 먼저 나가다 보니, 신인은 “따라가긴 하는데 머릿속이 정리되진 않는다”, “왜 이렇게 해야 하는지는 잘 모르겠다”고 느낄 수 있습니다.
-
-이럴 때 신인은 실수했을 경우 혼난 느낌은 강한데, 무엇을 고쳐야 하는지는 흐릿해질 수 있습니다. 코치님은 “분명 말해줬다”고 생각하지만, 신인은 감정과 속도에 눌려 핵심 판단을 놓치기 쉽습니다. 그래서 이 성향은 의식적으로 ‘생각을 정리해주는 말’을 추가하는 조율이 꼭 필요합니다. 기준과 에너지를 낮출 필요는 없지만, 그 사이에 정리용 문장을 끼워 넣어야 합니다.
-
-예를 들어 바로 “이건 잘못됐어”라고 말하기보다, “지금 상황을 한 줄로 정리해보면 이거야”, “여기서 우리가 판단해야 할 포인트는 딱 하나야” 같은 말을 먼저 해 주는 것입니다. 이렇게 하면 신인은 감정에 휩쓸리지 않고, 머릿속에 기준이 잡히기 시작합니다. 그다음에 지시나 격려가 나오면 훨씬 잘 흡수합니다.
-
-개선 시 고정멘트는 다음과 같이 쓰는 것이 좋습니다.
-첫 번째 고정멘트는 “지금 상황을 차분히 정리해보자, 핵심은 하나야.”입니다. 이 말은 신인의 머리를 멈추게 하고 생각을 모아 줍니다.
-두 번째 고정멘트는 “느낌 말고 기준으로 보면, 선택지는 이쪽이야.”입니다. 감정과 분위기에 흔들리지 않게 판단의 기준을 세워 줍니다.
-세 번째 고정멘트는 “왜 이걸 하는지 이해되면, 속도는 자연스럽게 따라와.”입니다. 빨리하라는 압박 대신 이해를 먼저 줍니다.
-
-이 세 문장을 반복해서 사용하면, 강한 기준과 밝은 에너지는 그대로 유지하면서도 신인이 스스로 판단하고 성장하는 구조를 만들어 줄 수 있습니다. 신인은 “재미있고 강한데, 머리도 정리해주는 코치님”라고 느끼게 되고, 단순히 끌려오는 신인이 아니라 생각하며 따라오는 신인으로 바뀌게 됩니다.`,improvement:``},CP_FC_AC:{manner:`신인을 코칭할 때의 말투는 기준이 분명하고 직설적이며, 분위기를 끌어올리는 힘이 강한 말투입니다. “이건 이렇게 하면 돼”, “지금 단계에서는 이 정도는 당연히 해줘야 해”처럼 정답을 바로 제시하는 말이 많고, 중간중간 농담이나 웃음, 칭찬을 섞어 신인의 기운을 끌어올립니다. 그래서 신인은 처음에 “말이 시원하고 답이 빨라서 좋다”, “같이 있으면 힘이 난다”라고 느낍니다. 특히 망설이는 신인에게는 방향을 딱 잡아주기 때문에 초반 추진력이 생깁니다.
-
-다만 이 성향은 신인의 눈치를 그다지 보지 않는 편이라 말이 강하게 들릴 수 있습니다. AC가 낮기 때문에 상대의 표정이나 속도를 세심하게 맞추기보다는, “될 사람은 따라온다”는 태도로 밀어붙이기 쉽습니다. 그래서 이해 속도가 느린 신인이나 자신감이 낮은 신인은 “혼나는 건 아닌데 부담된다”, “질문하기가 조금 무섭다”고 느낄 수 있습니다. 코치님은 도와준다고 생각하지만, 신인은 마음을 닫고 겉으로만 고개를 끄덕일 가능성이 생깁니다.
-
-이 성향에서 가장 중요한 조율 포인트는 말의 세기를 줄이는 것이 아니라, 말 앞에 안전한 안내문장을 붙이는 것입니다. 단호함과 에너지는 유지하되, 신인이 심리적으로 따라올 수 있게 다리를 놓아줘야 합니다. 예를 들어 바로 지시부터 하지 말고, “이건 누구나 처음엔 헷갈려”, “지금 단계에서 실수하는 건 정상이다” 같은 말을 먼저 건네는 것입니다. 그러면 신인은 방어를 풀고 말을 들을 준비를 하게 됩니다.
-
-개선 시 고정멘트는 다음과 같이 사용하는 것이 좋습니다.
-첫 번째 고정멘트는 “지금 이 단계에서는 잘 몰라도 괜찮아, 내가 기준만 잡아줄게.”입니다. 이 말은 신인의 긴장을 풀어주면서도 코치님의 기준을 자연스럽게 전달합니다.
-두 번째 고정멘트는 “이건 네가 못해서가 아니라, 아직 경험이 없어서 그래.”입니다. 신인의 자존감을 지켜주면서도 계속 따라오게 만드는 문장입니다.
-세 번째 고정멘트는 “질문해도 돼, 속도는 내가 책임질게.”입니다. AC가 낮은 성향에서 부족해지기 쉬운 ‘심리적 안전감’을 보완해 줍니다.
-
-이 세 문장을 의식적으로 반복하면, 코치님은 여전히 단호하고 에너지 넘치는 리더로 남으면서도, 신인은 “강하지만 나를 버리지 않는 사람”, “따라가도 안전한 코치님”라고 느끼게 됩니다. 그 결과 신인은 눈치 보며 따라오는 사람이 아니라, 안심하고 도전하는 신인으로 성장하게 됩니다.`,improvement:``},CP_AC_NP:{manner:`신인을 코칭할 때의 말투는 기준과 규칙을 매우 중요하게 여기면서도, 동시에 분위기와 관계를 많이 의식하는 말투입니다. 이 성향은 “이건 원칙이야”, “이 순서는 꼭 지켜야 해”처럼 정해진 기준을 분명히 말하는 힘이 있습니다. 그래서 신인은 처음에 “이 코치님은 기준이 뚜렷해서 헷갈리지 않는다”, “뭘 해야 하는지가 명확하다”고 느낍니다. 동시에 AC가 높기 때문에 말할 때 상대의 표정과 반응을 계속 살피며, 너무 세게 나가지는 않으려고 조절합니다.
-
-하지만 NP가 가장 낮기 때문에 공감이나 따뜻한 감정 표현이 부족해질 수 있습니다. 코치님은 규칙을 잘 설명하고 있다고 생각하지만, 신인은 “맞는 말인데 정이 없다”, “혼나는 느낌이 먼저 든다”고 느끼기 쉽습니다. 특히 잘 따라오지 못하는 신인에게는 “이건 기본이야”, “다들 이렇게 해” 같은 말이 의도치 않게 상처가 될 수 있습니다. AC가 높아 직접적으로 몰아붙이지는 않지만, 대신 차갑게 선을 긋는 말투가 나와 신인이 더 위축될 수 있습니다.
-
-이 성향에서 가장 중요한 조율 포인트는 기준을 말하기 전에 마음을 먼저 만져주는 것입니다. 기준을 낮출 필요는 없고, 말의 순서를 바꾸는 것이 핵심입니다. 바로 규칙부터 말하지 말고, 먼저 신인의 감정을 인정하는 한 문장을 넣어야 합니다. 예를 들어 “이 부분이 생각보다 어려울 수 있어” 또는 “처음이면 당연히 막히는 지점이야” 같은 말입니다. 이 한 문장이 들어가면 같은 지시도 훨씬 덜 차갑게 들립니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 “지금 속도가 느린 건 네 태도 문제가 아니라, 과정 중 하나야.”입니다. 이 문장은 NP가 낮아 생길 수 있는 비난 느낌을 줄여 줍니다.
-두 번째 고정멘트는 “기준은 지켜야 하지만, 이해하는 데 걸리는 시간은 사람마다 달라.”입니다. 기준 중심 성향을 유지하면서도 신인을 보호해 줍니다.
-세 번째 고정멘트는 “내가 기준은 잡아줄 테니, 너는 질문하는 걸 주저하지 마.”입니다. 신인이 마음을 닫지 않게 만드는 문장입니다.
-
-이 고정멘트들을 의식적으로 쓰면, 이 성향은 차갑고 무서운 코치님가 아니라 원칙은 분명하지만 사람을 놓치지 않는 코치님로 바뀝니다. 신인은 “지적만 하는 사람”이 아니라 “기준을 알려주면서도 나를 버리지 않는 사람”으로 코치님를 인식하게 되고, 그 결과 실행력과 지속력이 함께 올라가게 됩니다.`,improvement:``},CP_AC_A:{manner:`신인을 코칭할 때의 말투는 기준과 규칙을 분명히 제시하면서도, 동시에 상대의 반응과 분위기를 많이 살피는 말투입니다. 이 성향은 “이건 꼭 지켜야 해”, “이 순서는 이유가 있어서 정해진 거야”처럼 원칙을 명확히 말하는 힘이 매우 강합니다. 그래서 신인은 처음에 “이 코치님은 기준이 분명하다”, “헷갈리게 말하지 않는다”는 안정감을 느낍니다. 동시에 AC가 높기 때문에 신인의 표정, 말투, 반응을 계속 확인하며 혹시 기분이 상하지 않았는지 신경을 씁니다.
-
-하지만 A가 가장 낮기 때문에 왜 이걸 해야 하는지에 대한 논리적 설명이나 정리가 부족해질 수 있습니다. 코치님은 기준을 잘 전달했다고 생각하지만, 신인은 “왜 그렇게 해야 하는지는 잘 모르겠다”, “그냥 시키는 대로 하라는 느낌이다”라고 느끼기 쉽습니다. 특히 잘 따라오지 못하는 신인에게는 기준은 들리는데 이해는 따라오지 않아 답답함이 커질 수 있습니다. 이때 AC가 높아 신인의 눈치를 보다 보니, 설명을 더 하지 않고 말을 줄여버리는 경우도 생깁니다.
-
-이 성향에서 가장 중요한 조율 포인트는 기준 → 이유 → 확인의 순서를 의식적으로 지키는 것입니다. 기준을 먼저 말하는 것은 이 성향의 강점이지만, 바로 끝내지 말고 “왜 그런지”를 한 문장이라도 덧붙여야 합니다. 예를 들어 “이 순서를 지켜야 해” 다음에 “그래야 나중에 고객이 헷갈리지 않거든”처럼 이유를 붙이는 것입니다. 그리고 마지막으로 “이해됐는지 한 번 말로 정리해볼래?”라고 확인하면 신인의 머리가 정리됩니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 “이건 규칙이기도 하지만, 너를 덜 힘들게 하려고 만든 방법이야.”입니다. 기준 중심 말투에 설명과 배려를 더해 줍니다.
-두 번째 고정멘트는 “지금은 외우지 말고, 왜 필요한지만 먼저 이해하자.”입니다. A가 낮아 생길 수 있는 이해 부족을 보완해 줍니다.
-세 번째 고정멘트는 “내가 말한 걸 네 말로 한 번만 다시 설명해줘.”입니다. 신인의 이해 수준을 점검하면서도 압박을 주지 않는 문장입니다.
-
-이 고정멘트들을 의식적으로 사용하면, 이 성향은 기준만 강조하는 코치님가 아니라 기준을 설명하고 이해까지 책임지는 코치님로 바뀝니다. 신인은 “눈치만 보는 사람”이나 “차갑게 지시하는 사람”이 아니라, “규칙을 알려주고 생각까지 정리해주는 사람”으로 코치님를 신뢰하게 되고, 그 신뢰가 결국 실행력으로 이어지게 됩니다.`,improvement:``},CP_AC_FC:{manner:`신인을 코칭할 때의 말투는 기준과 규칙을 먼저 분명하게 말하고, 동시에 상대의 반응과 분위기를 계속 살피는 말투입니다. TOP1이 CP이기 때문에 코치님은 “이건 꼭 지켜야 해”, “이 순서는 바꾸면 안 돼”처럼 원칙과 기준을 분명히 제시합니다. 그래서 신인은 처음에 “이 코치님은 기준이 확실하다”, “뭘 해야 하는지가 명확하다”는 느낌을 받습니다. 여기에 TOP2가 AC라서 신인의 표정, 말투, 태도를 세심하게 관찰하며 혹시 부담을 느끼지는 않는지 계속 신경 씁니다.
-
-하지만 BOTTOM1이 FC이기 때문에 감정을 풀어 주는 말, 가볍게 분위기를 부드럽게 만드는 말은 부족한 편입니다. 코치님은 진지하고 성실하게 말하지만, 웃거나 공감하는 표현이 적어 신인 입장에서는 “혼나는 느낌이다”, “차갑게 느껴진다”고 오해할 수 있습니다. 실제로는 관심이 많지만, 그 마음이 말로 잘 드러나지 않는 경우입니다. 특히 잘 따라오지 못하는 신인은 긴장한 상태가 계속 유지되어 질문을 못 하거나 위축될 수 있습니다.
-
-이 성향에서 가장 중요한 조율 포인트는 기준을 말한 뒤 감정을 한 번 풀어 주는 문장을 의식적으로 넣는 것입니다. 규칙을 말하는 것에서 끝내지 말고, “너를 믿어서 말하는 거야”, “지금은 연습 단계니까 괜찮아” 같은 한 문장을 덧붙이면 신인의 마음이 훨씬 편해집니다. AC가 높아 신인의 눈치를 보는 대신, 따뜻한 표현을 먼저 말로 꺼내는 연습이 필요합니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 “지금 잘하려는 게 보여서 이 기준을 알려주는 거야.”입니다. 기준 제시와 동시에 신인의 노력을 인정해 줍니다.
-두 번째 고정멘트는 “틀려도 괜찮아, 연습 중이니까 여기서 배워가면 돼.”입니다. FC가 낮아 생기는 긴장감을 풀어 주는 문장입니다.
-세 번째 고정멘트는 “조금 어렵지? 그래도 네 속도에 맞춰 같이 가면 돼.”입니다. 신인이 혼자가 아니라는 느낌을 받게 합니다.
-
-이 고정멘트를 의식적으로 사용하면, 이 성향은 차갑게 느껴질 수 있는 코치님가 아니라 기준은 분명하지만 마음은 따뜻한 코치님로 바뀝니다. 신인은 “무서운 사람”이 아니라 “나를 챙기면서 이끌어주는 사람”으로 느끼게 되고, 그 안정감이 결국 꾸준한 성장으로 이어지게 됩니다.`,improvement:``},NP_CP_A:{manner:`신인을 코칭할 때의 말투는 먼저 따뜻하게 감싸 주고, 그 다음에 기준을 분명히 알려주는 말투입니다. TOP1이 NP이기 때문에 이 성향은 신인을 대할 때 “괜찮아”, “천천히 해도 돼”, “네가 힘들었겠다”처럼 공감과 배려가 먼저 나옵니다. 신인은 이 코치님를 만나면 “혼내지 않는 사람”, “내 편이 되어주는 사람”이라고 느끼기 쉽고, 마음을 열고 이야기하려는 태도를 보이게 됩니다. 여기에 TOP2가 CP라서, 완전히 느슨해지지는 않고 “이건 꼭 지켜야 해”, “이 부분은 기준이야”처럼 필요한 규칙과 선은 잡아 줍니다.
-
-하지만 BOTTOM1이 A이기 때문에 상황을 차분하게 정리해서 설명하는 말, 왜 이걸 해야 하는지 논리적으로 풀어주는 말이 부족해질 수 있습니다. 그래서 신인은 “좋은 말은 많이 듣는데, 그래서 정확히 뭘 어떻게 해야 하지?”라는 혼란을 느낄 수 있습니다. 특히 잘 따라오지 못하는 신인에게는 감정 위로는 충분하지만, 행동 기준이 머릿속에 정리되지 않아 같은 실수를 반복하는 일이 생기기 쉽습니다.
-
-이 성향에서 가장 중요한 조율 포인트는 공감 뒤에 반드시 ‘정리 문장’을 붙이는 것입니다. 위로와 배려에서 끝내지 말고, “그래서 지금 네가 할 건 이거야”처럼 한 번 더 구조를 잡아 주는 말이 필요합니다. 감정은 이미 충분히 살피고 있으므로, 이제는 의식적으로 이유와 순서를 말로 정리해 주는 연습이 중요합니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 “네 마음은 이해했어, 이제 우리가 해야 할 순서는 이거야.”입니다. 공감 뒤에 바로 방향을 제시해 줍니다.
-두 번째 고정멘트는 “이걸 하는 이유는 단순해, 이 단계가 다음으로 가는 준비야.”입니다. 복잡하지 않게 이유를 설명해 주는 문장입니다.
-세 번째 고정멘트는 “오늘은 이것 하나만 기억하면 돼, 나머지는 내가 도와줄게.”입니다. 신인의 머릿속 부담을 줄여 줍니다.
-
-이 고정멘트를 꾸준히 쓰면, 이 성향은 착하기만 한 코치님가 아니라 따뜻하면서도 방향을 잡아주는 코치님로 바뀝니다. 신인은 감정적으로 안정감을 느끼는 동시에, 무엇을 어떻게 해야 하는지도 분명히 알게 되고, 그 결과 따라오는 속도와 실행력이 눈에 띄게 좋아지게 됩니다.`,improvement:``},NP_CP_FC:{manner:`신인을 코칭할 때의 말투는 부드럽고 사람 냄새가 나지만, 말 속에는 분명한 기준이 들어 있는 말투입니다. TOP1이 NP이기 때문에 이 성향은 신인을 볼 때 먼저 사람으로 바라봅니다. “처음엔 다 어려워”, “너 나이 때 나도 그랬어”, “지금까지 버틴 것만 해도 잘하고 있어”처럼 위로와 인정이 먼저 나오는 말을 자연스럽게 합니다. 신인은 이 코치님를 만나면 “혼내지 않는다”, “나를 이해해 준다”, “편하게 물어볼 수 있다”고 느끼며 마음을 엽니다.
-
-TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이건 기본이야”, “이건 약속이야”, “여기까지는 반드시 지켜야 해”처럼 지켜야 할 선과 기준은 분명히 말해 줍니다. 그래서 신인은 정서적으로는 안정감을 느끼면서도, 이 코치님를 가볍게 보지는 않습니다. 다만 문제는 BOTTOM1이 FC라는 점입니다. 이 경우 코치님은 에너지를 끌어올리는 말, 분위기를 살리는 말, 재미있게 몰아가는 말이 부족할 수 있습니다.
-
-그래서 잘 따라오지 못하는 신인을 만났을 때, 코칭 분위기가 다소 조용하고 무거워질 수 있습니다. 신인은 “좋은 말은 듣는데 왠지 힘이 안 난다”, “해야 하는 건 알겠는데 신이 안 난다”는 느낌을 받을 수 있습니다. 특히 지치기 쉬운 신인에게는 동기 자극이 약해질 수 있습니다. 이 성향의 어려움은 틀린 말을 해서가 아니라, 에너지가 덜 실리는 말투에서 생깁니다.
-
-조율의 핵심은 의식적으로 말에 온도와 리듬을 더하는 것입니다. 말의 내용은 충분히 좋은데, 전달할 때 한 번 더 밝게, 한 번 더 살아 있게 말하는 연습이 필요합니다. 표정, 속도, 어조를 조금만 바꿔도 신인의 반응이 달라집니다.
-
-개선 시 사용할 고정멘트는 다음과 같습니다.
-첫 번째 고정멘트는 “지금 네가 하는 건 분명히 잘 가고 있는 과정이야, 그래서 더 기대가 돼.”입니다. 인정과 기대를 함께 전달해 줍니다.
-두 번째 고정멘트는 “이건 어렵지만, 이걸 넘기면 확실히 한 단계 올라가.”입니다. 힘을 주되 부담은 줄이는 말입니다.
-세 번째 고정멘트는 “지금은 속도보다 방향이 맞아, 우리는 이미 제대로 가고 있어.”입니다. 신인의 긴장을 풀어 주는 문장입니다.
-
-이 고정멘트를 꾸준히 쓰면, 이 성향은 따뜻하고 기준만 있는 코치님에서 따뜻하면서도 힘을 실어주는 코치님로 바뀝니다. 신인은 마음이 편해질 뿐 아니라, 다시 해볼 에너지를 얻게 되고, 자연스럽게 행동량과 지속력이 함께 올라가게 됩니다.`,improvement:``},NP_CP_AC:{manner:`신인을 코칭할 때의 말투는 따뜻한 배려와 분명한 기준이 함께 나오는 말투입니다. 이 성향의 코치님은 기본적으로 사람을 아끼는 마음이 크고, 신인이 상처받지 않도록 배려하며 말하려는 경향이 강합니다. 그래서 “괜찮아”, “네가 힘들었을 것 같아”, “그래도 여기까지 온 건 잘한 거야” 같은 공감의 말이 먼저 나옵니다. 동시에 기준과 원칙도 중요하게 여기기 때문에, 어느 순간에는 “이 부분은 꼭 지켜야 해”, “이건 선택이 아니라 기본이야”처럼 분명한 말도 합니다. 다만 AC가 낮은 편이기 때문에 신인의 반응이나 감정을 세심하게 살피는 데는 조금 약할 수 있습니다. 그래서 코칭이 빠르고 직설적으로 느껴질 수 있고, 신인은 “말은 따뜻한데 결정은 너무 빠른 것 같아”라고 느낄 수도 있습니다. 이때 코치님은 자신이 차갑게 말하고 있다는 생각보다, 속도가 빠를 수 있다는 점을 의식하는 것이 중요합니다.
-
-이 성향의 코치님은 신인을 도와주고 싶은 마음이 커서 대신 고민해주고, 대신 결정해주려는 경향도 있습니다. “이건 내가 봐도 이쪽이 맞아”, “너한테는 이 방법이 제일 좋아”라고 말하며 길을 바로 제시합니다. 이는 신인에게는 큰 도움이 될 수 있지만, 반복되면 신인이 스스로 생각하고 판단하는 힘이 자라기 어렵습니다. 그래서 코칭할 때는 설명을 하기 전에 한 번 더 질문을 던지는 습관이 필요합니다. 예를 들어 “내가 보기엔 이게 좋아 보이는데, 너 생각은 어때?”처럼 신인의 생각을 먼저 묻는 말투를 의식적으로 넣어야 합니다. 그러면 신인은 존중받는 느낌을 받고, 코칭을 더 잘 따라오게 됩니다.
-
-개선을 위한 고정 멘트는 항상 공감 → 기준 → 선택권의 순서로 말하는 것이 좋습니다. 첫 번째 고정 멘트는
-“네가 여기까지 오느라 얼마나 고민했는지 알아, 그 노력은 분명히 잘한 거야.”
-이 문장은 신인의 마음을 먼저 안정시켜 줍니다. 두 번째 고정 멘트는
-“다만 이 일에서는 꼭 지켜야 할 기준이 있고, 이 부분은 예외가 아니야.”
-이 말로 코치님의 기준을 분명히 세웁니다. 세 번째 고정 멘트는
-“이 기준 안에서 어떤 선택을 할지는 네가 정해도 돼, 나는 그 과정을 도와줄게.”
-이 문장은 신인에게 책임과 주도권을 돌려주는 역할을 합니다.
-
-이 세 문장을 세트처럼 반복해서 사용하면, 코칭이 부드러우면서도 흐트러지지 않습니다. 신인은 “나를 아끼는구나”라는 느낌과 동시에 “그래도 해야 할 건 해야 하는구나”를 자연스럽게 배우게 됩니다. 이 성향의 코치님은 이미 사람을 살리는 힘이 충분합니다. 여기에 신인의 반응을 한 박자 더 확인하는 습관만 더해진다면, 신인은 훨씬 안정적으로 성장하고, 코치님 역시 감정 소모 없이 오래 좋은 코칭을 이어갈 수 있습니다.`,improvement:``},NP_A_CP:{manner:`신인을 코칭할 때의 말투는 부드럽고 이해해 주는 말이 먼저 나오고, 판단은 차분하지만 기준 제시는 약한 말투입니다. 이 성향의 코치님은 사람을 먼저 보는 힘이 매우 큽니다. 그래서 신인이 실수를 하거나 성과가 느릴 때도 “그럴 수 있어”, “처음엔 다 그래”, “너 마음이 어떤지는 이해해”라는 말이 자연스럽게 나옵니다. 또 상황을 논리적으로 정리하는 힘도 있어서, 왜 안 됐는지 차분히 설명해 주고 흐름을 정리해 주는 데는 강합니다. 신인은 이 코치님를 보며 “말이 편하고, 옆에 있으면 안정된다”는 느낌을 많이 받습니다.
-
-하지만 CP가 낮은 편이기 때문에, 기준을 세우고 단호하게 선을 긋는 말은 상대적으로 약합니다. 그래서 코칭이 길어지거나, 같은 실수가 반복되어도 “다음엔 잘해보자”로 끝나는 경우가 생깁니다. 이때 신인은 편안함은 느끼지만, 한편으로는 “그래서 정확히 뭘 바꿔야 하지?” 하고 헷갈릴 수 있습니다. 즉, 마음은 따뜻한데 방향표가 약한 코칭이 될 위험이 있습니다.
-
-이 성향의 코치님은 신인을 다그치지 않으려는 마음이 강해서, 꼭 해야 할 말도 돌려서 표현하는 경향이 있습니다. “이건 조금 아쉬운 것 같아”, “다음엔 이렇게 해보면 좋을 것 같아”처럼 부드럽게 말하지만, 신인 입장에서는 그 말이 권유인지, 필수인지를 구분하기 어렵습니다. 그래서 코칭을 할 때는 “이건 선택이야”와 “이건 꼭 해야 해”를 말로 명확히 구분해 주는 연습이 필요합니다.
-
-개선을 위한 고정 멘트는 공감 → 사실 → 기준 순서로 말하는 것이 가장 효과적입니다. 첫 번째 고정 멘트는
-“지금까지 노력한 건 분명히 보여, 여기까지 온 것도 쉬운 일은 아니야.”
-이 말로 신인의 마음을 먼저 지켜줍니다. 두 번째 고정 멘트는
-“다만 지금 방식으로는 결과가 잘 안 나오는 게 사실이야.”
-이 문장은 감정이 아니라 현실을 짚어줍니다. 세 번째 고정 멘트는
-“그래서 이 부분만큼은 이번 주부터 꼭 이렇게 하자, 이건 약속이야.”
-이 말로 기준을 분명히 세웁니다.
-
-이 세 문장을 반복해서 사용하면, 코칭이 여전히 따뜻하면서도 흐려지지 않습니다. 신인은 “이 코치님은 나를 이해해 주지만, 그냥 넘어가지는 않는구나”라고 느끼게 됩니다. 이 성향의 코치님은 이미 신인을 살리는 말의 힘을 가지고 있습니다. 여기에 짧고 분명한 기준 문장만 더해지면, 신인은 훨씬 빠르게 성장하고 코칭의 효과도 눈에 띄게 좋아질 것입니다.`,improvement:``},NP_A_FC:{manner:`신인을 코칭할 때의 말투는 따뜻하고 배려 깊으며, 설명은 차분하지만 표현은 다소 조용한 말투입니다. 이 성향의 코치님은 사람을 먼저 생각합니다. 신인이 실수해도 혼내기보다 “괜찮아, 누구나 처음엔 그래”라는 말이 먼저 나오고, 신인의 마음을 다치지 않게 지켜주려는 태도가 분명합니다. 여기에 A가 함께 있어서 감정에만 치우치지 않고, 왜 일이 안 됐는지 이유를 논리적으로 설명해 줍니다. 그래서 신인은 “이 코치님은 나를 이해해 주고, 말이 합리적이야”라고 느끼며 신뢰를 갖게 됩니다.
-
-다만 FC가 낮은 편이라 표현이 담백하고 감정 표현이 적은 코칭이 되기 쉽습니다. 칭찬을 해도 크게 드러내지 않고, 잘했을 때도 “응, 괜찮았어” 정도로 지나갈 수 있습니다. 이때 신인은 혼나지는 않지만, 동시에 “내가 잘하고 있는 건가?”라는 확신을 얻기 어렵습니다. 또 분위기를 살리는 말이나 격려 멘트가 부족해 코칭 시간이 차분하지만 다소 무겁게 느껴질 수도 있습니다. 신인은 안정감은 느끼지만, 에너지가 끌어올려지는 느낌은 적을 수 있습니다.
-
-그래서 이 성향의 코치님은 의식적으로 표현을 한 단계 더 크게 하는 연습이 필요합니다. 마음속으로만 ‘잘했다’고 생각하지 말고, 말로 꺼내는 것이 중요합니다. 개선을 위한 첫 번째 고정 멘트는
-“지금 한 행동은 분명히 잘한 거야, 그 부분은 나도 만족해.”
-이 문장은 조용한 코치님의 인정을 신인이 확실히 느끼게 해줍니다.
-
-두 번째 고정 멘트는
-“내가 보기엔 방향은 맞아, 속도만 조금 더 올리면 돼.”
-이 말은 감정이 아니라 판단으로 격려해 주면서도, 신인에게 희망을 줍니다.
-
-세 번째 고정 멘트는
-“오늘은 여기까지 잘 왔고, 다음 단계로 넘어갈 준비는 됐어.”
-이 문장은 신인에게 ‘나 지금 성장 중이구나’라는 확신을 줍니다.
-
-이 세 문장을 꾸준히 쓰면, 코칭의 온기는 유지되면서도 부족했던 활력이 채워집니다. 신인은 이 코치님를 통해 편안함과 방향성, 그리고 조용하지만 분명한 응원을 동시에 느끼게 되고, 그 신뢰는 행동 변화로 자연스럽게 이어지게 됩니다.`,improvement:``},NP_A_AC:{manner:`신인을 코칭할 때의 말투는 부드럽고 차분하며, 설명은 이성적으로 정리된 말투입니다. 이 성향의 코치님은 사람을 먼저 배려합니다. NP가 높아 신인의 마음과 상황을 잘 읽고, “요즘 힘들지?”처럼 감정을 먼저 확인합니다. 여기에 A가 함께 있어 감정에만 머물지 않고, 왜 결과가 나왔는지 원인과 순서를 또박또박 설명해 줍니다. 그래서 신인은 “이 코치님은 내 편이면서도 설명이 이해하기 쉬워”라고 느끼며 안정감을 갖습니다.
-
-다만 AC가 낮은 편이라 조직 규칙이나 기준을 말할 때 신인의 눈치를 다소 보지 않고, 비교적 직설적으로 말하는 경향이 있습니다. 규칙을 어겼을 때 “이건 안 되는 거야”라고 바로 말해 버려, 신인은 기준은 분명히 알지만 마음이 준비되지 않았을 때는 부담을 느낄 수 있습니다. 코치님 입장에서는 명확함이지만, 신인에게는 “나를 이해해 주긴 하지만 단호하네”라는 인상이 남을 수 있습니다.
-
-그래서 이 성향의 코치님은 단호함 앞에 한 번의 공감 문장을 의식적으로 붙이는 연습이 필요합니다. 기준을 말하기 전에 감정을 먼저 짚어 주는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네 상황은 이해해, 그래도 이 기준은 같이 지켜야 해.”
-이 문장은 배려와 규칙을 동시에 전달해 줍니다.
-
-두 번째 고정 멘트는
-“지금 마음이 복잡할 수 있지만, 이 순서대로 가는 게 가장 안전해.”
-이 말은 신인의 감정을 인정하면서도, 이성적인 방향을 제시해 줍니다.
-
-세 번째 고정 멘트는
-“내가 이렇게 말하는 건 혼내려는 게 아니라, 오래 가게 도와주려는 거야.”
-이 문장은 단호한 말의 의도를 분명히 해 신인의 오해를 줄여 줍니다.
-
-이 세 문장을 반복해 사용하면, 코칭은 여전히 따뜻하지만 기준은 흐려지지 않습니다. 신인은 이 코치님를 통해 배려받고 있다는 느낌과 함께, 무엇을 지켜야 하는지도 분명히 이해하게 되고, 그 결과 행동 변화가 더 안정적으로 이어지게 됩니다.`,improvement:``},NP_FC_CP:{manner:`신인을 코칭할 때의 말투는 밝고 부드럽고, 사람을 먼저 살리는 말투입니다. 이 성향은 NP가 가장 높아 신인의 감정과 상황을 잘 헤아립니다. “오늘 표정이 좀 힘들어 보여”, “요즘 적응하느라 많이 애쓰지?”처럼 마음을 먼저 읽는 말을 자연스럽게 합니다. 여기에 FC가 함께 있어 분위기를 무겁게 만들지 않고, 웃음이나 가벼운 농담으로 긴장을 풀어 줍니다. 그래서 신인은 이 코치님와 있으면 “혼날 걱정은 없고, 같이 가는 느낌이 든다”고 느끼며 마음을 엽니다.
-
-하지만 CP가 낮은 편이라 기준과 규칙을 강하게 잡아 주는 데는 어려움이 생기기 쉽습니다. 신인이 약속을 어기거나 준비가 부족해도 “다음엔 잘해보자”로 넘어가는 경우가 많고, 해야 할 말을 마음에 담아두는 일이 생깁니다. 코치님 입장에서는 관계를 지키려는 배려지만, 신인 입장에서는 “이게 중요한 건지 아닌지 헷갈린다”는 느낌을 받을 수 있습니다. 결국 행동이 느슨해지고, 성장 속도가 더뎌질 위험이 있습니다.
-
-그래서 이 성향의 코치님은 따뜻함은 유지하되, 기준 문장을 의식적으로 입 밖으로 꺼내는 연습이 꼭 필요합니다. 감정을 살핀 뒤, 기준을 분명히 말하는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네가 노력하는 건 알아, 그래서 더 정확하게 말해줄게.”
-이 말은 배려 다음에 기준이 온다는 신호를 줍니다.
-
-두 번째 고정 멘트는
-“편하게 이야기하는 사이지만, 이건 꼭 지켜야 하는 약속이야.”
-관계는 유지하면서도 선을 분명히 긋는 문장입니다.
-
-세 번째 고정 멘트는
-“지금은 웃으면서 말하지만, 이 부분은 다음엔 꼭 바뀌어야 해.”
-부드러운 분위기 속에서도 행동 변화를 분명히 요구할 수 있습니다.
-
-이 고정 멘트를 반복해 쓰면, 코치님은 착한 사람에서 멈추지 않고 ‘믿을 수 있는 기준 있는 사람’으로 인식됩니다. 신인은 편안함 속에서도 해야 할 일을 분명히 알게 되고, 결국 실천력이 눈에 띄게 좋아지게 됩니다.`,improvement:``},NP_FC_A:{manner:`신인을 코칭할 때의 말투는 따뜻하고 밝으며, 사람을 편하게 만드는 말투입니다. 이 성향은 NP가 가장 높아 신인의 마음을 먼저 봅니다. 그래서 “오늘 교육 힘들었지?”, “요즘 적응하느라 많이 애쓰는 거 알아”처럼 감정을 먼저 읽는 말을 자주 합니다. 여기에 FC가 높아 분위기를 무겁게 끌지 않고, 웃음이나 가벼운 말로 긴장을 풀어 줍니다. 신인은 이 코치님와 있으면 “혼날까 봐 무섭지 않고, 이야기해도 괜찮다”는 느낌을 받습니다. 질문도 많아지고, 실수도 숨기지 않고 말하게 됩니다.
-
-다만 A가 낮아 상황을 차분히 정리하고, 왜 이 행동이 필요한지 논리적으로 설명하는 부분이 약해질 수 있습니다. 신인이 같은 실수를 반복해도 “괜찮아, 누구나 그래”로 넘어가다 보니, 신인 스스로도 무엇을 고쳐야 하는지 정확히 모르고 넘어가는 경우가 생깁니다. 코치님은 도와준다고 생각하지만, 신인은 “열심히는 하는데 방향이 맞는지는 잘 모르겠다”는 혼란을 느낄 수 있습니다. 결국 노력은 많은데 결과가 늦게 나오는 상황이 생기기 쉽습니다.
-
-그래서 이 성향의 코치님은 따뜻함은 유지하되, 말 속에 ‘이유와 기준’을 한 줄이라도 꼭 넣는 연습이 필요합니다. 길게 설명할 필요는 없고, 핵심만 짚어 주면 됩니다.
-첫 번째 고정 멘트는
-“지금 이걸 하는 이유는, 나중에 네가 덜 힘들어지기 때문이야.”
-이 말은 행동의 목적을 쉽게 알려 줍니다.
-
-두 번째 고정 멘트는
-“이건 잘했고, 이건 다음에 꼭 바꿔야 해. 이유는 하나야.”
-감정 평가와 행동 평가를 분리해 신인이 헷갈리지 않게 해 줍니다.
-
-세 번째 고정 멘트는
-“지금 느낌 말고, 결과를 기준으로 한 번만 더 해보자.”
-감정에 치우치지 않고 한 단계 더 나아가게 만드는 문장입니다.
-
-이 고정 멘트를 반복해서 쓰면, 코치님은 편한 사람에서 끝나지 않고 ‘방향을 잡아주는 사람’이 됩니다. 신인은 마음이 안정된 상태에서 무엇을 고쳐야 할지 또렷하게 알게 되고, 행동이 빨라지며 성장 속도도 눈에 띄게 달라집니다.`,improvement:``},NP_FC_AC:{manner:`신인을 코칭할 때의 말투는 아주 부드럽고, 밝고, 사람을 안심시키는 말투입니다. 이 성향은 NP가 가장 높아 신인의 감정과 상황을 먼저 살핍니다. 그래서 “요즘 많이 긴장됐지?”, “처음이라 어려운 게 당연해”처럼 공감부터 나옵니다. 여기에 FC가 높아 분위기를 가볍게 만들고, 웃음이나 농담으로 긴장을 풀어 줍니다. 신인은 이 코치님 앞에서 “혼나지 않을 것 같다”, “실수해도 말해도 된다”는 안정감을 느낍니다. 그래서 질문도 많아지고, 위축되기보다는 편안한 상태로 교육에 참여합니다.
-
-하지만 AC가 가장 낮은 성향이라 조직의 규칙이나 기준을 강하게 강조하지 않고, 신인의 눈치를 조금 덜 보며 말하는 경향이 있습니다. 이 말은 차갑게 군다는 뜻이 아니라, “이건 해야 해”, “이건 지금 넘어가면 안 돼” 같은 단호한 말을 자연스럽게 던진다는 의미입니다. 문제는 이 단호함이 NP·FC의 부드러움과 섞이면서 기준이 흐릿해질 수 있다는 점입니다. 말은 따뜻한데, 규칙은 명확히 남지 않아 신인이 “어디까지 해도 괜찮은지” 헷갈리는 상황이 생길 수 있습니다.
-
-이 성향의 코치님은 기분은 살리되, 규칙은 말로 남기는 연습이 필요합니다. 감정 공감 후에 반드시 기준 문장을 붙이는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네 마음은 이해해. 그래도 이건 우리 팀에서 꼭 지키는 약속이야.”
-공감과 규칙을 동시에 전달해 신인이 거부감 없이 받아들이게 합니다.
-
-두 번째 고정 멘트는
-“지금은 편해도 괜찮아 보이지만, 이 부분은 바로 잡고 가자.”
-지금의 감정과 미래의 결과를 연결해 줍니다.
-
-세 번째 고정 멘트는
-“분위기는 내가 책임질게. 대신 행동은 기준대로 해보자.”
-코치님의 역할과 신인의 역할을 분명히 나누는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 코치님은 ‘착한 코치님’에서 끝나지 않고 ‘편하지만 기준이 분명한 코치님’가 됩니다. 신인은 마음이 편한 상태에서 규칙을 배우고, 조직 안에서 어떻게 행동해야 하는지 빠르게 익히게 됩니다. 그 결과 실수는 줄고, 성장 속도는 훨씬 빨라집니다.`,improvement:``},NP_AC_CP:{manner:`신인을 코칭할 때의 말투는 아주 다정하고 조심스러운 말투입니다. 이 성향은 NP가 가장 높아 신인의 기분과 감정을 먼저 살핍니다. 그래서 말의 시작이 항상 “괜찮아”, “처음엔 다 그래”, “네 마음 이해해”처럼 위로와 공감으로 열립니다. 여기에 AC가 높아 상대의 반응을 많이 의식합니다. 신인이 표정이 어두워지거나 말수가 줄면, 바로 말을 누그러뜨리고 속도를 늦춥니다. 그래서 신인은 “이 코치님은 나를 배려해 준다”, “압박을 주지 않는다”는 느낌을 강하게 받습니다.
-
-하지만 CP가 가장 낮은 성향이라 기준을 세우는 말, 단호하게 정리하는 말이 약한 편입니다. 해야 할 행동, 지켜야 할 규칙을 알면서도 “혹시 상처받지 않을까” 걱정이 먼저 들어 말을 돌려서 하거나 넘어가는 경우가 생깁니다. 그 결과 신인은 편안하지만, 무엇이 필수인지 헷갈릴 수 있습니다. “이건 꼭 해야 하는 건지, 선택인지”를 잘 모르게 됩니다.
-
-이 성향의 코치님은 공감 뒤에 기준 문장을 붙이는 연습이 가장 중요합니다. 마음만 어루만지고 끝내지 말고, 반드시 행동 기준을 말로 남겨야 합니다.
-첫 번째 고정 멘트는
-“네가 힘든 건 이해해. 그래도 이건 우리 팀에서 꼭 지켜야 하는 일이야.”
-공감과 규칙을 한 문장에 담아 신인이 거부감 없이 듣게 합니다.
-
-두 번째 고정 멘트는
-“지금은 불편해 보여도, 이건 네가 성장하는 데 꼭 필요한 단계야.”
-현재 감정에 머물지 않고 이유를 알려 주는 말입니다.
-
-세 번째 고정 멘트는
-“내가 옆에서 도와줄게. 대신 이 부분은 오늘 꼭 해보자.”
-혼자가 아니라는 안정감과 실행 약속을 동시에 줍니다.
-
-이 고정 멘트를 반복하면, 이 성향의 코치님은 ‘다정하기만 한 코치님’가 아니라 ‘따뜻하지만 기준이 분명한 코치님’가 됩니다. 신인은 마음은 편한 상태를 유지하면서도, 무엇을 해야 하는지 명확히 알게 됩니다. 그 결과 행동이 빨라지고, 조직에 적응하는 속도도 훨씬 빨라집니다.`,improvement:``},NP_AC_A:{manner:`신인을 코칭할 때의 말투는 아주 부드럽고 배려가 많은 말투입니다. 이 성향은 NP가 가장 높아 신인의 감정과 상황을 먼저 살핍니다. 말의 시작이 늘 “괜찮아”, “네 마음 이해해”, “처음이라 그럴 수 있어”처럼 공감으로 열립니다. 여기에 AC가 높아 상대의 반응을 민감하게 느낍니다. 신인의 표정이 굳거나 말수가 줄면, 바로 톤을 낮추고 속도를 늦춥니다. 그래서 신인은 “이 코치님은 나를 존중해 준다”, “혼내지 않는다”는 느낌을 강하게 받습니다.
-
-하지만 A가 가장 낮은 성향이라 정리해서 설명하는 말, 판단을 분명히 하는 말이 부족한 편입니다. 무엇을 왜 해야 하는지, 지금 단계에서 무엇이 중요한지 머릿속에서는 알고 있어도 말로 차분히 정리해 주는 데 어려움을 느낍니다. 그래서 코칭이 길어지거나, 이야기는 많은데 핵심이 흐려질 수 있습니다. 신인은 “그래서 내가 지금 뭘 하면 되는 거지?” 하고 헷갈릴 수 있습니다.
-
-이 성향의 코치님은 공감 뒤에 ‘정리 문장’을 붙이는 연습이 가장 중요합니다. 마음을 먼저 받아준 뒤, 반드시 핵심을 짧게 정리해 주어야 합니다.
-첫 번째 고정 멘트는
-“네가 힘들다는 건 이해해. 그래서 지금은 이 한 가지만 먼저 해보자.”
-공감 다음에 행동 하나를 딱 정해 주는 말입니다.
-
-두 번째 고정 멘트는
-“지금 단계에서는 잘하려고 고민하는 것보다, 이 순서대로 해보는 게 더 중요해.”
-감정이 아니라 기준과 순서를 알려 주는 문장입니다.
-
-세 번째 고정 멘트는
-“내가 옆에서 같이 볼게. 대신 오늘은 이 기준까지만 꼭 해보자.”
-배려와 실행 기준을 동시에 전달합니다.
-
-이 고정 멘트를 반복하면, 이 성향의 코치님은 ‘착하기만 한 코치님’에서 ‘따뜻하면서도 방향을 잡아주는 코치님’로 바뀝니다. 신인은 감정적으로 안정된 상태를 유지하면서도, 무엇을 해야 하는지 분명히 알게 됩니다. 그 결과 고민에 머무는 시간이 줄고, 행동으로 옮기는 속도가 훨씬 빨라집니다.`,improvement:``},NP_AC_FC:{manner:`신인을 코칭할 때의 말투는 아주 조심스럽고 배려가 많은 말투입니다. TOP1이 NP라서 신인의 감정부터 먼저 살피고, TOP2가 AC라서 상대의 눈치와 반응을 빠르게 읽습니다. 그래서 말의 시작은 “괜찮아”, “그럴 수 있어”, “네 입장 이해해”처럼 부드러운 공감으로 열립니다. 신인이 긴장하거나 위축돼 있으면 목소리를 낮추고, 속도를 늦추며, 최대한 부담을 주지 않으려 합니다. 이 덕분에 신인은 “이 코치님은 나를 보호해 준다”, “혼내지 않는다”는 안정감을 느낍니다.
-
-하지만 BOTTOM1이 FC라서 분위기를 가볍게 풀어주는 말, 에너지를 끌어올리는 말이 다소 부족한 편입니다. 웃으면서 분위기를 전환하거나, “괜찮아, 해보면 돼”처럼 힘을 주는 말이 자연스럽게 나오지 않습니다. 그래서 코칭 분위기가 조용하고 진지해지기 쉽고, 신인은 편안하긴 하지만 한편으로는 “조금 무거운 느낌”을 받을 수 있습니다. 특히 성과가 안 나는 시기에는 신인의 표정과 기운이 더 가라앉을 수 있습니다.
-
-이 성향의 코치님은 의식적으로 분위기를 밝히는 문장을 준비해 두는 것이 중요합니다. 감정 공감만으로 끝내지 말고, 에너지를 한 단계 올려주는 말을 꼭 붙여야 합니다.
-첫 번째 고정 멘트는
-“지금까지 충분히 잘 버텼어. 여기까지 온 것 자체가 쉬운 일이 아니야.”
-노력을 인정하면서 기운을 살리는 문장입니다.
-
-두 번째 고정 멘트는
-“완벽하게 할 필요 없어. 오늘은 70점만 해도 충분해.”
-부담을 낮추고 행동을 쉽게 만드는 말입니다.
-
-세 번째 고정 멘트는
-“우리 분위기 조금만 가볍게 가보자. 하나만 해보고 끝내도 돼.”
-진지함을 풀고 시작 장벽을 낮추는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 코치님은 ‘배려만 하는 코치님’에서 ‘따뜻하면서도 기운을 살려주는 코치님’로 바뀝니다. 신인은 마음의 안정뿐 아니라 움직일 힘을 함께 얻게 되고, 코칭 현장은 조용하지만 멈추지 않는 흐름을 만들 수 있습니다.`,improvement:``},A_CP_NP:{manner:`신인을 코칭할 때의 말투는 차분하고 논리적인 설명형 말투입니다. TOP1이 A라서 코치님은 감정보다 사실과 순서를 먼저 봅니다. “왜 안 됐는지”, “어디서 막혔는지”, “다음에 무엇을 바꿔야 하는지”를 정리해서 말합니다. 여기에 TOP2가 CP라서 말이 또렷하고 단호합니다. “이건 기준을 지켜야 해”, “여기는 반드시 이렇게 해야 해”처럼 규칙과 방향을 분명히 제시합니다. 이 말투 덕분에 신인은 헷갈리지 않고 구조를 이해하기 쉬운 장점이 있습니다. 무엇을 해야 하고, 무엇을 하면 안 되는지가 명확합니다.
-
-하지만 BOTTOM1이 NP라서 공감과 위로의 말이 상대적으로 적은 편입니다. 코치님은 도와주려는 마음이 있어도 “힘들었지?”, “마음이 어땠어?” 같은 말이 먼저 나오지 않습니다. 그래서 신인은 “맞는 말인데 마음이 좀 딱딱하다”, “이해는 되지만 위로받는 느낌은 적다”고 느낄 수 있습니다. 특히 실적이 안 나거나 자존감이 떨어진 신인에게는 코칭이 ‘정답 설명’처럼 들릴 수 있습니다.
-
-이 성향의 코치님은 의식적으로 감정 확인 문장을 먼저 꺼내는 연습이 필요합니다. 논리 설명 전에 공감 한 문장을 붙이는 것만으로도 코칭의 전달력이 크게 달라집니다.
-첫 번째 고정 멘트는
-“일단 여기까지 온 것 자체가 쉽지 않았을 거야.”
-신인의 노력을 먼저 인정하는 문장입니다.
-
-두 번째 고정 멘트는
-“지금 이 결과가 네가 못해서가 아니라, 과정이 아직 익숙하지 않은 거야.”
-문제의 원인을 사람에게 두지 않고 상황에 두는 말입니다.
-
-세 번째 고정 멘트는
-“그럼 이제 하나만 같이 정리해 보자. 내가 옆에서 같이 볼게.”
-단호함 속에 동행의 느낌을 더하는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향은 차갑게 보일 수 있는 분석형 코치님에서 ‘믿을 수 있고 함께 가는 코치님’로 인식됩니다. 신인은 지적받는 느낌 대신, 정리해 주고 끌어주는 느낌을 받게 되고, 코칭은 부담이 아니라 방향을 잡아주는 시간이 됩니다.`,improvement:``},A_CP_FC:{manner:`신인을 코칭할 때의 말투는 차분하고 이성적인 설명형 말투입니다. TOP1이 A이기 때문에 이 코치님은 감정에 휘둘리지 않고 상황을 정리해서 말합니다. “어디에서 막혔는지”, “왜 이 결과가 나왔는지”, “다음에는 무엇을 바꿔야 하는지”를 순서대로 설명합니다. 여기에 TOP2가 CP라서 말이 분명하고 기준이 뚜렷합니다. “이건 반드시 지켜야 해”, “이 단계는 건너뛰면 안 돼”처럼 방향을 명확히 제시합니다. 이 말투 덕분에 신인은 해야 할 일이 정리되어 보이고, 기준이 분명하다는 안정감을 느낍니다.
-
-하지만 BOTTOM1이 FC라서 밝은 반응이나 감정 표현이 적은 편입니다. 잘했을 때도 “그래, 다음 단계로 가자”라고 넘어가고, 힘들어할 때도 분위기를 풀어주는 말이 잘 나오지 않습니다. 그래서 신인은 “맞는 말이긴 한데 좀 딱딱하다”, “열심히 했는데 반응이 없는 것 같다”고 느낄 수 있습니다. 특히 처음 일을 배우는 신인에게는 이 코칭이 차갑게 느껴질 가능성이 있습니다.
-
-이 성향의 코치님은 의식적으로 감정 반응을 한 박자 더 얹는 연습이 필요합니다. 분석과 지적 전에 짧은 긍정 표현만 추가해도 코칭의 온도가 달라집니다.
-첫 번째 고정 멘트는
-“여기까지 해낸 건 분명 잘한 거야.”
-성과의 크기와 상관없이 노력을 인정해 주는 말입니다.
-
-두 번째 고정 멘트는
-“이 부분은 조금 더 연습하면 충분히 좋아질 수 있어.”
-부족함을 말하면서도 희망을 함께 주는 문장입니다.
-
-세 번째 고정 멘트는
-“지금처럼만 꾸준히 가면 분명 달라질 거야.”
-과정 자체를 믿어주는 말입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 코치님은 차분하지만 따뜻한 코치님로 인식됩니다. 신인은 지적만 받는 느낌이 아니라, 잘한 점과 보완할 점을 함께 듣게 되고 코칭 시간이 부담이 아닌 힘을 얻는 시간이 됩니다.`,improvement:``},A_CP_AC:{manner:`신인을 코칭할 때의 말투는 차분하게 정리하면서도 기준을 분명히 말하는 설명형 말투입니다. TOP1이 A라서 이 코치님은 감정에 휘둘리지 않고 상황을 차분히 정리해 줍니다. “지금 단계는 어디까지 왔는지”, “왜 이 결과가 나왔는지”, “다음에 무엇을 바꾸면 되는지”를 순서대로 설명합니다. 여기에 TOP2가 CP이기 때문에 말이 또렷하고 기준이 분명합니다. “이건 반드시 지켜야 해”, “이 순서는 건너뛰면 안 돼”처럼 방향을 정확히 제시합니다. 그래서 신인은 해야 할 일이 명확해지고, 길을 잃지 않는 느낌을 받습니다.
-
-하지만 BOTTOM1이 AC라서 이 코치님은 신인의 반응이나 기분을 살피는 말이 다소 적은 편입니다. 신인의 입장을  조금은 덜 살피고 곧바로 본론으로 들어가는 성향에 가깝습니다. 그래서 신인이 힘들어하거나 위축되어 있어도, 코치님은 “그건 감정의 문제야”라며 바로 해결 방법부터 말할 수 있습니다. 이때 신인은 “맞는 말이긴 한데 마음은 잘 안 알아주는 것 같다”고 느낄 수 있습니다.
-
-이 성향의 코치님은 의식적으로 상대의 상태를 먼저 확인하는 한 문장을 넣는 연습이 필요합니다. 설명과 지적 전에 감정을 짧게 짚어주면 코칭이 훨씬 부드러워집니다.
-첫 번째 고정 멘트는
-“지금 이 상황이 쉽지 않았을 것 같아.”
-신인의 감정을 먼저 인정해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“네 입장에서는 이렇게 느낄 수 있어.”
-공감의 문장을 먼저 말한 뒤 기준을 설명하는 데 도움이 됩니다.
-
-세 번째 고정 멘트는
-“그래도 우리가 지켜야 할 기준은 이거야.”
-공감 뒤에 방향을 분명히 제시하는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향의 코치님은 차분하고 논리적이면서도 사람을 배려하는 코치님로 보이게 됩니다. 신인은 지적만 받는 느낌이 아니라, 이해받으면서도 분명한 방향을 안내받는다고 느끼게 됩니다.`,improvement:``},A_NP_CP:{manner:`신인을 코칭할 때의 말투는 차분하고 따뜻하게 설명하면서, 사람을 먼저 생각하는 말투입니다. TOP1이 A라서 이 성향은 감정에 휘둘리지 않고 상황을 정리해 주는 힘이 있습니다. 무엇이 문제인지, 왜 이런 결과가 나왔는지를 논리적으로 풀어 설명합니다. 여기에 TOP2가 NP라서 말 속에 배려와 응원이 자연스럽게 담깁니다. “괜찮아, 누구나 이 단계에서는 헷갈려”, “지금까지 잘해 온 부분도 분명히 있어”처럼 신인을 안심시키는 말을 자주 합니다. 그래서 신인은 이 코치님를 편하고 믿을 수 있는 사람, 나를 이해해 주는 멘토로 느끼게 됩니다.
-
-하지만 BOTTOM1이 CP이기 때문에 이 성향은 기준을 강하게 세우거나 단호하게 말하는 힘이 약한 편입니다. 신인이 약속을 지키지 않거나, 같은 실수를 반복해도 “그럴 수도 있지”라며 넘어가는 경우가 생길 수 있습니다. 이러다 보면 신인은 편안함은 느끼지만, 무엇을 반드시 지켜야 하는지는 헷갈릴 수 있습니다. 즉, 따뜻하지만 기준이 흐릿한 코칭으로 받아들여질 위험이 있습니다.
-
-이 성향의 코치님은 의식적으로 기준을 말로 꺼내는 연습이 꼭 필요합니다. 화를 내거나 강하게 말할 필요는 없습니다. 다만, 부드러운 말투 안에 분명한 기준을 넣는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“네 마음은 이해하지만, 이 부분은 꼭 지켜야 해.”
-공감과 기준을 동시에 담은 문장입니다.
-
-두 번째 고정 멘트는
-“지금까지는 괜찮았지만, 다음부터는 이 방식으로 가야 해.”
-과거를 탓하지 않으면서 방향을 정리해 주는 말입니다.
-
-세 번째 고정 멘트는
-“도와줄 수는 있지만, 이건 네가 반드시 해줘야 하는 부분이야.”
-책임의 경계를 분명히 해 주는 문장입니다.
-
-이 고정 멘트를 반복해서 사용하면, 이 성향은 따뜻함은 유지하면서도 중심이 서 있는 코치님로 성장할 수 있습니다. 신인은 보호받는 느낌과 동시에, 무엇을 해야 하는지가 분명해져 더 안정적으로 따라오게 됩니다.`,improvement:``},A_NP_FC:{manner:`신인을 코칭할 때의 말투는 차분하고 설명이 분명하면서도 따뜻하게 안심시켜 주는 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 휘둘리지 않고 상황을 정리해서 설명하는 힘이 큽니다. “지금 상황을 하나씩 정리해 보자”, “이 단계에서는 이걸 먼저 하면 돼”처럼 복잡한 일을 순서대로 풀어 말합니다. 여기에 TOP2가 NP라서 말 속에 배려와 공감이 자연스럽게 섞입니다. “처음이라 헷갈릴 수 있어”, “여기까지 온 것도 충분히 잘한 거야” 같은 말로 신인의 마음을 먼저 편하게 만듭니다. 그래서 신인은 이 코치님를 침착하고 믿을 수 있는 사람, 나를 존중해 주는 어른으로 느끼게 됩니다.
-
-하지만 BOTTOM1이 FC이기 때문에 이 성향은 밝은 에너지 표현이나 분위기를 살리는 말이 부족한 편입니다. 칭찬을 마음속으로는 하고 있어도 말로 잘 드러내지 않거나, 표정과 톤이 무덤덤해 보일 수 있습니다. 그 결과 신인은 “이 코치님가 나를 좋게 보고 있는 걸까?” 하고 헷갈릴 수 있고, 잘해도 반응이 적다고 느껴 의욕이 떨어질 수 있습니다. 즉, 설명은 잘 들리지만 재미와 활력이 부족한 코칭으로 받아들여질 가능성이 있습니다.
-
-이 성향의 코치님은 의식적으로 밝은 반응을 말로 표현하는 연습이 꼭 필요합니다. 과장되게 웃거나 억지로 분위기를 띄울 필요는 없습니다. 다만, 잘한 행동에 즉각적으로 짧은 긍정 표현을 붙이는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“지금 이건 정말 잘했어, 방향이 딱 맞아.”
-행동을 정확히 짚어 주며 칭찬하는 말입니다.
-
-두 번째 고정 멘트는
-“이 부분은 생각보다 훨씬 빨리 좋아지고 있어.”
-변화를 느끼게 해 주는 말입니다.
-
-세 번째 고정 멘트는
-“이 정도면 충분히 기대해도 돼.”
-신인의 자신감을 끌어올려 주는 문장입니다.
-
-이 고정 멘트를 자주 사용하면, 이 성향은 정리 잘해 주는 코치님를 넘어 기분까지 살려주는 코치님로 인식됩니다. 신인은 안정감과 함께 즐겁게 배우게 되고, 행동도 훨씬 적극적으로 바뀌게 됩니다.`,improvement:``},A_NP_AC:{manner:`신인을 코칭할 때의 말투는 차분하고 논리적으로 설명하면서도, 사람을 먼저 존중하는 부드러운 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 휩쓸리지 않고 상황을 객관적으로 바라보며 “왜 이게 필요한지”, “지금 뭘 먼저 해야 하는지”를 또렷하게 설명합니다. 말이 복잡하지 않고 순서가 있어서 신인은 “이 코치님은 생각이 정리돼 있다”는 느낌을 받습니다. 여기에 TOP2가 NP라서 말속에는 배려와 보호의 메시지가 자연스럽게 담깁니다. “처음엔 누구나 헷갈려”, “지금 속도면 괜찮아” 같은 말로 신인의 마음을 먼저 안정시켜 줍니다. 그래서 신인은 이 성향을 이해해 주고 믿어주는 코치님로 느끼게 됩니다.
-
-다만 BOTTOM1이 AC이기 때문에, 이 성향은 신인의 표정이나 감정 변화에 조금은 둔감해 보일 수 있습니다. 일부러 차갑게 대하는 것은 아니지만, 기준과 설명을 우선하다 보니 신인이 긴장하거나 부담을 느끼는 신호를 놓칠 때가 있습니다. 그 결과 신인은 “틀리면 바로 지적받을 것 같다”, “내 기분보다는 결과가 더 중요해 보인다”라고 느낄 수 있습니다. 즉, 말은 친절하지만 심리적인 거리감이 생길 수 있는 구조입니다.
-
-그래서 이 성향은 코칭할 때 감정 확인 문장을 의식적으로 넣는 것이 매우 중요합니다. 설명을 시작하기 전이나 마무리할 때, 신인의 마음 상태를 먼저 짚어 주는 말이 필요합니다.
-첫 번째 고정 멘트는
-“이 이야기 들으면서 부담되지는 않는지 먼저 확인하고 싶어.”
-신인의 감정을 존중해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“지금 표정 보니까 조금 긴장한 것 같아, 맞을까?”
-눈치를 보는 대신 직접 확인하는 방식입니다.
-
-세 번째 고정 멘트는
-“결과보다 지금 느끼는 게 더 중요해, 편하게 말해도 돼.”
-안전한 분위기를 만들어 주는 말입니다.
-
-이 고정 멘트를 꾸준히 사용하면, 이 성향은 논리적이고 따뜻한 코치님로 완성됩니다. 신인은 지적받는 느낌보다 함께 정리해 나가는 느낌을 받게 되고, 코칭에 더 솔직하게 반응하며 성장 속도도 훨씬 빨라집니다.`,improvement:``},A_FC_CP:{manner:`신인을 코칭할 때의 말투는 차분하고 논리적인 설명을 기본으로 하면서, 분위기는 비교적 밝고 편안한 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 치우치기보다 “왜 이걸 해야 하는지”, “지금 단계에서 무엇이 중요한지”를 순서 있게 설명합니다. 말이 정리되어 있어 신인은 “이 코치님은 생각이 명확하다”는 느낌을 받습니다. 여기에 TOP2가 FC라서 말투가 딱딱하지 않고 중간중간 웃음이나 가벼운 표현이 섞입니다. “이건 게임처럼 생각해보자”, “여기까지 온 것도 꽤 잘한 거야” 같은 말로 긴장을 풀어 줍니다. 그래서 신인은 이 코치님를 편하게 질문할 수 있는 사람으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 CP이기 때문에, 이 성향은 기준을 분명히 말하거나 단호하게 방향을 잡아주는 데 다소 약한 모습이 나타날 수 있습니다. 신인이 흐트러지거나 같은 실수를 반복해도 “괜찮아, 다음에 하면 돼”로 넘어가 버리기 쉬워, 신인은 “어디까지가 괜찮고 어디부터는 고쳐야 하는지” 헷갈릴 수 있습니다. 분위기는 좋은데 기준이 보이지 않으면, 신인은 노력의 방향을 잃고 속도가 느려질 수 있습니다.
-
-그래서 이 성향은 코칭할 때 기준을 짧고 분명하게 말하는 문장을 의식적으로 사용해야 합니다.
-첫 번째 고정 멘트는
-“여기까지는 잘했고, 여기부터는 꼭 바꿔야 하는 기준이야.”
-잘한 점과 기준을 동시에 전달하는 문장입니다.
-
-두 번째 고정 멘트는
-“이건 선택이 아니라 지금 단계에서 반드시 해야 하는 부분이야.”
-흔들리지 않는 방향을 제시해 줍니다.
-
-세 번째 고정 멘트는
-“지금은 편함보다 기본을 먼저 잡는 시기야.”
-따뜻하지만 분명한 메시지입니다.
-
-이 고정 멘트를 반복해서 사용하면, 이 성향은 재미있지만 느슨하지 않은 코치님로 자리 잡게 됩니다. 신인은 편안함 속에서도 명확한 기준을 느끼게 되고, 무엇을 고쳐야 성장하는지 분명히 알게 되어 코칭 효과가 크게 높아집니다.`,improvement:``},A_FC_NP:{manner:`신인을 코칭할 때의 말투는 차분하고 이성적인 설명을 기본으로 하면서, 분위기는 밝고 부드러운 말투입니다. TOP1이 A이기 때문에 이 성향의 코치님은 감정에 휩쓸리지 않고 “지금 상황이 왜 이런지”, “다음에 무엇을 하면 되는지”를 순서대로 설명합니다. 말이 정리되어 있어 신인은 “이 코치님은 생각이 명확하고 논리적이다”라고 느낍니다. 여기에 TOP2가 FC라서 표정과 말투가 가볍고 친근합니다. “이건 너무 어렵게 생각 안 해도 돼”, “여기까지 온 것도 충분히 잘했어” 같은 말로 긴장을 풀어 주며, 신인이 위축되지 않게 돕습니다.
-
-하지만 BOTTOM1이 NP이기 때문에, 이 성향은 신인의 감정을 깊게 공감하거나 정서적으로 안아주는 표현이 부족해질 수 있습니다. 코치님은 설명은 잘해주지만, 신인은 “내 마음을 이해해주는 느낌은 조금 부족하다”고 느낄 수 있습니다. 특히 잘 못 따라오는 신인에게는 “논리는 알겠는데 마음이 힘들다”는 상태가 생길 수 있습니다. 이 경우 신인은 스스로 위축되거나, 혼자 버티려고 하다 지칠 가능성이 있습니다.
-
-그래서 이 성향은 코칭할 때 공감 문장을 의식적으로 먼저 넣는 습관이 필요합니다. 설명보다 공감을 한 박자 먼저 주는 것이 핵심입니다.
-첫 번째 고정 멘트는
-“이 속도에서 답답한 마음이 드는 게 너무 자연스러워.”
-신인의 감정을 먼저 인정해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“네가 느끼는 부담을 내가 이해하고 있다는 걸 먼저 말해주고 싶어.”
-신인이 혼자가 아니라는 느낌을 줍니다.
-
-세 번째 고정 멘트는
-“잘 못하는 게 아니라, 지금 배우는 중이라서 그런 거야.”
-신인의 자존감을 지켜주는 문장입니다.
-
-이 고정 멘트를 설명 앞에 항상 붙이면, 이 성향은 논리도 있고 분위기도 좋으며, 마음까지 챙겨주는 코치님로 변합니다. 신인은 안전하다고 느끼고 질문을 더 많이 하게 되며, 결과적으로 성장 속도도 훨씬 빨라집니다.`,improvement:``},A_FC_AC:{manner:`신인을 코칭할 때의 말투는 차분하고 논리적인 설명을 중심으로 하면서, 분위기는 밝고 편안하게 풀어주는 말투입니다. TOP1이 A이기 때문에 이 성향은 감정에 휘둘리지 않고 “왜 이걸 해야 하는지”, “어떤 순서로 하면 되는지”를 또렷하게 설명합니다. 말이 정리되어 있어 신인은 방향을 잃지 않습니다. TOP2가 FC라서 표정과 말투가 가볍고 유연합니다. “지금 단계는 연습 구간이야”, “실수해도 괜찮아, 여기서 배우면 돼”처럼 긴장을 풀어 주며 코칭 분위기를 부드럽게 만듭니다.
-
-다만 BOTTOM1이 AC라서 상대의 눈치나 분위기를 다소 덜 의식하는 경향이 나타날 수 있습니다. 그래서 설명이 정확해도 신인은 “조금 빠르다”, “나한테 맞춘 느낌은 덜하다”고 느낄 수 있습니다. 특히 잘 못 따라오는 신인에게는 코치님의 말이 정답처럼 들려 부담이 될 수 있습니다. 신인은 이해는 하지만 스스로 질문하기를 망설이게 됩니다.
-
-이 성향의 핵심 보완은 속도를 낮추고 선택권을 주는 말을 의식적으로 사용하는 것입니다. 정답을 바로 제시하기보다 “어떻게 느끼는지”를 먼저 묻는 한 문장이 큰 차이를 만듭니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 설명이 빠르게 느껴질 수 있어, 여기서 멈추고 네 생각부터 들어볼게.”
-신인의 속도를 존중하는 문장입니다.
-
-두 번째 고정 멘트는
-“이 방법 말고도 선택지는 있어, 너한테 편한 쪽을 같이 정해보자.”
-신인에게 주도권을 나눠주는 말입니다.
-
-세 번째 고정 멘트는
-“틀려도 괜찮아, 지금은 맞추는 단계가 아니라 익히는 단계야.”
-부담을 낮추고 도전을 돕는 문장입니다.
-
-이 세 문장을 설명 앞에 붙이면, 이 성향은 논리적이면서도 따뜻하고, 신인의 리듬을 존중하는 코치님가 됩니다. 신인은 안정감을 느끼고 질문이 늘어나며, 결과적으로 코칭 효과가 훨씬 좋아집니다.`,improvement:``},A_AC_CP:{manner:`신인을 코칭할 때의 말투는 차분하고 이성적으로 설명하면서도, 상대의 반응을 계속 살피는 말투입니다. TOP1이 A라서 이 성향은 감정에 휘둘리지 않고 상황을 정리해 설명합니다. “지금 단계에서는 이 순서가 좋아”, “이렇게 하면 실수가 줄어들어”처럼 이유와 근거를 붙여 말합니다. TOP2가 AC이기 때문에 신인의 표정, 말투, 반응을 잘 살피며 “혹시 부담되면 말해도 돼”, “지금 이 속도 괜찮아?” 같은 배려의 말이 자연스럽게 나옵니다. 그래서 신인은 이 코치님를 차분하고 친절하며, 나를 신경 써주는 사람으로 느낍니다.
-
-다만 BOTTOM1이 CP라서 기준을 세우고 단호하게 말하는 힘이 약한 편입니다. 이로 인해 코칭에서 “해도 되고 안 해도 되는 느낌”, “지금 당장 해야 하는지 잘 모르겠는 느낌”을 줄 수 있습니다. 특히 잘 못 따라오는 신인에게는 배려는 많은데 방향과 기준이 흐려져, 오히려 더 헷갈릴 수 있습니다. 신인은 “편하긴 한데, 정확히 뭘 해야 하는지는 모르겠다”고 느낄 가능성이 있습니다.
-
-이 성향의 핵심 보완은 기준을 먼저 말하고, 그 다음에 배려를 붙이는 순서를 의식하는 것입니다. 단호함을 키운다고 해서 무섭게 말할 필요는 없습니다. “지금은 이걸 해야 하는 시점이야”라는 기준 한 문장만 분명히 해도 코칭의 힘이 달라집니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 단계에서는 이 행동이 꼭 필요해, 이건 선택이 아니라 기본이야.”
-부드럽지만 기준을 분명히 세우는 문장입니다.
-
-두 번째 고정 멘트는
-“어렵게 느껴질 수는 있어도, 오늘은 여기까지는 반드시 가보자.”
-배려 속에 단호함을 담은 말입니다.
-
-세 번째 고정 멘트는
-“내가 옆에서 도울게, 대신 이 부분은 오늘 꼭 해보자.”
-신인을 지지하면서도 책임을 분명히 하는 문장입니다.
-
-이 고정 멘트를 사용하면 이 성향은 배려만 많은 코치님가 아니라, 방향과 기준을 잡아주는 믿음직한 코치님가 됩니다. 신인은 안정감과 함께 “지금 내가 뭘 해야 하는지”를 분명히 알게 되고, 행동으로 옮길 힘이 생깁니다.`,improvement:``},A_AC_NP:{manner:`신인을 코칭할 때의 말투는 차분하고 이성적으로 설명하면서, 신인의 반응을 세심하게 살피는 말투입니다. TOP1이 A이기 때문에 감정보다는 사실과 순서를 중심으로 말합니다. “지금 상황을 보면 먼저 이걸 하는 게 좋아”, “이 단계에서는 이렇게 움직이는 게 효율적이야”처럼 이유와 구조를 분명히 설명합니다. TOP2가 AC라서 신인의 표정, 말투, 눈빛을 잘 보고 “지금 너무 빠르지 않아?”, “이 정도면 괜찮아?”처럼 부담을 줄이려는 말도 자주 합니다. 그래서 신인은 이 코치님를 논리적이고 신중하며, 나를 불편하게 하지 않으려는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 NP라서 따뜻한 공감과 감정적인 지지가 부족하게 느껴질 수 있습니다. 이 성향은 마음으로 다독이는 말보다, 상황 설명과 해결 방법을 먼저 꺼냅니다. 그래서 잘 못 따라오는 신인은 “틀린 건 아닌데, 좀 차갑게 느껴져”, “이해는 되는데 마음이 힘들다”고 느낄 수 있습니다. 코치님은 배려하고 있다고 생각하지만, 신인은 정서적인 응원을 충분히 받지 못했다고 느낄 가능성이 있습니다.
-
-이 성향의 핵심 보완은 설명 전에 공감 한 문장을 먼저 말하는 것입니다. 길게 위로할 필요는 없고, 짧은 감정 인정만 있어도 코칭의 온도가 달라집니다. “힘들겠다”, “여기서 막히는 게 당연해” 같은 말이 먼저 나오면, 뒤에 오는 논리가 훨씬 잘 전달됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“여기서 헷갈리는 거 정말 자연스러워, 많은 사람들이 이 단계에서 멈춰.”
-신인의 감정을 먼저 인정해 주는 문장입니다.
-
-두 번째 고정 멘트는
-“잘 안 되는 게 네가 부족해서가 아니라, 과정이 원래 어려워서 그래.”
-신인의 자책을 줄여주는 말입니다.
-
-세 번째 고정 멘트는
-“지금까지 여기까지 온 것만 해도 충분히 잘하고 있어, 이제 다음 단계만 같이 보자.”
-정서적 지지 뒤에 방향을 제시하는 문장입니다.
-
-이 고정 멘트를 사용하면 이 성향은 차갑게 느껴질 수 있는 논리형 코치님에서, 이성과 배려, 따뜻함이 균형 잡힌 코치님로 바뀝니다. 신인은 마음이 먼저 안정되고, 그 다음에 설명을 받아들이게 되며, 포기하지 않고 계속 따라올 힘을 얻게 됩니다.`,improvement:``},A_AC_FC:{manner:`신인을 코칭할 때의 말투는 차분하고 이성적이면서도, 상대의 반응을 살피는 조심스러운 말투입니다. TOP1이 A라서 감정에 휘둘리기보다는 사실과 순서를 중심으로 설명합니다. “지금은 이 순서로 가는 게 좋아”, “이 단계에서 이걸 먼저 하면 실수가 줄어들어”처럼 이유와 구조를 분명히 말합니다. TOP2가 AC라서 신인의 표정과 분위기를 잘 보고, 부담을 주지 않으려는 말도 곁들입니다. “너무 빠르면 말해도 돼”, “이 정도 속도 괜찮아?”처럼 상대를 배려하는 표현이 자연스럽게 나옵니다.
-
-하지만 BOTTOM1이 FC라서 밝은 감정 표현이나 응원, 분위기를 띄우는 말이 부족해 보일 수 있습니다. 코치님은 진지하게 도와주고 있다고 생각하지만, 신인은 “설명은 잘 해주는데 재미가 없다”, “맞는 말인데 기운이 안 난다”고 느낄 수 있습니다. 특히 잘 못 따라오는 신인은 이미 위축돼 있는데, 말투가 차분하고 진지하다 보니 더 긴장하거나 스스로를 딱딱한 사람으로 느끼게 될 수 있습니다.
-
-이 성향의 코치님은 일부러라도 감정 표현을 한 단계 더 보태는 연습이 필요합니다. 크게 웃거나 과하게 칭찬할 필요는 없고, 짧고 분명한 긍정 표현만 추가해도 충분합니다. 설명만 바로 들어가기보다, 먼저 분위기를 풀어주는 한 문장을 얹는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“여기까지 온 거 보면 생각보다 잘하고 있어, 속도는 조금만 같이 맞춰보자.”
-신인의 긴장을 낮추면서 방향을 잡아주는 말입니다.
-
-두 번째 고정 멘트는
-“완벽할 필요 없어, 지금은 연습 단계니까 편하게 해도 돼.”
-진지함 속에서 부담을 덜어주는 문장입니다.
-
-세 번째 고정 멘트는
-“이건 누구나 처음엔 막혀, 그래도 네가 포기 안 하고 있는 게 좋아.”
-감정적인 응원을 짧게 담은 말입니다.
-
-이 고정 멘트를 사용하면 이 성향은 차분하고 배려 깊은 코치님에 따뜻함이 더해진 모습이 됩니다. 신인은 안전하다고 느끼고, 마음이 풀리면서 설명을 더 잘 받아들이게 됩니다. 그 결과, 잘 못 따라오던 신인도 부담을 덜고 다시 시도할 힘을 얻게 됩니다.`,improvement:``},FC_CP_NP:{manner:`신인을 코칭할 때의 말투는 밝고 에너지 넘치면서도 기준이 분명한 말투입니다. TOP1이 FC라서 코치님은 분위기를 살리고, 말에 감정과 리듬이 살아 있습니다. “괜찮아, 다시 해보자!”, “이건 생각보다 잘했어!”처럼 즉각적인 반응과 표정이 함께 나옵니다. 신인은 처음엔 이 말투 덕분에 긴장이 풀리고, 코치님와 대화하는 것이 편하다고 느낍니다. 여기에 TOP2가 CP라서 장난만 치지는 않습니다. “이건 꼭 지켜야 해”, “여기서는 이렇게 해야 돼”처럼 기준과 규칙을 분명하게 제시합니다. 그래서 이 성향의 코치님은 재미있지만 흐트러지지 않는 지도자로 보입니다.
-
-하지만 BOTTOM1이 NP라서 신인의 감정이나 사정을 충분히 헤아리는 말이 부족해질 수 있습니다. 코치님은 “분위기도 살려주고, 기준도 알려줬으니 충분히 도와줬다”고 느끼지만, 잘 못 따라오는 신인은 “내 마음은 잘 안 물어봐 주는 것 같다”, “힘든 이유를 말할 틈이 없다”고 느낄 수 있습니다. 특히 이 성향은 신인이 힘들어 보일 때도 “에이, 이 정도는 다 해”, “웃으면서 해보자”처럼 넘겨버리는 말이 나오기 쉬워, 신인은 혼자 버티는 느낌을 받을 수 있습니다.
-
-그래서 이 성향의 코치님은 밝은 말과 기준 제시에 앞서, 신인의 상태를 한 번 짚는 말을 의식적으로 넣어야 합니다. 긴 상담이 필요한 것은 아니고, 짧은 공감 문장 하나면 충분합니다. 이 한 문장이 들어가면 신인은 “나를 보고 있구나”라고 느끼게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 표정 보니까 조금 버거운 것 같아, 어디가 제일 어려워?”
-신인의 감정을 먼저 확인하는 말입니다.
-
-두 번째 고정 멘트는
-“못해서가 아니라 아직 익숙하지 않은 거야, 천천히 가도 괜찮아.”
-신인의 자존감을 지켜주는 문장입니다.
-
-세 번째 고정 멘트는
-“네 입장에서는 이 부분이 힘들 수 있어, 그래도 내가 옆에서 같이 볼게.”
-혼자가 아니라는 메시지를 주는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 밝음과 기준에 따뜻한 배려가 더해진 코치님가 됩니다. 신인은 더 이상 웃음과 기준에 밀리지 않고, 마음을 열고 질문하게 됩니다. 그 결과, 잘 못 따라오던 신인도 감정적으로 안정되고, 코칭을 오래 버틸 힘을 갖게 됩니다.`,improvement:``},FC_CP_A:{manner:`신인을 코칭할 때의 말투는 밝고 감정이 살아 있으면서도 기준이 분명한 말투입니다. TOP1이 FC라서 코치님은 표정과 말에 에너지가 있고, “괜찮아!”, “다시 해보면 돼!”처럼 분위기를 살리는 말을 자주 씁니다. 신인은 처음에 이 말투 덕분에 긴장이 풀리고, 코치님가 친근하다고 느낍니다. 여기에 TOP2가 CP라서 “이건 반드시 지켜야 해”, “여기서는 이렇게 해야 해”처럼 규칙과 기준을 분명히 말합니다. 그래서 이 성향은 재미있지만 느슨하지 않은 코치님로 보입니다.
-
-하지만 BOTTOM1이 A라서 차분하게 상황을 정리하고 이유를 설명하는 말이 부족해지기 쉽습니다. 코치님은 감정과 기준으로 빠르게 말하지만, 신인은 “왜 이렇게 해야 하는지”, “지금 내가 어디서 막힌 건지”를 충분히 이해하지 못할 수 있습니다. 그 결과, 신인은 혼란스러워지고 “열심히 하라는 말은 많은데 정리가 안 된다”고 느낄 수 있습니다. 특히 잘 못 따라오는 신인에게는 감정적인 격려와 단호한 지시가 오히려 부담이 될 수 있습니다.
-
-그래서 이 성향의 코치님은 말을 하기 전에 한 번 멈추고 정리하는 문장을 의식적으로 넣어야 합니다. 길게 설명할 필요는 없고, 핵심만 짚어주는 말이면 충분합니다. 이 한 문장이 들어가면 신인은 머릿속이 정리되고, 행동으로 옮기기 쉬워집니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 단계에서 해야 할 건 딱 한 가지야, 이것부터 해보자.”
-복잡함을 줄여주는 말입니다.
-
-두 번째 고정 멘트는
-“왜 이걸 하는지부터 말해줄게, 이게 되면 다음이 쉬워져.”
-이유를 알려주는 문장입니다.
-
-세 번째 고정 멘트는
-“지금은 속도보다 순서가 중요해, 순서만 맞추면 충분해.”
-신인의 불안을 낮춰주는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 밝음과 기준 위에 정리가 더해진 코치님가 됩니다. 신인은 감정에 휩쓸리지 않고 상황을 이해하게 되고, 잘 못 따라오던 신인도 “이제 뭘 해야 할지 알겠다”는 느낌을 받게 됩니다. 그 결과 코칭은 훨씬 안정적으로 이어집니다.`,improvement:``},FC_CP_AC:{manner:`신인을 코칭할 때의 말투는 밝고 에너지가 있으면서도 기준이 분명한 말투입니다. TOP1이 FC라서 코치님은 표정과 목소리에 힘이 있고, “괜찮아, 다시 해보자”, “지금 분위기 좋아”처럼 감정을 살리는 말을 자주 씁니다. 이 덕분에 신인은 처음엔 긴장이 풀리고, 코치님가 친근하고 재미있다고 느낍니다. 여기에 TOP2가 CP라서 “이건 꼭 지켜야 해”, “여기서는 이렇게 해야 해”처럼 규칙과 기준을 또렷하게 말합니다. 그래서 이 성향은 분위기는 살리되 기준은 흐리지 않는 코치님로 보입니다.
-
-하지만 BOTTOM1이 AC라서 신인의 반응이나 눈치를 다소 덜 살피고, 말이 단호하고 직설적으로 나갈 때가 있습니다. 코치님은 “지금 이건 아니야”, “그렇게 하면 안 돼”라고 빠르게 말하지만, 신인은 마음의 준비가 덜 된 상태일 수 있습니다. 그러면 신인은 “혼난 느낌”, “말할 틈이 없는 느낌”을 받을 수 있고, 질문을 참고 따라오기만 하게 됩니다. 특히 잘 못 따라오는 신인에게는 이 말투가 부담이 되어 위축될 수 있습니다.
-
-그래서 이 성향의 코치님은 단호한 말 앞이나 뒤에 한 문장의 완충 표현을 의식적으로 넣는 것이 중요합니다. 기준은 그대로 유지하되, 신인의 마음을 먼저 한 번 확인해 주는 말이 필요합니다. 이렇게 하면 단호함이 차가움으로 느껴지지 않습니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 이 부분은 기준상 안 맞아, 대신 이렇게 하면 바로 좋아질 거야.”
-단호함과 대안을 함께 주는 말입니다.
-
-두 번째 고정 멘트는
-“내가 지금은 분명하게 말할게, 너를 돕기 위해서야.”
-직설적인 말을 받아들이기 쉽게 만드는 문장입니다.
-
-세 번째 고정 멘트는
-“어려울 수 있어, 그래도 이건 꼭 넘어가야 하는 단계야.”
-신인의 감정을 인정하면서 기준을 지키는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 밝음과 기준에 배려가 더해진 코치님가 됩니다. 신인은 “엄격하지만 나를 생각해준다”고 느끼고, 잘 못 따라오던 신인도 위축되지 않고 다시 시도할 용기를 얻게 됩니다. 결국 코칭은 더 오래, 더 안정적으로 이어집니다.`,improvement:``},FC_NP_CP:{manner:`신인을 코칭할 때의 말투는 밝고 부드러우며 정서적으로 안전한 말투입니다. TOP1이 FC라서 코치님은 표정과 목소리에 에너지가 있고, “괜찮아”, “지금도 충분히 잘하고 있어” 같은 말을 자주 합니다. 분위기를 살리고 긴장을 풀어 주는 데 능숙해 신인은 코치님와 있으면 편하다고 느낍니다. 여기에 TOP2가 NP라서 “힘들지?”, “천천히 가도 돼”, “네 입장 이해해”처럼 공감과 배려의 말이 자연스럽게 나옵니다. 그래서 이 성향의 코치님은 다정하고 따뜻한 사람으로 인식됩니다.
-
-하지만 BOTTOM1이 CP라서 기준과 원칙을 분명하게 말하는 데는 다소 약한 편입니다. 신인이 과제를 미루거나 규칙을 어겨도 “괜찮아, 다음에 하면 돼”라고 넘기기 쉽고, 잘못된 부분을 바로 잡기보다는 위로를 먼저 하게 됩니다. 그 결과 신인은 마음은 편하지만, “어디까지가 기준인지”, “지금 뭘 꼭 해야 하는지”를 헷갈릴 수 있습니다. 잘 못 따라오는 신인은 오히려 방향을 잃고 제자리걸음을 하게 됩니다.
-
-그래서 이 성향의 코치님은 따뜻한 말 뒤에 기준을 한 문장으로 붙이는 연습이 필요합니다. 공감은 유지하되, 행동 기준을 분명히 말해야 신인이 성장합니다. 감정과 기준을 함께 주는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“힘든 건 이해해, 그래도 오늘은 여기까지는 꼭 해보자.”
-공감 뒤에 행동 기준을 붙이는 말입니다.
-
-두 번째 고정 멘트는
-“괜찮다고 말해주고 싶지만, 이건 지금 바로 고쳐야 해.”
-다정함 속에 분명함을 담은 문장입니다.
-
-세 번째 고정 멘트는
-“네 편이지만, 이 규칙은 지켜야 더 오래 갈 수 있어.”
-관계와 원칙을 동시에 지키는 말입니다.
-
-이 고정 멘트를 쓰면 이 성향은 따뜻하지만 흐리지 않은 코치님가 됩니다. 신인은 “편한데도 방향이 보인다”고 느끼고, 잘 못 따라오던 신인도 무엇을 고쳐야 하는지 명확히 알게 됩니다. 그 결과 코칭은 감정 위로에 머물지 않고 실제 성장을 만들어 냅니다.`,improvement:``},FC_NP_A:{manner:`인을 코칭할 때의 말투는 밝고 부드럽고 감정 중심적인 말투입니다. TOP1이 FC라서 코치님은 표정이 밝고 말에 에너지가 있습니다. “괜찮아, 다시 하면 돼”, “지금도 열심히 하고 있어”처럼 분위기를 살리는 말을 자주 쓰고, 신인이 긴장하지 않도록 웃으며 말을 건넵니다. TOP2가 NP이기 때문에 상대 마음을 먼저 살피며 “힘들지?”, “네 마음 이해해” 같은 공감 표현이 자연스럽습니다. 그래서 신인은 이 코치님를 편하고 따뜻한 사람, 나를 지켜주는 어른처럼 느낍니다.
-
-하지만 BOTTOM1이 A라서 상황을 차분히 정리해서 설명하거나, 왜 이걸 해야 하는지 논리적으로 말하는 데는 약한 편입니다. 신인이 일을 잘 못 따라오면 “괜찮아, 마음 쓰지 마”라고 말해주지만, 무엇이 문제인지, 다음에 뭘 바꿔야 하는지는 분명히 정리해 주지 못하는 경우가 생깁니다. 그러다 보니 신인은 위로는 받았지만 “그래서 내가 다음에 뭘 해야 하지?” 하고 헷갈릴 수 있습니다. 감정은 안정되지만 방향이 흐려지는 것입니다.
-
-그래서 이 성향의 코치님은 공감 뒤에 꼭 한 번은 정리해서 말하는 연습이 필요합니다. 길게 설명할 필요는 없고, 핵심만 차분히 붙이면 충분합니다. 감정 → 정리 → 다음 행동, 이 순서를 의식하는 것이 중요합니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 마음이 힘든 건 이해해, 그래서 정리하면 오늘은 이 한 가지만 해보자.”
-공감 후에 행동을 정리해 주는 말입니다.
-
-두 번째 고정 멘트는
-“괜찮아라고 말해주고 싶고, 동시에 지금 이 부분은 다시 연습해야 해.”
-위로와 판단을 함께 담은 문장입니다.
-
-세 번째 고정 멘트는
-“천천히 가도 돼, 대신 오늘 목표는 여기까지야.”
-속도는 배려하되 기준은 분명히 하는 말입니다.
-
-이 고정 멘트를 반복하면 이 성향은 따뜻하면서도 방향을 잡아주는 코치님로 바뀝니다. 신인은 감정적으로 보호받으면서도, 다음 행동을 분명히 알게 되고 잘 못 따라오던 신인도 점점 안정적으로 성장하게 됩니다.`,improvement:``},FC_NP_AC:{manner:`신인을 코칭할 때의 말투는 밝고 부드럽지만, 생각보다 직설적인 말투입니다. TOP1이 FC라서 코치님은 표정이 밝고 말에 에너지가 있으며, 분위기를 무겁게 만들지 않습니다. “괜찮아, 다시 해보자”, “지금도 충분히 잘하고 있어”처럼 신인의 긴장을 풀어주는 말을 자연스럽게 씁니다. TOP2가 NP이기 때문에 신인의 마음을 먼저 살피고, 감정을 공감해 주는 말도 많습니다. 그래서 신인은 이 코치님를 편하고 따뜻한 사람, 이야기해도 안전한 어른으로 느낍니다.
-
-하지만 BOTTOM1이 AC라서 신인의 눈치를 다소 덜 보며, 규칙이나 기준을 말할 때는 생각보다 단호해질 수 있습니다. 감정적으로는 따뜻하지만, “이건 안 되는 거야”, “그렇게 하면 안 돼” 같은 말이 갑자기 튀어나와 신인이 놀랄 수 있습니다. 코치님 입장에서는 솔직하고 분명하게 말한 것인데, 신인에게는 마음의 준비 없이 맞는 말처럼 느껴질 수 있습니다. 그래서 신인은 “좋은 사람인데, 가끔 말이 갑자기 세다”라고 느끼기도 합니다.
-
-이 성향의 코치님은 공감 → 기준 → 선택권의 순서를 의식적으로 지키는 것이 중요합니다. 먼저 마음을 충분히 받아주고, 그 다음에 기준을 말하며, 마지막에는 신인이 따라올 수 있는 여지를 주어야 합니다. 기준만 말하고 끝내면 신인은 위축되고, 공감만 하면 행동이 바뀌지 않습니다. 이 균형이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“네가 힘든 건 이해해, 그래도 이 부분은 우리가 지켜야 하는 기준이야.”
-공감과 기준을 함께 담은 문장입니다.
-
-두 번째 고정 멘트는
-“지금은 감정이 먼저일 수 있어, 그래서 선택지는 두 가지야. 같이 정해보자.”
-단호함을 부드럽게 바꾸는 말입니다.
-
-세 번째 고정 멘트는
-“나는 너 편이야, 그래서 이건 분명히 말해줄게.”
-따뜻함 속에서 직설을 전달하는 문장입니다.
-
-이 고정 멘트를 반복하면, 이 성향은 밝고 따뜻하지만 무섭지 않은 코치님로 바뀝니다. 신인은 마음의 안정감을 느끼면서도 기준을 이해하게 되고, 잘 못 따라오던 신인도 “그래도 이 코치님은 나를 믿고 말해준다”는 신뢰 속에서 성장하게 됩니다.`,improvement:``},FC_A_CP:{manner:`신인을 코칭할 때의 말투는 부드럽고 차분하며, 분위기를 편안하게 만드는 말투입니다. TOP1이 FC라서 코치님은 표정과 말이 밝고 친근합니다. 신인이 긴장하면 먼저 웃어 주고, “괜찮아, 처음엔 다 그래”처럼 부담을 낮춰 줍니다. TOP2가 A이기 때문에 감정에만 끌려가지 않고, 상황을 정리해서 설명합니다. “지금 단계는 이거고, 다음은 이거야”처럼 순서를 잡아 주며 논리적으로 말합니다. 그래서 신인은 이 코치님를 편하고 이해 잘 해주는 사람으로 느끼고, 질문하기도 어렵지 않습니다.
-
-하지만 BOTTOM1이 CP라서 기준을 세우고 단호하게 말하는 힘이 약한 편입니다. 규칙을 어겼을 때도 “다음엔 좀 더 신경 써보자”처럼 부드럽게 넘기기 쉬워, 신인은 “이 정도는 괜찮은가 보다”라고 오해할 수 있습니다. 코치님은 분위기를 깨고 싶지 않아 강한 말을 아끼지만, 그 결과 기준이 흐려질 수 있습니다. 이때 신인은 편안함은 느끼지만, 무엇이 맞고 틀린지는 헷갈릴 수 있습니다.
-
-그래서 이 성향의 코치님은 밝음과 논리 위에 ‘분명한 기준 한 문장’을 얹는 연습이 필요합니다. 감정 공감과 설명은 이미 충분하니, 마지막에 기준을 또렷하게 말해 주는 것이 핵심입니다. 화를 낼 필요는 없고, 짧고 분명하면 됩니다. 말의 톤은 그대로 두고, 내용만 분명하게 하면 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“분위기는 괜찮아, 다만 이건 우리 팀 기준이라 꼭 지켜야 해.”
-
-두 번째 고정 멘트는
-“지금 상황은 이해했어, 그리고 이 부분은 예외 없이 이렇게 가는 거야.”
-
-세 번째 고정 멘트는
-“편하게 가도 돼, 대신 이 기준만큼은 꼭 기억하자.”
-
-이 고정 멘트를 반복하면, 이 성향은 편안하지만 흐리지 않은 코치님가 됩니다. 신인은 마음 놓고 질문하면서도, 어디까지가 허용이고 어디부터가 기준인지 분명히 알게 됩니다. 그 결과 잘 못 따라오던 신인도 방향을 잃지 않고, 안정적으로 성장하게 됩니다.`,improvement:``},FC_A_NP:{manner:`신인을 코칭할 때의 말투는 밝고 부드러우며 차분한 설명형 말투입니다. TOP1이 FC라서 코치님은 표정이 밝고 말에 온기가 있습니다. 신인이 실수해도 먼저 웃으며 분위기를 풀고, “처음엔 누구나 헷갈릴 수 있어”처럼 긴장을 낮춰 줍니다. 덕분에 신인은 이 코치님 앞에서 위축되지 않고 질문도 비교적 편하게 합니다. TOP2가 A이기 때문에 말이 감정에만 흐르지 않고, 상황을 정리해서 설명해 줍니다. “지금 단계에서는 이걸 먼저 하고, 그다음에 이걸 하면 돼”처럼 순서를 잡아 주는 말이 많아 이해가 쉽습니다.
-
-하지만 BOTTOM1이 NP라서 공감과 감정 다독임이 부족하게 느껴질 수 있습니다. 코치님은 친절하고 밝지만, 신인의 마음 상태를 깊게 살피며 “지금 마음이 어때?”라고 묻는 말은 상대적으로 적습니다. 그래서 신인은 “잘 설명해 주긴 하는데, 내 마음까지 이해받는 느낌은 조금 부족하다”고 느낄 수 있습니다. 특히 실적이 안 나오거나 자신감이 떨어진 신인에게는, 논리적인 설명만으로는 위로가 충분하지 않을 수 있습니다.
-
-이 성향의 코치님은 밝음과 논리 사이에 ‘짧은 공감 한 문장’을 의식적으로 넣는 것이 중요합니다. 길게 위로할 필요는 없고, 먼저 마음을 인정해 주는 말 한마디만 있어도 신인의 반응이 달라집니다. 예를 들어 설명을 시작하기 전에 “요즘 마음이 좀 힘들었겠다” 같은 말을 먼저 건네는 것입니다. 그러면 신인은 “이 코치님가 나를 사람으로 보고 있구나”라고 느끼게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 결과가 안 나와서 속상할 수 있어, 그 마음은 충분히 이해해.”
-
-두 번째 고정 멘트는
-“네가 여기까지 온 것만 해도 쉽지 않았어, 그 점은 분명히 잘한 거야.”
-
-세 번째 고정 멘트는
-“마음이 흔들릴 수 있는 시기야, 그래도 내가 옆에서 같이 볼게.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향은 밝고 설명 잘하는 코치님에서, 마음까지 챙겨주는 코치님로 바뀝니다. 신인은 부담 없이 다가오면서도, 감정적으로 혼자가 아니라는 느낌을 받게 됩니다. 그 결과 잘 못 따라오던 신인도 다시 힘을 얻고, 포기하지 않고 한 걸음씩 나아갈 수 있게 됩니다.`,improvement:``},FC_A_AC:{manner:`신인을 코칭할 때의 말투는 부드럽고 친근하지만, 말의 내용은 차분하고 이성적인 설명형 말투입니다. TOP1이 FC라서 코치님은 표정이 밝고 분위기를 편안하게 만듭니다. 신인이 긴장해 있으면 먼저 웃으며 말을 걸고, “괜찮아, 누구나 처음엔 헷갈려” 같은 말로 부담을 낮춰 줍니다. 그래서 신인은 이 코치님 앞에서 비교적 편하게 질문하고, 실수를 숨기지 않고 말하려는 태도를 보입니다. TOP2가 A이기 때문에 말이 감정적으로 흐르지 않고, “지금은 이 단계야”, “이건 이렇게 하면 돼”처럼 상황을 정리해 주는 설명이 많아 이해도 잘 됩니다.
-
-하지만 BOTTOM1이 AC라서 조직의 규칙이나 기준을 분명하게 밀어붙이는 힘은 다소 약한 편입니다. 코치님은 신인이 규칙을 어기거나 루틴을 지키지 않아도, 분위기를 깨고 싶지 않아서 강하게 말하지 못할 때가 있습니다. 그래서 말투는 부드럽지만, 신인 입장에서는 “이건 꼭 지켜야 하는 건지, 선택인 건지”가 헷갈릴 수 있습니다. 특히 자기관리나 행동 기준이 약한 신인은 이 틈을 느끼고 흐트러질 가능성도 있습니다.
-
-이 성향의 코치님은 밝음과 논리 위에 ‘기준을 분명히 말하는 한 문장’을 의식적으로 얹는 것이 중요합니다. 화를 낼 필요도 없고 딱딱해질 필요도 없습니다. 대신 웃는 얼굴로라도 “이건 선택이 아니라 약속이야”라는 말을 분명히 해야 합니다. 그러면 신인은 무섭지 않게, 하지만 명확하게 기준을 인식하게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“편하게 하되, 이 부분만큼은 꼭 지켜야 하는 약속이야.”
-
-두 번째 고정 멘트는
-“분위기는 부드러워도, 이 행동 기준은 모두에게 동일해.”
-
-세 번째 고정 멘트는
-“웃으면서 말하지만, 이건 정말 중요해서 다시 한 번 강조할게.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향은 좋은 분위기만 만드는 코치님가 아니라, 편안하지만 흔들리지 않는 코치님로 바뀝니다. 신인은 부담 없이 다가오면서도, 어디까지가 허용이고 어디부터가 기준인지 명확히 알게 됩니다. 그 결과 잘 따라오지 못하던 신인도 행동의 선이 잡히고, 조직 안에서 안정적으로 성장할 수 있게 됩니다.`,improvement:``},FC_AC_CP:{manner:`신인을 코칭할 때의 말투는 아주 친절하고 공감이 많은 말투입니다. TOP1이 FC라서 코치님은 표정이 밝고 말이 부드러우며, 신인이 긴장하거나 실수했을 때 먼저 분위기를 풀어 줍니다. “괜찮아, 처음엔 다 그래”, “지금 단계에선 이 정도면 잘하고 있어”처럼 감정을 다독이는 말이 자연스럽게 나옵니다. TOP2가 AC이기 때문에 신인의 표정과 반응을 잘 살피며, 상처받지 않도록 말의 수위를 조절합니다. 그래서 신인은 이 코치님를 편하고 따뜻한 사람, 내 편이 되어주는 사람으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 CP라서 기준을 세우고 단호하게 말하는 힘이 약한 편입니다. 신인이 약속을 어기거나, 루틴을 건너뛰거나, 같은 실수를 반복해도 “다음엔 잘하자” 정도로 넘어갈 때가 많습니다. 코치님은 분위기가 깨질까 봐, 신인이 멀어질까 봐 강하게 말하지 못합니다. 그 결과 신인은 “이건 꼭 지켜야 하는 건가?”, “조금 늦어도 괜찮은 건가?” 하고 기준을 헷갈릴 수 있습니다. 착하고 성실한 신인에게는 문제가 없지만, 자기 관리가 약한 신인에게는 성장 속도가 느려질 위험이 있습니다.
-
-이 성향의 코치님은 따뜻함 위에 ‘명확한 기준 한 문장’을 의식적으로 올려야 합니다. 목소리를 높일 필요도 없고 무섭게 말할 필요도 없습니다. 다정한 말투 그대로, 하지만 기준만큼은 분명히 말하는 연습이 필요합니다. “미안하지만”, “혹시” 같은 완충어를 줄이고, 짧고 분명한 문장을 쓰는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“나는 너를 아끼지만, 이 기준은 꼭 지켜야 해.”
-
-두 번째 고정 멘트는
-“기분 상하게 하려는 건 아니고, 이건 우리 팀의 약속이야.”
-
-세 번째 고정 멘트는
-“괜찮다고 넘기고 싶지만, 너 성장을 위해서는 여기서 선을 지켜야 해.”
-
-이 고정 멘트를 반복해서 사용하면, 이 성향의 코치님은 좋은 사람에서 끝나는 코치님가 아니라, 따뜻하지만 중심이 있는 코치님가 됩니다. 신인은 사랑받는 느낌을 유지하면서도, 어디까지가 허용이고 어디부터가 반드시 지켜야 할 기준인지 분명히 알게 됩니다. 그 순간 신인의 행동이 안정되고, 성장 속도도 눈에 띄게 달라집니다.`,improvement:``},FC_AC_NP:{manner:`신인을 코칭할 때의 말투는 아주 부드럽고 조심스러운 말투입니다. TOP1이 FC라서 코치님은 표정이 밝고 분위기를 잘 살리며, 신인이 긴장하지 않도록 먼저 웃어 주고 말을 쉽게 꺼냅니다. “괜찮아, 천천히 해도 돼”, “지금도 충분히 잘하고 있어” 같은 말이 자연스럽게 나옵니다. TOP2가 AC이기 때문에 신인의 눈빛과 표정, 말투 변화에 민감합니다. 혹시 상처받지 않을까, 기분이 상하지 않을까를 계속 살피며 말을 고릅니다. 그래서 신인은 이 코치님를 편하고 다정한 사람, 나를 이해해 주는 어른으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 NP라서 따뜻하게 감싸 주는 말과 응원의 말이 부족해지기 쉬운 성향입니다. 겉으로는 웃고 있지만, 진심으로 “너를 믿는다”, “너라서 괜찮다”는 메시지가 자주 전달되지 않을 수 있습니다. 코치님은 행동과 분위기로는 배려를 하지만, 말로 마음을 안아 주는 표현은 상대적으로 적습니다. 그래서 신인 중에는 “나를 싫어하는 건 아닌데, 진짜 응원받고 있는지는 잘 모르겠다”라고 느끼는 경우도 생길 수 있습니다.
-
-이 성향의 코치님은 이미 충분히 친절하고 예의 바르기 때문에, 더 잘하려면 의식적으로 ‘따뜻한 말 한 문장’을 추가해야 합니다. 길게 설명할 필요도 없고 감정적인 연설을 할 필요도 없습니다. 짧고 분명한 인정의 말, 신인의 편이라는 메시지를 자주 말로 표현하는 것이 중요합니다. FC와 AC가 이미 관계를 부드럽게 만들어 주고 있으므로, NP 한 문장만 더해도 코칭의 온도가 크게 올라갑니다.
-
-개선 시 고정 멘트 첫 번째는
-“나는 네가 잘해낼 거라고 진심으로 믿어.”
-
-두 번째 고정 멘트는
-“속도가 조금 느려도 괜찮아, 지금 방향은 맞아.”
-
-세 번째 고정 멘트는
-“네가 여기까지 온 것만 봐도 충분히 잘하고 있어.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향의 코치님은 편한 사람을 넘어 마음을 지지해 주는 코치님가 됩니다. 신인은 눈치 보지 않고 질문할 수 있고, 실수해도 다시 도전할 용기를 얻게 됩니다. 그 결과 신인은 더 오래 버티고, 더 안정적으로 성장하게 됩니다.`,improvement:``},FC_AC_A:{manner:`신인을 코칭할 때의 말투는 아주 부드럽고 조심스러운 말투입니다. TOP1이 FC라서 코치님은 밝은 표정과 친근한 분위기를 잘 만듭니다. 신인이 긴장하면 먼저 웃어 주고, 말이 막히면 “괜찮아, 편하게 말해도 돼”라고 분위기를 풀어 줍니다. TOP2가 AC이기 때문에 신인의 표정, 말투, 반응을 계속 살피며 말을 고릅니다. 혹시 상처받지 않을지, 부담을 느끼지 않을지를 먼저 생각합니다. 그래서 말투는 전반적으로 둥글고 부드럽고 배려 중심적입니다. 신인은 이 코치님를 “편한 사람”, “나를 이해해 주는 어른”으로 느끼기 쉽습니다.
-
-하지만 BOTTOM1이 A라서 논리적으로 정리해 주는 말, 기준을 잡아 주는 설명이 부족해지기 쉬운 성향입니다. 공감은 많은데, “그래서 지금 뭘 하면 되는지”, “다음 단계는 무엇인지”가 명확하지 않을 수 있습니다. 코치님은 마음을 먼저 헤아리다 보니 결론을 흐리게 말하거나, 판단을 신인에게 맡겨 버리는 경우도 생깁니다. 그 결과 신인은 “위로는 되는데, 정확히 뭘 해야 할지는 헷갈린다”고 느낄 수 있습니다.
-
-이 성향의 코치님은 이미 관계 형성과 정서적 안정에는 강점이 있으므로, 의식적으로 ‘정리된 한 문장’을 추가하는 것이 핵심 보완 포인트입니다. 감정을 더 얹을 필요는 없고, 이미 충분합니다. 대신 지금 상황을 한 줄로 정리하고, 다음 행동을 분명히 말해 주는 연습이 필요합니다. 부드러운 말투는 그대로 유지하되, 결론만 또렷하게 말하면 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 상황을 정리하면, 오늘은 이 한 가지만 하면 돼.”
-
-두 번째 고정 멘트는
-“여기까지는 잘 왔고, 다음 단계는 이거야.”
-
-세 번째 고정 멘트는
-“네 마음은 이해했고, 그래서 선택은 이렇게 하자.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 성향의 코치님은 다정하면서도 방향을 잡아 주는 코치님로 바뀝니다. 신인은 감정적으로 안정감을 느끼면서도, 무엇을 해야 할지 명확히 알게 됩니다. 그 결과 망설임이 줄고 실행력이 높아지며, 코칭에 대한 신뢰도도 함께 올라가게 됩니다.`,improvement:``},AC_CP_NP:{manner:`신인을 코칭할 때의 말투는 조심스럽지만 단호함이 섞인 말투입니다. TOP1이 AC라서 코치님은 신인의 표정과 반응을 먼저 살핍니다. 말 한마디가 신인에게 부담이 되지는 않을지, 기분이 상하지는 않을지 자연스럽게 신경을 씁니다. 그래서 말투는 공격적이지 않고 비교적 차분합니다. 다만 TOP2가 CP이기 때문에, 기준과 규칙이 분명한 부분에서는 생각보다 직설적으로 말이 나옵니다. “이건 원칙이야”, “이건 꼭 지켜야 해”라는 말이 비교적 쉽게 나옵니다. 신인은 이 코치님를 보며 “배려는 있는데 기준이 분명한 사람”이라고 느끼게 됩니다.
-
-하지만 BOTTOM1이 NP라서 따뜻하게 감싸 주는 말, 괜찮다고 다독이는 말이 부족해지기 쉬운 성향입니다. 코치님은 신인의 어려움을 이해하고 있으면서도, 그것을 말로 충분히 표현하지 못합니다. 그래서 신인은 “맞는 말이긴 한데 마음이 좀 차갑게 느껴진다”, “혼나는 느낌이 든다”고 받아들일 수 있습니다. 특히 성과가 안 나는 시기에는, 신인이 정서적으로 위축되기 쉽습니다.
-
-이 성향의 코치님은 이미 규칙과 방향 제시는 잘하고 있으므로, 의식적으로 ‘따뜻한 한 문장’을 먼저 꺼내는 연습이 필요합니다. 기준을 말하기 전에 감정을 한 번 받아 주는 것만으로도 코칭의 분위기가 크게 달라집니다. 단호함을 줄일 필요는 없고, 순서를 바꾸는 것이 핵심입니다. 공감 → 기준 → 행동 순서로 말하면 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“네가 어려운 상황이라는 건 진심으로 이해해, ”
-
-두 번째 고정 멘트는
-“그래도 우리 팀 기준에서는 이건 꼭 지켜야 해.”
-
-세 번째 고정 멘트는
-“내가 너를 믿기 때문에 이 기준을 말하는 거야.”
-
-이 고정 멘트를 의식적으로 사용하면, 이 코치님은 차갑게 느껴질 수 있는 단호함을 신뢰로 바꿀 수 있습니다. 신인은 “나를 혼내는 게 아니라 키우려는 말이구나”라고 느끼게 되고, 지적을 방어하지 않고 받아들이게 됩니다. 그 결과 코칭이 잔소리가 아니라 성장의 안내로 작동하게 됩니다.`,improvement:``},AC_CP_A:{manner:`신인을 코칭할 때의 말투는 조심스럽고 배려가 많지만, 기준을 말할 때는 딱 잘라 말하는 말투입니다. TOP1이 AC이기 때문에 코치님은 신인의 표정, 말투, 분위기를 먼저 느낍니다. “지금 이 말이 부담이 되지는 않을까?”, “기분이 상하지는 않을까?”를 자연스럽게 생각합니다. 그래서 처음 말은 부드럽고 낮은 톤으로 시작하는 경우가 많습니다. 하지만 TOP2가 CP라서, 기준이나 규칙을 이야기할 때는 생각보다 단호해집니다. “이건 꼭 지켜야 해”, “이건 선택이 아니야” 같은 말이 분명하게 나옵니다. 신인은 이 코치님를 보며 “배려는 있는데 기준이 확실한 사람”이라고 느낍니다.
-
-다만 BOTTOM1이 A이기 때문에 이 상황을 왜 해야 하는지, 어떤 이유로 중요한지 논리적으로 풀어주는 설명이 부족해지기 쉽습니다. 코치님은 기준을 제시하지만, 그 기준의 이유를 충분히 설명하지 않고 넘어가는 경우가 많습니다. 그래서 신인은 “왜 그런지는 잘 모르겠는데 그냥 하라고 하네”라고 느낄 수 있습니다. 이때 신인이 이해가 느리거나 질문이 많으면, 코치님은 속으로 답답함을 느끼면서도 겉으로는 참고 넘기는 경우가 많습니다.
-
-이 성향의 코치님은 단호함을 줄일 필요는 없고, 기준 앞에 ‘이유 한 줄’을 붙이는 연습이 필요합니다. 감정 배려는 이미 잘하고 있으므로, 여기에 짧은 설명만 더해도 코칭의 설득력이 크게 올라갑니다. 길게 설명할 필요는 없고, 중학생도 이해할 수 있는 한 문장이면 충분합니다.
-
-개선 시 고정 멘트 첫 번째는
-“이걸 지키는 이유는 네가 더 빨리 성장할 수 있기 때문이야.”
-
-두 번째 고정 멘트는
-“지금은 불편할 수 있지만, 나중에 너 스스로를 지켜주는 기준이야.”
-
-세 번째 고정 멘트는
-“그냥 하라는 말이 아니라, 너에게 꼭 필요한 과정이야.”
-
-이 고정 멘트를 사용하면, 이 코치님은 배려 많은 사람에서 ‘이해시키는 리더’로 인식이 바뀝니다. 신인은 기준을 강요로 느끼지 않고, “아, 이건 나를 위한 말이구나”라고 받아들이게 됩니다. 그 결과 코칭이 지시가 아니라 납득과 행동으로 이어지게 됩니다.`,improvement:``},AC_CP_FC:{manner:`신인을 코칭할 때의 말투는 전체적으로 차분하고 조심스럽지만, 기준을 말할 때는 분명히 선을 긋는 말투입니다. TOP1이 AC이기 때문에 이 코치님은 신인의 표정, 말투, 반응을 매우 잘 살핍니다. “지금 이 말이 부담되지는 않을까?”, “혹시 상처받지 않을까?”를 먼저 느끼며 말을 고릅니다. 그래서 처음 이야기를 꺼낼 때는 목소리가 크지 않고, 속도를 늦추며 부드럽게 시작합니다. 다만 TOP2가 CP이기 때문에, 해야 할 일과 하지 말아야 할 일에 대해서는 분명한 기준을 제시합니다. “이건 반드시 지켜야 해”, “이건 넘어갈 수 없어” 같은 말이 비교적 또렷하게 나옵니다. 신인은 이 코치님를 보며 “배려는 많지만 기준은 확실한 사람”이라고 느낍니다.
-
-하지만 BOTTOM1이 FC이기 때문에 밝은 격려, 분위기를 살리는 말, 감정적으로 에너지를 올려주는 표현이 부족해지기 쉽습니다. 코치님은 진지하고 성실한 코칭은 잘하지만, 신인을 가볍게 웃게 하거나 “잘하고 있어!”, “생각보다 괜찮아!” 같은 감정적 응원을 자주 쓰지 못하는 편입니다. 그래서 신인은 “틀린 말은 아닌데, 좀 딱딱하다”, “잘하고 있는지 잘 모르겠다”라고 느낄 수 있습니다. 특히 지치거나 자신감이 떨어진 신인에게는 코치님의 말이 맞아도 힘이 덜 전달될 수 있습니다.
-
-이 성향의 코치님은 기준을 낮출 필요는 전혀 없고, 말의 끝에 감정을 살짝 얹는 연습이 필요합니다. 길게 칭찬할 필요도, 과하게 웃을 필요도 없습니다. 짧은 한마디만 더해도 신인의 에너지가 달라집니다. 핵심은 “맞다”와 “괜찮다”를 말로 표현해 주는 것입니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 방향은 맞아, 그래서 계속 가면 돼.”
-
-두 번째 고정 멘트는
-“완벽하진 않아도, 여기까지 온 건 분명 잘한 거야.”
-
-세 번째 고정 멘트는
-“네가 생각하는 것보다 지금 훨씬 괜찮아.”
-
-이 고정 멘트를 사용하면, 이 코치님은 차갑게 보일 수 있는 리더에서 믿고 따라갈 수 있는 리더로 인식이 바뀝니다. 신인은 기준을 지키면서도 정서적으로 안정감을 느끼게 되고, 코칭이 부담이 아니라 힘이 되는 시간으로 받아들여집니다. 결과적으로 신인의 지속력과 몰입도가 함께 올라가게 됩니다.`,improvement:``},AC_NP_CP:{manner:`신인을 코칭할 때의 말투는 아주 부드럽고 조심스러우며, 상대 마음을 먼저 살피는 말투입니다. TOP1이 AC이기 때문에 이 코치님은 신인의 표정, 말의 뉘앙스, 분위기 변화를 빠르게 알아차립니다. “지금 이 말이 부담되지 않을까?”, “혹시 기분 상하지 않을까?”를 먼저 느끼며 말을 꺼냅니다. 그래서 코칭을 시작할 때도 명령형보다는 질문형이 많고, 속도를 늦춰 차분하게 설명합니다. 여기에 TOP2가 NP이기 때문에 말투에는 따뜻함과 공감이 자연스럽게 묻어납니다. “그럴 수 있어”, “처음엔 다 그래”, “네 입장도 이해돼” 같은 말이 자주 나옵니다. 신인은 이 코치님를 보며 “나를 이해해 주는 사람”, “편하게 이야기할 수 있는 사람”이라고 느낍니다.
-
-하지만 BOTTOM1이 CP이기 때문에 기준을 세우는 말, 선을 긋는 말, 단호한 표현이 약해지기 쉽습니다. 신인이 약속을 어기거나 같은 실수를 반복해도, 마음이 상할까 봐 강하게 말하지 못하고 넘어가는 경우가 생깁니다. 그래서 신인은 어느 순간 “조금 느슨해도 괜찮은가 보다”, “이건 꼭 안 지켜도 되는구나”라고 오해할 수 있습니다. 코치님은 분명 좋은 의도로 배려하지만, 기준이 말로 또렷하게 전달되지 않으면 코칭의 힘이 약해집니다.
-
-이 성향의 코치님은 차갑게 말할 필요는 전혀 없고, 부드러운 말 안에 기준을 담는 연습이 필요합니다. 목소리를 높이거나 무섭게 말하는 것이 아니라, 짧고 분명한 문장을 추가하는 것이 핵심입니다. “이해해” 다음에 “그래도 이건 지켜야 해”를 붙이는 연습입니다.
-
-개선 시 고정 멘트 첫 번째는
-“네 상황은 이해해, 그래도 이건 꼭 지켜야 해.”
-
-두 번째 고정 멘트는
-“힘든 건 알아, 하지만 이 부분은 약속이야.”
-
-세 번째 고정 멘트는
-“괜찮다고 넘어갈 수는 없어, 여기까지는 기준이야.”
-
-이 고정 멘트를 쓰기 시작하면, 이 코치님은 착하기만 한 코치님가 아니라 신뢰할 수 있는 코치님로 인식됩니다. 신인은 보호받는 느낌과 함께 방향을 분명히 알게 되고, 조직의 규칙과 기대치를 자연스럽게 받아들이게 됩니다. 결과적으로 코칭은 더 안정되고, 신인의 성장 속도도 빨라집니다.`,improvement:``},AC_NP_A:{manner:`신인을 코칭할 때의 말투는 아주 조심스럽고 배려가 많으며, 먼저 마음을 다독이는 말투입니다. TOP1이 AC이기 때문에 이 코치님은 신인의 표정과 분위기에 민감하고, 말 한마디가 상처가 될까 늘 살핍니다. TOP2가 NP라서 따뜻한 공감이 자연스럽게 따라옵니다. “그럴 수 있어”, “처음엔 다 헷갈려”, “네 마음 이해해” 같은 말이 먼저 나오고, 신인은 이 코치님를 편안하고 안전한 사람으로 느낍니다. 질문도 부드럽고 속도도 느려서, 신인이 긴장하지 않고 이야기를 꺼내기 좋습니다.
-
-하지만 BOTTOM1이 A이기 때문에 정리된 기준과 이유 설명, 선택의 우선순위를 말로 구조화하는 힘이 약해지기 쉽습니다. 공감은 충분한데, “그래서 다음에 정확히 뭐부터 할까?”, “이건 왜 중요한가?” 같은 판단 질문이 빠질 수 있습니다. 그러다 보니 신인은 위로는 받지만 행동이 또렷해지지 않거나, 다음 단계가 모호해질 수 있습니다. 이 성향의 코치님은 신인을 배려하다가 결론을 흐리게 만드는 경우가 생깁니다.
-
-개선의 핵심은 공감 뒤에 짧은 정리 문장을 붙이는 것입니다. 길게 설명할 필요는 없고, 한 문장으로 방향만 또렷하게 잡아주면 됩니다. 차갑게 말할 필요도 없습니다. 따뜻함을 유지한 채, 판단의 기준을 덧붙이는 연습이 중요합니다.
-
-개선 시 고정 멘트 첫 번째는
-“네 마음은 이해해, 그래서 지금은 이 한 가지만 하자.”
-
-두 번째 고정 멘트는
-“힘든 건 알겠어, 하지만 오늘의 우선순위는 이거야.”
-
-세 번째 고정 멘트는
-“괜찮아, 다만 다음 단계는 이렇게 가는 게 맞아.”
-
-이 고정 멘트를 사용하면, 이 코치님은 배려만 하는 코치님가 아니라 길을 보여주는 코치님가 됩니다. 신인은 감정적으로 안정된 상태에서 해야 할 행동을 명확히 알게 되고, 혼란이 줄어듭니다. 결과적으로 코칭은 더 분명해지고, 신인의 실행력도 자연스럽게 올라갑니다.`,improvement:``},AC_NP_FC:{manner:`신인을 코칭할 때의 말투는 차분하고 조심스러우며, 상대의 반응을 살피는 말투입니다. TOP1이 AC라서 이 코치님은 신인의 표정과 말투 변화에 민감하고, 말이 강해질까 봐 한 번 더 고르고 말합니다. 규칙과 절차를 중요하게 여기고, “이건 이렇게 하는 게 맞아”, “회사 기준은 이거야”처럼 질서를 지키는 방향으로 이야기합니다. TOP2가 NP이기 때문에 말의 시작은 늘 따뜻합니다. “괜찮아”, “처음이라 그럴 수 있어”, “네 입장 이해해” 같은 말이 먼저 나오고, 신인은 이 코치님를 믿을 수 있고 착한 사람으로 느낍니다.
-
-하지만 BOTTOM1이 FC라서 밝은 에너지, 표정, 분위기를 살리는 말이 부족해지기 쉽습니다. 코칭이 지나치게 조용해지거나, 분위기가 무거워질 수 있습니다. 신인이 잘한 부분이 있어도 “좋았어!”보다는 “문제는 없었어” 정도로 지나가 버리기 쉽고, 웃음이나 리액션이 적어 신인은 “내가 잘하고 있는 건가?” 하고 헷갈릴 수 있습니다. 이 성향의 코치님은 신인을 존중하지만, 응원받는 느낌은 약해질 수 있습니다.
-
-그래서 개선의 핵심은 의식적으로 밝은 말과 반응을 더하는 것입니다. 성격을 바꾸라는 게 아니라, 말의 온도만 조금 올리는 연습입니다. 짧은 칭찬, 가벼운 웃음, 감탄 한마디만 추가해도 충분합니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 이 부분은 정말 잘했어, 생각보다 훨씬 좋아.”
-
-두 번째 고정 멘트는
-“완벽하진 않아도, 오늘 여기까지 온 건 분명한 성과야.”
-
-세 번째 고정 멘트는
-“조금씩 늘고 있어, 이 흐름이면 충분히 해낼 수 있어.”
-
-이 고정 멘트를 쓰기 시작하면, 이 코치님은 질서와 배려를 지키면서도 분위기를 살리는 코치님가 됩니다. 신인은 혼나지 않는다는 안정감에 더해, “나 잘하고 있구나”라는 힘을 얻습니다. 그 힘이 쌓이면 행동 속도가 빨라지고, 코칭 현장은 훨씬 살아 움직이게 됩니다.`,improvement:``},AC_A_CP:{manner:`신인을 코칭할 때의 말투는 조심스럽고 차분하며, 이성적으로 설명하려는 말투입니다. TOP1이 AC라서 이 성향은 먼저 신인의 눈빛과 표정을 살피고, 말이 상처가 되지 않을지를 한 번 더 고민합니다. “괜찮아?”, “너무 힘들진 않아?” 같은 말이 먼저 나오고, 신인이 불편해할 수 있는 표현은 최대한 피하려고 합니다. TOP2가 A이기 때문에 감정적으로 몰아붙이기보다는 “이 상황을 보면”, “지금 결과를 기준으로 보면”처럼 이유와 근거를 설명하는 방식으로 말합니다. 신인은 이 코치님를 차분하고 논리적인 사람, 그리고 불필요한 감정 기복이 없는 안정적인 어른으로 느낍니다.
-
-하지만 BOTTOM1이 CP라서 기준을 분명하게 세우는 말, 단호하게 끊어주는 말, 행동을 바로잡는 말이 부족해지기 쉽습니다. 신인이 약속을 지키지 않거나 같은 실수를 반복해도, “다음엔 잘하면 돼”, “사정이 있었겠지” 하고 넘어가 버릴 수 있습니다. 이 코치님은 규칙을 몰라서 못 말하는 게 아니라, 말을 꺼내는 순간 신인이 상처받을까 봐 망설이는 성향입니다. 그 결과 신인은 편안함은 느끼지만, 어디까지가 허용이고 어디부터가 안 되는지 헷갈릴 수 있습니다. 시간이 지나면 “이 정도는 괜찮겠지”라는 느슨함이 생길 위험도 있습니다.
-
-그래서 이 성향의 개선 포인트는 차갑게 혼내는 것이 아니라, 기준을 말로 분명히 꺼내는 연습입니다. 감정을 억누르거나 성격을 바꾸는 게 아니라, 기준을 문장으로 꺼내는 훈련입니다. 말투는 여전히 부드러워도 괜찮습니다. 대신 내용은 명확해야 합니다.
-
-개선 시 고정 멘트 첫 번째는
-“이건 네가 잘하고 못하고의 문제가 아니라, 우리가 꼭 지켜야 하는 기준이야.”
-
-두 번째 고정 멘트는
-“사정은 이해하지만, 이 부분은 다음에도 같으면 안 돼.”
-
-세 번째 고정 멘트는
-“여기까지는 괜찮고, 여기부터는 분명히 고쳐야 해.”
-
-이 고정 멘트를 꾸준히 쓰면, 이 코치님은 배려만 있는 코치님가 아니라 기준까지 세워주는 코치님가 됩니다. 신인은 혼났다는 느낌보다 “아, 여기 선은 넘으면 안 되는구나”를 배우게 됩니다. 그 순간부터 코칭은 더 안정되고, 신인의 성장 속도도 훨씬 빨라집니다.`,improvement:``},AC_A_NP:{manner:`신인을 코칭할 때의 말투는 조심스럽고 부드러우며, 상황을 먼저 살피는 말투입니다. TOP1이 AC라서 이 코치님은 말을 꺼내기 전에 항상 신인의 표정과 반응을 봅니다. “지금 말해도 괜찮을까?”, “혹시 부담되진 않을까?”를 먼저 생각하며, 강한 표현보다는 완곡한 표현을 씁니다. TOP2가 A이기 때문에 감정에 휩쓸려 말하기보다는 “지금 결과를 보면”, “이 과정을 기준으로 보면”처럼 이유와 근거를 들어 설명하는 말투를 사용합니다. 그래서 신인은 이 코치님를 차분하고 이성적인 사람, 말을 함부로 하지 않는 어른으로 느끼게 됩니다.
-
-하지만 BOTTOM1이 NP라서 공감과 정서적인 격려가 말로 잘 나오지 않는 편입니다. 마음속으로는 신인을 걱정하고 응원하지만, “힘들었겠다”, “그래도 여기까지 온 게 대단해” 같은 말이 자연스럽게 나오지 않습니다. 대신 해결 방법이나 구조부터 설명하려다 보니, 신인은 “맞는 말이긴 한데 마음은 잘 안 알아주는 것 같다”고 느낄 수 있습니다. 이 코치님은 차갑게 굴려고 하는 게 아니라, 어떻게 위로의 말을 해야 하는지 잘 몰라서 건너뛰는 경우가 많습니다.
-
-그래서 이 성향의 코치님은 공감의 말을 의식적으로 먼저 꺼내는 연습이 필요합니다. 길게 위로할 필요는 없습니다. 짧아도 괜찮지만, 순서는 꼭 지켜야 합니다. 설명보다 공감이 먼저입니다. 그래야 신인은 마음을 닫지 않고 말을 듣게 됩니다.
-
-개선 시 고정 멘트 첫 번째는
-“일단 여기까지 온 것 자체가 쉬운 건 아니야.”
-
-두 번째 고정 멘트는
-“이 부분에서 막히는 건 누구나 한 번쯤 겪는 거야.”
-
-세 번째 고정 멘트는
-“힘들었을 텐데도 계속 해보려는 건 분명 장점이야.”
-
-이 고정 멘트를 먼저 말한 뒤에, 그 다음에 구조와 방법을 설명하면 됩니다. 그러면 이 코치님은 눈치를 보느라 말 못 하는 코치님가 아니라, 공감으로 문을 열고 이성으로 방향을 잡아주는 코치님가 됩니다. 신인은 “이 사람은 나를 이해하면서도 기준을 잃지 않는구나”라고 느끼게 되고, 코칭에 대한 신뢰도 훨씬 높아집니다.`,improvement:``},AC_A_FC:{manner:`신인을 코칭할 때의 말투는 조용하고 차분하며, 신인의 반응을 많이 살피는 말투입니다. TOP1이 AC인 이 코치님은 신인을 대할 때 항상 “이 말을 해도 괜찮을까?”, “기분 상하지 않을까?”를 먼저 생각합니다. 그래서 말이 부드럽고 공격적인 표현을 거의 쓰지 않습니다. 명령형보다는 “이렇게 해보는 건 어때요?”, “이 방법도 한 번 생각해볼 수 있어요”처럼 제안형 말투를 자주 사용합니다. TOP2가 A이기 때문에 감정적으로 몰아붙이기보다는 “지금 상황을 보면”, “과정상 여기에서 막히는 게 자연스러워요”처럼 이유와 흐름을 설명하는 말을 곁들입니다. 신인은 이 코치님를 차분하고 이성적이며, 함부로 혼내지 않는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 FC라서 밝은 격려, 분위기를 살리는 말, 가볍게 웃어주는 표현이 부족한 편입니다. 이 코치님은 진지하게 돕고 싶어 하지만 표정이 굳어 있거나 말투가 너무 차분해서, 신인은 “혼나는 건 아닌데 왠지 무겁다”, “분위기가 딱딱해서 더 긴장된다”고 느낄 수 있습니다. 즐겁게 해도 되는 상황에서도 지나치게 진지해져서, 신인의 긴장을 풀어주지 못하는 경우가 생깁니다. 이건 관심이 없어서가 아니라, 어떻게 밝게 풀어야 할지 익숙하지 않아서입니다.
-
-그래서 이 성향의 코치님은 의식적으로 분위기를 가볍게 만드는 말을 연습해야 합니다. 크게 웃거나 농담을 잘할 필요는 없습니다. 짧고 소소한 긍정 표현이면 충분합니다. 신인이 숨을 쉴 수 있는 여지를 먼저 만들어줘야 합니다. 그 다음에 설명을 해도 늦지 않습니다.
-
-개선 시 고정 멘트 첫 번째는
-“처음 치고는 여기까지 온 거면 꽤 잘한 거야.”
-
-두 번째 고정 멘트는
-“지금은 완벽하지 않아도 괜찮아, 연습하는 단계니까.”
-
-세 번째 고정 멘트는
-“이건 너무 심각하게 볼 일은 아니고, 한 단계씩 가면 돼.”
-
-이 고정 멘트를 먼저 던져주면 신인의 얼굴이 풀립니다. 그 다음에 이 코치님가 가진 A의 강점으로 차분하게 방향과 기준을 설명하면 됩니다. 그러면 이 코치님은 눈치를 보느라 말 못 하는 코치님가 아니라, 분위기를 안정시키고 신인을 편하게 만든 뒤 이성적으로 이끌어주는 코치님가 됩니다. 신인은 “이 사람 앞에서는 실수해도 괜찮다”고 느끼게 되고, 그 순간부터 행동 속도가 훨씬 빨라집니다.`,improvement:``},AC_FC_CP:{manner:`신인을 코칭할 때의 말투는 부드럽고 친근하며, 분위기를 살리는 말투입니다. TOP1이 AC인 이 성향은 기본적으로 상대의 표정과 기분을 먼저 살피는 말투를 씁니다. 그래서 신인이 긴장하면 바로 느끼고, 말의 강도를 낮추며 “괜찮아?”, “너무 부담 갖지 않아도 돼” 같은 말을 자연스럽게 건넵니다. TOP2가 FC이기 때문에 웃음, 농담, 가벼운 공감 표현도 많습니다. “이건 다들 한 번씩 겪어”, “나도 처음엔 더 심했어” 같은 말로 신인의 마음을 풀어줍니다. 신인은 이 코치님를 편하고 다가가기 쉬운 사람, 혼내지 않는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 CP라서 기준을 분명히 말하는 힘, 단호하게 정리해주는 말이 부족한 편입니다. 규칙을 어겼을 때도 “다음엔 조심하자” 정도로 넘어가거나, 성과가 안 나와도 “요즘 좀 힘들지?”로 끝나는 경우가 많습니다. 이러다 보면 신인은 편해지지만, 어디까지가 괜찮고 어디부터는 안 되는지를 헷갈리게 됩니다. 그 결과, 행동이 느려지고 같은 실수가 반복됩니다. 이 코치님은 신인을 싫어해서가 아니라, 상처 줄까 봐 기준을 말하지 못하는 경우가 많습니다.
-
-그래서 이 성향의 코치님은 부드러움을 유지한 채 기준을 말하는 연습이 꼭 필요합니다. 화를 낼 필요도, 목소리를 높일 필요도 없습니다. 다만 “이건 명확히 지켜야 해”라는 문장을 말로 꺼내는 연습이 필요합니다.
-
-개선 시 고정 멘트 첫 번째는
-“편하게 해도 되지만, 이건 반드시 지켜야 하는 약속이야.”
-
-두 번째 고정 멘트는
-“기분은 이해하지만, 이 부분은 다음엔 꼭 바꿔보자.”
-
-세 번째 고정 멘트는
-“지금은 웃으면서 말하지만, 이건 중요한 기준이야.”
-
-이 고정 멘트를 쓰면, 신인은 혼나는 느낌 없이도 선을 인식하게 됩니다. 그러면 이 코치님은 착한 코치님를 넘어서 편하지만 흐트러지지 않는 코치님가 됩니다. 신인은 “이 사람은 나를 이해해주면서도 방향은 분명히 알려준다”고 느끼게 되고, 그때부터 행동이 훨씬 안정되고 빨라집니다.`,improvement:``},AC_FC_NP:{manner:`신인을 코칭할 때의 말투는 아주 부드럽고 친근하며, 분위기를 먼저 살리는 말투입니다. TOP1이 AC인 이 성향은 기본적으로 상대의 눈치와 반응을 먼저 살피는 말투를 씁니다. 신인이 표정이 어두우면 바로 말을 멈추고, 부담스러워 보이면 “괜찮아, 천천히 해도 돼”라고 말합니다. TOP2가 FC이기 때문에 말투에는 웃음과 농담이 섞여 있고, 분위기를 가볍게 만드는 표현이 많습니다. “이 정도면 잘하고 있어”, “처음엔 다 이래” 같은 말로 신인을 편하게 만듭니다. 그래서 신인은 이 코치님를 편하고 재미있는 사람, 무서움이 없는 사람으로 느낍니다.
-
-하지만 BOTTOM1이 NP라서 진짜로 마음을 붙잡아 주는 말, 깊게 공감해 주는 말이 부족한 편입니다. 겉으로는 웃고 괜찮다고 말하지만, 신인의 속마음까지 천천히 들어주거나 “네가 왜 힘든지 이해한다”는 말을 충분히 하지 못하는 경우가 있습니다. 그 결과 신인은 겉으로는 편하지만, 속으로는 “내 마음을 진짜 알아주는 건가?”라는 느낌을 받을 수 있습니다. 또 AC가 높아 다소 신인의 눈치를 보게 되면서, 힘들어 보이면 기준을 낮추거나 중요한 이야기를 미루는 경우도 생깁니다.
-
-이 성향의 코치님은 분위기를 살리는 장점은 그대로 두고, 공감의 말을 의식적으로 늘리는 연습이 필요합니다. 웃어 넘기지 말고, 신인의 감정을 한 번 더 말로 확인해 주는 것이 핵심입니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금 웃고 있지만, 네가 이 부분에서 힘들 수 있다는 건 이해해.”
-
-두 번째 고정 멘트는
-“괜찮다고 말해도, 네 입장에선 쉽지 않았을 것 같아.”
-
-세 번째 고정 멘트는
-“편하게 하자는 말과 별개로, 네 마음은 내가 제대로 듣고 싶어.”
-
-이 고정 멘트를 쓰면 신인은 가볍게 넘겨지는 사람이 아니라, 존중받고 있다고 느끼게 됩니다. 그러면 이 코치님은 단순히 재미있는 코치님를 넘어서, 편안하면서도 믿을 수 있는 코치님가 됩니다. 신인은 마음을 숨기지 않게 되고, 코칭의 깊이가 자연스럽게 깊어집니다.`,improvement:``},AC_FC_A:{manner:`신인을 코칭할 때의 말투는 아주 부드럽고 친근하며, 분위기를 먼저 편안하게 만드는 말투입니다. TOP1이 AC라서 상대의 표정과 반응을 먼저 살피며 말을 꺼냅니다. 신인이 긴장하면 목소리를 낮추고, 부담스러워 보이면 “괜찮아, 천천히 해도 돼”라고 먼저 안심시킵니다. TOP2가 FC이기 때문에 말투에는 웃음, 공감, 가벼운 농담이 섞여 있습니다. “처음엔 다 헷갈려”, “이 정도면 꽤 잘했어” 같은 말로 분위기를 밝게 만들고, 신인이 웃으면 함께 웃어 줍니다. 그래서 신인은 이 코치님를 편하고 재미있는 사람, 무섭지 않은 사람으로 느낍니다.
-
-하지만 BOTTOM1이 A라서 정리된 설명, 이유를 차분히 알려주는 말이 부족해질 수 있습니다. 분위기를 살리느라 “느낌상 이렇게 하면 돼”처럼 감각적인 말이 많아지고, 왜 그렇게 해야 하는지, 다음에 무엇을 하면 되는지에 대한 구조적인 안내가 약해질 수 있습니다. 그 결과 신인은 기분은 좋지만 “그래서 정확히 뭘 해야 하지?”라는 혼란을 느낄 수 있습니다. 또한 AC가 높아 다소 신인의 반응을 의식하다 보니, 꼭 짚어야 할 기준이나 피드백을 부드럽게만 넘길 위험도 있습니다.
-
-이 성향의 코치님은 편안함은 유지하되, 설명을 한 단계 더 정리해서 말하는 연습이 필요합니다. 웃으며 말하되, 핵심을 짧게 정리해 주는 것이 중요합니다. 말의 끝에 ‘이유’와 ‘다음 행동’을 붙이는 습관을 들이면 좋습니다.
-
-개선 시 고정 멘트 첫 번째는
-“지금은 편하게 말할게, 그런데 이유를 하나만 짚어보자.”
-
-두 번째 고정 멘트는
-“느낌은 괜찮은데, 정리하면 이렇게 하면 더 좋아.”
-
-세 번째 고정 멘트는
-“지금 단계에서는 이 한 가지만 기억하면 돼.”
-
-이 고정 멘트를 쓰면 신인은 편안함 속에서도 방향을 잃지 않게 됩니다. 그러면 이 코치님은 재미있는 코치님를 넘어서, 편안하면서도 믿고 따라갈 수 있는 코치님가 됩니다. 신인은 무엇을 왜 해야 하는지 이해하게 되고, 코칭의 속도와 안정감이 함께 올라가게 됩니다.`,improvement:``}},cm6:{},cm7:{CP_NP_A:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
+결국 이 성향의 핵심은 강한 책임감과 상황 정리 능력입니다. 다만 신인이 ‘이 코치는 내 상황도 이해하려고 한다’라는 느낌을 받을 수 있도록 공감의 표현을 조금 더 의식적으로 사용해야 신인의 생산성과 매출도 더 오래 안정적으로 유지될 수 있습니다.`,improvement:``},CP_A_FC:{manner:`이 성향의 코치는 조직 안에서 방향을 잡고 흐름을 정리하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 운영 흐름과 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 부분을 먼저 맞춰야 합니다.”
+“여기서는 흐름이 흔들리면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 상황을 정리하고 분석하려는 힘이 강합니다. 신인의 활동량, 상담 흐름, 고객 반응, 실적 흐름을 비교적 냉정하게 보려고 하며 문제를 발견하면 빠르게 정리해서 해결 방향을 잡으려 합니다. 그래서 신인 입장에서는
+“판단이 빠르고 정확하다.”
+“흐름을 잘 정리해준다.”
+“문제가 생겨도 중심을 잃지 않는다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현이 부족해질 수 있습니다. 코치 본인은 진지하게 이야기하고 있다고 느끼지만 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“가까이 다가가기 쉽지 않다.”
+“계속 긴장하게 된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 방향과 실행 흐름을 안정적으로 끌고 가는 힘은 매우 강하지만, 신인의 긴장감을 풀어주고 편하게 움직이게 만드는 표현이 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 결과 점검만 하는 것이 아니라 신인이 심리적으로 편안하게 움직일 수 있는 분위기를 함께 만들어주는 것이 중요합니다.
+
+특히 FC가 낮은 코치는 의식적으로
+ 미소를 띄고 고개를 끄덕이는 반응을 보여주고
+ 결과 이야기 전에 인정하는 말을 먼저 넣어주고
+ 무거운 분위기를 너무 오래 끌고 가지 않는 습관
+이 중요합니다.
+
+이 성향은 원래 조직을 오래 안정적으로 운영할 수 있는 힘이 매우 강한 성향입니다. 여기에 분위기를 조금 더 편안하게 만드는 표현이 더해지면 신인의 활동량과 상담 움직임, 조직의 에너지와 매출 흐름이 훨씬 살아나게 됩니다.
+
+결국 이 성향의 핵심은 강한 책임감과 상황 정리 능력입니다. 다만 신인이 긴장만 하기보다 편하게 움직일 수 있도록 분위기를 조금 더 부드럽게 만들어줘야 신인의 생산성과 매출도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_A_AC:{manner:`이 성향의 코치는 조직 안에서 방향을 잡고 흐름을 안정적으로 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 운영 흐름과 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 실행 움직임이 중요합니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 상황을 정리하고 분석하려는 힘이 강합니다. 신인의 활동량, 고객 흐름, 상담 진행률, 계약 흐름 등을 비교적 객관적으로 보려고 하며 문제가 생기면 빠르게 원인을 찾고 해결 방향을 정리하려 합니다. 그래서 신인 입장에서는
+“판단이 빠르다.”
+“흐름 정리가 명확하다.”
+“조직 운영이 안정적이다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 상태와 부담 정도를 세밀하게 살피는 부분이 부족해질 수 있습니다. 코치 본인은 조직을 위해 필요한 이야기를 하고 있다고 느끼지만 신인 입장에서는
+“말이 조금 강하게 느껴진다.”
+“결론이 너무 빨리 나온다.”
+“내 상황을 충분히 설명하기 어렵다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 끌고 가는 힘은 매우 강하지만 신인의 현재 상태와 부담 정도를 확인하는 질문이 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 실행 방향을 이야기하기 전에 상대의 현재 흐름을 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는 결과와 행동을 먼저 이야기하기 전에
+“지금 코칭속도는 괜찮으신가요?”
+“요즘 가장 버거운 부분은 어떤 건가요?”
+“이 방향이 부담스럽게 느껴지진 않으신가요?”
+같은 질문을 먼저 넣어주는 것만으로도 신인의 긴장감과 거리감이 크게 줄어들게 됩니다.
+
+또한 신인이 실적이 떨어졌을 때 바로 수정 방향부터 이야기하면 신인은 자신이 이해받지 못한다고 느끼기 쉽습니다. 그래서 먼저 현재 상황을 듣고 난 뒤 행동 방향을 정리해주는 순서가 중요합니다. 공감 없이 바로 결론으로 들어가면 신인은 움직이기보다 방어적으로 변할 가능성이 높아집니다.
+
+그래서 이 성향의 코치는
+“무엇을 바꿀 것인가”보다
+“지금 어떤 상태인가”를 먼저 묻는 습관이 중요합니다.
+
+이 성향은 원래 조직을 강하게 끌고 갈 수 있는 힘이 매우 뛰어난 성향입니다. 여기에 신인의 감정과 부담을 한 번 더 확인하는 표현이 더해지면 활동량과 상담 움직임, 조직의 실행 지속력이 훨씬 안정적으로 살아나게 됩니다.`,improvement:``},CP_FC_NP:{manner:`이 성향의 코치는 조직 안에서 실행력과 분위기를 동시에 끌고 가는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 실행 움직임이 중요합니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 상담 현장이나 회의 분위기가 너무 가라앉지 않도록 에너지를 살리려는 모습도 강하게 나타납니다. 그래서 신인 입장에서는
+“분위기를 답답하지 않게 만든다.”
+“조직 안의 에너지를 살린다.”
+“같이 움직이면 힘이 난다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태와 속마음을 깊게 공감해주는 부분이 부족해질 수 있습니다. 코치 본인은 분위기도 좋고 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결국 결과 중심으로 느껴질 때가 있다.”
+“힘든 상황을 길게 이야기하기 어렵다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 움직임과 분위기를 끌어올리는 힘은 강하지만 신인의 감정을 오래 들어주고 공감하는 부분이 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기를 살리는 것만으로 끝나는 것이 아니라 신인의 현재 상태를 차분하게 들어주는 시간이 함께 필요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 다시 해보면 됩니다.”
+라고 빠르게 넘어가기보다
+“지금 어떤 부분이 가장 힘드셨나요?”
+“최근에 마음이 가장 무거웠던 순간이 언제였나요?”
+처럼 현재 감정 상태를 먼저 물어보는 습관이 중요합니다.
+
+또한 FC가 높은 코치는 조직 분위기를 밝게 만들려는 힘이 강하기 때문에 신인이 보내는 무거운 신호를 가볍게 넘길 가능성도 있습니다. 그래서 분위기를 올리는 말 뒤에는 반드시 현재 상태를 확인하는 질문이 함께 들어가야 신인이 심리적으로 더 오래 버틸 수 있게 됩니다.
+
+이 성향은 원래 조직의 활동량과 움직임을 끌어올리는 힘이 매우 좋은 성향입니다. 여기에 공감과 경청이 조금 더해지면 신인의 안정감과 조직의 유지력이 훨씬 좋아지고 생산성과 매출 흐름도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_FC_A:{manner:`이 성향의 코치는 조직 안에서 실행력과 분위기를 동시에 끌고 가는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 수준을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 현장 분위기가 처지지 않도록 에너지를 끌어올리는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“분위기를 답답하지 않게 만든다.”
+“같이 움직이면 힘이 난다.”
+“조직 안에 에너지가 살아 있다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 끌고 가다가도 실제 문제 원인이나 숫자 흐름을 차분하게 정리하는 부분이 부족해질 수 있습니다. 코치 본인은 열심히 독려하고 분위기를 살리고 있다고 느끼지만 신인 입장에서는
+“무엇부터 정리해야 하는지 헷갈린다.”
+“구체적인 우선순위가 부족하다.”
+“열심히는 하는데 방향이 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 활동량과 분위기를 끌어올리는 힘은 매우 강하지만 실행의 우선순위와 현실적인 정리 부분이 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기를 올리는 것과 동시에 “지금 가장 먼저 해야 할 한 가지”를 명확하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“열심히 해봅시다.”
+라는 독려만 반복하기보다
+“오늘 가장 먼저 해야 하는 건 고객 연락 3건입니다.”
+“이번 주는 상담 약속 확보에 집중해보시죠.”
+처럼 행동 순서를 구체적으로 정리해주는 것이 중요합니다.
+
+또한 FC가 높은 코치는 조직 분위기를 살리는 힘이 좋은 대신 신인의 어려움을 가볍게 넘기거나 현실적인 문제를 정확히 짚지 못하는 경우도 생길 수 있습니다. 그래서 격려 이후에는 반드시 현재 숫자 흐름과 행동량을 차분하게 확인하는 과정이 함께 들어가야 합니다.
+
+이 성향은 원래 조직의 에너지와 활동량을 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 우선순위를 정리해주는 습관과 현실적인 점검이 더해지면 신인의 생산성과 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},CP_FC_AC:{manner:`이 성향의 코치는 조직 안에서 실행력과 분위기를 동시에 끌고 가는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 흐름과 실행 움직임을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 현장 분위기가 처지지 않도록 에너지를 끌어올리는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“현장 에너지가 살아 있다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 상태와 부담 정도를 세밀하게 살피는 부분이 부족해질 수 있습니다. 코치 본인은 분위기도 좋고 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“조금 압박처럼 느껴질 때가 있다.”
+“결론이 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 활동량과 분위기를 끌어올리는 힘은 매우 강하지만 신인의 현재 상태와 부담 정도를 세밀하게 확인하는 질문이 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기를 살리는 것만으로 끝나는 것이 아니라 상대의 현재 상태를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는 분위기를 밝게 만들면서도 중간중간
+“지금 코칭속도는 괜찮으신가요?”
+“요즘 가장 버거운 부분은 어떤 건가요?”
+“지금 이 흐름이 부담스럽게 느껴지진 않으신가요?”
+같은 질문을 함께 넣어주는 것이 중요합니다.
+
+또한 FC가 높은 코치는 조직 분위기를 끌어올리는 힘이 강하기 때문에 신인의 힘든 신호를 가볍게 넘길 가능성도 있습니다. 그래서 격려와 독려 이후에는 반드시 현재 상태와 부담 정도를 차분하게 확인하는 과정이 함께 들어가야 신인이 더 오래 안정적으로 움직이게 됩니다.
+
+이 성향은 원래 조직의 에너지와 실행 움직임을 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 감정과 부담을 한 번 더 살피는 질문이 더해지면 신인의 생산성과 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},CP_AC_NP:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하고 신인을 관리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 방향과 실행 움직임을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 비교적 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고, 조직 안에서 충돌이 커지지 않도록 중간에서 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“조직 분위기를 안정적으로 유지하려고 한다.”
+“강하게 밀어붙이기보다 조율하려 한다.”
+“함부로 부담 주는 말을 하지 않는다.”
+라는 느낌을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 배려하고 있다고 느끼지만 신인 입장에서는
+“정은 있지만 따뜻한 공감은 부족하다.”
+“내 마음을 깊게 이해받는 느낌은 아니다.”
+“결국 실행 이야기로 빨리 넘어간다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 운영하고 흐름을 유지하는 힘은 좋지만 신인의 감정을 깊게 공감하고 심리적으로 안아주는 표현은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 결과와 실행 방향을 이야기하기 전에 신인의 현재 감정 상태를 먼저 들어주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“왜 이것밖에 안 됐을까요?”
+보다
+“요즘 가장 힘든 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 AC가 높은 코치는 조직 분위기를 맞추려는 힘이 있기 때문에 속으로 답답함이 있어도 직접 표현하지 못하고 혼자 끌어안는 경우도 있습니다. 그러다 어느 순간 말이 차갑게 나오거나 거리감이 생길 수 있기 때문에 평소 작은 공감 표현을 자주 사용하는 것이 중요합니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지할 수 있는 힘이 좋은 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 신인의 심리적 안정감과 조직의 유지력이 훨씬 좋아지고 생산성과 매출 흐름도 더 안정적으로 올라가게 됩니다.`,improvement:``},CP_AC_A:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하고 신인을 책임감 있게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 방향과 실행 움직임을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고, 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“조직 분위기를 안정적으로 유지하려고 한다.”
+“말을 함부로 강하게 하지 않는다.”
+“조율하면서 같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 운영하다가도 실제 문제 원인과 우선순위를 차분하게 정리하는 부분이 부족해질 수 있습니다. 코치 본인은 충분히 노력하고 챙기고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 할지 헷갈린다.”
+“이야기는 많은데 정리가 안 되는 느낌이다.”
+“실행 순서가 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 유지하고 관계 흐름을 맞추는 힘은 좋지만 실제 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만으로 끝나는 것이 아니라 “지금 가장 먼저 해야 하는 한 가지”를 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“열심히 해봅시다.”
+라는 격려만 반복하기보다
+“오늘 가장 먼저 해야 하는 건 고객 연락 3건입니다.”
+“이번 주는 상담 약속 확보에 집중해보시죠.”
+처럼 행동 순서를 구체적으로 정리해주는 것이 중요합니다.
+
+또한 AC가 높은 코치는 상대 눈치를 많이 보다가 정작 꼭 해야 하는 말을 늦게 꺼내는 경우도 있습니다. 그러다 어느 순간 답답함이 쌓이면 말이 갑자기 강하게 나올 수 있기 때문에 평소 짧고 분명하게 방향을 정리해주는 습관이 중요합니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지할 수 있는 힘이 좋은 성향입니다. 여기에 실행 우선순위를 명확하게 정리하는 습관이 더해지면 조직의 활동량과 생산성, 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},CP_AC_FC:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하고 신인을 책임감 있게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 CP가 높기 때문에 조직의 방향과 실행 움직임을 중요하게 생각합니다. 그래서 신인에게도
+“지금은 이 흐름을 먼저 맞춰야 합니다.”
+“여기서는 움직임이 끊기면 안 됩니다.”
+같은 말이 자연스럽게 먼저 나오는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고, 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“조직 분위기를 안정적으로 유지하려고 한다.”
+“말을 함부로 강하게 하지 않는다.”
+“조율하면서 같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현이 부족해질 수 있습니다. 코치 본인은 충분히 배려하면서 이야기하고 있다고 느끼지만 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“가까이 다가가기 쉽지 않다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직을 안정적으로 유지하고 흐름을 관리하는 힘은 좋지만 신인이 심리적으로 편하게 움직일 수 있도록 분위기를 풀어주는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 실행 방향과 조율만 하는 것이 아니라 신인이 편하게 이야기할 수 있는 분위기를 만드는 습관이 중요합니다.
+
+특히 이 성향의 코치는 결과와 움직임을 이야기하기 전에
+“요즘 많이 지치진 않으신가요?”
+“지금 코칭속도는 괜찮으신가요?”
+“혼자 너무 무겁게 끌고 가고 계시진 않으신가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 FC가 낮은 코치는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 신인은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지할 수 있는 힘이 매우 좋은 성향입니다. 여기에 신인이 심리적으로 편하게 움직일 수 있는 분위기와 따뜻한 반응이 더해지면 조직의 활동량과 생산성, 매출 흐름이 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_CP_A:{manner:`이 성향의 코치는 조직 안에서 사람을 챙기고 보호하려는 마음이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 신인이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“쉽게 포기하지 않고 끝까지 챙겨준다.”
+“사람을 중요하게 생각한다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 따뜻하기만 한 코치가 아니라 조직의 방향과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고, 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 신인 입장에서는
+“따뜻하지만 중심은 있는 코치다.”
+“조직 흐름을 놓치지 않는다.”
+“결국은 움직이게 만든다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 운영하다가도 실제 문제 원인과 실행 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 챙기고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈린다.”
+“위로는 되는데 정리가 부족하다.”
+“방향이 조금 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 관계를 안정적으로 유지하는 힘은 매우 좋지만 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 격려만으로 끝나는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 명확하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 잘하실 수 있습니다.”
+라는 위로만 반복하기보다
+“오늘 가장 먼저 해야 하는 건 고객 연락 3건입니다.”
+“이번 주는 상담 약속 확보 하나에 집중해보시죠.”
+처럼 행동 순서를 구체적으로 정리해주는 것이 중요합니다.
+
+또한 NP가 높은 코치는 신인이 힘들어하면 너무 오래 감정을 들어주다가 실행 흐름이 늦어지는 경우도 생길 수 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 방향을 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 움직임과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 순서를 명확하게 정리하는 힘이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_CP_FC:{manner:`이 성향의 코치는 조직 안에서 사람을 챙기고 보호하려는 마음이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 신인이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“쉽게 포기하지 않고 끝까지 챙겨준다.”
+“사람을 중요하게 생각한다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 따뜻하기만 한 코치가 아니라 조직의 방향과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고, 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 신인 입장에서는
+“따뜻하지만 중심은 있는 코치다.”
+“조직 흐름을 놓치지 않는다.”
+“결국은 움직이게 만든다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현은 부족해질 수 있습니다. 코치 본인은 충분히 배려하고 있다고 느끼지만 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있도록 분위기를 풀어주는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 실행 방향만 이야기하는 것이 아니라 신인이 편하게 움직일 수 있는 분위기를 함께 만들어주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 중요합니다.
+
+또한 FC가 낮은 코치는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 신인은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+이 성향은 원래 조직을 오래 안정적으로 유지하고 신인을 지켜주는 힘이 매우 좋은 성향입니다. 여기에 밝은 반응과 편안한 분위기가 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_CP_AC:{manner:`이 성향의 코치는 조직 안에서 사람을 챙기고 보호하려는 마음이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 신인이 힘들어하면 먼저 이유를 들으려 하고, 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“쉽게 포기하지 않고 끝까지 챙겨준다.”
+“사람을 중요하게 생각한다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 따뜻하기만 한 코치가 아니라 조직의 방향과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고, 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 신인 입장에서는
+“따뜻하지만 조직 흐름은 놓치지 않는다.”
+“사람을 챙기면서도 실행 움직임은 관리한다.”
+“결국은 다시 움직이게 만든다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 챙기고 배려하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“조금 압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 신인의 현재 부담과 심리 상태를 세밀하게 확인하는 질문은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 격려만 하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 다시 해보면 됩니다.”
+라고 바로 정리하기보다
+“지금 가장 버거운 부분은 어떤 건가요?”
+“요즘 코칭속도는 괜찮으신가요?”
+“지금 어떤 부분에서 가장 부담을 느끼고 계신가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 NP가 높은 코치는 신인을 오래 챙기려는 마음이 강하기 때문에 속으로 답답함이 있어도 참고 넘어가는 경우도 있습니다. 그러다가 어느 순간 말이 갑자기 강하게 나오면 신인은 더 크게 위축될 수 있습니다. 그래서 평소 짧고 부드럽게 현재 상태를 확인하는 습관이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 상대의 부담과 현재 흐름을 한 번 더 확인하는 질문이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_A_CP:{manner:`이 성향의 코치는 조직 안에서 사람을 안정적으로 챙기고 신인의 감정 흐름을 세밀하게 살피려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인이 힘들어하면 먼저 이유를 들으려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“압박보다 안정감을 준다.”
+“사람을 중요하게 생각한다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 감정적으로만 조직을 운영하는 것이 아니라 현실적인 흐름과 숫자도 같이 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 차분하게 정리하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“차분하게 상황을 정리해준다.”
+“무리하게 몰아가지 않는다.”
+“이야기를 들은 뒤 현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 공감하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“움직임을 강하게 끌어주는 느낌은 부족하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 안정감을 유지하는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 이해만으로 끝나는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 천천히 해봅시다.”
+라는 말만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP가 높은 코치는 신인이 힘들어하면 너무 오래 감정을 들어주다가 실제 행동 흐름이 늦어지는 경우도 생길 수 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 방향을 짧게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 움직임을 조금 더 분명하게 끌어주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_A_FC:{manner:`이 성향의 코치는 조직 안에서 사람을 안정적으로 챙기고 신인의 감정 흐름을 세밀하게 살피려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인이 힘들어하면 먼저 이유를 들으려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“압박보다 안정감을 준다.”
+“사람을 중요하게 생각한다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 감정적으로만 조직을 운영하는 것이 아니라 현실적인 흐름과 숫자도 같이 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 차분하게 정리하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“차분하게 상황을 정리해준다.”
+“무리하게 몰아가지 않는다.”
+“이야기를 들은 뒤 현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현은 부족해질 수 있습니다. 코치 본인은 충분히 배려하고 차분하게 이야기하고 있다고 느끼지만 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 현실적인 정리만 하는 것이 아니라 신인이 “편하게 움직일 수 있는 분위기”를 함께 만들어주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 중요합니다.
+
+또한 FC가 낮은 코치는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 신인은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 밝은 반응과 편안한 분위기가 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_A_AC:{manner:`이 성향의 코치는 조직 안에서 사람을 안정적으로 챙기고 신인의 감정 흐름을 세밀하게 살피려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인이 힘들어하면 먼저 이유를 들으려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“압박보다 안정감을 준다.”
+“사람을 중요하게 생각한다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 감정적으로만 조직을 운영하는 것이 아니라 현실적인 흐름과 숫자도 같이 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 차분하게 정리하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“차분하게 상황을 정리해준다.”
+“무리하게 몰아가지 않는다.”
+“이야기를 들은 뒤 현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 배려하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“조금 압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 안정감을 유지하는 힘은 매우 좋지만 신인의 현재 부담과 심리 상태를 세밀하게 확인하는 질문은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 현실적인 정리만 하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 다시 해보면 됩니다.”
+라고 바로 정리하기보다
+“지금 가장 버거운 부분은 어떤 건가요?”
+“요즘 코칭속도는 괜찮으신가요?”
+“지금 어떤 부분에서 가장 부담을 느끼고 계신가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 NP가 높은 코치는 신인을 오래 챙기려는 마음이 강하기 때문에 속으로 답답함이 있어도 참고 넘어가는 경우도 있습니다. 그러다가 어느 순간 말이 갑자기 강하게 나오면 신인은 더 크게 위축될 수 있습니다. 그래서 평소 짧고 부드럽게 현재 상태를 확인하는 습관이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 상대의 부담과 현재 흐름을 한 번 더 확인하는 질문이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_FC_CP:{manner:`이 성향의 코치는 조직 안에서 사람을 편안하게 만들고 분위기를 밝게 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“정서적으로 안정감을 준다.”
+“사람을 진심으로 챙긴다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 공감하고 격려하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 느슨해질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 잘될 겁니다.”
+라는 격려만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP와 FC가 함께 높은 코치는 신인과 관계가 좋아지는 대신 분위기가 너무 편안해져 실행 긴장감이 약해질 가능성도 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 명확하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 움직임을 조금 더 분명하게 끌어주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_FC_A:{manner:`이 성향의 코치는 조직 안에서 사람을 편안하게 만들고 분위기를 밝게 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“정서적으로 안정감을 준다.”
+“사람을 진심으로 챙긴다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 감정 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 공감하고 격려하고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈린다.”
+“위로는 되는데 정리가 부족하다.”
+“열심히는 하는데 방향이 흐려질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력은 매우 좋지만 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 잘될 겁니다.”
+라는 격려만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP와 FC가 함께 높은 코치는 신인과 관계가 좋아지는 대신 분위기가 너무 편안해져 실행 긴장감이 약해질 가능성도 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 명확하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 우선순위를 정리해주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_FC_AC:{manner:`이 성향의 코치는 조직 안에서 사람을 편안하게 만들고 분위기를 밝게 유지하는 힘이 매우 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인의 감정 상태와 어려움을 잘 살피려고 합니다. 그래서 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“정서적으로 안정감을 준다.”
+“사람을 진심으로 챙긴다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며, 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 공감하고 편안한 분위기를 만들고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“좋은 분위기인데도 압박처럼느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력은 매우 좋지만 신인의 현재 부담과 심리 상태를 세밀하게 확인하는 질문은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+
+또한 NP와 FC가 함께 높은 코치는 조직 분위기를 너무 편안하게 유지하려다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 어느 순간 답답함이 쌓이면 말이 갑자기 강하게 나올 수 있기 때문에 평소 짧고 부드럽게 현재 상태를 확인하면서도 실행 움직임은 분명하게 정리해주는 습관이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 상대의 부담과 현재 흐름을 한 번 더 확인하는 질문이 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_AC_CP:{manner:`조합의 코치는 조직 안에서 사람을 안정적으로 챙기고 신인의 감정 흐름과 조직 분위기를 부드럽게 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 챙기고 배려하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만으로 끝나는 것이 아니라 “지금 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“괜찮습니다. 천천히 해봅시다.”
+라는 말만 반복하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 NP와 AC가 함께 높은 코치는 신인의 부담을 너무 배려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 조직 분위기가 느슨해지면 활동량과 상담 움직임도 함께 떨어질 가능성이 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 움직임을 조금 더 분명하게 끌어주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_AC_A:{manner:`이 성향의 코치는 조직 안에서 사람을 안정적으로 챙기고 신인의 감정 흐름과 조직 분위기를 부드럽게 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 감정과 분위기 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 챙기고 배려하고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈린다.”
+“좋은 분위기인데 방향이 흐려질 때가 있다.”
+“위로는 되는데 정리가 부족하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 실행 우선순위와 현실적인 정리 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만 하는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 너무 오래 위로와 공감만 이어가기보다, 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“지금 여러 가지를 한꺼번에 하려고 하기보다 이번 주는 상담 약속 확보 하나에 집중해보시지요.”
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 NP와 AC가 함께 높은 코치는 신인의 부담을 너무 배려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 조직 분위기가 느슨해지면 활동량과 상담 움직임도 함께 떨어질 가능성이 있습니다. 그래서 충분히 공감해준 뒤에는 반드시 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 실행 우선순위를 정리해주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},NP_AC_FC:{manner:`이 성향의 코치는 조직 안에서 사람을 안정적으로 챙기고 신인의 감정 흐름과 조직 분위기를 부드럽게 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 NP가 높기 때문에 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습이 강하게 나타납니다. 신인 입장에서는
+“내 이야기를 편하게 할 수 있다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주는 표현은 부족해질 수 있습니다. 코치 본인은 충분히 배려하고 조심해서 이야기하고 있다고 느끼지만 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 유지력을 안정적으로 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 배려만 하는 것이 아니라 신인이 “편하게 움직일 수 있는 반응과 표현”을 의식적으로 자주 사용하는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 차분하게 듣기만 하기보다
+“고생 많으셨습니다.”
+“계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 자주 넣어주는 것이 중요합니다.
+
+또한 FC가 낮은 코치는 표정과 반응이 차분하게 유지되는 경우가 많기 때문에 신인은 자신이 혼나고 있다고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 NP와 AC가 함께 높은 코치는 신인의 부담을 너무 배려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그래서 충분히 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 함께 정리해주는 것이 중요합니다.
+
+이 성향은 원래 조직의 분위기와 유지력을 매우 좋게 만드는 성향입니다. 여기에 밝은 반응과 편안한 분위기가 더해지면 조직의 활동량과 생산성, 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_CP_NP:{manner:`이 성향의 코치는 조직 안에서 흐름을 차분하게 정리하고 현실적으로 움직임을 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 조직의 실행 움직임과 운영 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 신인 입장에서는
+“조직 흐름을 놓치지 않는다.”
+“결국 움직이게 만든다.”
+“성과 방향이 분명하다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“조금 차갑게 느껴질 때가 있다.”
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결론이 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 생산성을 안정적으로 끌고 가는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“지금 왜 안 되고 있을까요?”
+라고 바로 원인을 정리하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 CP가 함께 높은 코치는 문제를 빨리 해결하려는 힘이 강하기 때문에 신인이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 그러다 보면 신인은 “내 마음은 이해받지 못했다”라고 느끼면서 움직임까지 줄어들 가능성이 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 생산성을 안정적으로 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_CP_FC:{manner:`이 성향의 코치는 조직 안에서 흐름을 차분하게 정리하고 현실적으로 움직임을 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 조직의 실행 움직임과 운영 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 신인 입장에서는
+“조직 흐름을 놓치지 않는다.”
+“결국 움직이게 만든다.”
+“성과 방향이 분명하다.”
+라는 느낌을 받게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주거나 감정을 편안하게 표현하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 생산성을 안정적으로 끌고 가는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 신인이 편하게 움직일 수 있는 반응과 표현을 의식적으로 자주 사용하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이 부분은 이렇게 정리하겠습니다.”
+처럼 결론 중심으로만 이야기하기보다
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 자주 넣어주는 것이 중요합니다.
+
+또한 A와 CP가 함께 높은 코치는 문제를 빨리 해결하려는 힘이 강하기 때문에 신인이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 거기에 FC까지 낮아지면 말투와 분위기가 더 단단하게 전달될 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 분위기를 편안하게 만든 뒤에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 생산성을 안정적으로 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 부드러운 반응과 따뜻한 표현이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_CP_AC:{manner:`이 성향의 코치는 조직 안에서 흐름을 차분하게 정리하고 현실적으로 움직임을 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 조직의 실행 움직임과 운영 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 움직임이 흐트러질 때는 다시 중심을 잡아주려는 힘도 있습니다. 그래서 신인 입장에서는
+“조직 흐름을 놓치지 않는다.”
+“결국 움직이게 만든다.”
+“성과 방향이 분명하다.”
+라는 느낌을 받게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 생산성을 안정적으로 끌고 가는 힘은 매우 좋지만 신인의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이 부분은 이렇게 정리하겠습니다.”
+라고 바로 결론부터 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 CP가 함께 높은 코치는 문제를 빨리 해결하려는 힘이 강하기 때문에 신인이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 거기에 AC까지 낮아지면 상대 입장에서는 “내 상황은 충분히 이해받지 못했다”라고 느끼면서 움직임이 위축될 가능성도 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 생산성을 안정적으로 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 부담과 감정 상태를 한 번 더 확인해주는 부드러운 접근이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_NP_CP:{manner:`이 성향의 코치는 조직 안에서 상황을 차분하게 정리하고 신인을 안정적으로 챙기려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 코치가 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 들어주려고 한다.”
+“사람을 함부로 대하지 않는다.”
+“결과만 보는 사람이 아니다.”
+라는 안정감을 느끼게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 공감하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 방향 설명은 있는데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 공감만으로 끝나는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“지금 상황은 이해했습니다.”
+라고 정리만 하기보다
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 A와 NP가 함께 높은 코치는 신인의 감정과 현실 상황을 모두 이해하려는 힘이 좋기 때문에 오히려 결론을 늦게 내리는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+그리고 이 성향은 조직을 안정적으로 유지하는 힘이 매우 좋은 성향이기 때문에 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_NP_FC:{manner:`이 성향의 코치는 조직 안에서 상황을 차분하게 정리하고 신인을 안정적으로 챙기려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 코치가 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 들어주려고 한다.”
+“사람을 함부로 대하지 않는다.”
+“결과만 보는 사람이 아니다.”
+라는 안정감을 느끼게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 조직 안에서 분위기를 부드럽게 풀어주거나 감정을 편안하게 표현하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 공감하고 있다고 느끼지만 신인 입장에서는
+“조금 어렵게 느껴질 때가 있다.”
+“칭찬과 반응 표현이 부족하다.”
+“긴장감이 오래 유지된다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 공감만 하는 것이 아니라 신인이 편하게 움직일 수 있는 반응과 표현을 의식적으로 자주 사용하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이 부분은 이렇게 정리하겠습니다.”
+처럼 결론 중심으로만 이야기하기보다
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 정말 좋습니다.”
+“오늘 분위기 좋게 잘 버텨주셨습니다.”
+같은 짧은 인정 표현을 자주 넣어주는 것이 중요합니다.
+
+또한 A와 NP가 함께 높은 코치는 문제를 빨리 정리하면서도 신인을 챙기려는 마음이 함께 있기 때문에 속으로는 배려하고 있어도 표정과 반응은 차분하게 유지되는 경우가 많습니다. 거기에 FC까지 낮아지면 신인 입장에서는 “혼나고 있는 건가?”라고 오해할 수도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘도 좋은 편이기 때문에 분위기를 안정적으로 만든 뒤에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 안정감을 함께 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_NP_AC:{manner:`이 성향의 코치는 조직 안에서 상황을 차분하게 정리하고 신인을 안정적으로 챙기려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“감정적으로 흔들리지 않는다.”
+“현실적으로 방향을 잡아준다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 결과만 보는 코치가 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 들어주려고 한다.”
+“사람을 함부로 대하지 않는다.”
+“결과만 보는 사람이 아니다.”
+라는 안정감을 느끼게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 공감하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 실행력과 안정감을 함께 끌고 가는 힘은 매우 좋지만 신인의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 결과와 방향만 이야기하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이 부분은 이렇게 정리하겠습니다.”
+라고 바로 결론부터 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 NP가 함께 높은 코치는 문제를 빨리 정리하면서도 신인을 챙기려는 마음이 함께 있기 때문에 속으로는 배려하고 있어도 행동 속도가 빨라지는 경우가 많습니다. 거기에 AC까지 낮아지면 신인 입장에서는 “내 상황을 충분히 설명하기 전에 결론이 나온다”라고 느끼면서 심리적으로 위축될 가능성도 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘이 좋기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직의 흐름과 안정감을 함께 유지하는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 감정 속도와 부담을 한 번 더 확인해주는 부드러운 접근이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_FC_CP:{manner:`이 성향의 코치는 조직 안에서 상황을 빠르게 정리하고 활동 분위기를 살리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 분위기도 좋게 만들고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 활동성을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 공감만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 중요합니다.
+
+또한 A와 FC가 함께 높은 코치는 상황 판단과 분위기 조성은 좋은 편이지만 조직 분위기가 너무 편안해지면 실행 긴장감이 약해질 가능성도 있습니다. 그러다 보면 활동량은 바쁜데 실제 계약 흐름은 약해지는 상황도 생길 수 있습니다. 그래서 충분히 분위기를 살려준 뒤에는 반드시 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+그리고 이 성향은 조직 분위기를 살리면서도 흐름을 현실적으로 정리하는 힘이 좋은 성향이기 때문에 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_FC_NP:{manner:`이 성향의 코치는 조직 안에서 상황을 빠르게 정리하고 활동 분위기를 살리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 분위기도 좋게 만들고 있다고 느끼지만 신인 입장에서는
+“조금 차갑게 느껴질 때가 있다.”
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결론이 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 활동성을 만드는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 결과만 이야기하는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 FC가 함께 높은 코치는 상황 판단과 분위기 조성은 좋은 편이지만 문제를 빨리 정리하려는 힘도 강하기 때문에 신인이 충분히 이야기하기 전에 결론부터 정리하는 경우도 생길 수 있습니다. 그러다 보면 신인은 “내 마음은 충분히 이해받지 못했다”라고 느끼면서 움직임까지 줄어들 가능성이 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘도 좋은 편이기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기를 살리면서도 흐름을 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_FC_AC:{manner:`이 성향의 코치는 조직 안에서 상황을 빠르게 정리하고 활동 분위기를 살리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“조직 분위기가 답답하지 않다.”
+“같이 움직이면 힘이 난다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 분위기도 좋게 만들고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빨리 나온다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 분위기와 활동성을 만드는 힘은 매우 좋지만 신인의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 결과만 이야기하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 FC가 함께 높은 코치는 상황 판단과 분위기 조성은 좋은 편이지만 움직임 속도가 빨라지는 경우도 많습니다. 거기에 AC까지 낮아지면 신인 입장에서는 “내 상황을 충분히 설명하기 전에 결론이 나온다”라고 느끼면서 심리적으로 위축될 가능성도 있습니다. 그래서 충분히 듣고 난 뒤 행동 방향을 정리해주는 순서가 매우 중요합니다.
+
+그리고 이 성향은 실행 움직임을 끌어가는 힘도 좋은 편이기 때문에 공감 이후에는 반드시 실제 행동으로 연결해주는 흐름이 필요합니다. 예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 현실적인 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기를 살리면서도 흐름을 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 감정 속도와 부담을 한 번 더 확인해주는 부드러운 접근이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다`,improvement:``},A_AC_CP:{manner:`이 성향의 코치는 조직 안에서 흐름을 현실적으로 정리하고 조직 전체 움직임을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 조율하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“움직임을 강하게 끌어주는 느낌은 부족하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 조율만으로 끝나는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 너무 오래 설명과 조율만 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 A와 AC가 함께 높은 코치는 조직 흐름을 안정적으로 유지하려는 힘이 좋은 대신 신인의 부담을 너무 고려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+그리고 이 성향은 원래 조직을 안정적으로 유지하고 문제를 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 신인의 생산성과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_AC_NP:{manner:`이 성향의 코치는 조직 안에서 흐름을 현실적으로 정리하고 조직 전체 움직임을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황, 계약 움직임 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 따뜻하게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 설명하고 조율하고 있다고 느끼지만 신인 입장에서는
+“조금 차갑게 느껴질 때가 있다.”
+“내 마음까지 충분히 이해받는 느낌은 아니다.”
+“결론이 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 부족해질 수 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 조율만 하는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이 부분은 이렇게 정리하겠습니다.”
+라고 바로 결론부터 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지쳤던 순간은 언제였나요?”
+“지금 어떤 부분이 가장 부담되시는 건가요?”
+같은 질문을 먼저 넣어주는 것이 중요합니다.
+
+또한 A와 AC가 함께 높은 코치는 조직 흐름을 안정적으로 유지하려는 힘이 좋은 대신 신인의 부담을 너무 고려하다가 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+그리고 이 성향은 원래 조직을 안정적으로 유지하고 문제를 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},A_AC_FC:{manner:`이 성향의 코치는 조직 안에서 흐름을 현실적으로 정리하고 조직 전체 움직임을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 A가 높기 때문에 감정적으로 흔들리기보다 현재 상황을 객관적으로 보려고 합니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 냉정하게 확인하며 문제 원인을 빠르게 정리하려는 모습이 강하게 나타납니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 분명하다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 흐름이 흔들리지 않도록 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“함께 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 상황 설명과 조율만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 A와 AC가 함께 높은 코치는 조직 흐름을 안정적으로 유지하려는 힘이 좋은 대신 분위기를 너무 조용하게 끌고 갈 수도 있습니다. 그러다 보면 조직 전체 에너지가 차분해지면서 활동량까지 함께 내려갈 가능성도 있습니다. 그래서 현실적인 방향 정리 이후에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 문제를 현실적으로 정리하는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_CP_NP:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들고 움직임 에너지를 끌어올리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 활동량이 떨어질 때는 다시 흐름을 끌어올리려는 힘도 있습니다. 그래서 신인 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 분위기도 좋게 만들고 실행 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 실행 에너지를 끌어올리는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 실행만 강조하는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이번 주는 조금 더 움직여보시지요.”
+라고 바로 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근에 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 CP가 함께 높은 코치는 분위기를 살리면서도 실행 움직임을 강하게 끌어가는 힘이 좋기 때문에 조직 에너지를 빠르게 끌어올리는 장점이 있습니다. 다만 활동 흐름에 집중하다 보면 신인이 지치고 있는 신호를 놓칠 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 실행 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 따뜻한 공감과 감정 확인이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_CP_A:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들고 실행 에너지를 끌어올리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 활동량이 떨어질 때는 다시 흐름을 끌어올리려는 힘도 있습니다. 그래서 신인 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 실행 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 만들고 움직임도 끌어가고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“분위기에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 실행 에너지를 끌어올리는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 실행만 강조하는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“일단 많이 움직여보시지요.”
+라고 넓게 이야기하기보다
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 우선순위를 짧고 명확하게 정리해주는 것이 좋습니다.
+
+또한 FC와 CP가 함께 높은 코치는 조직 에너지를 빠르게 끌어올리는 장점이 매우 강합니다. 다만 분위기와 추진력이 강해질수록 신인이 여러 가지를 동시에 하려다 흐름이 분산될 가능성도 있습니다. 그래서 활동량을 늘리는 것과 동시에 “지금 가장 중요한 한 가지”를 반복해서 정리해주는 과정이 함께 들어가야 신인의 생산성과 매출 흐름이 더 안정적으로 올라가게 됩니다.
+
+그리고 이 성향은 원래 조직 분위기와 실행 움직임을 강하게 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 우선순위 정리와 흐름 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_CP_AC:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들고 실행 에너지를 끌어올리는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 필요할 때는 분명하게 방향을 정리하고 활동량이 떨어질 때는 다시 흐름을 끌어올리려는 힘도 있습니다. 그래서 신인 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 분위기도 좋게 만들고 실행 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빠르게 느껴질 때가 있다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 실행 에너지를 끌어올리는 힘은 매우 좋지만 신인의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 실행만 강조하는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향을 이야기하기 전에
+“지금 가장 부담되는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 막히는 부분은 어떤 건가요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 CP가 함께 높은 코치는 조직 에너지를 빠르게 끌어올리는 장점이 매우 강합니다. 다만 분위기와 추진력이 강해질수록 신인이 따라오는 속도까지 세밀하게 살피지 못할 가능성도 있습니다. 그러다 보면 조직 안에서 활동량은 늘어나지만 심리적으로 지치는 신인이 생길 수도 있습니다. 그래서 충분히 듣고 난 뒤
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 실행 움직임을 강하게 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 속도와 부담을 한 번 더 확인해주는 조율이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_NP_CP:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들고 사람의 마음을 편안하게 움직이게 하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 신인도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 NP가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 신인이 힘들어할 때 너무 이해하고 배려만 하다 보면 활동량 관리가 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_NP_A:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들고 사람의 마음을 편안하게 움직이게 하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 공감 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 신인도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“분위기에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 NP가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 활동 방향이 흐려질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_NP_AC:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들고 사람의 마음을 편안하게 움직이게 하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 좋은 것이 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 신인도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빠르게 느껴질 때가 있다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 신인의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감만 오래 이어가기보다 현재 부담되는 부분을 먼저 확인한 뒤 행동 방향을 함께 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“지금 가장 부담되는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 막히는 부분은 어떤 건가요?”
+처럼 먼저 듣고 난 뒤
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결해주는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 NP가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 속도와 부담을 한 번 더 확인해주는 조율이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다。`,improvement:``},FC_A_CP:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들면서도 현실적인 흐름을 빠르게 정리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 좋은 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 신인 입장에서는
+“현실적으로 방향을 잡아준다.”
+“상황 정리가 빠르다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 현실적인 정리도 잘하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 활동 에너지를 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 설명만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“잘하고 계십니다.”
+라고 격려만 이어가기보다
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 A가 함께 높은 코치는 조직 분위기를 밝게 유지하면서도 흐름 정리를 잘하는 장점이 있습니다. 다만 분위기가 좋아질수록 실행 긴장감까지 함께 약해질 가능성도 있습니다. 그래서 활동 방향과 우선순위를 짧고 반복적으로 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 활동 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_A_NP:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들면서도 현실적인 흐름을 빠르게 정리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 좋은 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 신인 입장에서는
+“현실적으로 방향을 잡아준다.”
+“상황 정리가 빠르다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 현실적인 정리도 잘하고 있다고 느끼지만 신인 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 활동 에너지를 만드는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 설명만 만드는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 A가 함께 높은 코치는 조직 분위기를 밝게 유지하면서도 흐름 정리를 잘하는 장점이 있습니다. 다만 분위기와 활동 흐름에 집중하다 보면 신인이 지치고 있는 신호를 놓칠 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 활동 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_A_AC:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝게 만들면서도 현실적인 흐름을 빠르게 정리하는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 좋은 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 신인 입장에서는
+“현실적으로 방향을 잡아준다.”
+“상황 정리가 빠르다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 AC의 점수가 가장 낮으면 상대의 감정 속도와 부담 정도를 세밀하게 살피는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 현실적인 정리도 잘하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 빠르게 느껴질 때가 있다.”
+“내 속도까지 충분히 이해받는 느낌은 아니다.”
+“압박처럼 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 활동 에너지를 만드는 힘은 매우 좋지만 신인의 현재 감정 상태와 부담 정도를 세밀하게 확인하는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 분위기와 설명만 만드는 것이 아니라 상대의 현재 흐름과 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“지금 가장 부담되는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 막히는 부분은 어떤 건가요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 FC와 A가 함께 높은 코치는 조직 분위기를 밝게 유지하면서도 흐름 정리를 잘하는 장점이 있습니다. 다만 분위기와 활동 흐름에 집중하다 보면 신인이 따라오는 속도까지 세밀하게 살피지 못할 가능성도 있습니다. 그래서 충분히 듣고 난 뒤
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 활동 에너지를 끌어올리는 힘이 매우 뛰어난 성향입니다. 여기에 상대의 속도와 부담을 한 번 더 확인해주는 조율이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_AC_CP:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝고 편안하게 만들면서 사람 간의 관계 흐름을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 AC가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_AC_NP:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝고 편안하게 만들면서 사람 간의 관계 흐름을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 유지력을 만드는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다. 그리고 충분히 들은 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+또한 FC와 AC가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 현실적인 행동 정리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},FC_AC_A:{manner:`이 성향의 코치는 조직 안에서 분위기를 밝고 편안하게 만들면서 관계 흐름을 안정적으로 유지하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름도 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 안정감을 느끼는 경우가 많습니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 관계 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“분위기에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직 분위기와 관계 유지력을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 FC와 AC가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_CP_NP:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하면서도 실행 움직임을 놓치지 않으려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 활동량이 떨어질 때는 다시 흐름을 끌어올리려 하고 해야 할 부분은 비교적 분명하게 정리하려는 힘도 있습니다. 그래서 신인 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 조율하고 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 실행 흐름을 만드는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 조율과 방향 정리만 하는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 AC와 CP가 함께 높은 코치는 조직 흐름을 안정적으로 유지하면서도 실행 움직임을 끌어가는 힘이 좋은 편입니다. 다만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하면서도 실행 흐름을 끌어가는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_CP_A:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하면서도 실행 움직임을 놓치지 않으려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 활동량이 떨어질 때는 다시 흐름을 끌어올리려 하고 해야 할 부분은 비교적 분명하게 정리하려는 힘도 있습니다. 그래서 신인 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 관계 흐름 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 조율하고 방향도 잘 잡아주고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“상황에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 실행 흐름을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 조율과 분위기만 유지하는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감과 조율만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 CP가 함께 높은 코치는 조직 흐름을 안정적으로 유지하면서도 실행 움직임을 끌어가는 힘이 좋은 편입니다. 다만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하면서도 실행 흐름을 끌어가는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_CP_FC:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하면서도 실행 움직임을 놓치지 않으려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 CP가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 실제 움직임과 실행 흐름도 중요하게 생각합니다. 활동량이 떨어질 때는 다시 흐름을 끌어올리려 하고 해야 할 부분은 비교적 분명하게 정리하려는 힘도 있습니다. 그래서 신인 입장에서는
+“결국 움직이게 만든다.”
+“실행 방향이 분명하다.”
+“성과 흐름을 놓치지 않는다.”
+라는 느낌을 받게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 실행 흐름을 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 조율과 방향 정리만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 AC와 CP가 함께 높은 코치는 조직 흐름을 안정적으로 유지하면서도 실행 움직임을 끌어가는 힘이 좋은 편입니다. 다만 분위기를 너무 차분하게 유지하다 보면 조직 전체 에너지가 함께 내려갈 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하면서도 실행 흐름을 끌어가는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_NP_CP:{manner:`이 성향의 코치는 조직 안에서 관계 흐름을 안정적으로 유지하면서 신인을 편안하게 이끌어가려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 유지하는 것이 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 조율하고 신인도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 관계 유지력을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 조율만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 NP가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_NP_A:{manner:`이 성향의 코치는 조직 안에서 관계 흐름을 안정적으로 유지하면서 신인을 편안하게 이끌어가려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 유지하는 것이 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 공감 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 조율하고 신인도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“상황에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 관계 유지력을 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 조율만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 NP가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 공감해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_NP_FC:{manner:`이 성향의 코치는 조직 안에서 관계 흐름을 안정적으로 유지하면서 신인을 편안하게 이끌어가려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 NP가 높기 때문에 단순히 분위기만 유지하는 것이 아니라 신인의 감정 상태와 어려움도 함께 보려고 합니다. 신인이 힘들어하면 먼저 이유를 들어주려 하고 쉽게 포기하지 않도록 옆에서 계속 챙겨주려는 모습도 나타납니다. 그래서 신인 입장에서는
+“내 이야기를 잘 들어준다.”
+“사람을 함부로 대하지 않는다.”
+“정서적으로 안정감을 준다.”
+라는 느낌을 받게 됩니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 관계 유지력을 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 조율만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 AC와 NP가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기를 너무 차분하게 유지하다 보면 조직 전체 에너지가 함께 내려갈 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 충분히 듣고 공감해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_A_CP:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하면서도 전체 움직임을 차분하게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 조율하고 흐름도 잘 관리하고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 조율과 설명만 하는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 충분히 듣고 조율해준 뒤에는 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 A가 함께 높은 코치는 조직 흐름을 안정적으로 유지하고 문제를 차분하게 정리하는 힘이 매우 좋은 편입니다. 다만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 흐름을 현실적으로 관리하는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_A_NP:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하면서도 전체 움직임을 차분하게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 조율하고 흐름도 잘 관리하고 있다고 느끼지만 신인 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 조율과 설명만 하는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+라고 방향만 이야기하기보다
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다.
+
+또한 AC와 A가 함께 높은 코치는 조직 흐름을 안정적으로 유지하고 문제를 차분하게 정리하는 힘이 매우 좋은 편입니다. 다만 분위기를 너무 안정적으로 유지하려다 보면 조직 전체 에너지가 조용해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 흐름을 현실적으로 관리하는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 감정 확인이 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_A_FC:{manner:`이 성향의 코치는 조직 안에서 흐름을 안정적으로 유지하면서도 전체 움직임을 차분하게 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 안정적으로 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 A가 높기 때문에 단순히 분위기만 챙기는 것이 아니라 현재 상황을 현실적으로 정리하려는 힘도 함께 나타납니다. 신인의 활동량, 고객 흐름, 상담 진행 상황 등을 비교적 객관적으로 보며 문제 원인을 빠르게 정리하려는 모습도 있습니다. 그래서 신인 입장에서는
+“상황 정리가 명확하다.”
+“현실적으로 방향을 잡아준다.”
+“무엇을 해야 하는지 이해가 된다.”
+라는 신뢰감을 느끼는 경우가 많습니다.
+
+다만 FC의 점수가 가장 낮으면 감정 표현과 반응 표현은 비교적 절제되어 보일 수 있습니다. 실제로는 충분히 배려하고 조심하고 있지만 표정 변화나 표현이 크지 않다 보니 신인 입장에서는
+“조금 어렵게 느껴진다.”
+“칭찬 표현이 적게 느껴진다.”
+“조심스럽게 느껴질 때가 있다.”
+라고 받아들이는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 운영 흐름을 만드는 힘은 매우 좋지만 신인이 심리적으로 편하게 움직일 수 있는 분위기를 만드는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 조율과 설명만 하는 것이 아니라 짧더라도 반응과 인정 표현을 자주 전달해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는
+“고생 많으셨습니다.”
+“지금 계속 움직이고 계신 부분이 좋습니다.”
+“오늘 고객 연락 흐름 잘 유지하고 계십니다.”
+같은 짧은 인정 표현을 의식적으로 자주 사용하는 것이 좋습니다.
+
+또한 AC와 A가 함께 높은 코치는 조직 흐름을 안정적으로 유지하고 문제를 차분하게 정리하는 힘이 매우 좋은 편입니다. 다만 분위기를 너무 차분하게 유지하다 보면 조직 전체 에너지가 함께 내려갈 가능성도 있습니다. 그래서 의식적으로 미소를 띄고 고개를 끄덕이며 들어주는 반응을 추가하는 것만으로도 조직 분위기가 훨씬 편안해질 수 있습니다.
+
+그리고 충분히 듣고 조율해준 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+처럼 실제 움직임으로 연결해주는 흐름이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직을 안정적으로 유지하고 흐름을 현실적으로 관리하는 힘이 매우 뛰어난 성향입니다. 여기에 조금 더 부드러운 반응과 밝은 표현이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_FC_CP:{manner:`이 성향의 코치는 조직 안에서 분위기를 편안하게 유지하면서 관계 흐름을 안정적으로 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 느낌을 받게 됩니다.
+
+다만 CP의 점수가 가장 낮으면 방향을 강하게 잡아주거나 실행 움직임을 밀어주는 힘은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“결론이 조금 약하다.”
+“긴장감이 흐려질 때가 있다.”
+“좋은 분위기인데 실행 압박은 약하다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 분위기를 만드는 힘은 매우 좋지만 실행 움직임을 강하게 끌어올리는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 반드시 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 FC가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 실행 움직임을 조금 더 끌어주는 힘이 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_FC_NP:{manner:`이 성향의 코치는 조직 안에서 분위기를 편안하게 유지하면서 관계 흐름을 안정적으로 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 느낌을 받게 됩니다.
+
+다만 NP의 점수가 가장 낮으면 신인의 감정 상태를 깊게 공감하거나 오래 들어주는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“속마음까지 충분히 이해받는 느낌은 아니다.”
+“힘든 이야기를 오래 하기는 어렵다.”
+“결론이 비교적 빨리 나온다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 분위기를 만드는 힘은 매우 좋지만 신인의 감정과 심리 상태를 충분히 공감해주는 부분은 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 현재 신인의 감정 상태와 부담 정도를 먼저 확인하는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때
+“요즘 가장 버겁게 느껴지는 부분은 어떤 건가요?”
+“최근 활동하면서 가장 지치는 순간은 언제였나요?”
+같은 질문을 먼저 넣어주는 것이 좋습니다. 그리고 충분히 들은 뒤에는
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+처럼 실제 움직임으로 연결해주는 표현이 함께 들어가야 조직의 활동량과 생산성이 살아나게 됩니다.
+
+또한 AC와 FC가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 신인의 부담을 너무 고려하다 보면 꼭 해야 하는 이야기를 늦게 꺼내는 경우도 생길 수 있습니다. 그러다 보면 조직 전체 활동량이 점점 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 따뜻한 공감과 현실적인 행동 정리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``},AC_FC_A:{manner:`이 성향의 코치는 조직 안에서 분위기를 편안하게 유지하면서 관계 흐름을 안정적으로 관리하려는 힘이 강한 성향입니다.
+
+제일 높은 점수인 AC가 높기 때문에 조직 안의 분위기와 관계 흐름을 많이 살피는 편입니다. 신인이 부담을 느끼지 않도록 조심하려 하고 조직 안에서 충돌이 커지지 않도록 흐름을 안정적으로 조율하려는 모습도 나타납니다. 그래서 신인 입장에서는
+“부담을 심하게 주지 않는다.”
+“조직 분위기를 편안하게 유지하려 한다.”
+“같이 가려는 느낌이 있다.”
+라는 인상을 받는 경우가 많습니다.
+
+그리고 두 번째로 높은 점수인 FC가 높기 때문에 조직 분위기를 너무 무겁게 끌고 가지 않습니다. 신인과 이야기할 때 비교적 밝고 편안한 분위기를 만들려고 하며 조직 안의 긴장감을 줄이고 활동 분위기를 살리려는 힘도 강하게 나타납니다. 그래서 신인 입장에서는
+“같이 움직이면 힘이 난다.”
+“조직 분위기가 답답하지 않다.”
+“편안하게 다가갈 수 있다.”
+라는 느낌을 받게 됩니다.
+
+다만 A의 점수가 가장 낮으면 분위기와 관계 중심으로 조직을 운영하다가 실제 문제 원인과 우선순위를 차분하게 정리하는 부분은 부족해질 수 있습니다. 코치 본인은 충분히 분위기도 좋게 만들고 조직도 잘 챙기고 있다고 느끼지만 신인 입장에서는
+“무엇부터 해야 하는지 헷갈릴 때가 있다.”
+“열심히는 하는데 방향 정리가 부족하다.”
+“상황에 따라 움직임이 달라질 때가 있다.”
+라고 느끼는 경우도 생길 수 있습니다.
+
+즉, 이 성향은 조직의 안정감과 분위기를 만드는 힘은 매우 좋지만 현실적인 우선순위와 흐름 정리는 조금 의식할 필요가 있는 구조입니다. 그래서 신인의 생산성과 매출을 더 끌어올리기 위해서는 공감과 분위기만 만드는 것이 아니라 “지금 가장 먼저 해야 하는 행동”을 짧고 분명하게 정리해주는 습관이 중요합니다.
+
+특히 이 성향의 코치는 신인이 힘들어할 때 공감과 배려만 오래 이어가기보다 현재 가장 먼저 움직여야 하는 행동을 하나씩 정리해주는 흐름이 중요합니다.
+
+예를 들어
+“그래서 내일까지 고객에게 안부전화하고 추가적인 약속을 잡아보는 데 힘을 써보시지요.”
+“이번 주는 상담 약속 확보에 조금 더 집중해보시지요.”
+“지금은 기존 고객 재상담 연결 움직임을 유지해보시지요.”
+처럼 실제 움직임으로 연결되는 표현을 의식적으로 사용하는 것이 좋습니다.
+
+또한 AC와 FC가 함께 높은 코치는 조직 분위기와 관계 유지력은 매우 좋은 편이지만 분위기와 공감에 집중하다 보면 조직 전체 움직임이 느슨해질 가능성도 있습니다. 그래서 충분히 듣고 조율해준 뒤에는 행동 목표를 짧고 분명하게 정리해주는 과정이 함께 들어가야 조직의 활동량과 생산성이 안정적으로 유지될 수 있습니다.
+
+이 성향은 원래 조직 분위기와 사람의 에너지를 살리는 힘이 매우 뛰어난 성향입니다. 여기에 현실적인 흐름 정리와 우선순위 관리가 조금 더해지면 조직의 유지력과 매출 흐름도 훨씬 안정적으로 올라가게 됩니다.`,improvement:``}},cm6:{},cm7:{CP_NP_A:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
-이 성향은 기준을 세우는 힘이 강하고, 동시에 사람을 아끼는 마음이 큽니다. 그래서 후보자를 만나면 흐트러진 이야기를 정리해 주고, 무엇이 맞는 길인지 또렷하게 보여줄 수 있습니다. 방향을 잡아 주는 리더의 모습이 자연스럽게 드러납니다. 여기에 따뜻함까지 더해지니 후보자는 부담보다는 보호받는 느낌을 받습니다.
+이 성향은 기준을 세우는 힘이 강하고, 동시에 사람을 아끼는 마음이 큽니다. 그래서 후보자를 만나면 흐트러진 이야기를 정리해 주고, 무엇이 맞는 길인지 또렷하게 보여줄 수 있습니다. 방향을 잡아 주는 코치의 모습이 자연스럽게 드러납니다. 여기에 따뜻함까지 더해지니 후보자는 부담보다는 보호받는 느낌을 받습니다.
 특히 신뢰감을 만들어내는 능력은 매우 뛰어납니다. “이 사람이라면 나를 함부로 두지 않겠다”라는 생각이 마음속에 자리 잡습니다.
 
 다만 한 가지, 왜 가능한지, 어떤 순서로 성장하는지, 숫자와 과정으로 차분히 설명해 주는 부분을 조금 더 의식하면 좋습니다. 논리가 채워질수록 후보자의 망설임은 확신으로 바뀝니다.
@@ -4848,7 +6824,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 다만 분위기를 조금 더 부드럽게 만드는 노력이 더해지면 좋습니다. 표정, 고개 끄덕임, 작은 공감 표현이 들어가면 후보자는 훨씬 편안해집니다. 진지함이 유지되면서도 거리감이 줄어들기 때문입니다.
 
 이 부분까지 갖추어지면 후보자는 결국 이렇게 느끼게 됩니다.
-“나를 성장시킬 힘이 있으면서도, 나를 사람으로 아껴 줄 리더다.”
+“나를 성장시킬 힘이 있으면서도, 나를 사람으로 아껴 줄 코치다.”
 그리고 그 마음이 합류 결정으로 이어집니다.`,CP_NP_AC:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
@@ -4871,7 +6847,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 다만 사람의 감정을 충분히 따뜻하게 감싸주는 표현은 의식적으로 보완하면 더 좋아집니다. 논리와 기준이 앞서다 보면 마음을 헤아리는 과정이 조금 빠르게 지나갈 수 있기 때문입니다. 상대의 입장에서 한 번 더 묻고, 공감의 말을 덧붙이면 설득력이 훨씬 커집니다.
 
 이렇게 균형이 맞춰지면 후보자는 이렇게 느낍니다.
-“정확하게 알려 주면서도 나를 이해하려는 리더다. 여기서 배우면 성장하겠다.”
+“정확하게 알려 주면서도 나를 이해하려는 코치다. 여기서 배우면 성장하겠다.”
 신뢰와 기대가 동시에 생깁니다.`,CP_A_FC:`신인 리크루팅의 가장 중요한 요소는 세 가지입니다.
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
@@ -4890,7 +6866,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 성향은 기준을 세우고 방향을 잡아주는 힘이 매우 좋습니다. 무엇이 중요하고 어디로 가야 하는지 분명하게 이야기할 수 있으며, 현실적인 판단을 바탕으로 계획을 보여 줄 수 있습니다. 그래서 후보자 입장에서는 막연함이 줄어들고 “이 사람을 따라가면 성장하겠다”는 확신을 갖게 됩니다. 특히 두 번째 요소인 설명력과 세 번째 요소인 신뢰감을 만드는 부분은 자연스럽게 잘 해낼 수 있는 장점입니다.
 
-다만 상대의 마음을 세밀하게 살피는 부분은 의식적으로 더 노력하면 좋습니다. 기준과 논리가 앞서다 보면 후보자의 감정이나 망설임을 충분히 듣기 전에 결론을 말할 수 있기 때문입니다. 질문을 조금 더 하고, 대답을 끝까지 듣고, 이해했다는 표현을 덧붙이면 훨씬 따뜻한 리더로 느껴집니다.
+다만 상대의 마음을 세밀하게 살피는 부분은 의식적으로 더 노력하면 좋습니다. 기준과 논리가 앞서다 보면 후보자의 감정이나 망설임을 충분히 듣기 전에 결론을 말할 수 있기 때문입니다. 질문을 조금 더 하고, 대답을 끝까지 듣고, 이해했다는 표현을 덧붙이면 훨씬 따뜻한 코치로 느껴집니다.
 
 이렇게 하면 후보자는 이렇게 받아들입니다.
 “실력 있고 방향이 분명한데, 나를 존중해 주는 사람.”
@@ -4926,7 +6902,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 조금 더 신경 쓰면 좋은 부분은 상대의 표정과 속도를 세밀하게 맞추는 것입니다. 추진력이 좋다 보니 설명이 빠르게 흘러갈 수 있습니다. 그래서 중간중간 멈추고, 이해했는지 묻고, 마음의 부담은 없는지 확인해 주면 훨씬 좋아집니다. 한 번 더 기다려 주는 여유가 생기면 설득력이 더 깊어집니다.
 
 이렇게 균형이 맞춰지면 후보자는 이렇게 느끼게 됩니다.
-“나를 끌어주는 리더인데, 동시에 내 마음도 존중해 주는 사람.”
+“나를 끌어주는 코치인데, 동시에 내 마음도 존중해 주는 사람.”
 그래서 자연스럽게 이 조직 안에서 자신의 미래를 그려보게 됩니다.`,CP_AC_NP:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
@@ -4936,7 +6912,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 다만 조금 더 신경 쓰면 좋은 점은 따뜻하게 품어주는 표현입니다. 기준과 판단이 앞서다 보면 “맞는 말”은 잘다만, 상대 마음이 충분히 위로받는 느낌은 약해질 수 있습니다. 그래서 결론을 말하기 전에 공감 한마디를 먼저 건네는 습관이 중요합니다.
 예를 들어 이렇게 말하면 좋습니다.  “지금 고민이 많으실 것 같아요.” “결정이 쉽지 않으셨을 텐데 이야기해 주셔서 감사합니다.”
-이 균형이 맞춰지면 후보자는 이 사람을 나를 정확히 이끌어 줄 리더, 현실적인 길을 알려주는 믿을 만한 사람, 함께하면 성장할 수 있을 것 같은 존재로 보게 됩니다. 차갑기보다는 단단하고, 부담스럽기보다는 의지하고 싶은 모습으로 기억됩니다.`,CP_AC_A:`신인 리크루팅의 가장 중요한 요소 세 가지
+이 균형이 맞춰지면 후보자는 이 사람을 나를 정확히 이끌어 줄 코치, 현실적인 길을 알려주는 믿을 만한 사람, 함께하면 성장할 수 있을 것 같은 존재로 보게 됩니다. 차갑기보다는 단단하고, 부담스럽기보다는 의지하고 싶은 모습으로 기억됩니다.`,CP_AC_A:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -4945,7 +6921,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 다만 조금 더 신경 쓰면 더 좋아질 부분은, 판단을 말하기 전에 한 번 더 이유를 차분히 풀어주는 과정입니다. 결론이 빠르면 똑똑해 보이지만, 상대는 따라가기 벅찰 수 있습니다. 설명을 한 걸음만 더 천천히 하면 이해와 공감이 같이 올라갑니다.
 
-이 부분이 보완되면 후보자는 이 사람을 정답을 알고 있는 리더, 내 상황을 읽어 주는 사람, 따라가면 안전하게 성장할 수 있을 것 같은 존재로 느끼게 됩니다. 무섭기보다는 믿음직하고, 어렵기보다는 의지하고 싶은 모습으로 보이게 됩니다.`,CP_AC_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
+이 부분이 보완되면 후보자는 이 사람을 정답을 알고 있는 코치, 내 상황을 읽어 주는 사람, 따라가면 안전하게 성장할 수 있을 것 같은 존재로 느끼게 됩니다. 무섭기보다는 믿음직하고, 어렵기보다는 의지하고 싶은 모습으로 보이게 됩니다.`,CP_AC_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -4954,18 +6930,18 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 다만 조금 더 신경 쓰면 좋은 부분은 따뜻한 표현입니다. 내용이 정확해도 분위기가 단단하면 후보자는 긴장할 수 있습니다. 고개를 끄덕여 주거나, 표정에 부드러움을 더하고, “충분히 하실 수 있습니다” 같은 말이 함께 나오면 마음의 문이 훨씬 빨리 열립니다.
 
-이 점이 보완되면 후보자는 이 사람을 실력 있고 믿을 수 있는데, 게다가 편안하기까지 한 리더로 보게 됩니다. 무섭게 잘하는 사람이 아니라, 나를 데리고 함께 가 줄 사람처럼 느끼게 됩니다.`,NP_CP_A:`신인 리크루팅의 가장 중요한 요소 세 가지
+이 점이 보완되면 후보자는 이 사람을 실력 있고 믿을 수 있는데, 게다가 편안하기까지 한 코치로 보게 됩니다. 무섭게 잘하는 사람이 아니라, 나를 데리고 함께 가 줄 사람처럼 느끼게 됩니다.`,NP_CP_A:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
-이 성향은 사람을 대할 때 따뜻함이 먼저 느껴집니다. 상대를 존중하고 배려하는 태도가 자연스럽게 나오기 때문에 후보자는 긴장이 빨리 풀립니다. 또 기준과 방향을 분명하게 제시하는 힘도 있어, 막연한 이야기가 아니라 “그래서 어떻게 하면 되는지”를 또렷하게 보여 줄 수 있습니다. 그래서 세 가지 요소 중에서 특히 신뢰감을 만드는 능력이 뛰어납니다. 편안한데도 리더로서 믿음이 가는 모습으로 보입니다.
+이 성향은 사람을 대할 때 따뜻함이 먼저 느껴집니다. 상대를 존중하고 배려하는 태도가 자연스럽게 나오기 때문에 후보자는 긴장이 빨리 풀립니다. 또 기준과 방향을 분명하게 제시하는 힘도 있어, 막연한 이야기가 아니라 “그래서 어떻게 하면 되는지”를 또렷하게 보여 줄 수 있습니다. 그래서 세 가지 요소 중에서 특히 신뢰감을 만드는 능력이 뛰어납니다. 편안한데도 코치로서 믿음이 가는 모습으로 보입니다.
 
 다만 조금 더 신경 써야 할 부분은 판단과 분석입니다. 분위기가 좋아도 구조와 현실성이 약하면 후보자는 마음은 움직여도 결정을 미루게 됩니다. 그래서 설명할 때 숫자, 과정, 실제 사례처럼 눈에 보이는 근거를 더해 주면 훨씬 힘이 생깁니다. 따뜻함 위에 명확함이 올라가야 합니다.
 
 이 부분이 보완되면 후보자는 이렇게 느끼게 됩니다.
 “나를 이해해 주고, 기준을 잡아 주고, 여기서 하면 정말 성장할 수 있겠다.”
-좋은 사람을 넘어, 함께 미래를 맡기고 싶은 리더로 보이게 됩니다.`,NP_CP_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
+좋은 사람을 넘어, 함께 미래를 맡기고 싶은 코치로 보이게 됩니다.`,NP_CP_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -4976,7 +6952,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 부분이 갖춰지면 후보자는 이렇게 느끼게 됩니다.
 “배려받고 있고, 방향도 분명하고, 함께하면 안전하게 성장할 수 있겠다.”
-좋은 사람이 아니라, 믿고 따라가고 싶은 리더로 보이게 됩니다.`,NP_CP_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
+좋은 사람이 아니라, 믿고 따라가고 싶은 코치로 보이게 됩니다.`,NP_CP_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -4986,7 +6962,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 다만 한 가지 신경 써야 할 점이 있습니다. 마음은 따뜻다만 표현이 빠르거나 직선적으로 나가면 상대의 표정이나 속도를 놓칠 수 있습니다. 본인은 좋은 의도로 한 말인데도 후보자는 조금 부담을 느낄 수도 있습니다. 그래서 말하기 전에 한 번 더 상대 반응을 보고, 선택권을 주는 표현을 더하면 훨씬 편안해집니다.
 
 이렇게 균형이 잡히면 후보자는
-따뜻하고 믿을 수 있는데, 배려까지 해주는 리더라고 느낍니다.
+따뜻하고 믿을 수 있는데, 배려까지 해주는 코치라고 느낍니다.
 존중받는 느낌을 받기 때문에 마음을 열 가능성이 훨씬 커집니다.`,NP_A_CP:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
@@ -5010,7 +6986,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이렇게 부드러움이 더해지면 후보자는
 나를 이해해 주면서도 현실적인 길을 알려주는 사람,
-그리고 따라가 보고 싶은 안정적인 리더로 받아들이게 됩니다.`,NP_A_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
+그리고 따라가 보고 싶은 안정적인 코치로 받아들이게 됩니다.`,NP_A_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5021,7 +6997,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 한 단계만 더하면 후보자는
 따뜻하게 이해해 주면서도 길을 정확히 알려주는 사람,
-그리고 믿고 기대도 되는 리더라고 받아들이게 됩니다.`,NP_FC_CP:`신인 리크루팅의 가장 중요한 요소 세 가지
+그리고 믿고 기대도 되는 코치라고 받아들이게 됩니다.`,NP_FC_CP:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5033,7 +7009,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 말이 더해지면 후보자는
 따뜻하고 편안한데, 믿고 따라도 되는 사람,
-그리고 함께하면 성장할 수 있는 리더로 보게 됩니다.`,NP_FC_A:`신인 리크루팅의 가장 중요한 요소 세 가지
+그리고 함께하면 성장할 수 있는 코치로 보게 됩니다.`,NP_FC_A:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5044,7 +7020,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 부분이 보완되면 후보자는
 따뜻하기만 한 사람이 아니라, 믿고 따라가면 되는 사람,
-그리고 정도와 방법을 알고 있는 리더로 받아들이게 됩니다.`,NP_FC_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
+그리고 정도와 방법을 알고 있는 코치로 받아들이게 됩니다.`,NP_FC_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5055,7 +7031,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이런 배려가 더해지면 후보자는
 따뜻하고 즐거운 사람,
-그리고 나를 존중하면서 기다려 주는 믿을 수 있는 리더라고 느끼게 됩니다.`,NP_AC_CP:`신인 리크루팅의 가장 중요한 요소 세 가지
+그리고 나를 존중하면서 기다려 주는 믿을 수 있는 코치라고 느끼게 됩니다.`,NP_AC_CP:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5069,7 +7045,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 말이 더해지면 후보자는
 나를 이해해 주는 따뜻한 사람,
-동시에 따라가도 되는 믿을 만한 리더라고 느끼게 됩니다.`,NP_AC_A:`신인 리크루팅의 가장 중요한 요소 세 가지
+동시에 따라가도 되는 믿을 만한 코치라고 느끼게 됩니다.`,NP_AC_A:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5106,7 +7082,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이렇게 균형이 맞춰지면 후보자는 
 똑똑하고 믿을 수 있으면서도,
-내 마음까지 이해해 주는 리더로 받아들입니다.`,A_CP_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
+내 마음까지 이해해 주는 코치로 받아들입니다.`,A_CP_FC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5117,12 +7093,12 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이런 표현이 더해지면 후보자는
 똑똑하고 원칙이 있으면서도,
-내 마음을 편하게 해 주는 리더로 받아들이게 됩니다.`,A_CP_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
+내 마음을 편하게 해 주는 코치로 받아들이게 됩니다.`,A_CP_AC:`신인 리크루팅의 가장 중요한 요소 세 가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
-이 성향은 상황을 빠르게 파악하고 무엇이 현실적으로 가능한지 분명하게 알려주는 힘이 있습니다. 애매한 표현보다 명확한 방향을 주기 때문에 후보자는 “여기 오면 어떻게 성장하는지 알겠다”라고 느끼게 됩니다. 특히 설명력과 신뢰감을 만드는 부분에서 큰 강점을 보입니다. 기준이 분명하고 흔들림이 없어서 리더로서의 안정감이 느껴집니다.
+이 성향은 상황을 빠르게 파악하고 무엇이 현실적으로 가능한지 분명하게 알려주는 힘이 있습니다. 애매한 표현보다 명확한 방향을 주기 때문에 후보자는 “여기 오면 어떻게 성장하는지 알겠다”라고 느끼게 됩니다. 특히 설명력과 신뢰감을 만드는 부분에서 큰 강점을 보입니다. 기준이 분명하고 흔들림이 없어서 코치로서의 안정감이 느껴집니다.
 
 다만, 상대의 표정이나 분위기를 세밀하게 읽는 부분은 의식하지 않으면 부족해 보일 수 있습니다. 내가 맞는 말을 하더라도 상대의 마음이 따라오지 않으면 결정은 늦어집니다. 그래서 일부러라도 한 번 더 묻고, 속도를 조절하고, 부담이 없는지 확인하는 노력이 필요합니다.
 
@@ -5139,7 +7115,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 성향은 상대를 편안하게 만드는 힘이 있습니다. 말을 부드럽게 하고, 먼저 이해하려 하기 때문에 후보자는 긴장이 풀립니다. 또한 상황을 현실적으로 판단하여 무리한 약속을 하지 않기 때문에 오히려 믿음이 생깁니다. 그래서 마음을 읽는 능력과 신뢰감을 만드는 부분에서 특히 잘할 수 있습니다.
 
-다만 기준을 분명히 세우는 부분은 의식하지 않으면 약해질 수 있습니다. 너무 배려하다 보면 선택의 순간에 방향을 딱 잡아 주지 못할 수 있기 때문입니다. 후보자는 따뜻함도 원다만, 동시에 “그래서 어떻게 하면 되죠?”라는 답을 주는 리더를 원합니다.
+다만 기준을 분명히 세우는 부분은 의식하지 않으면 약해질 수 있습니다. 너무 배려하다 보면 선택의 순간에 방향을 딱 잡아 주지 못할 수 있기 때문입니다. 후보자는 따뜻함도 원다만, 동시에 “그래서 어떻게 하면 되죠?”라는 답을 주는 코치를 원합니다.
 
 그래서 한 번은 정리해 주는 말이 필요합니다.
 “지금 시작하시면 이 일정으로 성장하실 수 있습니다.”
@@ -5242,7 +7218,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 다만 기준을 세우고 방향을 또렷하게 끌고 가는 힘은 조금 더 의식하면 훨씬 좋아집니다. 좋게 말해 주려다 보니 결정의 순간에 단호함이 약해질 수 있기 때문입니다. 설명은 충분히 잘했는데 “그래서 어떻게 하시겠습니까?”라는 마지막 한 문장을 미루면 후보자는 다시 고민 속으로 돌아갑니다.
 
 이 부분을 조금만 보완하면 후보자는 이렇게 느끼게 됩니다.
-“나를 이해해 주면서도 결국 길을 잡아주는 믿을 수 있는 리더.”
+“나를 이해해 주면서도 결국 길을 잡아주는 믿을 수 있는 코치.”
 부담은 없는데 이상하게 따라가고 싶어지는 사람, 바로 그런 모습으로 남게 됩니다.`,A_AC_NP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
@@ -5282,12 +7258,12 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이렇게 균형이 잡히면 후보자는 이렇게 느낍니다.
 “편하게 이야기할 수 있고, 방향도 확실하게 알려주는 사람이네.”
-재미와 확신을 동시에 주는 리더로 보이기 때문에, 자연스럽게 함께 도전해 보고 싶다는 마음이 생깁니다.`,FC_CP_A:`신인 리크루팅의 가장 중요한 요소 세가지
+재미와 확신을 동시에 주는 코치로 보이기 때문에, 자연스럽게 함께 도전해 보고 싶다는 마음이 생깁니다.`,FC_CP_A:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
-이 성향은 사람을 만났을 때 밝은 분위기를 만들고 에너지를 전달하는 힘이 큽니다. 이야기를 재미있게 풀어가며 상대가 지루하지 않게 듣도록 만드는 재능이 있습니다. 거기에 기준과 방향을 또렷하게 말해 주기 때문에 리더처럼 보이기도 합니다. 그래서 설명력과 존재감, 추진력에서는 강점을 보일 가능성이 큽니다.
+이 성향은 사람을 만났을 때 밝은 분위기를 만들고 에너지를 전달하는 힘이 큽니다. 이야기를 재미있게 풀어가며 상대가 지루하지 않게 듣도록 만드는 재능이 있습니다. 거기에 기준과 방향을 또렷하게 말해 주기 때문에 코치처럼 보이기도 합니다. 그래서 설명력과 존재감, 추진력에서는 강점을 보일 가능성이 큽니다.
 
 다만 숫자와 현실 조건을 차분하게 따져 주는 부분은 조금 더 보완하면 좋습니다. 열정과 확신은 충분한데, 상대는 “그래서 내가 구체적으로 어떻게 시작하지?”라는 질문을 마음속에 가질 수 있습니다. 순서, 방법, 준비 과정 같은 현실적인 그림을 천천히 정리해 주면 불안이 크게 줄어듭니다.
 
@@ -5298,7 +7274,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
-이 성향은 분위기를 밝게 만들고 사람을 편하게 해 주는 힘이 아주 큽니다. 처음 만난 자리에서도 어색함을 빨리 풀고, 재미있는 이야기와 에너지로 상대를 집중하게 합니다. 여기에 기준과 방향을 분명하게 말하는 힘까지 있어서 리더처럼 느껴지기도 합니다. 그래서 설명력과 추진력에서는 충분히 강점을 발휘할 수 있습니다.
+이 성향은 분위기를 밝게 만들고 사람을 편하게 해 주는 힘이 아주 큽니다. 처음 만난 자리에서도 어색함을 빨리 풀고, 재미있는 이야기와 에너지로 상대를 집중하게 합니다. 여기에 기준과 방향을 분명하게 말하는 힘까지 있어서 코치처럼 느껴지기도 합니다. 그래서 설명력과 추진력에서는 충분히 강점을 발휘할 수 있습니다.
 
 다만 상대의 표정 변화나 미묘한 마음 신호를 세밀하게 읽는 부분은 조금 더 의식하면 좋습니다. 내가 하고 싶은 말, 내가 옳다고 생각하는 방향을 빠르게 제시하다 보면, 상대가 아직 준비되지 않았는데도 앞으로 밀어붙이는 느낌을 줄 수 있습니다. 그래서 중간중간 멈추고 확인하는 태도가 중요합니다.
 
@@ -5308,14 +7284,14 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 그렇게 되면 후보자는 이렇게 느끼게 됩니다.
 “밝고 힘이 있고 믿음직한데, 내 마음도 살펴주는 사람이구나.”
-따라가 보고 싶은 리더, 나를 존중해 주는 선배라는 인상이 자연스럽게 만들어집니다.`,FC_NP_CP:`신인 리크루팅의 가장 중요한 요소 세가지
+따라가 보고 싶은 코치, 나를 존중해 주는 선배라는 인상이 자연스럽게 만들어집니다.`,FC_NP_CP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
 이 성향은 사람을 기분 좋게 만드는 힘이 매우 좋습니다. 밝은 표정, 부드러운 말투, 따뜻한 관심 덕분에 후보자는 금방 마음을 엽니다. 특히 긴장을 풀어 주고 편안한 분위기를 만드는 능력은 큰 장점입니다. 그래서 첫 번째 요소인 마음을 읽는 관계 형성에서는 자연스럽게 강점을 발휘합니다. 상대는 “이 사람과 있으면 부담이 없다”라고 느끼게 됩니다.
 
-다만 기준을 세우고 분명하게 방향을 제시하는 부분은 조금 더 의식적으로 가져가야 합니다. 혹시 상처 줄까 봐, 혹은 분위기가 나빠질까 봐 중요한 말을 부드럽게만 하다 보면 리더로서의 무게가 약해 보일 수 있습니다. 그래서 친절함 위에 단단함을 하나 더 얹는 태도가 필요합니다.
+다만 기준을 세우고 분명하게 방향을 제시하는 부분은 조금 더 의식적으로 가져가야 합니다. 혹시 상처 줄까 봐, 혹은 분위기가 나빠질까 봐 중요한 말을 부드럽게만 하다 보면 코치로서의 무게가 약해 보일 수 있습니다. 그래서 친절함 위에 단단함을 하나 더 얹는 태도가 필요합니다.
 
 예를 들면,
 “편하게 시작하실 수 있도록 제가 옆에서 도와드릴게요. 대신 배우는 기간에는 약속한 행동은 꼭 함께 지켜요.”
@@ -5323,7 +7299,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이 균형이 만들어지면 후보자는 이렇게 받아들입니다.
 “다정하고 편한데, 믿고 따라가도 되는 사람이다.”
-좋은 형, 좋은 선배, 나를 챙겨 줄 리더처럼 보이게 됩니다.`,FC_NP_A:`신인 리크루팅의 가장 중요한 요소 세가지
+좋은 형, 좋은 선배, 나를 챙겨 줄 코치처럼 보이게 됩니다.`,FC_NP_A:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5338,7 +7314,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 이처럼 근거를 함께 말해 주면 훨씬 힘이 생깁니다.
 
 이 균형이 맞춰지면 후보자는 이렇게 느낍니다.
-“따뜻하고 좋은 사람인데, 미래까지 보여 주는 믿을 만한 리더다.”
+“따뜻하고 좋은 사람인데, 미래까지 보여 주는 믿을 만한 코치다.”
 함께 시작해 보고 싶다는 마음이 훨씬 커집니다.`,FC_NP_AC:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
@@ -5371,7 +7347,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 이렇게 말하면 분위기는 부드럽지만 중심이 생깁니다.
 
 이렇게 균형이 맞춰지면 후보자는 이렇게 느낍니다.
-“편안하고 믿음이 가는데, 나를 제대로 키워 줄 리더 같다.”
+“편안하고 믿음이 가는데, 나를 제대로 키워 줄 코치 같다.”
 함께 가고 싶은 마음이 훨씬 강해집니다.`,FC_A_NP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
@@ -5405,14 +7381,14 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이렇게 균형이 맞춰지면 후보자는 이렇게 느낍니다.
 “편안하고 설명도 잘하는데, 내 생각까지 챙겨주는 사람이다.”
-함께 시작해도 안정적으로 이끌어 줄 것 같은 리더의 모습으로 보이게 됩니다.`,FC_AC_CP:`신인 리크루팅의 가장 중요한 요소 세가지
+함께 시작해도 안정적으로 이끌어 줄 것 같은 코치의 모습으로 보이게 됩니다.`,FC_AC_CP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
 이 성향은 사람을 긴장하지 않게 만드는 힘이 아주 좋습니다. 밝은 분위기를 만들고 자연스럽게 말을 걸기 때문에 후보자는 “이 사람과 있으면 편하다”는 느낌을 빨리 받습니다. 또한 상대의 표정과 반응을 잘 살피는 편이라 타이밍을 맞추는 데에도 강점이 있습니다. 그래서 첫째인 마음을 읽는 능력은 비교적 잘 해낼 수 있습니다.
 
-다만 기준을 세우고 방향을 잡아 주는 힘이 약하면, 좋아 보이기는 해도 결정적인 리더처럼 느껴지지 않을 수 있습니다. 너무 부드럽기만 하면 후보자는 “좋은 사람인데, 나를 성장시켜 줄 수 있을까?”라고 생각할 수도 있습니다.
+다만 기준을 세우고 방향을 잡아 주는 힘이 약하면, 좋아 보이기는 해도 결정적인 코치처럼 느껴지지 않을 수 있습니다. 너무 부드럽기만 하면 후보자는 “좋은 사람인데, 나를 성장시켜 줄 수 있을까?”라고 생각할 수도 있습니다.
 
 그래서 의식적으로는 또렷함을 보태야 합니다. 말끝을 흐리지 말고, 선택 기준과 방향을 분명하게 전하는 연습이 필요합니다.
 예를 들면
@@ -5421,7 +7397,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이렇게 되면 후보자는 이렇게 느끼게 됩니다.
 “편안한데 눈치도 빠르고, 따라가면 안전하겠다.”
-따뜻함과 안정감을 함께 가진 믿을 수 있는 리더로 보이게 됩니다.`,FC_AC_NP:`신인 리크루팅의 가장 중요한 요소 세가지
+따뜻함과 안정감을 함께 가진 믿을 수 있는 코치로 보이게 됩니다.`,FC_AC_NP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5436,7 +7412,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 이렇게 되면 후보자는 이렇게 느낍니다.
 “편하고, 상황도 잘 읽고, 나를 챙겨 줄 사람이다.”
-부담은 없지만 마음까지 맡길 수 있는 믿음직한 리더로 보이게 됩니다.`,FC_AC_A:`신인 리크루팅의 가장 중요한 요소 세가지
+부담은 없지만 마음까지 맡길 수 있는 믿음직한 코치로 보이게 됩니다.`,FC_AC_A:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5457,7 +7433,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
 
-이 성향은 상대의 표정과 분위기를 빠르게 읽는 힘이 뛰어납니다. 말하지 않아도 부담과 망설임을 알아차리기 때문에 후보자는 이해받는다고 느낍니다. 여기에 기준이 분명한 모습까지 더해져 마음을 읽으면서도 흐트러지지 않는 리더로 보입니다. 그래서 공감과 신뢰를 만드는 능력은 이미 강점입니다.
+이 성향은 상대의 표정과 분위기를 빠르게 읽는 힘이 뛰어납니다. 말하지 않아도 부담과 망설임을 알아차리기 때문에 후보자는 이해받는다고 느낍니다. 여기에 기준이 분명한 모습까지 더해져 마음을 읽으면서도 흐트러지지 않는 코치로 보입니다. 그래서 공감과 신뢰를 만드는 능력은 이미 강점입니다.
 
 다만 배려가 깊다 보니 혹시 부담 줄까 봐 확신 있게 권하지 못하는 순간이 생길 수 있습니다. 그러면 좋았던 분위기만 남고 결정은 멀어질 수 있습니다.
 
@@ -5478,7 +7454,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 “지금 걱정하시는 부분을 제가 잘 알고 있습니다. 그래서 이렇게 준비했습니다.”
 “여러 선택지가 있지만, 저는 이 길이 가장 좋다고 판단합니다.”
 
-이렇게 되면 후보자는 편안함을 느끼면서도 의지해도 되는 사람, 나를 이끌어 줄 리더라고 받아들이게 됩니다.`,AC_CP_FC:`신인 리크루팅의 가장 중요한 요소 세가지
+이렇게 되면 후보자는 편안함을 느끼면서도 의지해도 되는 사람, 나를 이끌어 줄 코치라고 받아들이게 됩니다.`,AC_CP_FC:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5489,7 +7465,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 예를 들어 고개를 끄덕이며 웃어 주거나, “충분히 고민되실 수 있습니다” 같은 말을 먼저 건네는 행동이 큰 차이를 만듭니다. 그러면 후보자는 단단함 속에서 따뜻함을 함께 느끼게 됩니다.
 
-이렇게 균형이 맞춰지면 후보자는 당신을 예리하게 이해하면서도 함께하면 든든한 리더로 받아들이게 됩니다.`,AC_NP_CP:`신인 리크루팅의 가장 중요한 요소 세가지
+이렇게 균형이 맞춰지면 후보자는 당신을 예리하게 이해하면서도 함께하면 든든한 코치로 받아들이게 됩니다.`,AC_NP_CP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5498,7 +7474,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 다만 기준을 세우고 결정을 끌어가는 힘은 조금 더 의식할 필요가 있습니다. 상대에게 맞추는 데 집중하다 보면 방향 제시가 약해질 수 있기 때문입니다. 그래서 필요할 때는 선택지를 정리해 주고, “저라면 이 길을 권해 드리고 싶습니다”처럼 분명한 안내를 더해 주는 연습이 중요합니다.
 
-이렇게 하면 후보자는 당신을 잘 이해해 주면서도 믿고 따라갈 수 있는 사람으로 보게 됩니다. 부드러움 속에 중심이 느껴지는 리더, 바로 그런 모습으로 기억됩니다.`,AC_NP_A:`신인 리크루팅의 가장 중요한 요소 세가지
+이렇게 하면 후보자는 당신을 잘 이해해 주면서도 믿고 따라갈 수 있는 사람으로 보게 됩니다. 부드러움 속에 중심이 느껴지는 코치, 바로 그런 모습으로 기억됩니다.`,AC_NP_A:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5507,7 +7483,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 다만 정보를 정리하고 방향을 명확하게 제시하는 부분은 조금 더 의식이 필요합니다. 공감에 집중하다 보면 설명이 길어지거나 핵심 결론이 흐려질 수 있기 때문입니다. 그래서 말을 마칠 때는 “그래서 제가 권하고 싶은 선택은 이것입니다”처럼 또렷한 정리를 덧붙이는 습관이 중요합니다.
 
-이렇게 균형을 잡으면 후보자는 당신을 따뜻하게 이해해 주면서도 현실적인 길을 보여주는 사람, 즉 감정과 판단을 함께 믿을 수 있는 리더로 받아들이게 됩니다.`,AC_NP_FC:`신인 리크루팅의 가장 중요한 요소 세가지
+이렇게 균형을 잡으면 후보자는 당신을 따뜻하게 이해해 주면서도 현실적인 길을 보여주는 사람, 즉 감정과 판단을 함께 믿을 수 있는 코치로 받아들이게 됩니다.`,AC_NP_FC:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5516,7 +7492,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 다만 감정적인 교류의 표현이 조금 적게 보일 수 있어 따뜻함이 속으로만 전달될 가능성은 있습니다. 본인은 충분히 배려했다고 생각다만, 상대는 “조금 더 웃어주면 좋겠다”라고 느낄 수도 있습니다. 그래서 의식적으로 표정을 부드럽게 하고, 고개를 끄덕이며 반응을 보여주는 노력이 중요합니다.
 
-이 부분만 보완되면 후보자는 당신을 나를 깊이 이해해 주고 안전하게 이끌어 줄 수 있는 사람, 그래서 오래 함께하고 싶은 리더로 받아들이게 됩니다.`,AC_A_CP:`신인 리크루팅의 가장 중요한 요소 세가지
+이 부분만 보완되면 후보자는 당신을 나를 깊이 이해해 주고 안전하게 이끌어 줄 수 있는 사람, 그래서 오래 함께하고 싶은 코치로 받아들이게 됩니다.`,AC_A_CP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5525,7 +7501,7 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
 
 다만 자신의 기준을 분명하게 밀어붙이는 힘은 조금 약하게 보일 수 있습니다. 너무 배려하다 보면 확신이 약하게 전달될 수 있기 때문입니다. 그래서 필요할 때는 선택을 정리해 주고, 결정의 순간에는 또렷한 기준을 보여주는 태도를 의식해야 합니다.
 
-이 부분이 보완되면 후보자는 당신을 내 이야기를 잘 들어주면서도 길을 정확히 안내해 주는 믿을 수 있는 리더, 즉 안정감과 방향성을 동시에 주는 사람으로 받아들이게 됩니다.`,AC_A_NP:`신인 리크루팅의 가장 중요한 요소 세가지
+이 부분이 보완되면 후보자는 당신을 내 이야기를 잘 들어주면서도 길을 정확히 안내해 주는 믿을 수 있는 코치, 즉 안정감과 방향성을 동시에 주는 사람으로 받아들이게 됩니다.`,AC_A_NP:`신인 리크루팅의 가장 중요한 요소 세가지
 첫째, 상대의 마음을 읽는 능력입니다.
 둘째, 일하는 방법과 미래 비전을 심어주는 설명력입니다.
 셋째, 함께 가도 괜찮겠다는 신뢰감입니다.
@@ -5714,4 +7690,4 @@ TOP2가 CP라서, 이 코치님은 마냥 느슨하지는 않습니다. “이�
                                    “그럼 핵심만 정리한 내용을 하나 드릴게요 이걸 보시고  판단을 해보시지요"
        가장 잘못된 대응은 “상의해 보시고 연락주세요" “ 그럼 생각해 보시고 연락주세요" 이 말은 바로 계약 이탈이 됨`},{title:`클로징 화법`,body:`(계약체결을 해야 할 시점이 오면)
 “더 궁금한 점은 있으세요?
-그럼 이대로 진행을 하겠습니다. 모바일로 진행을 하니까 따라오시면 됩니다.” 라고 자신있게 리드해야 함.`}]},Kc={sales:Hc,manager:Uc,coach:Wc},qc={sales:`sales`,coach:`coach`,sales_leader:`manager`,branch_manager:`manager`,training_leader:`manager`,division_head:`manager`,executive:`manager`};function Jc(e){return e>=17?`17-20`:e>=14?`14-16`:e>=11?`11-13`:e>=8?`8-10`:`0-7`}function Yc(e,t,n){let[r,i]=ur[fr(n)]?.[e]||[11,16];return t<r||t>i}function Xc(e,t){return e===`AC`?t>=17:t<=7}function Zc(e,t){let n=qc[t]||`sales`,r=Kc[n];if(!r)return null;let{scores:i,top1:a,top2:o,bottom:s}=e,c={},l={},u={},d={},f=[];for(let e of ar){let t=Jc(i[e]);c[e]=r.cm1[t]?.[e]||``,l[e]=r.cm2[t]?.[e]||``,u[e]=r.cm4_1[t]?.[e]||``,d[e]=r.cm4_2[t]?.[e]||``,Xc(e,i[e])&&f.push({ego:e,...r.cm4_4[e]})}let p=ar.every(e=>!Yc(e,i[e],t)),m=`${a}_${o}`,h=`${a}_${o}_${s}`,g=n===`sales`,_=``,v=``,y=null;if(g)_=r.cm6[m]||``,v=r.cm7[h]||``,y=r.cm8[a]||null;else{v=r.cm7[h]||``;let e=`${a}_${s}`;y=r.cm8[e]||null}return{jobLabel:r.job_label,name:``,isInsurance:g,cm1:c,cm2:l,cm3:r.cm3[m]||``,cm4_1:u,cm4_2:d,cm4_3:p?r.cm4_3.all_no_coaching:``,cm4_4:f,cm5:r.cm5[h]||null,cm6:_,cm6_common:g?Gc?.items||[]:null,cm7:v,cm8:y}}var U={report:{intro:{title:`성향 코칭 리포트의 목적`,items:[`거울로 얼굴을 보듯이 성향리포트로 나의 성향을 발견할 수 있습니다. 이후 다섯가지의 성향을 조절해서 사용할 수 있습니다.`,`나를 진심으로 알게 되면 각성과 성찰을 통해 에고상태의 의식적인 조절과 수정을 실천해 나가게 됩니다. 결국 점점 체득화 되고 습관이 바뀌어 원만한 인간관계와 성공적인 비지니스를 달성할 수 있습니다.`,`특히 비지니스를 하는 사람은 "왜 흔들리는 지"를 알게 하고 "어떻게 다시 중심을 잡을 지"를 스스로 알게 되어 상담을 원하는 방향으로 이끌 수 있고 슬럼프에 빠지는 것을 예방할 수 있습니다.`,`궁극적으로 인생 전반에 거쳐 지금보다 나은 삶을 영위할 수 있으며 특히 사랑하는 사람들과의 좋은 관계를 잘 유지해 나갈 수 있습니다.`]},closing:{greeting:`끝까지 함께해 주셔서 감사합니다. 이 리포트가 작은 거울이 되어 드리길 바랍니다.`,contact:{name:``,email:`egogram.son@gmail.com`,instagram:``,phone:``}},sections:{s1_title:`님의 성향`,s2_title:`자아상태의 성향과 말투`,s3_title:`내 성향의 강점`,s4_title:`내 성향의 조율 포인트`,s4_no_coaching:`조율을 하지 않아도 되는 성향`,s4_detailed_title:`세밀한 코칭`,s5_title_insurance:`보장에 대한 제안을 할 때`,s5_title_manager:`성과에 도움이 되는 화법`,s5_title_coach:`신인PA 성과에 도움되는 코칭`,s5_manner:`이 성향의 말투와 태도`,s5_improvement:`개선이 되는 코칭 내용`,s6_title:`클로징 전 고객님이 거절시`,s7_title:`신인 리크루팅 레벨업`,s8_title:`명언`,quote_encourage:`격려`,quote_improve:`개선`}}};function Qc({text:e}){return e?e.split(/\n\s*\n/).map(e=>e.replace(/\n/g,` `).trim()).filter(Boolean).map((e,t)=>(0,k.jsx)(`p`,{children:e},t)):null}var $c={CP:`#ef4444`,NP:`#f59e0b`,A:`#38bdf8`,FC:`#10b981`,AC:`#8b5cf6`};function el({number:e,title:t,children:n}){return(0,k.jsxs)(`div`,{className:`report-section`,children:[(0,k.jsxs)(`h2`,{className:`report-section-title`,children:[e&&(0,k.jsxs)(`span`,{className:`report-section-num`,children:[e,`.`]}),t]}),n]})}function tl({scores:e,jobType:t}){return(0,k.jsx)(`div`,{className:`report-chart`,children:ar.map(n=>{let[r,i]=pr(n,t);return(0,k.jsxs)(`div`,{className:`report-chart-row`,children:[(0,k.jsxs)(`div`,{className:`report-chart-label`,style:{color:$c[n]},children:[(0,k.jsx)(`strong`,{children:n}),(0,k.jsx)(`span`,{children:or[n]})]}),(0,k.jsxs)(`div`,{className:`report-chart-bar-wrap`,children:[(0,k.jsx)(`div`,{className:`report-chart-success`,style:{left:`${r/20*100}%`,width:`${(i-r+1)/20*100}%`}}),(0,k.jsx)(`div`,{className:`report-chart-bar`,style:{width:`${e[n]/20*100}%`,backgroundColor:$c[n]}})]}),(0,k.jsx)(`div`,{className:`report-chart-score`,children:e[n]})]},n)})})}function nl(){let{id:e}=ht(),[t,n]=(0,x.useState)(null),[r,i]=(0,x.useState)(null),[a,o]=(0,x.useState)(!0),[s,c]=(0,x.useState)(null);(0,x.useEffect)(()=>{async function t(){let{data:t,error:r}=await wc.from(`responses`).select(`*`).eq(`id`,e).single();if(r||!t){c(`리포트를 찾을 수 없습니다.`),o(!1);return}let a={scores:{CP:t.score_cp,NP:t.score_np,A:t.score_a,FC:t.score_fc,AC:t.score_ac},top1:t.top1,top2:t.top2,bottom:t.bottom,total:t.total,grades:t.grades},s=Zc(a,t.job_type);s.name=t.name,n({...t,result:a}),i(s),o(!1)}t()},[e]);let[l,u]=(0,x.useState)(!1);if(a)return(0,k.jsx)(`div`,{className:`report-loading`,children:`리포트 생성 중...`});if(s)return(0,k.jsx)(`div`,{className:`report-error`,children:s});if(!r)return null;let{result:d}=t,{scores:f,top1:p,top2:m,bottom:h}=d;return(0,k.jsxs)(`div`,{className:`report-container ${l?`report-bling`:``}`,children:[(0,k.jsx)(`button`,{className:`bling-toggle`,onClick:()=>u(!l),children:l?`기본`:`bling`}),(0,k.jsxs)(`div`,{className:`report-cover`,children:[(0,k.jsxs)(`h1`,{children:[(0,k.jsx)(`span`,{className:`report-cover-brand`,children:`MIND2ACTION`}),` 성향 코칭 리포트`]}),(0,k.jsxs)(`div`,{className:`report-cover-name`,children:[r.name,`님`]}),(0,k.jsxs)(`div`,{className:`report-cover-meta`,children:[t.company&&(0,k.jsx)(`span`,{children:t.company}),t.department&&(0,k.jsx)(`span`,{children:t.department})]})]}),(0,k.jsxs)(`div`,{className:`report-intro`,children:[(0,k.jsx)(`h2`,{children:U.report.intro.title}),(0,k.jsx)(`ol`,{children:U.report.intro.items.map((e,t)=>(0,k.jsx)(`li`,{children:e},t))})]}),(0,k.jsxs)(el,{number:1,title:`${r.name}${U.report.sections.s1_title}`,children:[(0,k.jsx)(tl,{scores:f,jobType:t.job_type}),(0,k.jsx)(`div`,{className:`report-traits`,children:ar.map(e=>(0,k.jsxs)(`div`,{className:`report-trait-item`,children:[(0,k.jsxs)(`div`,{className:`report-trait-ego`,style:{borderColor:$c[e]},children:[e,` — `,or[e],` `,(0,k.jsxs)(`span`,{children:[f[e],`점 (`,Jc(f[e]),`)`]})]}),(0,k.jsx)(Qc,{text:r.cm2[e]})]},e))})]}),(0,k.jsxs)(el,{number:2,title:U.report.sections.s3_title,children:[(0,k.jsxs)(`div`,{className:`report-strength-badge`,children:[`TOP1 `,(0,k.jsx)(`strong`,{children:or[p]}),`(`,p,`) + TOP2 `,(0,k.jsx)(`strong`,{children:or[m]}),`(`,m,`)`]}),(0,k.jsx)(Qc,{text:r.cm3})]}),(0,k.jsxs)(el,{number:3,title:U.report.sections.s4_title,children:[(0,k.jsx)(`div`,{className:`report-score-table`,children:ar.map(e=>(0,k.jsxs)(`div`,{className:`report-score-cell`,children:[(0,k.jsx)(`div`,{className:`report-score-cell-label`,style:{backgroundColor:$c[e]},children:e}),(0,k.jsx)(`div`,{className:`report-score-cell-value`,children:f[e]})]},e))}),ar.map(e=>{let n=r.cm4_4.find(t=>t.ego===e),i=Yc(e,f[e],t.job_type);return(0,k.jsxs)(`div`,{className:`report-coaching-item`,children:[(0,k.jsxs)(`h4`,{style:{color:$c[e]},children:[e,` — `,or[e]]}),n?(0,k.jsxs)(`div`,{className:`report-coaching-detailed`,children:[(0,k.jsxs)(`div`,{className:`report-detailed-trait`,children:[(0,k.jsx)(`strong`,{children:`성향:`}),` `,n.trait]}),(0,k.jsx)(Qc,{text:n.coaching}),n.script&&(0,k.jsxs)(`div`,{className:`report-detailed-script`,children:[(0,k.jsx)(`strong`,{children:`화법 스크립트:`}),(0,k.jsx)(`p`,{children:n.script})]})]}):i?(0,k.jsxs)(k.Fragment,{children:[(0,k.jsx)(Qc,{text:r.cm4_1[e]}),r.cm4_2[e]&&(0,k.jsx)(`div`,{className:`report-coaching-detail`,children:(0,k.jsx)(Qc,{text:r.cm4_2[e]})})]}):(0,k.jsx)(`p`,{className:`report-coaching-ok`,children:U.report.sections.s4_no_coaching})]},e)}),r.cm4_3&&(0,k.jsx)(`div`,{className:`report-coaching-message`,children:(0,k.jsx)(`p`,{children:r.cm4_3})})]}),r.cm5&&(0,k.jsxs)(el,{number:4,title:r.isInsurance?U.report.sections.s5_title_insurance:r.jobLabel===`관리자`?U.report.sections.s5_title_manager:U.report.sections.s5_title_coach,children:[(0,k.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m,` + BOTTOM `,h]}),(0,k.jsxs)(`div`,{className:`report-cm5`,children:[(0,k.jsx)(`h4`,{children:U.report.sections.s5_manner}),(0,k.jsx)(Qc,{text:r.cm5.manner}),(0,k.jsx)(`h4`,{children:U.report.sections.s5_improvement}),(0,k.jsx)(Qc,{text:r.cm5.improvement})]})]}),r.isInsurance&&(0,k.jsxs)(el,{number:5,title:U.report.sections.s6_title,children:[r.cm6&&(0,k.jsxs)(k.Fragment,{children:[(0,k.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m]}),(0,k.jsx)(Qc,{text:r.cm6})]}),r.cm6_common&&r.cm6_common.length>0&&(0,k.jsx)(`div`,{className:`report-cm6-common`,children:r.cm6_common.map((e,t)=>(0,k.jsxs)(`div`,{className:`report-cm6-common-item`,children:[(0,k.jsx)(`h4`,{children:e.title}),(0,k.jsx)(Qc,{text:e.body})]},t))})]}),r.cm7&&(0,k.jsxs)(el,{number:r.isInsurance?6:5,title:U.report.sections.s7_title,children:[(0,k.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m,` + BOTTOM `,h]}),(0,k.jsx)(Qc,{text:r.cm7})]}),(0,k.jsxs)(`div`,{className:`report-closing`,children:[(0,k.jsx)(`p`,{className:`report-closing-greeting`,children:U.report.closing.greeting}),(0,k.jsxs)(`div`,{className:`report-contact`,children:[U.report.closing.contact.email&&(0,k.jsxs)(`p`,{className:`report-contact-email`,children:[`✉\xA0\xA0`,U.report.closing.contact.email]}),U.report.closing.contact.instagram&&(0,k.jsxs)(`p`,{className:`report-contact-email`,children:[`인스타그램  `,U.report.closing.contact.instagram]}),U.report.closing.contact.phone&&(0,k.jsxs)(`p`,{className:`report-contact-email`,children:[`전화  `,U.report.closing.contact.phone]})]})]}),(0,k.jsx)(`div`,{className:`report-copyright`,children:`© 2026 MIND2ACTION`})]})}function rl(){return(0,k.jsx)(`header`,{className:`header`,children:(0,k.jsxs)(`div`,{className:`header-inner`,children:[(0,k.jsx)(`div`,{className:`header-brand`,children:`MIND2ACTION`}),(0,k.jsx)(`div`,{className:`header-sub`,children:`에고그램 성향 진단`})]})})}function il(){return(0,k.jsxs)(`footer`,{className:`footer`,children:[`MIND2ACTION © 2026 `,(0,k.jsx)(`span`,{className:`footer-version`,children:`v0.7`})]})}function al(){let e=ut(),t=e.pathname===`/admin`,n=e.pathname.startsWith(`/report`);return(0,k.jsxs)(`div`,{className:`app`,children:[!n&&(0,k.jsx)(rl,{}),(0,k.jsx)(`main`,{className:t?`main-content main-admin`:n?`main-content main-report`:`main-content`,children:(0,k.jsxs)(Vt,{children:[(0,k.jsx)(zt,{path:`/admin`,element:(0,k.jsx)(Vc,{})}),(0,k.jsx)(zt,{path:`/report/:id`,element:(0,k.jsx)(nl,{})}),(0,k.jsx)(zt,{path:`/*`,element:(0,k.jsx)(kc,{})})]})}),!n&&(0,k.jsx)(il,{})]})}function ol(){return(0,k.jsx)(kn,{children:(0,k.jsx)(al,{})})}(0,Qn.createRoot)(document.getElementById(`root`)).render((0,k.jsx)(x.StrictMode,{children:(0,k.jsx)(ol,{})}));
+그럼 이대로 진행을 하겠습니다. 모바일로 진행을 하니까 따라오시면 됩니다.” 라고 자신있게 리드해야 함.`}]},Kc={sales:Hc,manager:Uc,coach:Wc},qc={sales:`sales`,coach:`coach`,sales_leader:`manager`,branch_manager:`manager`,training_leader:`manager`,division_head:`manager`,executive:`manager`};function Jc(e){return e>=17?`17-20`:e>=14?`14-16`:e>=11?`11-13`:e>=8?`8-10`:`0-7`}function Yc(e,t,n){let[r,i]=ur[fr(n)]?.[e]||[11,16];return t<r||t>i}function Xc(e,t){return e===`AC`?t>=17:t<=7}function Zc(e,t){let n=qc[t]||`sales`,r=Kc[n];if(!r)return null;let{scores:i,top1:a,top2:o,bottom:s}=e,c={},l={},u={},d={},f=[];for(let e of ar){let t=Jc(i[e]);c[e]=r.cm1[t]?.[e]||``,l[e]=r.cm2[t]?.[e]||``,u[e]=r.cm4_1[t]?.[e]||``,d[e]=r.cm4_2[t]?.[e]||``,Xc(e,i[e])&&f.push({ego:e,...r.cm4_4[e]})}let p=ar.every(e=>!Yc(e,i[e],t)),m=`${a}_${o}`,h=`${a}_${o}_${s}`,g=n===`sales`,_=``,v=``,y=null;if(g)_=r.cm6[m]||``,v=r.cm7[h]||``,y=r.cm8[a]||null;else{v=r.cm7[h]||``;let e=`${a}_${s}`;y=r.cm8[e]||null}return{jobLabel:r.job_label,name:``,isInsurance:g,cm1:c,cm2:l,cm3:r.cm3[m]||``,cm4_1:u,cm4_2:d,cm4_3:p?r.cm4_3.all_no_coaching:``,cm4_4:f,cm5:r.cm5[h]||null,cm6:_,cm6_common:g?Gc?.items||[]:null,cm7:v,cm8:y}}var U={report:{intro:{title:`성향 코칭 리포트의 목적`,items:[`거울로 얼굴을 보듯이 성향리포트로 나의 성향을 발견할 수 있습니다. 이후 다섯가지의 성향을 조절해서 사용할 수 있습니다.`,`나를 진심으로 알게 되면 각성과 성찰을 통해 에고상태의 의식적인 조절과 수정을 실천해 나가게 됩니다. 결국 점점 체득화 되고 습관이 바뀌어 원만한 인간관계와 성공적인 비지니스를 달성할 수 있습니다.`,`특히 비지니스를 하는 사람은 "왜 흔들리는 지"를 알게 하고 "어떻게 다시 중심을 잡을 지"를 스스로 알게 되어 상담을 원하는 방향으로 이끌 수 있고 슬럼프에 빠지는 것을 예방할 수 있습니다.`,`궁극적으로 인생 전반에 거쳐 지금보다 나은 삶을 영위할 수 있으며 특히 사랑하는 사람들과의 좋은 관계를 잘 유지해 나갈 수 있습니다.`]},closing:{greeting:`끝까지 함께해 주셔서 감사합니다. 이 리포트가 작은 거울이 되어 드리길 바랍니다.`,contact:{name:``,email:`egogram.son@gmail.com`,instagram:``,phone:``}},sections:{s1_title:`님의 성향`,s2_title:`자아상태의 성향과 말투`,s3_title:`내 성향의 강점`,s4_title:`내 성향의 조율 포인트`,s4_no_coaching:`조율을 하지 않아도 되는 성향`,s4_detailed_title:`세밀한 코칭`,s5_title_insurance:`보장에 대한 제안을 할 때`,s5_title_manager:`성과에 도움이 되는 화법`,s5_title_coach:`신인PA 성과에 도움되는 코칭`,s5_manner:`이 성향의 말투와 태도`,s5_improvement:`개선이 되는 코칭 내용`,s6_title:`클로징 전 고객님이 거절시`,s7_title:`신인 리크루팅 레벨업`,s8_title:`명언`,quote_encourage:`격려`,quote_improve:`개선`}}};function Qc({text:e}){return e?e.split(/\n\s*\n/).map(e=>e.replace(/\n/g,` `).trim()).filter(Boolean).map((e,t)=>(0,k.jsx)(`p`,{children:e},t)):null}var $c={CP:`#ef4444`,NP:`#f59e0b`,A:`#38bdf8`,FC:`#10b981`,AC:`#8b5cf6`};function el({number:e,title:t,children:n}){return(0,k.jsxs)(`div`,{className:`report-section`,children:[(0,k.jsxs)(`h2`,{className:`report-section-title`,children:[e&&(0,k.jsxs)(`span`,{className:`report-section-num`,children:[e,`.`]}),t]}),n]})}function tl({scores:e,jobType:t}){return(0,k.jsx)(`div`,{className:`report-chart`,children:ar.map(n=>{let[r,i]=pr(n,t);return(0,k.jsxs)(`div`,{className:`report-chart-row`,children:[(0,k.jsxs)(`div`,{className:`report-chart-label`,style:{color:$c[n]},children:[(0,k.jsx)(`strong`,{children:n}),(0,k.jsx)(`span`,{children:or[n]})]}),(0,k.jsxs)(`div`,{className:`report-chart-bar-wrap`,children:[(0,k.jsx)(`div`,{className:`report-chart-success`,style:{left:`${r/20*100}%`,width:`${(i-r+1)/20*100}%`}}),(0,k.jsx)(`div`,{className:`report-chart-bar`,style:{width:`${e[n]/20*100}%`,backgroundColor:$c[n]}})]}),(0,k.jsx)(`div`,{className:`report-chart-score`,children:e[n]})]},n)})})}function nl(){let{id:e}=ht(),[t,n]=(0,x.useState)(null),[r,i]=(0,x.useState)(null),[a,o]=(0,x.useState)(!0),[s,c]=(0,x.useState)(null);(0,x.useEffect)(()=>{async function t(){let{data:t,error:r}=await wc.from(`responses`).select(`*`).eq(`id`,e).single();if(r||!t){c(`리포트를 찾을 수 없습니다.`),o(!1);return}let a={scores:{CP:t.score_cp,NP:t.score_np,A:t.score_a,FC:t.score_fc,AC:t.score_ac},top1:t.top1,top2:t.top2,bottom:t.bottom,total:t.total,grades:t.grades},s=Zc(a,t.job_type);s.name=t.name,n({...t,result:a}),i(s),o(!1)}t()},[e]);let[l,u]=(0,x.useState)(!1);if(a)return(0,k.jsx)(`div`,{className:`report-loading`,children:`리포트 생성 중...`});if(s)return(0,k.jsx)(`div`,{className:`report-error`,children:s});if(!r)return null;let{result:d}=t,{scores:f,top1:p,top2:m,bottom:h}=d;return(0,k.jsxs)(`div`,{className:`report-container ${l?`report-bling`:``}`,children:[(0,k.jsx)(`button`,{className:`bling-toggle`,onClick:()=>u(!l),children:l?`기본`:`bling`}),(0,k.jsxs)(`div`,{className:`report-cover`,children:[(0,k.jsxs)(`h1`,{children:[(0,k.jsx)(`span`,{className:`report-cover-brand`,children:`MIND2ACTION`}),` 성향 코칭 리포트`]}),(0,k.jsxs)(`div`,{className:`report-cover-name`,children:[r.name,`님`]}),(0,k.jsxs)(`div`,{className:`report-cover-meta`,children:[t.company&&(0,k.jsx)(`span`,{children:t.company}),t.department&&(0,k.jsx)(`span`,{children:t.department})]})]}),(0,k.jsxs)(`div`,{className:`report-intro`,children:[(0,k.jsx)(`h2`,{children:U.report.intro.title}),(0,k.jsx)(`ol`,{children:U.report.intro.items.map((e,t)=>(0,k.jsx)(`li`,{children:e},t))})]}),(0,k.jsxs)(el,{number:1,title:`${r.name}${U.report.sections.s1_title}`,children:[(0,k.jsx)(tl,{scores:f,jobType:t.job_type}),(0,k.jsx)(`div`,{className:`report-traits`,children:ar.map(e=>(0,k.jsxs)(`div`,{className:`report-trait-item`,children:[(0,k.jsxs)(`div`,{className:`report-trait-ego`,style:{borderColor:$c[e]},children:[e,` — `,or[e],` `,(0,k.jsxs)(`span`,{children:[f[e],`점 (`,Jc(f[e]),`)`]})]}),(0,k.jsx)(Qc,{text:r.cm2[e]})]},e))})]}),(0,k.jsxs)(el,{number:2,title:U.report.sections.s3_title,children:[(0,k.jsxs)(`div`,{className:`report-strength-badge`,children:[`TOP1 `,(0,k.jsx)(`strong`,{children:or[p]}),`(`,p,`) + TOP2 `,(0,k.jsx)(`strong`,{children:or[m]}),`(`,m,`)`]}),(0,k.jsx)(Qc,{text:r.cm3})]}),(0,k.jsxs)(el,{number:3,title:U.report.sections.s4_title,children:[(0,k.jsx)(`div`,{className:`report-score-table`,children:ar.map(e=>(0,k.jsxs)(`div`,{className:`report-score-cell`,children:[(0,k.jsx)(`div`,{className:`report-score-cell-label`,style:{backgroundColor:$c[e]},children:e}),(0,k.jsx)(`div`,{className:`report-score-cell-value`,children:f[e]})]},e))}),ar.map(e=>{let n=r.cm4_4.find(t=>t.ego===e),i=Yc(e,f[e],t.job_type);return(0,k.jsxs)(`div`,{className:`report-coaching-item`,children:[(0,k.jsxs)(`h4`,{style:{color:$c[e]},children:[e,` — `,or[e]]}),n?(0,k.jsxs)(`div`,{className:`report-coaching-detailed`,children:[(0,k.jsxs)(`div`,{className:`report-detailed-trait`,children:[(0,k.jsx)(`strong`,{children:`성향:`}),` `,n.trait]}),(0,k.jsx)(Qc,{text:n.coaching}),n.script&&(0,k.jsxs)(`div`,{className:`report-detailed-script`,children:[(0,k.jsx)(`strong`,{children:`화법 스크립트:`}),(0,k.jsx)(`p`,{children:n.script})]})]}):i?(0,k.jsxs)(k.Fragment,{children:[(0,k.jsx)(Qc,{text:r.cm4_1[e]}),r.cm4_2[e]&&(0,k.jsx)(`div`,{className:`report-coaching-detail`,children:(0,k.jsx)(Qc,{text:r.cm4_2[e]})})]}):(0,k.jsx)(`p`,{className:`report-coaching-ok`,children:U.report.sections.s4_no_coaching})]},e)}),r.cm4_3&&(0,k.jsx)(`div`,{className:`report-coaching-message`,children:(0,k.jsx)(`p`,{children:r.cm4_3})})]}),r.cm5&&(0,k.jsxs)(el,{number:4,title:r.isInsurance?U.report.sections.s5_title_insurance:r.jobLabel===`관리자`?U.report.sections.s5_title_manager:U.report.sections.s5_title_coach,children:[(0,k.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m,` + BOTTOM `,h]}),(0,k.jsxs)(`div`,{className:`report-cm5`,children:[(0,k.jsx)(`h4`,{children:U.report.sections.s5_manner}),(0,k.jsx)(Qc,{text:r.cm5.manner}),(0,k.jsx)(`h4`,{children:U.report.sections.s5_improvement}),(0,k.jsx)(Qc,{text:r.cm5.improvement})]})]}),r.isInsurance&&(0,k.jsxs)(el,{number:5,title:U.report.sections.s6_title,children:[r.cm6&&(0,k.jsxs)(k.Fragment,{children:[(0,k.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m]}),(0,k.jsx)(Qc,{text:r.cm6})]}),r.cm6_common&&r.cm6_common.length>0&&(0,k.jsx)(`div`,{className:`report-cm6-common`,children:r.cm6_common.map((e,t)=>(0,k.jsxs)(`div`,{className:`report-cm6-common-item`,children:[(0,k.jsx)(`h4`,{children:e.title}),(0,k.jsx)(Qc,{text:e.body})]},t))})]}),r.cm7&&(0,k.jsxs)(el,{number:r.isInsurance?6:5,title:U.report.sections.s7_title,children:[(0,k.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m,` + BOTTOM `,h]}),(0,k.jsx)(Qc,{text:r.cm7})]}),(0,k.jsxs)(`div`,{className:`report-closing`,children:[(0,k.jsx)(`p`,{className:`report-closing-greeting`,children:U.report.closing.greeting}),(0,k.jsxs)(`div`,{className:`report-contact`,children:[U.report.closing.contact.email&&(0,k.jsxs)(`p`,{className:`report-contact-email`,children:[`✉\xA0\xA0`,U.report.closing.contact.email]}),U.report.closing.contact.instagram&&(0,k.jsxs)(`p`,{className:`report-contact-email`,children:[`인스타그램  `,U.report.closing.contact.instagram]}),U.report.closing.contact.phone&&(0,k.jsxs)(`p`,{className:`report-contact-email`,children:[`전화  `,U.report.closing.contact.phone]})]})]}),(0,k.jsx)(`div`,{className:`report-copyright`,children:`© 2026 MIND2ACTION`})]})}function rl(){return(0,k.jsx)(`header`,{className:`header`,children:(0,k.jsxs)(`div`,{className:`header-inner`,children:[(0,k.jsx)(`div`,{className:`header-brand`,children:`MIND2ACTION`}),(0,k.jsx)(`div`,{className:`header-sub`,children:`에고그램 성향 진단`})]})})}function il(){return(0,k.jsxs)(`footer`,{className:`footer`,children:[`MIND2ACTION © 2026 `,(0,k.jsx)(`span`,{className:`footer-version`,children:`v0.8`})]})}function al(){let e=ut(),t=e.pathname===`/admin`,n=e.pathname.startsWith(`/report`);return(0,k.jsxs)(`div`,{className:`app`,children:[!n&&(0,k.jsx)(rl,{}),(0,k.jsx)(`main`,{className:t?`main-content main-admin`:n?`main-content main-report`:`main-content`,children:(0,k.jsxs)(Vt,{children:[(0,k.jsx)(zt,{path:`/admin`,element:(0,k.jsx)(Vc,{})}),(0,k.jsx)(zt,{path:`/report/:id`,element:(0,k.jsx)(nl,{})}),(0,k.jsx)(zt,{path:`/*`,element:(0,k.jsx)(kc,{})})]})}),!n&&(0,k.jsx)(il,{})]})}function ol(){return(0,k.jsx)(kn,{children:(0,k.jsx)(al,{})})}(0,Qn.createRoot)(document.getElementById(`root`)).render((0,k.jsx)(x.StrictMode,{children:(0,k.jsx)(ol,{})}));
