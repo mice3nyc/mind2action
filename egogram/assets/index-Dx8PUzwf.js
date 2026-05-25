@@ -649,7 +649,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 지금 선택해야 할 필요성을 분명히 만든다.
 셋째, 고객님이 안심하고 맡길 수 있다는 확신을 준다.
 
-지금  고객님은 마음속으로 “여기까지 설명했으면 결정할 때가 됐다”라고 느낍니다. 기준을 세우고 밀어붙이는 힘이 강하고, 동시에 고객님에게 도움이 되는 선택을 하게 해주고 싶다는 보호 본능도 같이 올라옵니다. 그래서 말은 단호하지만 방향은 고객님을 위하는 쪽으로 갑니다. 예를 들면 “걱정되시는 부분 제가 책임지고 관리하겠습니다”라든가 “미루실수록 위험은 그대로입니다”처럼 따뜻함과 압박이 함께 들어갑니다.
+이 상황에서 컨설턴트는 “여기까지 설명했으면 결정할 때가 됐다”라고 느낍니다. 기준을 세우고 밀어붙이는 힘이 강하고, 동시에 고객님에게 도움이 되는 선택을 하게 해주고 싶다는 보호 본능도 같이 올라옵니다. 그래서 말은 단호하지만 방향은 고객님을 위하는 쪽으로 갑니다. 예를 들면 “걱정되시는 부분 제가 책임지고 관리하겠습니다”라든가 “미루실수록 위험은 그대로입니다”처럼 따뜻함과 압박이 함께 들어갑니다.
 
 하지만 고객님의 마음은 조금 다릅니다. 틀린 선택을 할까 봐 부담스럽고, 혹시 더 생각해볼 여지가 없나 시간을 벌고 싶은 상태입니다. 그래서 상의, 다음에, 생각해본다는 표현으로 뒤로 물러나 숨을 고르는 겁니다.
 
@@ -657,7 +657,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 지금 해야 하는 근거를 논리로 분명히 한다.
 셋째, 선택 이후의 관리 그림을 보여준다.
 
- 고객님의 마음은 이미 계산이 끝난 상태입니다. 보장도 맞고, 타이밍도 맞고, 더 미루는 것이 손해라는 판단이 서 있습니다. 그래서 머릿속에는 “이제는 정리할 단계”라는 확신이 있습니다. 말은 비교적 단단하게 나가지만 감정이 아니라 사실과 데이터로 밀어붙입니다. “지금 준비 안 하시면 공백이 생깁니다”, “조건 좋을 때 확정하는 게 유리합니다”처럼 근거 중심으로 고객님을 움직이려 합니다. 스스로 보기에는 합리적이고 깔끔한 안내라고 느낍니다.
+ 이 상황에서 컨설턴트는 제안내용도 맞고, 타이밍도 맞고, 더 미루는 것이 손해라는 판단이 서 있습니다. 그래서 머릿속에는 “이제는 정리할 단계”라는 확신이 있습니다. 말은 비교적 단단하게 나가지만 감정이 아니라 사실과 데이터로 밀어붙입니다. “지금 준비 안 하시면 공백이 생깁니다”, “조건 좋을 때 확정하는 게 유리합니다”처럼 근거 중심으로 고객님을 움직이려 합니다. 스스로 보기에는 합리적이고 깔끔한 안내라고 느낍니다.
 
 그런데 고객님의 마음은 조금 다릅니다. 틀릴까 봐 걱정되고, 혹시 놓친 부분이 있을까 봐 불안합니다. 그래서 배우자 상의나 다음에 하겠다는 말로 시간을 벌며 안전한 선택을 찾으려 합니다. 아직 머리보다 마음이 완전히 따라오지 않은 상태입니다.
 
@@ -665,7 +665,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 지금 결정해도 괜찮다는 안심을 준다.
 셋째, 결정 후 좋아질 모습을 그려준다.
 
- 고객님의 마음은 솔직히 답답합니다. 준비는 충분했고 설명도 다 했다고 느끼기 때문입니다. 그래서 속으로는 “왜 또 미루시지?”라는 생각이 올라옵니다. 하지만 표현은 비교적 부드럽고 인간적으로 나갑니다. 분위기를 풀고, 웃고, 가볍게 다가가면서 “충분히 고민되실 수 있어요”라고 공감부터 꺼냅니다. 딱딱하게 몰아붙이기보다는 친근함과 현장 감각으로 자연스럽게 결정을 끌어내려는 모습입니다. 본인은 부담을 줄여주고 있다고 생각합니다.
+ 이 상황에서 컨설턴트의 마음은 솔직히 답답합니다. 준비는 충분했고 설명도 다 했다고 느끼기 때문입니다. 그래서 속으로는 “왜 또 미루시지?”라는 생각이 올라옵니다. 하지만 표현은 비교적 부드럽고 인간적으로 나갑니다. 분위기를 풀고, 웃고, 가볍게 다가가면서 “충분히 고민되실 수 있어요”라고 공감부터 꺼냅니다. 딱딱하게 몰아붙이기보다는 친근함과 현장 감각으로 자연스럽게 결정을 끌어내려는 모습입니다. 본인은 부담을 줄여주고 있다고 생각합니다.
 
 하지만 고객님의 마음은 아직 마지막 불안이 남아 있습니다. 혹시 급하게 결정하는 건 아닐지, 집에 가서 다시 생각하면 다른 선택이 떠오르지 않을지 망설입니다. 그래서 시간을 벌 수 있는 말을 찾게 됩니다. 미루는 말은 거절이라기보다 확신이 더 필요하다는 신호에 가깝습니다.
 
@@ -673,7 +673,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 결정해도 안전하다는 근거를 준다.
 셋째, 오늘 하는 게 왜 유리한지 정리한다.
 
- 고객님의 마음은 이미 답이 나와 있다고 느낍니다. 준비했고, 설명했고, 조건도 맞췄다고 생각합니다. 그래서 속에서는 “여기서 더 뭐가 필요하지?”라는 생각이 올라옵니다. 다만 고객님의 표정과 말의 뉘앙스를 빠르게 읽는 힘이 좋아서 강하게 밀어붙이기 전에 분위기를 살핍니다. 상대가 부담을 느끼는지, 진짜 고민인지, 그냥 습관처럼 미루는지 촉으로 파악하려고 합니다. 그러면서 말은 비교적 단호하고 결론 중심으로 갑니다. “사실 지금 결정 못 하시는 이유가 따로 있으실까요?”처럼 핵심을 바로 건드립니다.
+ 이 상황에서 컨설턴트의 마음은 이미 답이 나와 있다고 느낍니다. 준비했고, 설명했고, 조건도 맞췄다고 생각합니다. 그래서 속에서는 “여기서 더 뭐가 필요하지?”라는 생각이 올라옵니다. 다만 고객님의 표정과 말의 뉘앙스를 빠르게 읽는 힘이 좋아서 강하게 밀어붙이기 전에 분위기를 살핍니다. 상대가 부담을 느끼는지, 진짜 고민인지, 그냥 습관처럼 미루는지 촉으로 파악하려고 합니다. 그러면서 말은 비교적 단호하고 결론 중심으로 갑니다. “사실 지금 결정 못 하시는 이유가 따로 있으실까요?”처럼 핵심을 바로 건드립니다.
 
 하지만 고객님의 마음은 압박을 피하고 싶은 상태일 가능성이 큽니다. 아직 완전히 확신이 안 섰거나, 책임지는 느낌이 무거워서 시간을 벌고 싶습니다. 그래서 상의, 다음에 같은 말을 꺼냅니다. 마음은 불안 쪽에 더 가깝습니다.
 
@@ -681,7 +681,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 결정을 도와주는 기준을 잡아준다.
 셋째, 지금 선택해도 괜찮다는 확신을 준다.
 
- 고객님의 마음은 고객님을 놓치고 싶지 않은 보호자의 마음이 먼저 올라옵니다. 도움이 되어야 한다는 생각, 혹시라도 손해 보게 하면 안 된다는 마음이 큽니다. 동시에 기준을 세우고 결론을 내야 한다는 책임감도 같이 작동합니다. 그래서 말은 따뜻하지만 방향은 또렷합니다. “충분히 상의하실 수 있는데요, 혹시 가장 걸리는 부분이 어떤 걸까요?”처럼 배려를 깔고 핵심을 묻습니다. 필요하면 “제가 볼 때는 지금 준비하시는 게 더 안전합니다”라고 정리해 주려 합니다.
+ 이 상황에서 컨설턴트의 마음은 고객님을 놓치고 싶지 않은 보호자의 마음이 먼저 올라옵니다. 도움이 되어야 한다는 생각, 혹시라도 손해 보게 하면 안 된다는 마음이 큽니다. 동시에 기준을 세우고 결론을 내야 한다는 책임감도 같이 작동합니다. 그래서 말은 따뜻하지만 방향은 또렷합니다. “충분히 상의하실 수 있는데요, 혹시 가장 걸리는 부분이 어떤 걸까요?”처럼 배려를 깔고 핵심을 묻습니다. 필요하면 “제가 볼 때는 지금 준비하시는 게 더 안전합니다”라고 정리해 주려 합니다.
 
 하지만 고객님의 마음은 아직 결정 부담을 피하고 싶은 상태일 때가 많습니다. 틀릴까 봐, 괜히 급하게 했다가 후회할까 봐 시간을 벌고 싶습니다. 그래서 상의나 다음이라는 표현으로 숨을 고릅니다. 누군가 확신을 대신 져주길 바라기도 합니다.
 
@@ -689,7 +689,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 숫자와 기준으로 결정을 도와준다.
 셋째, 지금 선택해도 불안하지 않게 만든다.
 
-이 상황에서 고객님의 마음은 “도움이 되고 싶다”가 가장 먼저 올라옵니다. 괜히 부담을 줘서 관계를 망치고 싶지 않고, 고객님이 편안해야 한다고 생각합니다. 동시에 머리는 계산을 합니다. 언제 준비하는 게 유리한지, 미루면 무엇이 달라지는지를 빠르게 정리합니다. 그래서 말은 부드럽지만 내용은 현실적입니다. “충분히 상의 가능하신데요, 혹시 결정에 가장 걸리는 숫자가 어떤 부분일까요?”처럼 접근합니다. 감정을 안정시키면서 판단 자료를 줍니다. 필요하면 “지금 하실 때와 나중의 차이만 비교해 보시죠”라며 표로 정리해 주려 합니다.
+이 상황에서 컨설턴트의 마음은 “도움이 되고 싶다”가 가장 먼저 올라옵니다. 괜히 부담을 줘서 관계를 망치고 싶지 않고, 고객님이 편안해야 한다고 생각합니다. 동시에 머리는 계산을 합니다. 언제 준비하는 게 유리한지, 미루면 무엇이 달라지는지를 빠르게 정리합니다. 그래서 말은 부드럽지만 내용은 현실적입니다. “충분히 상의 가능하신데요, 혹시 결정에 가장 걸리는 숫자가 어떤 부분일까요?”처럼 접근합니다. 감정을 안정시키면서 판단 자료를 줍니다. 필요하면 “지금 하실 때와 나중의 차이만 비교해 보시죠”라며 표로 정리해 주려 합니다.
 
 반면 고객님의 마음은 아직 확신이 부족합니다. 틀린 선택을 할까 봐 시간을 벌고 싶고, 누군가 명확하게 정리해 주길 바랍니다. 거절이라기보다 불안 회피에 가깝습니다.
 
@@ -697,7 +697,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 분위기를 부드럽게 풀어 마음의 문을 연다.
 셋째, 결정이 쉬워지도록 한 걸음만 제시한다.
 
-이 성향은 마음속에 “부담 주지 말자, 기분 좋게 끝내자”가 가장 크게 움직입니다. 혹시라도 강하게 말했다가 관계가 틀어질까 봐 속도를 늦추고, 고객님이 웃으면서 이야기하도록 분위기를 만듭니다. 그래서 응대는 따뜻하고 친근합니다. “네, 당연히 상의하셔야죠. 제가 괜히 급하게 하는 사람 되면 안 되니까요.” 같은 말이 자연스럽게 나옵니다. 중간중간 농담이나 공감으로 긴장을 풀어 주고, 선택을 편안하게 느끼게 해 줍니다.
+이 상황에서 컨설턴트의 마음은 “부담 주지 말자, 기분 좋게 끝내자”가 가장 크게 움직입니다. 혹시라도 강하게 말했다가 관계가 틀어질까 봐 속도를 늦추고, 고객님이 웃으면서 이야기하도록 분위기를 만듭니다. 그래서 응대는 따뜻하고 친근합니다. “네, 당연히 상의하셔야죠. 제가 괜히 급하게 하는 사람 되면 안 되니까요.” 같은 말이 자연스럽게 나옵니다. 중간중간 농담이나 공감으로 긴장을 풀어 주고, 선택을 편안하게 느끼게 해 줍니다.
 
 하지만 고객님의 마음은 조금 다릅니다. 사실은 더 설명을 듣고 싶은데 스스로 결정하기가 부담스럽거나, 누군가 등을 살짝 밀어주길 기다리는 경우가 많습니다. 겉으로는 미루지만 속에서는 정리를 원합니다.
 
@@ -705,7 +705,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 부담을 줄이며 선택을 돕는다.
 셋째, 편안함 속에서 방향을 제시한다.
 
-이 성향은 마음속에서 “지금 밀어붙이면 부담 느끼시지 않을까?”라는 생각이 가장 먼저 올라옵니다. 상대 반응을 매우 빠르게 캐치하고, 혹시라도 싫은 기색이 보이면 바로 속도를 낮춥니다. 그래서 응대는 조심스럽고 배려 깊습니다. “네, 상의 충분히 하셔야죠. 결정은 편하실 때 하시면 됩니다.” 같은 말로 안전한 공간을 만들어 줍니다. 고객님 입장에서 듣기 편하고 사람 좋다는 느낌을 받습니다.
+이 상황에서 컨설턴트의 마음은 “지금 밀어붙이면 부담 느끼시지 않을까?”라는 생각이 가장 먼저 올라옵니다. 상대 반응을 매우 빠르게 캐치하고, 혹시라도 싫은 기색이 보이면 바로 속도를 낮춥니다. 그래서 응대는 조심스럽고 배려 깊습니다. “네, 상의 충분히 하셔야죠. 결정은 편하실 때 하시면 됩니다.” 같은 말로 안전한 공간을 만들어 줍니다. 고객님 입장에서 듣기 편하고 사람 좋다는 느낌을 받습니다.
 
 하지만 이 순간 고객님의 속마음은 조금 다를 수 있습니다. 누군가 책임 있게 정리해 주길 바라면서도 괜히 먼저 결정하기는 부담스러워 잠깐 뒤로 물러나 있는 경우가 많습니다. 즉, 편안함은 고맙지만 동시에 리드를 기다립니다.
 
@@ -713,7 +713,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 둘째, 선택을 미루는 이유를 정확히 묻는다.
 셋째, 결정을 도와주는 방향을 제시한다.
 
-이 성향은 속으로 이미 계산이 끝나 있습니다. “지금 미루면 위험은 그대로 남는다”라는 판단이 서 있고, 합리적으로 보면 오늘 정리하는 게 맞다고 생각합니다. 그래서 응대는 논리적이고 단단합니다. “충분히 고민하실 수 있습니다. 다만 보장 공백이 생기는 기간은 고객님께 그대로 남습니다.”처럼 현실을 분명하게 알려 줍니다. 말이 흔들리지 않고 기준이 있기 때문에 전문가 느낌을 줍니다.
+이 상황에서 컨설턴트의 마음은 “지금 미루면 위험은 그대로 남는다”라는 판단이 서 있고, 합리적으로 보면 오늘 정리하는 게 맞다고 생각합니다. 그래서 응대는 논리적이고 단단합니다. “충분히 고민하실 수 있습니다. 다만 보장 공백이 생기는 기간은 고객님께 그대로 남습니다.”처럼 현실을 분명하게 알려 줍니다. 말이 흔들리지 않고 기준이 있기 때문에 전문가 느낌을 줍니다.
 
 하지만 고객님의 마음은 꼭 계산대로만 움직이지 않습니다. 필요성은 이해했지만 결정의 책임이 부담스러워 잠깐 피하고 싶은 상태일 수 있습니다. 그래서 시간을 벌 수 있는 말을 꺼냅니다. 이때 너무 정답만 말하면 고객님은 맞는 말인데도 마음이 닫힐 수 있습니다.
 
@@ -7681,13 +7681,11 @@ CP는 팀을 단단하게 세웁니다. 흐트러짐을 그냥 넘기지 않고,
 
 감정을 억누르는 힘보다, 표현하는 용기가 더 필요하다
 의미- 감정 표현의 두려움을 낮춤
--브레네 브라운`}}},Uc={items:[{title:`거절의 고객 심리`,body:`먼저 고객이 “배우자와 상의해 보겠다"  “조금 더 생각 해 보겠다"는  거절의 근저에 있는 심리와
-클로징 전에 이런 거절이 나온 이유는  계약을 거절하겠다는 말이 아니라 ‘결정을 하기에는 아직 심리적으로 안전하지 않다'는 신호.  고객은 어느정도 이해했고 상품의 필요성도 인식했으며 진짜 심리는 “안하겠다"가 아니라 “지금 결정할 마음이 아직 아니다" 인 경우가 많음.  이때 컨설턴트의 역할은 설득자가 되면 안되고  결정을 가능하게 만드는 조율자가 되야 함. 
-이 단계에서 고객의 문제는 이해부족이 아니라 결정불안이니 절대로 설득과 결론을 밀지 말아야 함.`},{title:`화법 스크립트 코칭`,body:`그 다음은 계약을 PUSH하지 말고 더 이성적으로 잘 판단할 수 있도록 역할을 해야함.
-고객이 어디까지 결정했고 무엇이 남아 있는지 정리
-                                   “이 보장이 필요한 지 여부는 어느정도 공감이  되셨는지요?" 
-                                   “망설여지는 진짜 이유는 무엇일까요?” “보장내용 때문일까요? 아니면 보험료 때문일까요?”
-                                   “그럼 핵심만 정리한 내용을 하나 드릴게요 이걸 보시고  판단을 해보시지요"
-       가장 잘못된 대응은 “상의해 보시고 연락주세요" “ 그럼 생각해 보시고 연락주세요" 이 말은 바로 계약 이탈이 됨`},{title:`클로징 화법`,body:`(계약체결을 해야 할 시점이 오면)
+-브레네 브라운`}}},Uc={items:[{title:`고객의 실제 심리 해석`,body:`먼저 고객이 “배우자와 상의해 보겠다"  “조금 더 생각 해 보겠다"는  거절의 근저에 있는 심리는  계약을 거절하겠다는 말이 아니라 ‘결정을 하기에는 아직 심리적으로 안전하지 않다'는 신호라고 판단하면 됨. 고객은 어느정도 이해했고 상품의 필요성도 인식했으며 진짜 심리는 “안하겠다"가 아니라 “지금 결정할 마음이 아직 아니다" 인 경우가 많음.  이때 컨설턴트의 역할은 설득자이기 보다는  결정을 가능하게 만드는 조율자가 되야 함. 
+이 단계에서 고객의 문제는 이해부족이 아니라 결정불안이니 절대로 설득과 결론을 밀지 말아야 함.`},{title:`재질문 및 재결정 유도`,body:`먼저 고객이 어디까지 결정했고 무엇이 남아 있는지 질문을 통해서 알아봐야 합.
+ “이 보장이 필요한 지 여부는 어느정도 공감이  되셨는지요?" 
+ “망설여지는 진짜 이유는 무엇일까요?” “보장내용 때문일까요? 아니면 보험료 때문일까요?”
+ “그럼 핵심만 정리한 내용을 하나 드릴게요 이걸 보시고  판단을 해보시지요"
+가장 잘못된 대응은 “상의해 보시고 연락주세요" “ 그럼 생각해 보시고 연락주세요" 이 말은 바로 계약 이탈이 됨.`},{title:`최종 진행 멘트`,body:`(계약체결을 해야 할 시점이 오면)
 “더 궁금한 점은 있으세요?
 그럼 이대로 진행을 하겠습니다. 모바일로 진행을 하니까 따라오시면 됩니다.” 라고 자신있게 리드해야 함.`}]},Wc={sales:Bc,manager:Vc,coach:Hc},Gc={sales:`sales`,coach:`coach`,sales_leader:`manager`,branch_manager:`manager`,training_leader:`manager`,division_head:`manager`,executive:`manager`};function Kc(e){return e>=17?`17-20`:e>=14?`14-16`:e>=11?`11-13`:e>=8?`8-10`:`0-7`}function qc(e,t,n){let[r,i]=lr[dr(n)]?.[e]||[11,16];return t<r||t>i}function Jc(e,t){return e===`AC`?t>=17:t<=7}function Yc(e,t){let n=Gc[t]||`sales`,r=Wc[n];if(!r)return null;let{scores:i,top1:a,top2:o,bottom:s}=e,c={},l={},u={},d={},f=[];for(let e of ir){let t=Kc(i[e]);c[e]=r.cm1[t]?.[e]||``,l[e]=r.cm2[t]?.[e]||``,u[e]=r.cm4_1[t]?.[e]||``,d[e]=r.cm4_2[t]?.[e]||``,Jc(e,i[e])&&f.push({ego:e,...r.cm4_4[e]})}let p=ir.every(e=>!qc(e,i[e],t)),m=`${a}_${o}`,h=`${a}_${o}_${s}`,g=n===`sales`,_=``,v=``,y=null;if(g)_=r.cm6[m]||``,v=r.cm7[h]||``,y=r.cm8[a]||null;else{v=r.cm7[h]||``;let e=`${a}_${s}`;y=r.cm8[e]||null}return{jobLabel:r.job_label,name:``,isInsurance:g,cm1:c,cm2:l,cm3:r.cm3[m]||``,cm4_1:u,cm4_2:d,cm4_3:p?r.cm4_3.all_no_coaching:``,cm4_4:f,cm5:r.cm5[h]||null,cm6:_,cm6_common:g?Uc?.items||[]:null,cm7:v,cm8:y}}var Xc={report:{intro:{title:`성향 코칭 리포트의 목적`,items:[`거울로 얼굴을 보듯이 성향리포트로 나의 성향을 발견할 수 있습니다. 이후 다섯가지의 성향을 조절해서 사용할 수 있습니다.`,`나를 진심으로 알게 되면 각성과 성찰을 통해 에고상태의 의식적인 조절과 수정을 실천해 나가게 됩니다. 결국 점점 체득화 되고 습관이 바뀌어 원만한 인간관계와 성공적인 비지니스를 달성할 수 있습니다.`,`특히 비지니스를 하는 사람은 "왜 흔들리는 지"를 알게 하고 "어떻게 다시 중심을 잡을 지"를 스스로 알게 되어 상담을 원하는 방향으로 이끌 수 있고 슬럼프에 빠지는 것을 예방할 수 있습니다.`,`궁극적으로 인생 전반에 거쳐 지금보다 나은 삶을 영위할 수 있으며 특히 사랑하는 사람들과의 좋은 관계를 잘 유지해 나갈 수 있습니다.`]},closing:{greeting:`끝까지 함께해 주셔서 감사합니다. 이 리포트가 작은 거울이 되어 드리길 바랍니다.`,contact:{name:``,email:`egogram.son@gmail.com`,instagram:``,phone:``}},sections:{s1_title:`님의 성향`,s2_title:`자아상태의 성향과 말투`,s3_title:`내 성향의 강점`,s4_title:`내 성향의 조율 포인트`,s4_no_coaching:`조율을 하지 않아도 되는 성향`,s4_detailed_title:`세밀한 코칭`,s5_title_insurance:`보장에 대한 제안을 할 때`,s5_title_manager:`성과에 도움이 되는 화법`,s5_title_coach:`신인PA 성과에 도움되는 코칭`,s5_manner:`이 성향의 말투와 태도`,s5_improvement:`개선이 되는 코칭 내용`,s6_title:`클로징 전 고객님이 거절시`,s7_title:`신인 리크루팅 레벨업`,s8_title:`명언`,quote_encourage:`격려`,quote_improve:`개선`}}};function Zc({text:e}){return e?e.split(/\n\s*\n/).map(e=>e.replace(/\n/g,` `).trim()).filter(Boolean).map((e,t)=>(0,A.jsx)(`p`,{children:e},t)):null}var Qc={CP:`#ef4444`,NP:`#f59e0b`,A:`#38bdf8`,FC:`#10b981`,AC:`#8b5cf6`};function $c({number:e,title:t,children:n}){return(0,A.jsxs)(`div`,{className:`report-section`,children:[(0,A.jsxs)(`h2`,{className:`report-section-title`,children:[e&&(0,A.jsxs)(`span`,{className:`report-section-num`,children:[e,`.`]}),t]}),n]})}function el({scores:e,jobType:t}){return(0,A.jsx)(`div`,{className:`report-chart`,children:ir.map(n=>{let[r,i]=fr(n,t);return(0,A.jsxs)(`div`,{className:`report-chart-row`,children:[(0,A.jsxs)(`div`,{className:`report-chart-label`,style:{color:Qc[n]},children:[(0,A.jsx)(`strong`,{children:n}),(0,A.jsx)(`span`,{children:ar[n]})]}),(0,A.jsxs)(`div`,{className:`report-chart-bar-wrap`,children:[(0,A.jsx)(`div`,{className:`report-chart-success`,style:{left:`${r/20*100}%`,width:`${(i-r+1)/20*100}%`}}),(0,A.jsx)(`div`,{className:`report-chart-bar`,style:{width:`${e[n]/20*100}%`,backgroundColor:Qc[n]}})]}),(0,A.jsx)(`div`,{className:`report-chart-score`,children:e[n]})]},n)})})}function tl(){let{id:e}=ht(),[t,n]=(0,x.useState)(null),[r,i]=(0,x.useState)(null),[a,o]=(0,x.useState)(!0),[s,c]=(0,x.useState)(null);(0,x.useEffect)(()=>{async function t(){let{data:t,error:r}=await Sc.from(`responses`).select(`*`).eq(`id`,e).single();if(r||!t){c(`리포트를 찾을 수 없습니다.`),o(!1);return}let a={scores:{CP:t.score_cp,NP:t.score_np,A:t.score_a,FC:t.score_fc,AC:t.score_ac},top1:t.top1,top2:t.top2,bottom:t.bottom,total:t.total,grades:t.grades},s=Yc(a,t.job_type);s.name=t.name,n({...t,result:a}),i(s),o(!1)}t()},[e]);let[l,u]=(0,x.useState)(!1);if(a)return(0,A.jsx)(`div`,{className:`report-loading`,children:`리포트 생성 중...`});if(s)return(0,A.jsx)(`div`,{className:`report-error`,children:s});if(!r)return null;let{result:d}=t,{scores:f,top1:p,top2:m,bottom:h}=d;return(0,A.jsxs)(`div`,{className:`report-container ${l?`report-bling`:``}`,children:[(0,A.jsx)(`button`,{className:`bling-toggle`,onClick:()=>u(!l),children:l?`기본`:`bling`}),(0,A.jsxs)(`div`,{className:`report-cover`,children:[(0,A.jsx)(`div`,{className:`report-cover-title`,children:(0,A.jsxs)(`h1`,{children:[(0,A.jsx)(`span`,{className:`report-cover-brand`,children:`MIND2ACTION`}),` 성향 코칭 리포트`]})}),(0,A.jsxs)(`div`,{className:`report-cover-id`,children:[(0,A.jsxs)(`div`,{className:`report-cover-name`,children:[r.name,`님`]}),(0,A.jsxs)(`div`,{className:`report-cover-meta`,children:[t.company&&(0,A.jsx)(`span`,{children:t.company}),t.department&&(0,A.jsx)(`span`,{children:t.department})]})]})]}),(0,A.jsxs)(`div`,{className:`report-intro`,children:[(0,A.jsx)(`h2`,{children:Xc.report.intro.title}),(0,A.jsx)(`ol`,{children:Xc.report.intro.items.map((e,t)=>(0,A.jsx)(`li`,{children:e},t))})]}),(0,A.jsxs)($c,{number:1,title:`${r.name}${Xc.report.sections.s1_title}`,children:[(0,A.jsx)(el,{scores:f,jobType:t.job_type}),(0,A.jsx)(`div`,{className:`report-traits`,children:ir.map(e=>(0,A.jsxs)(`div`,{className:`report-trait-item`,children:[(0,A.jsxs)(`div`,{className:`report-trait-ego`,style:{borderColor:Qc[e]},children:[e,` — `,ar[e],` `,(0,A.jsxs)(`span`,{children:[f[e],`점`]})]}),(0,A.jsx)(Zc,{text:r.cm2[e]})]},e))})]}),(0,A.jsxs)($c,{number:2,title:Xc.report.sections.s3_title,children:[(0,A.jsxs)(`div`,{className:`report-strength-badge`,children:[`TOP1 `,(0,A.jsx)(`strong`,{children:ar[p]}),`(`,p,`) + TOP2 `,(0,A.jsx)(`strong`,{children:ar[m]}),`(`,m,`)`]}),(0,A.jsx)(Zc,{text:r.cm3})]}),(0,A.jsxs)($c,{number:3,title:Xc.report.sections.s4_title,children:[(0,A.jsx)(`div`,{className:`report-score-table`,children:ir.map(e=>(0,A.jsxs)(`div`,{className:`report-score-cell`,children:[(0,A.jsx)(`div`,{className:`report-score-cell-label`,style:{backgroundColor:Qc[e]},children:e}),(0,A.jsx)(`div`,{className:`report-score-cell-value`,children:f[e]})]},e))}),ir.map(e=>{let n=r.cm4_4.find(t=>t.ego===e),i=qc(e,f[e],t.job_type);return(0,A.jsxs)(`div`,{className:`report-coaching-item`,children:[(0,A.jsxs)(`h4`,{style:{color:Qc[e]},children:[e,` — `,ar[e]]}),n?(0,A.jsxs)(`div`,{className:`report-coaching-detailed`,children:[(0,A.jsxs)(`div`,{className:`report-detailed-trait`,children:[(0,A.jsx)(`strong`,{children:`성향:`}),` `,n.trait]}),(0,A.jsx)(Zc,{text:n.coaching}),n.script&&(0,A.jsxs)(`div`,{className:`report-detailed-script`,children:[(0,A.jsx)(`strong`,{children:`화법 스크립트:`}),(0,A.jsx)(`p`,{children:n.script})]})]}):i?(0,A.jsxs)(A.Fragment,{children:[(0,A.jsx)(Zc,{text:r.cm4_1[e]}),r.cm4_2[e]&&(0,A.jsx)(`div`,{className:`report-coaching-detail`,children:(0,A.jsx)(Zc,{text:r.cm4_2[e]})})]}):(0,A.jsx)(`p`,{className:`report-coaching-ok`,children:Xc.report.sections.s4_no_coaching})]},e)}),r.cm4_3&&(0,A.jsx)(`div`,{className:`report-coaching-message`,children:(0,A.jsx)(`p`,{children:r.cm4_3})})]}),r.cm5&&(0,A.jsxs)($c,{number:4,title:r.isInsurance?Xc.report.sections.s5_title_insurance:r.jobLabel===`관리자`?Xc.report.sections.s5_title_manager:Xc.report.sections.s5_title_coach,children:[(0,A.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m,` + BOTTOM `,h]}),(0,A.jsxs)(`div`,{className:`report-cm5`,children:[(0,A.jsx)(Zc,{text:r.cm5.manner}),(0,A.jsx)(`div`,{className:`report-cm5-improvement`,children:(0,A.jsx)(Zc,{text:r.cm5.improvement})})]})]}),r.isInsurance&&(0,A.jsxs)($c,{number:5,title:Xc.report.sections.s6_title,children:[r.cm6&&(0,A.jsxs)(A.Fragment,{children:[(0,A.jsxs)(`div`,{className:`report-combination`,children:[`TOP1 `,p,` + TOP2 `,m]}),(0,A.jsx)(Zc,{text:r.cm6})]}),r.cm6_common&&r.cm6_common.length>0&&(0,A.jsx)(`div`,{className:`report-cm6-common`,children:r.cm6_common.map((e,t)=>(0,A.jsxs)(`div`,{className:`report-cm6-common-item`,children:[(0,A.jsx)(`h4`,{children:e.title}),(0,A.jsx)(Zc,{text:e.body})]},t))})]}),(0,A.jsx)(`div`,{className:`report-closing`,children:(0,A.jsx)(`p`,{className:`report-closing-greeting`,children:Xc.report.closing.greeting})}),(0,A.jsxs)(`div`,{className:`report-footer-bar`,children:[(0,A.jsx)(`span`,{className:`report-footer-copyright`,children:`© 2026 MIND2ACTION`}),Xc.report.closing.contact.email&&(0,A.jsxs)(`span`,{className:`report-footer-email`,children:[`✉\xA0\xA0`,Xc.report.closing.contact.email]})]})]})}function nl(){return(0,A.jsx)(`header`,{className:`header`,children:(0,A.jsxs)(`div`,{className:`header-inner`,children:[(0,A.jsx)(`div`,{className:`header-brand`,children:`MIND2ACTION`}),(0,A.jsx)(`div`,{className:`header-sub`,children:`에고그램 성향 진단`})]})})}function rl(){return(0,A.jsxs)(`footer`,{className:`footer`,children:[`MIND2ACTION © 2026 `,(0,A.jsx)(`span`,{className:`footer-version`,children:`v0.8`})]})}function il(){let e=ut(),t=e.pathname===`/admin`,n=e.pathname.startsWith(`/report`);return(0,A.jsxs)(`div`,{className:`app`,children:[!n&&(0,A.jsx)(nl,{}),(0,A.jsx)(`main`,{className:t?`main-content main-admin`:n?`main-content main-report`:`main-content`,children:(0,A.jsxs)(Bt,{children:[(0,A.jsx)(Rt,{path:`/admin`,element:(0,A.jsx)(zc,{})}),(0,A.jsx)(Rt,{path:`/report/:id`,element:(0,A.jsx)(tl,{})}),(0,A.jsx)(Rt,{path:`/*`,element:(0,A.jsx)(Dc,{})})]})}),!n&&(0,A.jsx)(rl,{})]})}function al(){return(0,A.jsx)(On,{children:(0,A.jsx)(il,{})})}(0,Zn.createRoot)(document.getElementById(`root`)).render((0,A.jsx)(x.StrictMode,{children:(0,A.jsx)(al,{})}));
