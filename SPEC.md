@@ -301,19 +301,26 @@ egogram/
 
 | 파일 | 직군 | 비고 |
 |------|------|------|
-| `src/data/cm_insurance.yaml` | 컨설턴트(sales) | cm1~cm8 + cm6 조합 20 |
-| `src/data/cm_manager.yaml` | 리더(manager) | cm2 v0.6 신규, cm3~cm8은 구 데이터 |
-| `src/data/cm_coach.yaml` | 코치(coach) | cm2 v0.6 신규, cm3~cm8은 구 데이터 |
+| `src/data/cm_insurance.yaml` | 컨설턴트(sales) | v0.8 전체 재변환, cm6 조합 20 + cm7 60 |
+| `src/data/cm_manager.yaml` | 리더(manager) | v0.8 전체 재변환 (cm1·cm8만 보존) |
+| `src/data/cm_coach.yaml` | 코치(coach) | v0.8 전체 재변환 (cm1·cm8만 보존) |
 | `src/data/cm6_common_consultant.yaml` | 컨설턴트 CM6 공통 | v0.7, 3섹션(title·body) |
 
-### 원본 데이터 출처 + v0.8 재변환 예정
+### 원본 데이터 출처 + v0.8 재변환 (5/25 완료)
 
-손소장 전체 새 데이터 = `Assets/incoming/에고그램/data/Archives/{코치,리더,컨설턴트}.xlsx`
-- 코치·리더: 8시트 (CM2·CM3강점추가·CM4-1·CM4-2·CM4-3·CM4-4·CM5코칭추가·CM6)
+손소장 전체 새 데이터 = `Assets/incoming/에고그램/data/Archives/{코치,리더,컨설턴트}.xlsx` (호칭 일원화 완료: 컨설턴트 "고객님"·코치 "신인"·리더 "구성원")
+- 코치·리더: 8시트 (CM2·CM3강점추가·CM4-1·CM4-2·CM4-3·CM4-4·CM5코칭추가|CM5추가·CM6)
 - 컨설턴트: 9시트 (+CM7)
-- 호칭 일원화 완료 상태(컨설턴트 "고객님"·코치 "신인"·리더 "구성원")
 
-**v0.8 예정**: 위 xlsx 전 시트 → cm_*.yaml 통째 재변환. 현재는 코치·리더 CM2 + 컨설턴트 CM6공통·CM2만 반영. CM3·CM4·CM5(세 직군) + 코치·리더 CM6 + 컨설턴트 CM7 미반영 → 옛 호칭 잔존. 재변환으로 데이터+호칭 동시 해소. 변환 시 §10 "엑셀 원본 행 구조" 대조 필수 ("CM3강점추가"·"CM5코칭추가" 시트명 교체/병합 확인).
+**v0.8 완료**: 변환기 `scripts/convert_cm.py`로 위 xlsx 전 시트 → cm_*.yaml 통째 재변환. cm1(자아상태 키워드)·cm8(명언, 렌더 폐기)은 xlsx에 시트가 없어 기존 yaml에서 보존. 결과: 본문 옛 호칭(설계사·지점장·멘토) 0건.
+
+**변환 주의 (convert_cm.py 설계 근거)**:
+- **행 위치가 직군마다 다름** → 행 번호 하드코딩 금지, 라벨 앵커 스캔("점수구간"·"구분 TOP 1/2/BOTTOM"·"에고그램 유형"). 예: CM3강점추가 TOP1 행이 코치/리더=행3, 컨설턴트=행5
+- **시트→yaml키 매핑 직군별 상이**: 코치/리더 CM6(리크루팅)→`cm7` / 컨설턴트 CM6(클로징)→`cm6`·CM7(리크루팅)→`cm7`. 코치/리더 `cm6`은 비어있음
+- **CM5 시트명**: 코치="CM5 코칭 추가" / 리더="CM5추가" / 컨설턴트="CM5" → 접두어 매칭. 컨설턴트만 본문 2행(manner+improvement), 코치/리더는 1행(manner)
+- **CM4-4 AC 이중 컬럼**: 시트에 AC가 0~7점·17점이상 두 컬럼 → 트리거 조건(CP/NP/A/FC=0-7, AC=17+)에 맞는 컬럼만 채택
+- **CM4-2 "코칭이 필요없는 구간"**: 셀이 빈칸이거나 리터럴 "코칭이 필요없는 구간" 텍스트 → 원본 그대로 보존(기존 동작과 동일)
+- **some_coaching**: 5/18 폐기, cmLookup.js 미참조 → 빈 문자열 처리(옛 호칭 잔존 죽은 데이터 제거)
 
 ### 리포트 렌더링 변경 (5/18 회의 반영)
 
@@ -333,6 +340,10 @@ egogram/
 - **마무리(closing)**: 시그니처 이름(손용배) 제거 + 이메일 표기 `✉  {email}` (레이블 "이메일:" 폐기, `.report-contact-email` 중앙). `ui_texts.closing.contact.name` 빈 값으로
 - **하단 카피라이트**: report-container 맨 아래 `<div class="report-copyright">© 2026 MIND2ACTION</div>` (작은 회색 중앙)
 - **참여자 결과화면(ResultPage)**: 총점(`result-total`) + "처음부터 다시" 버튼 삭제 (총점 높낮이 ≠ 성향 우열 / 재시도 = 성향 왜곡). 그래프 경계선은 `profile?.jobType` 반영
+
+### 리포트 렌더링 변경 (v0.8 — 손소장 26.0525 라이브 확인)
+
+- **§1 점수 뒤 구간 표기 제거**: `report-trait-ego`에서 `{점수}점 (11-13)` → `{점수}점`. 구간 라벨 괄호 삭제. `getScoreRange` import도 ReportPage에서 제거(미사용)
 
 ### 역할 → CM 매핑 (5/18 3종 축소)
 
@@ -392,6 +403,8 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 ```
 
 ### 엑셀 원본 행 구조 (변환 참조)
+
+> ⚠️ 아래 행 번호는 컨설턴트 기준. **코치/리더는 빈 줄 수가 달라 행이 위로 당겨진다**(예: CM3 TOP1이 컨설턴트 행5 vs 코치/리더 행3). 그래서 `convert_cm.py`는 행 번호가 아니라 라벨("구분 TOP 1" 등)을 앵커로 스캔한다. 이 표는 사람이 구조를 읽는 참조용.
 
 | 시트 | 키 행 | 데이터 행 |
 |------|-------|----------|

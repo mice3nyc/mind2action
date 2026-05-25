@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { lookupReport, EGO_STATES, EGO_LABELS, getScoreRange, needsCoaching } from '../../lib/cmLookup';
+import { lookupReport, EGO_STATES, EGO_LABELS, needsCoaching } from '../../lib/cmLookup';
 import { getSuccessRange } from '../../lib/scoreEngine';
 import uiTexts from '../../data/ui_texts.yaml';
 
@@ -143,7 +143,7 @@ export default function ReportPage() {
           {EGO_STATES.map(ego => (
             <div key={ego} className="report-trait-item">
               <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
-                {ego} — {EGO_LABELS[ego]} <span>{scores[ego]}점 ({getScoreRange(scores[ego])})</span>
+                {ego} — {EGO_LABELS[ego]} <span>{scores[ego]}점</span>
               </div>
               <Paragraphs text={report.cm2[ego]} />
             </div>
