@@ -131,7 +131,7 @@
 - [x] **§1 그래프 아래 박스 — 시도 후 원복 ✅** — 원래 구조 유지
 - [x] **목적 아래 여백 축소 ✅** — intro padding-bottom 40→20
 - [x] **인쇄 페이지 나눔 1차 ✅** — `break-inside: avoid` 제거(빈 공간 방지)
-- [ ] **출력 레이아웃 정밀화 (다음 작업) — break-inside 단위 축소** — 섹션 단위 avoid는 §1이 커지면 통째 밀려 빈 공간. 자아상태 항목·CM 카드 등 **작은 단위로 break-inside: avoid 재설정**해 깔끔한 페이지 채움 + 어정쩡한 잘림 둘 다 잡기. 피터공 "inside로 정의하는 구간을 작은 단위로". → 이어서 진행
+- [x] **출력 레이아웃 정밀화 — break-inside 단위 축소 ✅** (5/25) — 섹션 통째 avoid 폐기, 원자 단위에만 적용(자아상태 항목 `.report-trait-item`·코칭 항목 `.report-coaching-item`·CM6 카드 `.report-cm6-common-item`·차트·뱃지·커버·intro·closing·footer). 제목 고립 방지 `break-after: avoid`(섹션 제목·intro h2·cm5 h4). cm5는 통째 보호 시 빈 공간 재발 위험이라 제목만 붙이고 본문 흐름. orphans/widows 2. 빌드·배포 OK → **피터공 인쇄 미리보기(Cmd+P) 라이브 확인 대기**
 
 ### 5/18 회의 미결 (손소장님 답 대기)
 - [ ] 「자아 상태의 성향과 말투」 출처 — CM1(키워드만) vs CM4-1(괄호 부연 + 키워드)

@@ -349,7 +349,7 @@ egogram/
 - **커버 제목 폰트**: `.report-cover-brand`(MIND2ACTION) font-weight 300(얇게), 뒤 "성향 코칭 리포트"는 800 유지. 커버 상단 `margin-top: 20px`(숨통, 반절로 축소)
 - **§1 그래프 아래 박스 — 시도 후 원복**: ScoreChart 뒤 점선+회색 박스(`.report-traits-box`)를 넣어봤으나 원복. 현재 §1은 `ScoreChart` → `.report-traits`(자아상태별 CM2 항목, 각자 border) 원래 구조. 외곽 박스·divider 없음
 - **목적(intro) 아래 여백 축소**: `.report-intro` padding-bottom 40px → 20px (목적 내용과 하단 점선 사이 간격 축소)
-- **인쇄 페이지 나눔**: `@media print`의 `.report-section { break-inside: avoid }` 제거 → 섹션이 페이지를 채우며 흐름(빈 공간 방지). §1이 커지며 통째로 다음 장 밀리던 문제 해소. **다음 작업 예정**: break-inside 단위를 섹션보다 작은 단위(자아상태 항목·카드 등)로 잡아 깔끔한 출력
+- **인쇄 페이지 나눔 (v0.8 정밀화)**: `@media print`에서 `break-inside: avoid`를 섹션 통째가 아니라 **원자 단위**에만 적용 — `.report-cover`·`.report-intro`·`.report-chart`·`.report-trait-item`(자아상태 항목)·`.report-strength-badge`·`.report-coaching-item`(코칭 항목)·`.report-coaching-message`·`.report-combination`·`.report-cm6-common-item`(CM6 카드)·`.report-closing`·`.report-footer-bar`. 항목 하나가 페이지 경계에서 쪼개지지 않으면서, 단위가 작아 남은 공간을 채우므로 빈 공간도 최소화. 제목 고립 방지로 `break-after: avoid`를 `.report-section-title`·`.report-intro h2`·`.report-cm5 h4`에 적용. **cm5(성향의 조합)는 manner/improvement가 별도 래핑이 없고 길어질 수 있어 통째 보호 대신 제목만 붙이고 본문은 흐르게 둠**(통째 보호 시 빈 공간 재발 위험). 문단 고아·과부 줄은 `orphans: 2; widows: 2`
 
 ### 역할 → CM 매핑 (5/18 3종 축소)
 
