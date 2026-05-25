@@ -344,6 +344,8 @@ egogram/
 ### 리포트 렌더링 변경 (v0.8 — 손소장 26.0525 라이브 확인)
 
 - **§1 점수 뒤 구간 표기 제거**: `report-trait-ego`에서 `{점수}점 (11-13)` → `{점수}점`. 구간 라벨 괄호 삭제. `getScoreRange` import도 ReportPage에서 제거(미사용)
+- **상단 커버 재배치**: 두꺼운 선(`.report-cover` border-top 3px) → `.report-cover-title`(제목, border-bottom 3px 두꺼운 선) → `.report-cover-id`(이름·소속, 조금 아래 padding + border-bottom 1px dotted 점선) → 본문 시작. (기존: 제목·이름·소속 후 두꺼운 선 하나)
+- **마무리 재배치**: `.report-closing`(점선 위 border-top dotted) 안에 인사 한 줄 가운데(`.report-closing-greeting`, 좌측정렬·max-width 520 폐지 → 가운데·max-width 680) → `.report-footer-bar`(두꺼운 선 border-top 3px, flex space-between: 좌측 `© 2026 MIND2ACTION` / 우측 `✉ email`). 기존 `.report-copyright` 단독 div + 세로 나열 contact 폐지. 인스타·전화 라인은 새 한 줄 레이아웃에서 제외(빈 값이었음, 필요 시 별도 설계)
 
 ### 역할 → CM 매핑 (5/18 3종 축소)
 

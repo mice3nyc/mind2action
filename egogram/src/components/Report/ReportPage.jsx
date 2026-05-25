@@ -122,11 +122,15 @@ export default function ReportPage() {
         {bling ? '기본' : 'bling'}
       </button>
       <div className="report-cover">
-        <h1><span className="report-cover-brand">MIND2ACTION</span> 성향 코칭 리포트</h1>
-        <div className="report-cover-name">{report.name}님</div>
-        <div className="report-cover-meta">
-          {data.company && <span>{data.company}</span>}
-          {data.department && <span>{data.department}</span>}
+        <div className="report-cover-title">
+          <h1><span className="report-cover-brand">MIND2ACTION</span> 성향 코칭 리포트</h1>
+        </div>
+        <div className="report-cover-id">
+          <div className="report-cover-name">{report.name}님</div>
+          <div className="report-cover-meta">
+            {data.company && <span>{data.company}</span>}
+            {data.department && <span>{data.department}</span>}
+          </div>
         </div>
       </div>
 
@@ -252,14 +256,14 @@ export default function ReportPage() {
 
       <div className="report-closing">
         <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>
-        <div className="report-contact">
-          {uiTexts.report.closing.contact.email && <p className="report-contact-email">✉&nbsp;&nbsp;{uiTexts.report.closing.contact.email}</p>}
-          {uiTexts.report.closing.contact.instagram && <p className="report-contact-email">인스타그램  {uiTexts.report.closing.contact.instagram}</p>}
-          {uiTexts.report.closing.contact.phone && <p className="report-contact-email">전화  {uiTexts.report.closing.contact.phone}</p>}
-        </div>
       </div>
 
-      <div className="report-copyright">© 2026 MIND2ACTION</div>
+      <div className="report-footer-bar">
+        <span className="report-footer-copyright">© 2026 MIND2ACTION</span>
+        {uiTexts.report.closing.contact.email && (
+          <span className="report-footer-email">✉&nbsp;&nbsp;{uiTexts.report.closing.contact.email}</span>
+        )}
+      </div>
     </div>
   );
 }
