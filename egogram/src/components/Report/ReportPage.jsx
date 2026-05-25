@@ -214,10 +214,8 @@ export default function ReportPage() {
             TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
           </div>
           <div className="report-cm5">
-            <h4>{uiTexts.report.sections.s5_manner}</h4>
             <Paragraphs text={report.cm5.manner} />
-            <h4>{uiTexts.report.sections.s5_improvement}</h4>
-            <Paragraphs text={report.cm5.improvement} />
+            <div className="report-cm5-improvement"><Paragraphs text={report.cm5.improvement} /></div>
           </div>
         </Section>
       )}
@@ -245,14 +243,7 @@ export default function ReportPage() {
         </Section>
       )}
 
-      {report.cm7 && (
-        <Section number={report.isInsurance ? 6 : 5} title={uiTexts.report.sections.s7_title}>
-          <div className="report-combination">
-            TOP1 {top1} + TOP2 {top2} + BOTTOM {bottom}
-          </div>
-          <Paragraphs text={report.cm7} />
-        </Section>
-      )}
+      {/* 신인 리크루팅 레벨업(cm7) 섹션 — 5/25 렌더 제거(데이터는 보존) */}
 
       <div className="report-closing">
         <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>

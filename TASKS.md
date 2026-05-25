@@ -131,7 +131,11 @@
 - [x] **§1 그래프 아래 박스 — 시도 후 원복 ✅** — 원래 구조 유지
 - [x] **목적 아래 여백 축소 ✅** — intro padding-bottom 40→20
 - [x] **인쇄 페이지 나눔 1차 ✅** — `break-inside: avoid` 제거(빈 공간 방지)
-- [x] **출력 레이아웃 정밀화 — break-inside 단위 축소 ✅** (5/25) — 섹션 통째 avoid 폐기, 원자 단위에만 적용(자아상태 항목 `.report-trait-item`·코칭 항목 `.report-coaching-item`·CM6 카드 `.report-cm6-common-item`·차트·뱃지·커버·intro·closing·footer). 제목 고립 방지 `break-after: avoid`(섹션 제목·intro h2·cm5 h4). cm5는 통째 보호 시 빈 공간 재발 위험이라 제목만 붙이고 본문 흐름. orphans/widows 2. 빌드·배포 OK → **피터공 인쇄 미리보기(Cmd+P) 라이브 확인 대기**
+- [x] **출력 레이아웃 정밀화 — break-inside 단위 축소 ✅** (5/25) — 섹션 통째 avoid 폐기, 원자 단위에만 적용(자아상태 항목 `.report-trait-item`·코칭 항목 `.report-coaching-item`·CM6 카드 `.report-cm6-common-item`·차트·뱃지·커버·intro·closing·footer). 제목 고립 방지 `break-after: avoid`(섹션 제목·intro h2). orphans/widows 2. 빌드·배포 OK
+- [x] **인쇄 컬러 바 출력 ✅** (5/25) — 그래프 컬러 바·색 라벨이 인쇄 시 흰색으로 빠지던 문제. `@media print`에 `print-color-adjust: exact`(컨테이너 캐스케이드 + 바·success·score-cell-label 명시)
+- [x] **§4(성향의 조율) 소제목 삭제 ✅** (5/25) — "이 성향의 말투와 태도"·"개선이 되는 코칭 내용" h4 제거. manner→improvement 본문 순서 흐름(`.report-cm5-improvement` 16px 간격)
+- [x] **신인 리크루팅 레벨업(cm7) 섹션 삭제 ✅** (5/25) — `s7_title` 섹션 렌더 폐기(데이터 보존). 마지막 섹션이라 번호 시프트 없음 → 보험설계사 §5, 코치/리더 §4가 최대
+- [ ] **인쇄 페이지 나눔·컬러 바 라이브 확인** — 피터공 Cmd+P 미리보기 확인 대기
 
 ### 5/18 회의 미결 (손소장님 답 대기)
 - [ ] 「자아 상태의 성향과 말투」 출처 — CM1(키워드만) vs CM4-1(괄호 부연 + 키워드)

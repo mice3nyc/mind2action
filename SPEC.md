@@ -349,7 +349,10 @@ egogram/
 - **커버 제목 폰트**: `.report-cover-brand`(MIND2ACTION) font-weight 300(얇게), 뒤 "성향 코칭 리포트"는 800 유지. 커버 상단 `margin-top: 20px`(숨통, 반절로 축소)
 - **§1 그래프 아래 박스 — 시도 후 원복**: ScoreChart 뒤 점선+회색 박스(`.report-traits-box`)를 넣어봤으나 원복. 현재 §1은 `ScoreChart` → `.report-traits`(자아상태별 CM2 항목, 각자 border) 원래 구조. 외곽 박스·divider 없음
 - **목적(intro) 아래 여백 축소**: `.report-intro` padding-bottom 40px → 20px (목적 내용과 하단 점선 사이 간격 축소)
-- **인쇄 페이지 나눔 (v0.8 정밀화)**: `@media print`에서 `break-inside: avoid`를 섹션 통째가 아니라 **원자 단위**에만 적용 — `.report-cover`·`.report-intro`·`.report-chart`·`.report-trait-item`(자아상태 항목)·`.report-strength-badge`·`.report-coaching-item`(코칭 항목)·`.report-coaching-message`·`.report-combination`·`.report-cm6-common-item`(CM6 카드)·`.report-closing`·`.report-footer-bar`. 항목 하나가 페이지 경계에서 쪼개지지 않으면서, 단위가 작아 남은 공간을 채우므로 빈 공간도 최소화. 제목 고립 방지로 `break-after: avoid`를 `.report-section-title`·`.report-intro h2`·`.report-cm5 h4`에 적용. **cm5(성향의 조합)는 manner/improvement가 별도 래핑이 없고 길어질 수 있어 통째 보호 대신 제목만 붙이고 본문은 흐르게 둠**(통째 보호 시 빈 공간 재발 위험). 문단 고아·과부 줄은 `orphans: 2; widows: 2`
+- **인쇄 페이지 나눔 (v0.8 정밀화)**: `@media print`에서 `break-inside: avoid`를 섹션 통째가 아니라 **원자 단위**에만 적용 — `.report-cover`·`.report-intro`·`.report-chart`·`.report-trait-item`(자아상태 항목)·`.report-strength-badge`·`.report-coaching-item`(코칭 항목)·`.report-coaching-message`·`.report-combination`·`.report-cm6-common-item`(CM6 카드)·`.report-closing`·`.report-footer-bar`. 항목 하나가 페이지 경계에서 쪼개지지 않으면서, 단위가 작아 남은 공간을 채우므로 빈 공간도 최소화. 제목 고립 방지로 `break-after: avoid`를 `.report-section-title`·`.report-intro h2`에 적용. 문단 고아·과부 줄은 `orphans: 2; widows: 2`
+- **인쇄 컬러 바 출력 (5/25)**: 브라우저는 기본적으로 배경색을 인쇄하지 않아 그래프 컬러 바·색 라벨이 흰색으로 빠짐. `@media print`에서 `-webkit-print-color-adjust: exact; print-color-adjust: exact`를 `.report-container`(전체 캐스케이드) + `.report-chart-bar`·`.report-chart-success`·`.report-score-cell-label`(명시)에 적용
+- **§4(성향의 조율) 소제목 삭제 (5/25)**: cm5 블록의 `s5_manner`("이 성향의 말투와 태도")·`s5_improvement`("개선이 되는 코칭 내용") h4 두 개 제거. manner 본문 → `.report-cm5-improvement`(margin-top 16) 안의 improvement 본문 순서로 흐름. 두 텍스트 사이 16px 간격만으로 구분
+- **신인 리크루팅 레벨업(cm7) 섹션 삭제 (5/25)**: `s7_title` "신인 리크루팅 레벨업" 섹션 렌더 폐기(cm7 yaml/lookup 데이터는 보존). cm7은 항상 마지막 섹션이었으므로 번호 시프트 없음 → 보험설계사 최대 §5(cm6), 코치/리더 최대 §4(cm5)
 
 ### 역할 → CM 매핑 (5/18 3종 축소)
 

@@ -843,6 +843,7 @@ p {
 /* CM5 */
 .report-cm5 h4 { font-size: 14px; font-weight: 700; margin: 20px 0 8px; }
 .report-cm5 p { margin-bottom: 8px; }
+.report-cm5-improvement { margin-top: 16px; }
 
 /* Quotes (CM8) */
 .report-quotes { display: flex; flex-direction: column; gap: 20px; }
@@ -969,6 +970,16 @@ body:has(.report-bling) { background: #fff; }
   .bling-toggle { display: none; }
   .report-container { max-width: 100%; }
 
+  /* 컬러 바·색 라벨이 인쇄에서 사라지지 않게 — 배경색 강제 출력
+     (브라우저는 기본적으로 배경색을 인쇄하지 않음) */
+  .report-container,
+  .report-chart-bar,
+  .report-chart-success,
+  .report-score-cell-label {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   /* 작은 단위 보호 — 항목 하나가 페이지 경계에서 쪼개지지 않게.
      섹션 통째(break-inside)는 빈 공간을 만들어 폐기, 원자 단위에만 적용 */
   .report-cover,
@@ -985,11 +996,9 @@ body:has(.report-bling) { background: #fff; }
     break-inside: avoid;
   }
 
-  /* 제목이 페이지 맨 아래 홀로 남지 않게 — 다음 내용과 붙임.
-     cm5는 통째 보호 대신 제목만 붙여 빈 공간 방지(manner/improvement 본문은 흐름) */
+  /* 제목이 페이지 맨 아래 홀로 남지 않게 — 다음 내용과 붙임 */
   .report-section-title,
-  .report-intro h2,
-  .report-cm5 h4 {
+  .report-intro h2 {
     break-after: avoid;
   }
 
