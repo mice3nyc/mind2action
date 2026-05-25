@@ -143,18 +143,15 @@ export default function ReportPage() {
 
       <Section number={1} title={`${report.name}${uiTexts.report.sections.s1_title}`}>
         <ScoreChart scores={scores} jobType={data.job_type} />
-        <div className="report-traits-divider"></div>
-        <div className="report-traits-box">
-          <div className="report-traits">
-            {EGO_STATES.map(ego => (
-              <div key={ego} className="report-trait-item">
-                <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
-                  {ego} — {EGO_LABELS[ego]} <span>{scores[ego]}점</span>
-                </div>
-                <Paragraphs text={report.cm2[ego]} />
+        <div className="report-traits">
+          {EGO_STATES.map(ego => (
+            <div key={ego} className="report-trait-item">
+              <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
+                {ego} — {EGO_LABELS[ego]} <span>{scores[ego]}점</span>
               </div>
-            ))}
-          </div>
+              <Paragraphs text={report.cm2[ego]} />
+            </div>
+          ))}
         </div>
       </Section>
 

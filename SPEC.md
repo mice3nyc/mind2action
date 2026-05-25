@@ -346,8 +346,10 @@ egogram/
 - **§1 점수 뒤 구간 표기 제거**: `report-trait-ego`에서 `{점수}점 (11-13)` → `{점수}점`. 구간 라벨 괄호 삭제. `getScoreRange` import도 ReportPage에서 제거(미사용)
 - **상단 커버 재배치**: 두꺼운 선(`.report-cover` border-top 3px) → `.report-cover-title`(제목, border-bottom 3px 두꺼운 선) → `.report-cover-id`(이름·소속, 조금 아래 padding + border-bottom 1px dotted 점선) → 본문 시작. (기존: 제목·이름·소속 후 두꺼운 선 하나)
 - **마무리 재배치**: `.report-closing`(인사 한 줄 가운데 `.report-closing-greeting`, 좌측정렬·max-width 520 폐지 → 가운데·max-width 680, 위 점선은 직전 섹션 border-bottom 하나만 — closing 자체 점선 제거로 이중선 해소, `margin-top: -36px`로 인사 위/아래 28px 대칭) → `.report-footer-bar`(두꺼운 선 border-top 3px, flex space-between: 좌측 `© 2026 MIND2ACTION` 굵게 / 우측 `✉ email`). 기존 `.report-copyright` 단독 div + 세로 나열 contact 폐지. 인스타·전화 라인은 새 한 줄 레이아웃에서 제외(빈 값이었음, 필요 시 별도 설계)
-- **커버 제목 폰트**: `.report-cover-brand`(MIND2ACTION) font-weight 300(얇게), 뒤 "성향 코칭 리포트"는 800 유지. 커버 상단 `margin-top: 40px`(숨통)
-- **§1 그래프 아래 박스**: ScoreChart 뒤 `.report-traits-divider`(점선) → `.report-traits-box`(옅은 회색 #fafafa 박스, border 1px #ddd) 안에 자아상태별 CM2 카드(`.report-trait-item` 흰 배경으로 띄움)
+- **커버 제목 폰트**: `.report-cover-brand`(MIND2ACTION) font-weight 300(얇게), 뒤 "성향 코칭 리포트"는 800 유지. 커버 상단 `margin-top: 20px`(숨통, 반절로 축소)
+- **§1 그래프 아래 박스 — 시도 후 원복**: ScoreChart 뒤 점선+회색 박스(`.report-traits-box`)를 넣어봤으나 원복. 현재 §1은 `ScoreChart` → `.report-traits`(자아상태별 CM2 항목, 각자 border) 원래 구조. 외곽 박스·divider 없음
+- **목적(intro) 아래 여백 축소**: `.report-intro` padding-bottom 40px → 20px (목적 내용과 하단 점선 사이 간격 축소)
+- **인쇄 페이지 나눔**: `@media print`의 `.report-section { break-inside: avoid }` 제거 → 섹션이 페이지를 채우며 흐름(빈 공간 방지). §1이 커지며 통째로 다음 장 밀리던 문제 해소. **다음 작업 예정**: break-inside 단위를 섹션보다 작은 단위(자아상태 항목·카드 등)로 잡아 깔끔한 출력
 
 ### 역할 → CM 매핑 (5/18 3종 축소)
 
