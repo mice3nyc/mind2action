@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import SurveyApp from './pages/SurveyApp';
 import AdminApp from './pages/AdminApp';
 import ReportPage from './components/Report/ReportPage';
+import ReportPageV2 from './components/Report/ReportPageV2';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import './styles/praxi.css';
@@ -9,7 +10,7 @@ import './styles/praxi.css';
 function AppContent() {
   const location = useLocation();
   const isAdmin = location.pathname === '/admin';
-  const isReport = location.pathname.startsWith('/report');
+  const isReport = location.pathname.startsWith('/report') || location.pathname.startsWith('/report-v2');
 
   return (
     <div className="app">
@@ -18,6 +19,7 @@ function AppContent() {
         <Routes>
           <Route path="/admin" element={<AdminApp />} />
           <Route path="/report/:id" element={<ReportPage />} />
+          <Route path="/report-v2/:id" element={<ReportPageV2 />} />
           <Route path="/*" element={<SurveyApp />} />
         </Routes>
       </main>

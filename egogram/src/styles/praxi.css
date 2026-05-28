@@ -799,6 +799,34 @@ p {
 .report-trait-ego span { font-weight: 400; color: var(--text-muted); margin-left: 8px; font-size: 12px; }
 .report-trait-item p { margin: 0; }
 
+/* v2 리디자인 (ReportPageV2) */
+.report-v2-flag { position: fixed; top: 16px; left: 16px; z-index: 100; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border: 1px solid #1a6b5c; background: #1a6b5c; color: #fff; }
+.report-scale-note { font-size: 12px; color: var(--text-muted); margin: 0 0 12px; }
+.report-trait-plain { font-size: 13px; font-weight: 600; color: var(--text); margin: 0 0 8px !important; }
+.report-action-group { display: flex; align-items: stretch; gap: 6px; }
+.btn-report-v2 { display: flex; align-items: center; font-size: 11px; font-weight: 700; padding: 0 9px; text-decoration: none; border: 1px solid #1a6b5c; color: #1a6b5c; line-height: 1; }
+.btn-report-v2:hover { background: #1a6b5c; color: #fff; }
+/* intro 서술형 */
+.report-intro-v2 ol { display: none; }
+.report-intro-v2 p { margin: 0 0 12px; line-height: 1.7; }
+.report-intro-v2 p:last-child { margin-bottom: 0; }
+/* §1 종합 정체성 카드 */
+.report-identity { padding: 20px 22px; border: 1.5px solid var(--text); margin-bottom: 28px; }
+.report-identity-toplabel { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--text-muted); margin: 0 0 4px; }
+.report-identity-top { font-size: 26px; font-weight: 800; line-height: 1.25; margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid #e3e3e3; }
+.report-identity-line { font-size: 19px; line-height: 1.5; margin: 0; }
+.report-identity-line strong { font-weight: 800; }
+.report-identity-desc { font-size: 14px; line-height: 1.7; color: var(--text); margin: 12px 0 0; }
+/* 관점 소제목 */
+.report-subhead { font-size: 14px; font-weight: 700; margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
+/* 그래프 ego 코드 (보조, 흐리게) */
+.report-chart-code { font-size: 10px; font-weight: 400; color: #bbb; margin-left: 6px; }
+/* §2 강점 — 정체성 연결 리드 */
+.report-strength-lead { font-size: 14px; font-weight: 600; line-height: 1.6; margin: 0 0 14px; padding: 10px 14px; background: #f7f7f7; }
+/* §3 조율 — 평이 라벨 + 점수, 조율 불필요 한 줄 */
+.report-coaching-item h4 .report-coaching-score { font-weight: 400; color: var(--text-muted); font-size: 12px; margin-left: 6px; }
+.report-coaching-ok-line { font-size: 13px; line-height: 1.6; color: var(--text); margin: 14px 0 0; padding: 10px 14px; background: #f7f7f7; }
+
 /* CM2 */
 .report-cm2-item { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px dotted #ddd; }
 .report-cm2-item:last-child { border-bottom: none; padding-bottom: 0; }

@@ -244,9 +244,12 @@ export default function AdminDashboard({ onLogout }) {
                   <td><EgoTag ego={r.bottom} type="bot" /></td>
                   <td className="td-date">{new Date(r.timestamp).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                   <td>
-                    <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
-                      리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
-                    </a>
+                    <div className="report-action-group">
+                      <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
+                        리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
+                      </a>
+                      <a href={`#/report-v2/${r.id}`} target="_blank" className="btn-report-v2" title="리디자인 v2 리포트">v2</a>
+                    </div>
                   </td>
                   <td>
                     <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>
