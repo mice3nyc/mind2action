@@ -803,6 +803,13 @@ p {
 .report-v2-flag { position: fixed; top: 16px; left: 16px; z-index: 100; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border: 1px solid #1a6b5c; background: #1a6b5c; color: #fff; }
 .report-scale-note { font-size: 12px; color: var(--text-muted); margin: 0 0 12px; }
 .report-trait-plain { font-size: 13px; font-weight: 600; color: var(--text); margin: 0 0 8px !important; }
+/* §1 약한 성향 묶음 — 두드러진 성향(top1·top2) 아래 한 줄 요약(원칙 8) */
+.report-traits-rest { margin-top: 14px; padding: 12px 16px; background: #f7f7f7; display: flex; flex-direction: column; gap: 8px; }
+.report-trait-rest-line { font-size: 13px; line-height: 1.6; color: var(--text); margin: 0 !important; }
+.report-trait-rest-line strong { font-weight: 700; }
+.report-trait-rest-score { color: var(--text-muted); font-size: 12px; margin: 0 8px 0 6px; }
+.report-bling .report-traits-rest { background: none; padding: 16px 0 0; border-top: 1px solid #e5ddd4; }
+.report-bling .report-trait-rest-line { font-size: 14px; }
 .report-action-group { display: flex; align-items: stretch; gap: 6px; }
 .btn-report-v2 { display: flex; align-items: center; font-size: 11px; font-weight: 700; padding: 0 9px; text-decoration: none; border: 1px solid #1a6b5c; color: #1a6b5c; line-height: 1; }
 .btn-report-v2:hover { background: #1a6b5c; color: #fff; }

@@ -109,7 +109,7 @@ function getIdentity(top1, top2, name) {
 }
 
 // 그래프 라벨 — "통제적 부모" 같은 코드 정식명 대신 강점 평이어 (제안 2, 미스리딩 제거)
-const EGO_PLAIN_LABEL = { CP: '기준·결정력', NP: '공감·배려', A: '분석·균형', FC: '표현·활력', AC: '조율·배려심' };
+const EGO_PLAIN_LABEL = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
 
 // 유형 강점 명칭 ("~의 힘", 26.0528 피터공 선택). 가장 강한 유형(top1)을 이 이름으로 부각 — 손소장 강조점.
 // 부모/아이 메타포 제거, 강점 프레이밍. 프로토타입 인라인 — 4단계서 데이터화.
@@ -235,8 +235,9 @@ export default function ReportPageV2() {
       {/* intro — 번호 리스트 대신 서술형 (제안 1) */}
       <div className="report-intro report-intro-v2">
         <h2>{uiTexts.report.intro.title}</h2>
-        <p>거울로 얼굴을 보듯, 성향 리포트로 나의 성향을 발견할 수 있습니다. 다섯 가지 성향을 알아차리고 나면, 그것을 상황에 맞게 조절해 쓸 수 있게 됩니다. 나를 진심으로 알게 될 때 각성과 성찰이 시작되고, 의식적인 조절과 수정을 실천하면서 점차 습관이 바뀌어 원만한 관계와 성공적인 비즈니스로 이어집니다.</p>
-        <p>특히 비즈니스를 하는 사람에게 이 리포트는 "왜 흔들리는지"를 알게 하고 "어떻게 다시 중심을 잡을지"를 스스로 깨닫게 합니다. 그래서 상담을 원하는 방향으로 이끌고, 슬럼프를 예방할 수 있습니다. 궁극적으로 인생 전반에서 지금보다 나은 삶을, 무엇보다 사랑하는 사람들과의 좋은 관계를 오래 이어가도록 돕습니다.</p>
+        <p>성향 리포트는 나를 더 잘 이해하고, 다섯 가지 성향을 상황에 맞게 활용할 수 있도록 돕는 안내서입니다.</p>
+        <p>자신의 강점과 조율할 점을 알게 되면 인간관계와 비즈니스가 더욱 안정적으로 이루어지고, 흔들릴 때 다시 중심을 잡는 데 도움이 됩니다.</p>
+        <p>궁극적으로 더 나은 삶과 좋은 관계를 만들어 가도록 돕는 리포트입니다.</p>
       </div>
 
       {/* ── §1 성향분석 — v2 가이드 2차 (원칙 6·7) ─────────────────
@@ -257,19 +258,40 @@ export default function ReportPageV2() {
         <p className="report-scale-note">각 성향 0~20점</p>
         <ScoreChart scores={scores} jobType={data.job_type} />
 
-        {/* 3. 성향별로 자세히 보기 (깊은 본문 — 이제 "내가 그런 사람인 이유"로 읽힌다) */}
+        {/* 3. 성향별로 자세히 보기 — 강약 차등(원칙 8, 26.0529): 두드러진 성향(top1·top2)은 깊게,
+            나머지는 점수 순 한 줄 묶음. 다섯 평등 리스트 → 인물 초상으로 흐르게. */}
         <h3 className="report-subhead">성향별로 자세히 보기</h3>
-        <div className="report-traits">
-          {EGO_STATES.map(ego => (
-            <div key={ego} className="report-trait-item">
-              <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
-                {EGO_PLAIN_LABEL[ego]} <span>{scores[ego]}점</span>
+        {(() => {
+          const ranked = [...EGO_STATES].sort((a, b) => scores[b] - scores[a]);
+          const deep = ranked.filter(ego => ego === top1 || ego === top2);
+          const rest = ranked.filter(ego => ego !== top1 && ego !== top2);
+          return (
+            <>
+              <div className="report-traits">
+                {deep.map(ego => (
+                  <div key={ego} className="report-trait-item">
+                    <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
+                      {EGO_PLAIN_LABEL[ego]} <span>{scores[ego]}점</span>
+                    </div>
+                    <p className="report-trait-plain">{plainTranslation(ego, scores[ego], report.cm1)}</p>
+                    <Paragraphs text={report.cm2[ego]} />
+                  </div>
+                ))}
               </div>
-              <p className="report-trait-plain">{plainTranslation(ego, scores[ego], report.cm1)}</p>
-              <Paragraphs text={report.cm2[ego]} />
-            </div>
-          ))}
-        </div>
+              {rest.length > 0 && (
+                <div className="report-traits-rest">
+                  {rest.map(ego => (
+                    <p key={ego} className="report-trait-rest-line">
+                      <strong style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]}</strong>
+                      <span className="report-trait-rest-score">{scores[ego]}점</span>
+                      <span className="report-trait-rest-text">{plainTranslation(ego, scores[ego], report.cm1)}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </Section>
 
       <Section number={2} title={uiTexts.report.sections.s3_title}>
@@ -332,9 +354,7 @@ export default function ReportPageV2() {
       {report.cm5 && (
         <Section number={4} title={report.isInsurance ? uiTexts.report.sections.s5_title_insurance : report.jobLabel === '관리자' ? uiTexts.report.sections.s5_title_manager : uiTexts.report.sections.s5_title_coach}>
           <div className="report-cm5">
-            <h3 className="report-subhead">이렇게 말합니다</h3>
             <Paragraphs text={report.cm5.manner} />
-            <h3 className="report-subhead">한 가지 더하면</h3>
             <div className="report-cm5-improvement"><Paragraphs text={report.cm5.improvement} /></div>
           </div>
         </Section>
