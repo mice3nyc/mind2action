@@ -1,6 +1,6 @@
 # SPEC — 고객사별 설문 캠페인 시스템 (mind2action 에고그램)
 
-> 작성: 아리공, 2026-05-31 · 상태: 진행 (선문후코, 코드 전)
+> 작성: 아리공, 2026-05-31 · 상태: **Phase 1 + UI 조정 라이브 (5/31)**. Phase 2 대기
 > 요청 배경: 단일 설문 → 고객사별 설문 캠페인 플랫폼. 설문 생성·링크 카피·고객사별 결과·진행상황/기간/교육일 관리.
 > 결정 (5/31, 피터공): ① 1차 = MVP ② 링크 코드 = 짧은 랜덤 ③ 진입 = 링크 전용 + 랜덤 코드 + 상태 게이팅 (타이핑 코드 중복이라 안 씀)
 
@@ -105,14 +105,23 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 
 ## 7. 단계 (Phasing)
 
-### Phase 1 — MVP (척추, 실사용 가능)
-- [ ] 1-1. SQL 마이그레이션 (campaigns 테이블 + RPC + responses.campaign_id) — **피터공 Supabase SQL Editor 실행**
-- [ ] 1-2. `lib/campaigns.js` — list/create/update/close + 코드 발급, `getCampaignByCode` RPC 래퍼
-- [ ] 1-3. LandingPage 재작성 (URL ?g 파싱 + RPC + 상태 게이팅, VALID_CODES 제거)
-- [ ] 1-4. SurveyApp/storage — campaign_id 전달·저장
-- [ ] 1-5. AdminDashboard 탭 분리 + 캠페인 목록·생성·링크 카피
-- [ ] 1-6. 결과 탭 필터 캠페인 기반화 (GROUP_COLORS 폐기)
-- [ ] 1-7. 빌드·배포·테스트 (캠페인 생성→링크→설문 제출→결과 묶임 확인)
+### Phase 1 — MVP (척추, 실사용 가능) ✅ 5/31 완료·라이브
+- [x] 1-1. SQL 마이그레이션 (campaigns 테이블 + RPC + responses.campaign_id) — 피터공 Supabase SQL Editor 실행. ⚠️ 1차에 1개 statement만 실행돼 컬럼·RPC 누락 → 전체 재실행으로 해결. anon RPC·RLS 차단·컬럼 3중 검증 통과.
+- [x] 1-2. `lib/campaigns.js` — list/create/update + 랜덤 코드 발급(혼동문자 제외, unique 재시도), `getCampaignByCode` RPC 래퍼, `campaignLink()`
+- [x] 1-3. LandingPage 재작성 (URL ?g 파싱 + RPC + 상태 게이팅, VALID_CODES 제거)
+- [x] 1-4. SurveyApp/storage — campaign_id 전달·저장 (group_name=client_name 자동)
+- [x] 1-5. AdminDashboard 탭 분리 + CampaignManager(생성·목록·링크 카피)
+- [x] 1-6. 결과 탭 필터 캠페인 기반화 (GROUP_COLORS 하드코딩 → 동적 colorFor)
+- [x] 1-7. 빌드·배포·테스트 — 피터공 라이브 한 바퀴 OK (캠페인 생성→링크→소속 표시→제출→결과 묶임)
+
+### Phase 1.5 — UI 조정 (5/31, 피터공 피드백 반영) ✅
+- [x] 탭 라벨: 캠페인 → **캠페인 관리** / 결과 → **결과 확인**
+- [x] 생성 폼 3 fieldset 그룹화(기본정보/일정/메모) + 칸별 가시성 안내(고객사명=참여자 표시, 대상설명·메모=관리자만)
+- [x] 캠페인 화면 **2단 레이아웃**: 좌측 세로 생성박스(sticky 330px) + 우측 넓은 목록
+- [x] 목록 컬럼: 고객사·상태·참여시작·참여종료·교육일·참여수·링크복사·**[설문 결과](그 캠페인 필터로 점프)**·관리(마감). 레이블·데이터 중앙정렬
+- [x] **결과 확인 필터 = 드롭다운**(캠페인 많아져도 OK). **일정(참여시작)순 정렬**
+- [x] **샘플 로더 = 캠페인 생성 연동**: 샘플 그룹(망원동·서교동·합정동)을 캠페인으로 자동 생성(재사용)+응답 campaign_id 연결, 일정 staggered
+- [x] 브랜딩 정리: 헤더 MIND2ACTION만(weight 700, 좌정렬)·"에고그램" 노출 전면 제거·EGOGRAM 배지→"소속:{고객사}"·결과 "성향 진단 결과"·"나를 알면 행동이 바뀝니다" 한 줄
 
 ### Phase 2 — 심화
 - [ ] 참여기간 자동 차단 (period_start/end 게이팅 + 마감 UI)
@@ -125,6 +134,13 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - **레거시 호환**: 기존 group_name 응답(망원동 등 더미·실데이터)은 campaign_id null로 남고 결과 탭에 group_name으로 표시.
 
 ## 미확정 / 다음 결정
-- [ ] 캠페인 색 팔레트 자동 배정 방식 (순환 vs 고객사 지정)
-- [ ] 캠페인 "수정" 범위 (기간·교육일·상태만 vs 고객사명도)
-- [ ] 참여수 카운트 쿼리 (매번 count vs 캐시) — MVP는 매번 count
+- [x] 캠페인 색 → 고객사명 해시 기반 동적 `colorFor`(팔레트 8색 순환) 적용
+- [x] 참여수 카운트 → results 기준 매번 count (MVP)
+- [ ] 캠페인 **수정 기능** 미구현 — 현재 마감/재개(status)만. 기간·교육일·고객사명 인라인 수정 필요 시 추가
+- [ ] "주식회사 대한민국" 문구는 코드에 없어 EGOGRAM 배지를 소속 표기로 대체함 — 피터공이 다른 화면 의도였는지 확인 대기
+
+## Phase 2 — 심화 (다음)
+- [ ] 참여기간 자동 차단 (period_start/end 게이팅 + 마감 UI)
+- [ ] 진행상황 대시보드 (참여율·기간 D-day·교육일 카운트다운)
+- [ ] 캠페인 수정 폼
+- [ ] 단체별 리포트 일괄 PDF 저장 (기존 로드맵 항목)

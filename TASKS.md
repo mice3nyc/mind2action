@@ -6,6 +6,14 @@
 
 > 현재 단계: **Phase 1 ✅ + Phase 2 부분 완료 + Phase 3 보험설계사 1차 + 5/18 회의 반영**
 
+## 캠페인 시스템 (고객사별 설문) — 5/31 신설
+
+> 단일 설문 → 고객사별 설문 캠페인 플랫폼. SPEC·체크리스트 = [[_dev/mind2action/CAMPAIGNS|CAMPAIGNS.md]]
+> **Phase 1 + UI 조정 = 라이브 완료 (5/31, 세션401).** 도메인 이전(survey.mind2action.kr)도 같은 세션 완료 → [[_dev/mind2action/ADMIN-SECURITY|ADMIN-SECURITY §4]]
+- [x] campaigns 테이블 + RPC + responses.campaign_id (피터공 SQL)
+- [x] 캠페인 CRUD·랜덤코드 링크·설문 진입 게이팅·관리자 탭(캠페인 관리/결과 확인)·드롭다운 필터·샘플 연동·브랜딩 정리
+- [ ] **Phase 2**: 참여기간 자동 차단 / 진행상황 대시보드 / 캠페인 수정 폼 / 단체별 리포트 일괄 PDF
+
 ## Phase 1: 설문 + 점수 계산 ✅
 
 ### 1-1. 프로젝트 세팅
