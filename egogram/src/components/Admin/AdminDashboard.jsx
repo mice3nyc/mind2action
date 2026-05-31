@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { loadResults, deleteResult, clearResults, saveResult } from '../../lib/storage';
-import { listCampaigns } from '../../lib/campaigns';
+import { listCampaigns, createCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import CampaignManager from './CampaignManager';
 
@@ -113,6 +113,15 @@ export default function AdminDashboard({ onLogout }) {
     if (r.group) groupCounts[r.group] = (groupCounts[r.group] || 0) + 1;
   }
 
+  // 결과 필터 옵션: 캠페인을 일정(참여 시작)순 → 생성순, 그 뒤 레거시 그룹
+  const orderedCampaignNames = [...new Set(
+    campaigns.slice().sort((a, b) =>
+      (a.period_start || '9999-99-99').localeCompare(b.period_start || '9999-99-99')
+      || (a.created_at || '').localeCompare(b.created_at || '')
+    ).map(c => c.client_name)
+  )];
+  const filterOptions = [...orderedCampaignNames, ...groups.filter(g => !orderedCampaignNames.includes(g))];
+
   async function handleDelete(id) {
     const target = results.find(r => r.id === id);
     if (!window.confirm(`${target?.name || ''}님의 결과를 삭제하시겠습니까?`)) return;
@@ -127,14 +136,35 @@ export default function AdminDashboard({ onLogout }) {
   }
 
   async function handleLoadSample() {
+    // 샘플 그룹별로 캠페인 확보 (없으면 생성, 있으면 재사용) → 응답에 연결
+    const existing = await listCampaigns();
+    const byName = {};
+    for (const c of existing) byName[c.client_name] = c;
+    const sampleGroups = [...new Set(sampleData.map(r => r.group))];
+    const idByGroup = {};
+    let idx = 0;
+    for (const g of sampleGroups) {
+      if (byName[g]) {
+        idByGroup[g] = byName[g].id;
+      } else {
+        const periodStart = new Date(Date.now() + idx * 7 * 86400000).toISOString().slice(0, 10);
+        const camp = await createCampaign({
+          clientName: g, target: '샘플 캠페인', status: 'active',
+          periodStart, periodEnd: null, educationDate: null, memo: '테스트용 샘플 데이터',
+        });
+        idByGroup[g] = camp.id;
+      }
+      idx++;
+    }
+    // 샘플 응답 저장 (campaign_id 연결)
     for (const r of sampleData) {
       await saveResult(
         { group: r.group, name: r.name, birthDate: r.birthDate, careerMonths: r.careerMonths, company: r.company || '', department: r.department, jobType: r.jobType, incomeRange: r.incomeRange, recruitCount: r.recruitCount },
-        { scores: r.scores, grades: r.grades, top1: r.top1, top2: r.top2, bottom: r.bottom, total: r.total }
+        { scores: r.scores, grades: r.grades, top1: r.top1, top2: r.top2, bottom: r.bottom, total: r.total },
+        idByGroup[r.group] || null
       );
     }
-    const updated = await loadResults();
-    setResults(updated);
+    await reload();
   }
 
   function handleExportCSV() {
@@ -194,25 +224,17 @@ export default function AdminDashboard({ onLogout }) {
         <>
           <div className="admin-toolbar">
             <div className="admin-filters">
-              <button
-                className={`filter-chip ${filter === 'all' ? 'active' : ''}`}
-                onClick={() => setFilter('all')}
+              <label className="results-filter-label">캠페인</label>
+              <select
+                className="form-input results-filter-select"
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
               >
-                전체 ({results.length})
-              </button>
-              {groups.map(g => {
-                const gc = colorFor(g);
-                return (
-                  <button
-                    key={g}
-                    className={`filter-chip ${filter === g ? 'active' : ''}`}
-                    onClick={() => setFilter(g)}
-                    style={filter === g ? { background: gc.bg, borderColor: gc.bg, color: '#fff' } : { borderColor: gc.bg, color: gc.bg }}
-                  >
-                    {g} ({groupCounts[g] || 0})
-                  </button>
-                );
-              })}
+                <option value="all">전체 ({results.length})</option>
+                {filterOptions.map(g => (
+                  <option key={g} value={g}>{g} ({groupCounts[g] || 0})</option>
+                ))}
+              </select>
             </div>
             <div className="admin-actions">
               <button className="btn btn-secondary" onClick={handleLoadSample}>

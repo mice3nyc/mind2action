@@ -1228,3 +1228,17 @@ body:has(.report-bling) { background: #fff; }
   margin-left: 0;
   margin-top: 4px;
 }
+
+/* 결과 확인: 캠페인 필터 풀다운 */
+.admin-filters { align-items: center; }
+.results-filter-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+.results-filter-select {
+  width: auto;
+  min-width: 220px;
+  max-width: 340px;
+}
