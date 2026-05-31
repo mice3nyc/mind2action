@@ -1,0 +1,395 @@
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
+import { lookupReportLLM, EGO_STATES, EGO_LABELS, needsCoaching } from '../../lib/cmLookup';
+import { getSuccessRange } from '../../lib/scoreEngine';
+import uiTexts from '../../data/ui_texts.yaml';
+
+// ─────────────────────────────────────────────────────────────
+// ReportPageV3 — LLM 톤 리포트 (26.0531~). v2를 복제한 비교용 세 번째 타입.
+//   레이아웃·섹션은 v2와 동일(공정 비교), 데이터만 lookupReportLLM으로 LLM 톤 세트에서 가져온다.
+//   기획·SPEC: [[_dev/mind2action/REPORT-V3-LLM]] / 원칙: [[리포트 설계 원칙]]
+//   PoC: 컨설턴트 §1 성향분석(cm1) + §2 강점(cm3 변주 풀). 그 외 칸은 기존 cm fallback.
+// ─────────────────────────────────────────────────────────────
+
+function Paragraphs({ text }) {
+  if (!text) return null;
+  const paragraphs = text.split(/\n\s*\n/).map(p => p.replace(/\n/g, ' ').trim()).filter(Boolean);
+  return paragraphs.map((p, i) => <p key={i}>{p}</p>);
+}
+
+// 본문 첫머리의 조회 키/분류 메타 괄호 제거 (원칙 2 — 내부 키·분류 노출 금지)
+// 예: "(CP 통제적부모 & NP ...강점으로 발현됨.)" / "(원칙이 아주 강하고...성향)"
+function stripMeta(text) {
+  if (!text) return text;
+  return text.replace(/^\s*\([^)]*(?:성향|첫번째|두번째|높아|발현|BOTTOM|TOP)[^)]*\)\s*/g, '').trim();
+}
+
+const EGO_COLORS = {
+  CP: '#ef4444',
+  NP: '#f59e0b',
+  A: '#38bdf8',
+  FC: '#10b981',
+  AC: '#8b5cf6',
+};
+
+// 점수 → cm1 구간 (cmLookup.scoreRange와 동일 기준)
+function scoreRange(score) {
+  if (score >= 17) return '17-20';
+  if (score >= 14) return '14-16';
+  if (score >= 11) return '11-13';
+  if (score >= 8) return '8-10';
+  return '0-7';
+}
+
+// 강점우선 1차 손질 (가이드 규칙 3 — 낮은 점수대 부정어 → 중립/강점).
+// cm1 원본의 부정어 구간만 덮어쓴다. 프로토타입 인라인 — 4단계 역설계 때 데이터로 추출.
+// 검토 대상: 피터공. 같은 사실을 깎아내리지 않고 다시 본 표현인지.
+const STRENGTH_REFRAME = {
+  '0-7': {
+    CP: '부드럽고 · 수용적이며 · 상대를 앞세운다',
+    NP: '담백하고 · 군더더기 없으며 · 사실 중심이다',
+    A: '직관적이고 · 즉각적이며 · 감성이 풍부하다',
+    FC: '감정을 절제하고 · 차분하며 · 진중하다',
+    AC: '소신 있고 · 솔직하며 · 자기 기준이 또렷하다',
+  },
+  '8-10': {
+    NP: '차분하고 · 담백하며 · 실무 중심이다',
+    A: '느낌을 먼저 받아들이고 · 공감이 빠르며 · 사람 중심이다',
+    FC: '조용하고 · 신중하며 · 진지하다',
+  },
+};
+
+// cm1 원본 문자열 → "구 · 구 · 구" 형태로 정돈 (강점우선 손질 대상이 아닐 때)
+function formatKeywords(raw) {
+  if (!raw) return '';
+  return raw
+    .split(/[,，.]/)
+    .map(s => s.trim())
+    .filter(Boolean)
+    .join(' · ');
+}
+
+// 각 ego의 강점우선 한 줄 평이 번역
+function plainTranslation(ego, score, cm1) {
+  // v3: LLM cm1은 이미 강점우선으로 정제됨 → 그대로 우선. 미추출 칸만 STRENGTH_REFRAME fallback.
+  const v = cm1?.[ego];
+  if (v) return formatKeywords(v);
+  const range = scoreRange(score);
+  return STRENGTH_REFRAME[range]?.[ego] || '';
+}
+
+// ── 정체성 레이어 (원칙 6·7) ───────────────────────────────────
+// top1+top2 조합(20종) → "당신은 ___한 분" 명명 + 짧은 설명.
+// 점수에서 결정론적으로 조합이 정해지므로 고정 텍스트도 개인화돼 보인다(원칙 5의 나).
+// 프로토타입 1차 — 비교 케이스(컨설턴트) 우선 인라인. 4단계서 cm3 도입부 역설계 + 손소장 샘플로 20조합 yaml화.
+const IDENTITY = {
+  CP_NP: { title: '기준이 또렷하면서도 사람을 먼저 챙기는 분', desc: '무엇이 맞는지 분명히 말해 방향을 잡아 주고, 동시에 상대의 마음을 살펴 안심시킵니다. 단단함과 따뜻함을 함께 가졌습니다.' },
+  CP_A:  { title: '기준과 분석이 함께 단단한 분', desc: '원칙이 또렷하고 판단이 냉철해, 복잡한 상황에서도 흔들리지 않고 방향을 제시합니다.' },
+  CP_AC: { title: '분명한 기준을 갖되 상대에 맞춰 조율하는 분', desc: '결정의 중심은 또렷한데, 밀어붙이기보다 상황과 상대를 살펴 속도를 맞춥니다. 신뢰를 주면서도 부담을 주지 않습니다.' },
+  NP_CP: { title: '따뜻하게 품으면서 기준도 분명한 분', desc: '상대를 먼저 이해하고 보듬되, 필요한 자리에서는 분명한 방향을 짚어 줍니다.' },
+  NP_FC: { title: '따뜻하게 공감하고 밝게 다가가는 분', desc: '상대의 마음을 먼저 읽고, 환하고 편안한 분위기로 거리를 좁힙니다. 함께 있으면 마음이 놓이는 사람입니다.' },
+  NP_AC: { title: '깊이 공감하며 세심하게 맞춰 주는 분', desc: '상대의 감정을 먼저 살피고 조심스럽게 보폭을 맞춥니다. 곁에서 끝까지 함께해 줄 사람이라는 신뢰를 줍니다.' },
+  A_CP:  { title: '냉철하게 분석하고 기준이 또렷한 분', desc: '사실과 흐름을 차분히 정리해 핵심을 짚고, 그 위에 분명한 기준을 세웁니다.' },
+  FC_NP: { title: '밝은 에너지로 다가가 따뜻하게 품는 분', desc: '먼저 웃으며 다가가 분위기를 열고, 상대의 마음을 따뜻하게 감싸 안습니다.' },
+  AC_CP: { title: '상대에 맞춰 조율하되 자기 기준이 또렷한 분', desc: '상황과 상대를 세심히 살펴 맞추면서도, 중요한 자리에서는 자기 중심을 지킵니다.' },
+};
+
+// 미충원 조합 fallback — 두 강점을 합성 (빈 화면 방지)
+const EGO_STRENGTH = { CP: '또렷한 기준', NP: '따뜻한 공감', A: '차분한 분석', FC: '밝은 표현력', AC: '세심한 조율' };
+
+function getIdentity(top1, top2, name) {
+  const hit = IDENTITY[`${top1}_${top2}`];
+  if (hit) return hit;
+  return {
+    title: `${EGO_STRENGTH[top1]}과(와) ${EGO_STRENGTH[top2]}이 함께 도드라지는 분`,
+    desc: '',
+    fallback: true,
+  };
+}
+
+// 그래프 라벨 — "통제적 부모" 같은 코드 정식명 대신 강점 평이어 (제안 2, 미스리딩 제거)
+const EGO_PLAIN_LABEL = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
+
+// 유형 강점 명칭 ("~의 힘", 26.0528 피터공 선택). 가장 강한 유형(top1)을 이 이름으로 부각 — 손소장 강조점.
+// 부모/아이 메타포 제거, 강점 프레이밍. 프로토타입 인라인 — 4단계서 데이터화.
+const EGO_TYPE_NAME = { CP: '기준을 세우는 힘', NP: '마음을 살피는 힘', A: '흐름을 읽는 힘', FC: '분위기를 여는 힘', AC: '보폭을 맞추는 힘' };
+
+function Section({ number, title, children }) {
+  return (
+    <div className="report-section">
+      <h2 className="report-section-title">
+        {number && <span className="report-section-num">{number}.</span>}
+        {title}
+      </h2>
+      {children}
+    </div>
+  );
+}
+
+function ScoreChart({ scores, jobType }) {
+  const maxScore = 20;
+  return (
+    <div className="report-chart">
+      {EGO_STATES.map(ego => {
+        const [sLow, sHigh] = getSuccessRange(ego, jobType);
+        return (
+          <div key={ego} className="report-chart-row">
+            <div className="report-chart-label" style={{ color: EGO_COLORS[ego] }}>
+              <strong>{EGO_PLAIN_LABEL[ego]}</strong>
+              <span className="report-chart-code">{ego}</span>
+            </div>
+            <div className="report-chart-bar-wrap">
+              <div
+                className="report-chart-success"
+                style={{
+                  left: `${(sLow / maxScore) * 100}%`,
+                  width: `${((sHigh - sLow + 1) / maxScore) * 100}%`
+                }}
+              />
+              <div
+                className="report-chart-bar"
+                style={{
+                  width: `${(scores[ego] / maxScore) * 100}%`,
+                  backgroundColor: EGO_COLORS[ego],
+                }}
+              />
+            </div>
+            <div className="report-chart-score">{scores[ego]}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function ReportPageV3() {
+  const { id } = useParams();
+  const [data, setData] = useState(null);
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function load() {
+      const { data: row, error: err } = await supabase
+        .from('responses')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (err || !row) {
+        setError('리포트를 찾을 수 없습니다.');
+        setLoading(false);
+        return;
+      }
+
+      const result = {
+        scores: { CP: row.score_cp, NP: row.score_np, A: row.score_a, FC: row.score_fc, AC: row.score_ac },
+        top1: row.top1,
+        top2: row.top2,
+        bottom: row.bottom,
+        total: row.total,
+        grades: row.grades,
+      };
+
+      const rpt = lookupReportLLM({ ...result, id }, row.job_type);
+      rpt.name = row.name;
+
+      setData({ ...row, result });
+      setReport(rpt);
+      setLoading(false);
+    }
+    load();
+  }, [id]);
+
+  const [bling, setBling] = useState(false);
+
+  if (loading) return <div className="report-loading">리포트 생성 중...</div>;
+  if (error) return <div className="report-error">{error}</div>;
+  if (!report) return null;
+
+  const { result } = data;
+  const { scores, top1, top2, bottom } = result;
+  const identity = getIdentity(top1, top2, report.name);
+
+  return (
+    <div className={`report-container ${bling ? 'report-bling' : ''}`}>
+      <span className="report-v2-flag">v3</span>
+      <button className="bling-toggle" onClick={() => setBling(!bling)}>
+        {bling ? '기본' : 'bling'}
+      </button>
+      <div className="report-cover">
+        <div className="report-cover-title">
+          <h1><span className="report-cover-brand">MIND2ACTION</span> 성향 코칭 리포트</h1>
+        </div>
+        <div className="report-cover-id">
+          <div className="report-cover-name">{report.name}님</div>
+          <div className="report-cover-meta">
+            {data.company && <span>{data.company}</span>}
+            {data.department && <span>{data.department}</span>}
+          </div>
+        </div>
+      </div>
+
+      {/* intro — 번호 리스트 대신 서술형 (제안 1) */}
+      <div className="report-intro report-intro-v2">
+        <h2>{uiTexts.report.intro.title}</h2>
+        <p>성향 리포트는 나를 더 잘 이해하고, 다섯 가지 성향을 상황에 맞게 활용할 수 있도록 돕는 안내서입니다.</p>
+        <p>자신의 강점과 조율할 점을 알게 되면 인간관계와 비즈니스가 더욱 안정적으로 이루어지고, 흔들릴 때 다시 중심을 잡는 데 도움이 됩니다.</p>
+        <p>궁극적으로 더 나은 삶과 좋은 관계를 만들어 가도록 돕는 리포트입니다.</p>
+      </div>
+
+      {/* ── §1 성향분석 — v2 가이드 2차 (원칙 6·7) ─────────────────
+          종합 정체성 먼저 → 소제목 → 그래프(평이 라벨, 보조) → 자아상태별 깊은 본문. */}
+      <Section number={1} title={`${report.name}${uiTexts.report.sections.s1_title}`}>
+        {/* 1. 종합 성향 정체성 — 가장 강한 힘(top1) 부각(손소장 강조점) + 종합 인물상 */}
+        <div className="report-identity">
+          <p className="report-identity-toplabel">가장 강한 힘</p>
+          <p className="report-identity-top">{EGO_TYPE_NAME[top1]}</p>
+          <p className="report-identity-line">
+            {report.name}님은 <strong>{identity.title}</strong>입니다.
+          </p>
+          {identity.desc && <p className="report-identity-desc">{identity.desc}</p>}
+        </div>
+
+        {/* 2. 한눈에 보는 다섯 성향 (그래프 보조, 평이 라벨) */}
+        <h3 className="report-subhead">한눈에 보는 다섯 성향</h3>
+        <p className="report-scale-note">각 성향 0~20점</p>
+        <ScoreChart scores={scores} jobType={data.job_type} />
+
+        {/* 3. 성향별로 자세히 보기 — 강약 차등(원칙 8, 26.0529): 두드러진 성향(top1·top2)은 깊게,
+            나머지는 점수 순 한 줄 묶음. 다섯 평등 리스트 → 인물 초상으로 흐르게. */}
+        <h3 className="report-subhead">성향별로 자세히 보기</h3>
+        {(() => {
+          const ranked = [...EGO_STATES].sort((a, b) => scores[b] - scores[a]);
+          const deep = ranked.filter(ego => ego === top1 || ego === top2);
+          const rest = ranked.filter(ego => ego !== top1 && ego !== top2);
+          return (
+            <>
+              <div className="report-traits">
+                {deep.map(ego => (
+                  <div key={ego} className="report-trait-item">
+                    <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
+                      {EGO_PLAIN_LABEL[ego]} <span>{scores[ego]}점</span>
+                    </div>
+                    <p className="report-trait-plain">{plainTranslation(ego, scores[ego], report.cm1)}</p>
+                    <Paragraphs text={report.cm2[ego]} />
+                  </div>
+                ))}
+              </div>
+              {rest.length > 0 && (
+                <div className="report-traits-rest">
+                  {rest.map(ego => (
+                    <p key={ego} className="report-trait-rest-line">
+                      <strong style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]}</strong>
+                      <span className="report-trait-rest-score">{scores[ego]}점</span>
+                      <span className="report-trait-rest-text">{plainTranslation(ego, scores[ego], report.cm1)}</span>
+                    </p>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
+      </Section>
+
+      <Section number={2} title={uiTexts.report.sections.s3_title}>
+        <p className="report-strength-lead">
+          {report.name}님은 <strong>{identity.title}</strong>. 그 성향은 이런 강점으로 드러납니다.
+        </p>
+        <Paragraphs text={stripMeta(report.cm3)} />
+      </Section>
+
+      {/* ── §3 조율 포인트 — v2: 조율 필요한 성향만 카드, 나머지는 한 줄 (텍스트 절감) ── */}
+      {(() => {
+        const coaching = [];
+        const okEgos = [];
+        EGO_STATES.forEach(ego => {
+          const detailed = report.cm4_4.find(item => item.ego === ego);
+          const needs = needsCoaching(ego, scores[ego], data.job_type);
+          if (detailed || needs) coaching.push({ ego, detailed, needs });
+          else okEgos.push(ego);
+        });
+        return (
+          <Section number={3} title={uiTexts.report.sections.s4_title}>
+            {coaching.map(({ ego, detailed, needs }) => (
+              <div key={ego} className="report-coaching-item">
+                <h4 style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]} <span className="report-coaching-score">{scores[ego]}점</span></h4>
+                {detailed ? (
+                  <div className="report-coaching-detailed">
+                    <div className="report-detailed-trait">{stripMeta(detailed.trait)}</div>
+                    <Paragraphs text={detailed.coaching} />
+                    {detailed.script && (
+                      <div className="report-detailed-script">
+                        <strong>화법 스크립트:</strong>
+                        <p>{detailed.script}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : needs ? (
+                  <>
+                    <Paragraphs text={stripMeta(report.cm4_1[ego])} />
+                    {report.cm4_2[ego] && <div className="report-coaching-detail"><Paragraphs text={stripMeta(report.cm4_2[ego])} /></div>}
+                  </>
+                ) : null}
+              </div>
+            ))}
+
+            {okEgos.length > 0 && (
+              <p className="report-coaching-ok-line">
+                지금 균형이 좋아 따로 조율할 것이 없는 성향: <strong>{okEgos.map(e => EGO_PLAIN_LABEL[e]).join(', ')}</strong>.
+              </p>
+            )}
+
+            {report.cm4_3 && (
+              <div className="report-coaching-message">
+                <p>{report.cm4_3}</p>
+              </div>
+            )}
+          </Section>
+        );
+      })()}
+
+      {report.cm5 && (
+        <Section number={4} title={report.isInsurance ? uiTexts.report.sections.s5_title_insurance : report.jobLabel === '관리자' ? uiTexts.report.sections.s5_title_manager : uiTexts.report.sections.s5_title_coach}>
+          <div className="report-cm5">
+            <Paragraphs text={report.cm5.manner} />
+            <div className="report-cm5-improvement"><Paragraphs text={report.cm5.improvement} /></div>
+          </div>
+        </Section>
+      )}
+
+      {report.isInsurance && (
+        <Section number={5} title={uiTexts.report.sections.s6_title}>
+          {report.cm6 && (
+            <Paragraphs text={stripMeta(report.cm6)} />
+          )}
+          {report.cm6_common && report.cm6_common.length > 0 && (
+            <div className="report-cm6-common">
+              {report.cm6_common.map((item, i) => (
+                <div key={i} className="report-cm6-common-item">
+                  <h4>{item.title}</h4>
+                  <Paragraphs text={item.body} />
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
+
+      {/* 신인 리크루팅 레벨업(cm7) 섹션 — v1과 동일하게 렌더 제거(데이터는 보존) */}
+
+      <div className="report-closing">
+        <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>
+      </div>
+
+      <div className="report-footer-bar">
+        <span className="report-footer-copyright">© 2026 MIND2ACTION</span>
+        {uiTexts.report.closing.contact.email && (
+          <span className="report-footer-email">✉&nbsp;&nbsp;{uiTexts.report.closing.contact.email}</span>
+        )}
+      </div>
+    </div>
+  );
+}

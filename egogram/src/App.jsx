@@ -3,6 +3,7 @@ import SurveyApp from './pages/SurveyApp';
 import AdminApp from './pages/AdminApp';
 import ReportPage from './components/Report/ReportPage';
 import ReportPageV2 from './components/Report/ReportPageV2';
+import ReportPageV3 from './components/Report/ReportPageV3';
 import ReportBatchPage from './components/Report/ReportBatchPage';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
@@ -21,6 +22,7 @@ function AppContent() {
           <Route path="/admin" element={<AdminApp />} />
           <Route path="/report/:id" element={<ReportPage />} />
           <Route path="/report-v2/:id" element={<ReportPageV2 />} />
+          <Route path="/report-v3/:id" element={<ReportPageV3 />} />
           <Route path="/report-batch/:campaignId" element={<ReportBatchPage />} />
           <Route path="/*" element={<SurveyApp />} />
         </Routes>
