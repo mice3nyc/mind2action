@@ -10,6 +10,7 @@ const STATUS_LABEL = {
 const EMPTY_FORM = {
   clientName: '',
   target: '',
+  expectedCount: '',
   periodStart: '',
   periodEnd: '',
   educationDate: '',
@@ -36,6 +37,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
     setForm({
       clientName: camp.client_name || '',
       target: camp.target || '',
+      expectedCount: camp.expected_count != null ? String(camp.expected_count) : '',
       periodStart: camp.period_start || '',
       periodEnd: camp.period_end || '',
       educationDate: camp.education_date || '',
@@ -63,6 +65,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
         await updateCampaign(editingId, {
           client_name: form.clientName.trim(),
           target: form.target.trim() || null,
+          expected_count: form.expectedCount !== '' ? Number(form.expectedCount) : null,
           period_start: form.periodStart || null,
           period_end: form.periodEnd || null,
           education_date: form.educationDate || null,
@@ -73,6 +76,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
           clientName: form.clientName.trim(),
           target: form.target.trim(),
           status: 'active',
+          expectedCount: form.expectedCount,
           periodStart: form.periodStart || null,
           periodEnd: form.periodEnd || null,
           educationDate: form.educationDate || null,
@@ -124,6 +128,11 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
             <label className="form-label">대상 설명</label>
             <input className="form-input" name="target" value={form.target} onChange={handleChange} placeholder="예: 신입 설계사 (선택)" />
             <div className="form-hint">관리자 기록용 — 참여자에게는 보이지 않습니다</div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">참여 예상 인원</label>
+            <input className="form-input" type="number" min="0" name="expectedCount" value={form.expectedCount} onChange={handleChange} placeholder="예: 40 (선택)" />
+            <div className="form-hint">진행 현황 진행률 기준값 — 실제가 더 적거나 많아도 무방합니다</div>
           </div>
         </fieldset>
 

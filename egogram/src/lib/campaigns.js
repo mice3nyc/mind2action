@@ -30,7 +30,7 @@ export async function listCampaigns() {
 }
 
 // 관리자: 캠페인 생성 (코드 자동 발급 + unique 충돌 재시도)
-export async function createCampaign({ clientName, target, status, periodStart, periodEnd, educationDate, memo }) {
+export async function createCampaign({ clientName, target, status, periodStart, periodEnd, educationDate, memo, expectedCount }) {
   for (let attempt = 0; attempt < 6; attempt++) {
     const code = genCode();
     const { data, error } = await supabase
@@ -44,6 +44,7 @@ export async function createCampaign({ clientName, target, status, periodStart, 
         period_end: periodEnd || null,
         education_date: educationDate || null,
         memo: memo || null,
+        expected_count: expectedCount != null && expectedCount !== '' ? Number(expectedCount) : null,
       })
       .select()
       .single();

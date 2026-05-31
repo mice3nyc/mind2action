@@ -3,6 +3,7 @@ import { loadResults, deleteResult, clearResults, saveResult } from '../../lib/s
 import { listCampaigns, createCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import CampaignManager from './CampaignManager';
+import CampaignDashboard from './CampaignDashboard';
 
 const JOB_TO_REPORT = {
   sales: '보험설계사',
@@ -213,11 +214,16 @@ export default function AdminDashboard({ onLogout }) {
 
       <div className="admin-tabs">
         <button className={`admin-tab ${tab === 'campaigns' ? 'active' : ''}`} onClick={() => setTab('campaigns')}>캠페인 관리</button>
+        <button className={`admin-tab ${tab === 'dashboard' ? 'active' : ''}`} onClick={() => setTab('dashboard')}>진행 현황</button>
         <button className={`admin-tab ${tab === 'results' ? 'active' : ''}`} onClick={() => setTab('results')}>결과 확인</button>
       </div>
 
       {tab === 'campaigns' && (
         <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} />
+      )}
+
+      {tab === 'dashboard' && (
+        <CampaignDashboard campaigns={campaigns} counts={counts} />
       )}
 
       {tab === 'results' && (
