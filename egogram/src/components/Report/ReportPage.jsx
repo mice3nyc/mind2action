@@ -67,60 +67,33 @@ function ScoreChart({ scores, jobType }) {
   );
 }
 
-export default function ReportPage() {
-  const { id } = useParams();
-  const [data, setData] = useState(null);
-  const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    async function load() {
-      const { data: row, error: err } = await supabase
-        .from('responses')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (err || !row) {
-        setError('리포트를 찾을 수 없습니다.');
-        setLoading(false);
-        return;
-      }
-
-      const result = {
-        scores: { CP: row.score_cp, NP: row.score_np, A: row.score_a, FC: row.score_fc, AC: row.score_ac },
-        top1: row.top1,
-        top2: row.top2,
-        bottom: row.bottom,
-        total: row.total,
-        grades: row.grades,
-      };
-
-      const rpt = lookupReport(result, row.job_type);
-      rpt.name = row.name;
-
-      setData({ ...row, result });
-      setReport(rpt);
-      setLoading(false);
-    }
-    load();
-  }, [id]);
-
+// 응답 행(supabase snake_case) 하나를 받아 리포트 본문을 렌더.
+// 단일 리포트(ReportPage)와 단체 배치(ReportBatchPage)가 공유한다.
+export function ReportView({ row, showToggle = true }) {
   const [bling, setBling] = useState(false);
 
-  if (loading) return <div className="report-loading">리포트 생성 중...</div>;
-  if (error) return <div className="report-error">{error}</div>;
-  if (!report) return null;
+  const result = {
+    scores: { CP: row.score_cp, NP: row.score_np, A: row.score_a, FC: row.score_fc, AC: row.score_ac },
+    top1: row.top1,
+    top2: row.top2,
+    bottom: row.bottom,
+    total: row.total,
+    grades: row.grades,
+  };
 
-  const { result } = data;
+  const report = lookupReport(result, row.job_type);
+  report.name = row.name;
+
+  const data = { ...row, result };
   const { scores, top1, top2, bottom } = result;
 
   return (
     <div className={`report-container ${bling ? 'report-bling' : ''}`}>
-      <button className="bling-toggle" onClick={() => setBling(!bling)}>
-        {bling ? '기본' : 'bling'}
-      </button>
+      {showToggle && (
+        <button className="bling-toggle" onClick={() => setBling(!bling)}>
+          {bling ? '기본' : 'bling'}
+        </button>
+      )}
       <div className="report-cover">
         <div className="report-cover-title">
           <h1><span className="report-cover-brand">MIND2ACTION</span> 성향 코칭 리포트</h1>
@@ -257,4 +230,36 @@ export default function ReportPage() {
       </div>
     </div>
   );
+}
+
+export default function ReportPage() {
+  const { id } = useParams();
+  const [row, setRow] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function load() {
+      const { data: r, error: err } = await supabase
+        .from('responses')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (err || !r) {
+        setError('리포트를 찾을 수 없습니다.');
+        setLoading(false);
+        return;
+      }
+      setRow(r);
+      setLoading(false);
+    }
+    load();
+  }, [id]);
+
+  if (loading) return <div className="report-loading">리포트 생성 중...</div>;
+  if (error) return <div className="report-error">{error}</div>;
+  if (!row) return null;
+
+  return <ReportView row={row} />;
 }

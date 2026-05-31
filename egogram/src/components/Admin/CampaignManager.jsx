@@ -192,6 +192,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                 <th>인원</th>
                 <th>설문 링크</th>
                 <th>설문 결과</th>
+                <th>전체 PDF</th>
                 <th>관리</th>
               </tr>
             </thead>
@@ -218,6 +219,21 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                   </td>
                   <td>
                     <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문 결과</button>
+                  </td>
+                  <td>
+                    {counts[c.id] > 0 ? (
+                      <a
+                        className="btn-view-results"
+                        href={`#/report-batch/${c.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="전 참여자 리포트를 한 화면에 모아 PDF로 저장"
+                      >
+                        전체 리포트
+                      </a>
+                    ) : (
+                      <button className="btn-view-results" disabled title="참여자가 없습니다">전체 리포트</button>
+                    )}
                   </td>
                   <td>
                     <div className="campaign-actions">

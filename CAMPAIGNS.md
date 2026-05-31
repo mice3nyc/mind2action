@@ -1,6 +1,6 @@
 # SPEC — 고객사별 설문 캠페인 시스템 (mind2action 에고그램)
 
-> 작성: 아리공, 2026-05-31 · 상태: **Phase 1 + UI 조정 라이브 (5/31)**. Phase 2 진행 — 참여기간 자동 차단(`80400ad`) + 캠페인 수정 기능(`4c299f6`) + 진행 현황 대시보드(코드 `059f0cc`·CSS `3153334`, expected_count 컬럼 추가 완료) 모두 라이브. 남음: 단체별 일괄 PDF
+> 작성: 아리공, 2026-05-31 · 상태: **Phase 1 + UI 조정 라이브 (5/31)**. Phase 2 진행 — 참여기간 자동 차단(`80400ad`) + 캠페인 수정 기능(`4c299f6`) + 진행 현황 대시보드(코드 `059f0cc`·CSS `3153334`, expected_count 컬럼 추가 완료) 모두 라이브. **단체별 일괄 PDF = 브라우저 인쇄 묶음 방식으로 구현(§9)**.
 > 요청 배경: 단일 설문 → 고객사별 설문 캠페인 플랫폼. 설문 생성·링크 카피·고객사별 결과·진행상황/기간/교육일 관리.
 > 결정 (5/31, 피터공): ① 1차 = MVP ② 링크 코드 = 짧은 랜덤 ③ 진입 = 링크 전용 + 랜덤 코드 + 상태 게이팅 (타이핑 코드 중복이라 안 씀)
 
@@ -129,7 +129,7 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - [x] 참여기간 자동 차단 (period_start/end 게이팅) — 5/31, LandingPage 날짜 분기
 - [x] 캠페인 수정 기능 — 5/31, 생성 폼 재사용 (code·status 불변)
 - [x] 진행 현황 대시보드 — 5/31 라이브 (expected_count 컬럼 추가 완료, 코드 `059f0cc`·CSS `3153334`, 배포 완료)
-- [ ] 단체별 리포트 일괄 PDF 저장 (기존 로드맵 항목)
+- [ ] 단체별 리포트 일괄 PDF 저장 — **브라우저 인쇄 묶음 방식**(§9). 새 라우트 `#/report-batch/:campaignId` + ReportView 추출 + 캠페인 행 [전체 리포트] 버튼 + 점진 렌더 프로그래스
 
 ## 8. 기술 주의
 - **HashRouter + 쿼리**: 링크는 `/?g=code` (해시 앞). `window.location.search`로 파싱. `#/?g=` 아님.
@@ -162,4 +162,31 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - [ ] **설문 ON/OFF 토글 UI 정리** (선택) — 마감/재개 버튼이 이미 토글(status active↔closed)이나 토글처럼 안 보임. 필요 시 ON/OFF 스위치 모양으로.
 - [ ] **단체별 리포트 일괄 PDF 저장** — 한 캠페인 전 참여자 리포트 묶음 PDF(고객사 전달용). 기존 로드맵 항목.
 
-> Phase 2 착수 시 결정: ① 목표 인원 필드 추가 여부 → **추가 결정(expected_count, 5/31)** ② 기간 차단을 클라 today 기준으로 둘지 DB레벨 엄밀 차단까지 갈지 → **클라 today MVP 채택(5/31)** ③ 일괄 PDF 방식(브라우저 인쇄 묶음 vs 서버 생성) → 미정
+> Phase 2 착수 시 결정: ① 목표 인원 필드 추가 여부 → **추가 결정(expected_count, 5/31)** ② 기간 차단을 클라 today 기준으로 둘지 DB레벨 엄밀 차단까지 갈지 → **클라 today MVP 채택(5/31)** ③ 일괄 PDF 방식(브라우저 인쇄 묶음 vs 서버 생성) → **브라우저 인쇄 묶음 채택(5/31)**. 리포트 버전 = **v1**(현재 라이브, 직종별)
+
+---
+
+## 9. 단체별 일괄 PDF (배치 리포트) — 5/31 결정
+
+> 요청: 캠페인 전 참여자 리포트를 고객사 전달용 한 개 PDF로. 피터공은 지금도 1인씩 리포트를 열어 브라우저 PDF로 출력 중. 문제는 "개별 PDF를 하나로 합치기".
+
+### 핵심 판단 — 합치지 않고 한 번에 뽑는다
+개별 PDF를 사후 병합하면 PDF 라이브러리·서버·수작업이 필요하다. **합치는 대신 한 화면에 전원을 쌓아 한 번 인쇄**하면, 브라우저의 "PDF로 저장"이 전원이 담긴 단일 PDF를 네이티브로 만든다. 병합 단계가 통째로 사라진다.
+
+- **백엔드 없음**: GitHub Pages 정적 SPA + Supabase. 서버 PDF 생성(Puppeteer 등)은 없는 인프라를 새로 세워야 해 MVP로 부적합.
+- **기존 자산 재사용**: 리포트는 이미 1인씩 클라 렌더(`#/report/:id`) + `praxi.css @media print`에 페이지 분할 보호(`break-inside: avoid` 등)가 있다. 1인 인쇄는 이미 깔끔. 배치는 N명을 한 화면에 쌓고 사람 사이 `break-after: page`만 추가.
+
+### 구현
+1. **ReportView 추출** (`ReportPage.jsx`): 기존 렌더 본문을 `ReportView({ row, showToggle })`로 추출(supabase snake_case row 그대로 입력). `ReportPage`는 id 로딩 래퍼로 `<ReportView row={row} />` 렌더(기존 동작 동일, bling 토글 유지). 직종별 분기는 `lookupReport(result, row.job_type)`가 자동 처리.
+2. **새 라우트 `#/report-batch/:campaignId`** (`ReportBatchPage.jsx`):
+   - 캠페인 단건(`campaigns` by id) + 응답(`responses` where `campaign_id = id`, created_at 오름차순) 로드.
+   - **점진 렌더 프로그래스**: 행을 한 번에 다 마운트하면 큰 단체(40명+)에서 멈칫 → 청크로 나눠 `renderedCount`를 올리며 마운트. 상단 프로그래스 바 "리포트 준비 N/M".
+   - **인쇄 툴바**(sticky 상단, 인쇄 시 숨김): 캠페인명 · 참여 N명 · **[PDF로 저장(인쇄)]**(`window.print()`). 인쇄 자체는 브라우저 구간이라 진행률 없음(미리보기로 전환).
+   - 각 리포트 `.report-batch-item`로 감싸 `break-after: page`(마지막 제외). 빈 캠페인 → "참여자가 없습니다".
+3. **버튼**: 캠페인 관리 목록 행에 [전체 리포트](참여 0이면 비활성) → 새 탭으로 배치 라우트. 진행 현황 카드에도 동일 진입 추가 가능.
+4. **CSS**(`praxi.css`): `.report-batch-toolbar`(흰 배경·점선 하단), `@media print { .report-batch-toolbar { display:none } }`, `.report-batch-item:not(:last-child) { break-after: page }`.
+
+### 주의 / 한계
+- **큰 단체 = 긴 인쇄**: 40명 × ~3쪽 ≈ 120쪽. 크롬은 대개 OK. 무거우면 "20명씩 끊어 뽑기"(rows 슬라이스 파라미터) 후속 추가.
+- 리포트 버전 v1 고정. v2(리디자인)는 검토 중이라 배치 대상 아님. 후속에 `?v=2` 파라미터로 확장 가능.
+- 클라 렌더라 응답 데이터가 곧 PDF 내용. group_name·campaign 표시는 단일 리포트와 동일.

@@ -3,6 +3,7 @@ import SurveyApp from './pages/SurveyApp';
 import AdminApp from './pages/AdminApp';
 import ReportPage from './components/Report/ReportPage';
 import ReportPageV2 from './components/Report/ReportPageV2';
+import ReportBatchPage from './components/Report/ReportBatchPage';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import './styles/praxi.css';
@@ -20,6 +21,7 @@ function AppContent() {
           <Route path="/admin" element={<AdminApp />} />
           <Route path="/report/:id" element={<ReportPage />} />
           <Route path="/report-v2/:id" element={<ReportPageV2 />} />
+          <Route path="/report-batch/:campaignId" element={<ReportBatchPage />} />
           <Route path="/*" element={<SurveyApp />} />
         </Routes>
       </main>

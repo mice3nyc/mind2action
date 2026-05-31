@@ -1284,3 +1284,26 @@ body:has(.report-bling) { background: #fff; }
 .dashboard-meta-row { display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: #555; }
 .dashboard-meta-row > span:first-child { color: #999; }
 .dashboard-dday { font-weight: 700; color: #2d7ff9; }
+
+/* ===== 단체별 일괄 리포트 (배치 PDF) — CAMPAIGNS.md §9 ===== */
+.report-batch { width: 100%; }
+.report-batch-toolbar {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  padding: 16px 24px;
+  background: #fff;
+  border-bottom: 1px dashed var(--border);
+}
+.report-batch-info { display: flex; flex-direction: column; gap: 2px; }
+.report-batch-title { font-size: 16px; font-weight: 700; color: var(--text-strong); }
+.report-batch-count { font-size: 13px; color: var(--text-muted); }
+.report-batch-actions { display: flex; align-items: center; }
+.report-batch-progress { display: flex; flex-direction: column; gap: 6px; min-width: 200px; }
+.report-batch-progress-label { font-size: 12px; color: #555; }
+.report-batch-progress-track { width: 100%; height: 8px; border-radius: 999px; background: #eee; overflow: hidden; }
+.report-batch-progress-fill { height: 100%; border-radius: 999px; background: #E84A8A; transition: width 0.2s ease; }
+
+@media print {
+  .report-batch-toolbar { display: none; }
+  .report-batch-item:not(:last-child) { break-after: page; page-break-after: always; }
+}
