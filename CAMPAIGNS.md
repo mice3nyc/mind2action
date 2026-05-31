@@ -96,7 +96,7 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 
 ### 6-1. 캠페인 탭 (신설)
 - **목록 테이블**: 고객사명 · 상태(진행/준비/마감 뱃지) · 기간 · 교육일 · **참여수**(responses count by campaign_id) · 액션.
-  - 액션: **[링크 카피]**(`navigator.clipboard.writeText('https://survey.mind2action.kr/?g='+code)`) · [수정] · [마감](status→closed).
+  - 액션: **[링크 카피]**(`navigator.clipboard.writeText('https://survey.mind2action.kr/?g='+code)`) · [수정] · [마감](status→closed) · **[삭제]**(캠페인+연결 응답, 백업 후 — §10).
 - **생성 폼**: 고객사명* · 대상 · 참여기간(start/end) · 교육일 · 메모 → **코드 자동 발급**(랜덤 6~7자, 혼동문자 0/O/1/I/l 제외) → insert. unique 충돌 시 재발급.
 - 색은 캠페인별 자동 배정(고정 팔레트 순환) — 하드코딩 `GROUP_COLORS` 폐기.
 
@@ -129,7 +129,8 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - [x] 참여기간 자동 차단 (period_start/end 게이팅) — 5/31, LandingPage 날짜 분기
 - [x] 캠페인 수정 기능 — 5/31, 생성 폼 재사용 (code·status 불변)
 - [x] 진행 현황 대시보드 — 5/31 라이브 (expected_count 컬럼 추가 완료, 코드 `059f0cc`·CSS `3153334`, 배포 완료)
-- [ ] 단체별 리포트 일괄 PDF 저장 — **브라우저 인쇄 묶음 방식**(§9). 새 라우트 `#/report-batch/:campaignId` + ReportView 추출 + 캠페인 행 [전체 리포트] 버튼 + 점진 렌더 프로그래스
+- [x] 단체별 리포트 일괄 PDF 저장 ✅ 5/31 — **브라우저 인쇄 묶음 방식**(§9). 새 라우트 `#/report-batch/:campaignId` + ReportView 추출 + 캠페인 행 [전체 리포트] 버튼 + 점진 렌더 프로그래스. 커밋 `5b777b3`, 라이브 배포 완료. 피터공 라이브 확인 OK("완전 빠른데!").
+- [x] 삭제 모델 정비 ✅ 5/31 — 전체 일괄 삭제 폐기 → **캠페인별 삭제 + 백업 자동**(§10). 커밋 `5a14c86`, 라이브. 피터공 결정.
 
 ## 8. 기술 주의
 - **HashRouter + 쿼리**: 링크는 `/?g=code` (해시 앞). `window.location.search`로 파싱. `#/?g=` 아님.
@@ -190,3 +191,19 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - **큰 단체 = 긴 인쇄**: 40명 × ~3쪽 ≈ 120쪽. 크롬은 대개 OK. 무거우면 "20명씩 끊어 뽑기"(rows 슬라이스 파라미터) 후속 추가.
 - 리포트 버전 v1 고정. v2(리디자인)는 검토 중이라 배치 대상 아님. 후속에 `?v=2` 파라미터로 확장 가능.
 - 클라 렌더라 응답 데이터가 곧 PDF 내용. group_name·campaign 표시는 단일 리포트와 동일.
+
+---
+
+## 10. 삭제 모델 — 5/31 결정 (피터공)
+
+> 결정: **전체 일괄 삭제 폐기. 캠페인 단위로만 삭제. 삭제 시 백업 필수.** [샘플 20명]은 테스트용으로 유지.
+
+- **[전체 삭제] 버튼 제거**: 결과 확인 탭에서 일괄 삭제 폐기(`handleClearAll`·UI 버튼 제거). `storage.clearResults`는 미사용 export로만 잔존.
+- **캠페인별 [삭제]**(캠페인 관리 목록): `deleteCampaign(id)` = 연결 응답(`responses where campaign_id`) 먼저 → 캠페인 행(FK 순서). 빨강 톤으로 마감과 구분.
+- **백업 자동**: 삭제 흐름에 백업을 박아넣어 건너뛸 수 없음. confirm → 그 캠페인 응답을 CSV로 먼저 다운로드(`backup_{client}_{날짜}.csv`) → 삭제. CSV 빌더는 `downloadResultsCSV(rows, filename)`로 추출해 내보내기·백업 공용.
+- **개별 응답 삭제**: 결과 확인 탭 행별 [삭제](`deleteResult`)는 유지 — campaign_id 없는 레거시/더미 응답 정리에 사용.
+- **[샘플 20명]**: `sampleResults.json` 22건(망원동·서교동·합정동 3그룹, 보험 영업/관리자 허구 인물). 기능 테스트용 유지. 누르면 3그룹을 캠페인으로 확보(memo "테스트용 샘플 데이터") + 22건 연결.
+- 커밋 `5a14c86`, 라이브.
+
+### 테스트 데이터 정리 (1회, 피터공 admin에서)
+샘플 캠페인 3개를 새 [삭제]로 제거(각각 백업) + campaign_id 없는 보안 더미(`__TEST__/보안검증`)는 결과 확인 행별 [삭제]로. 옛 [전체 삭제] 없이 정리 가능.
