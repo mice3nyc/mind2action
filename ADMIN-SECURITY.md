@@ -89,11 +89,16 @@ create policy "Authenticated can delete responses"
 - [x] vite.config base `/mind2action/egogram/` → `/` (5/31)
 - [x] `egogram/public/CNAME` = `survey.mind2action.kr` (5/31)
 - [x] package.json deploy `gh-pages -d dist --dest egogram` → `gh-pages -d dist` (루트 배포) (5/31)
-- [ ] `npm run deploy` (DNS 선행 후 실행 — 아래 순서)
+- [x] `npm run deploy` (5/31, gh-pages 루트 + CNAME Published)
 
 ### 피터공이 콘솔에서 (순서 중요 — DNS 먼저)
-- [ ] 1. 후이즈 DNS: `survey` CNAME → `mice3nyc.github.io` 추가 (DNS 먼저여야 HTTPS 인증서 깔끔히 발급)
-- [ ] 2. (아리공 배포 후) GitHub repo `mice3nyc/mind2action` Settings → Pages: Custom domain = `survey.mind2action.kr` 자동 표시 확인 + 인증서 뜨면 Enforce HTTPS 체크
+- [x] 1. 후이즈 DNS: `survey` CNAME → `mice3nyc.github.io` 등록완료 (5/31, whois6 캡처) — dig 확인 `survey.mind2action.kr → mice3nyc.github.io.`
+- [ ] 2. (선택, 폴리시) GitHub repo `mice3nyc/mind2action` Settings → Pages: Enforce HTTPS 체크 (인증서 이미 발급됨, http→https 강제만 추가)
+
+### 라이브 (5/31 확인)
+- 설문: https://survey.mind2action.kr (HTTP/2 200)
+- 관리자: https://survey.mind2action.kr/#/admin
+- ⚠️ 옛 URL `mice3nyc.github.io/mind2action/egogram/`은 커스텀 도메인 잡히면서 survey로 리다이렉트(경로째 옮겨가 404 가능 — 옛 북마크 폐기, 새 주소 사용).
 
 ### 참고
 - localStorage/세션 영향 없음 (origin 바뀜 = 자연 분리). 진행 중 세션 없는 때 이전.
