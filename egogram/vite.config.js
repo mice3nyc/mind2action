@@ -4,5 +4,5 @@ import yaml from '@modyfi/vite-plugin-yaml'
 
 export default defineConfig({
   plugins: [react(), yaml()],
-  base: '/mind2action/egogram/',
+  base: '/',
 })

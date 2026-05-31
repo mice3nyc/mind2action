@@ -75,17 +75,31 @@ create policy "Authenticated can delete responses"
 
 > 주의: insert 정책 "Anyone can insert responses" (`with check(true)`)는 **건드리지 않는다.** 설문 참여자는 비로그인 상태로 제출해야 하므로 anon insert 유지.
 
-## 4. 도메인: survey.mind2action.kr (별도 작업, 병행 가능)
+## 4. 도메인: survey.mind2action.kr (진행 — 5/31)
 
-런북 [[_dev/mind2action/DOMAIN-MIGRATION]] §4 체크리스트:
-- [ ] vite.config base `/mind2action/egogram/` → `/`
-- [ ] `egogram/public/CNAME` = `survey.mind2action.kr`
-- [ ] package.json deploy `gh-pages -d dist --dest egogram` → `gh-pages -d dist`
-- [ ] 후이즈 CNAME: `survey` → `mice3nyc.github.io` (피터공)
-- [ ] GitHub repo Settings → Pages custom domain = survey.mind2action.kr
-- [ ] localStorage/세션 영향 없음 (origin 바뀜 = 자연 분리). 진행 중 세션 없는 때 이전.
+### 결정 (5/31, 피터공)
+- **설문 = `survey.mind2action.kr`** (루트). **관리자 = `survey.mind2action.kr/#/admin`** (해시 포함 OK로 확정 — BrowserRouter 전환은 안 함).
+- `mind2action.kr/admin`은 **불가**: GitHub Pages는 repo당 커스텀 도메인 1개 + 관리자는 설문과 같은 SPA(한 빌드, `mind2action` repo). 관리자는 설문이 사는 도메인을 따라간다. 랜딩 `mind2action.kr`은 별도 repo(`mind2action-home`)라 apex 경로에 egogram을 못 올림.
+- 관리자가 공개 도메인 경로에 노출돼도 Supabase Auth(§2) 걸려 있어 데이터는 안전.
 
-> ⚠️ 순서 주의: 보안(Phase A~C)을 **먼저** 끝내고 도메인(§4)을 붙이는 게 안전. 공개 도메인 붙은 채로 무방비 기간을 줄인다.
+### 루트 배포 안전 확인 (5/31)
+- gh-pages 루트 = `index.html`·`assets`·`favicon.svg`·`icons.svg`·`egogram/` — 전부 egogram 관련. 루트 `index.html`은 에셋을 `/mind2action/egogram/`로 가리키는 **옛 빌드 스테일 복제**. 별개 프로젝트 없음 → 루트 재배포해도 잃을 것 없음.
+
+### 코드/설정 (아리공)
+- [x] vite.config base `/mind2action/egogram/` → `/` (5/31)
+- [x] `egogram/public/CNAME` = `survey.mind2action.kr` (5/31)
+- [x] package.json deploy `gh-pages -d dist --dest egogram` → `gh-pages -d dist` (루트 배포) (5/31)
+- [ ] `npm run deploy` (DNS 선행 후 실행 — 아래 순서)
+
+### 피터공이 콘솔에서 (순서 중요 — DNS 먼저)
+- [ ] 1. 후이즈 DNS: `survey` CNAME → `mice3nyc.github.io` 추가 (DNS 먼저여야 HTTPS 인증서 깔끔히 발급)
+- [ ] 2. (아리공 배포 후) GitHub repo `mice3nyc/mind2action` Settings → Pages: Custom domain = `survey.mind2action.kr` 자동 표시 확인 + 인증서 뜨면 Enforce HTTPS 체크
+
+### 참고
+- localStorage/세션 영향 없음 (origin 바뀜 = 자연 분리). 진행 중 세션 없는 때 이전.
+- 옛 URL `mice3nyc.github.io/mind2action/egogram/`은 커스텀 도메인 설정되면 survey로 301 리다이렉트.
+
+> ⚠️ 순서 주의: 보안(Phase A~C)을 **먼저** 끝내고(완료) 도메인(§4)을 붙인다. 배포 순서도 **DNS 먼저 → 배포** 라야 다운타임/인증서 문제 없음.
 
 ## 미확정 / 다음 결정
 - [ ] Supabase Auth 계정 생성을 피터공이 직접 할지, 아리공에게 콘솔 자격 공유할지
