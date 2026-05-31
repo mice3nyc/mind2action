@@ -25,30 +25,65 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [error, setError] = useState('');
+  const [editingId, setEditingId] = useState(null); // null = 생성 모드, id = 그 캠페인 수정 모드
 
   function handleChange(e) {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  async function handleCreate(e) {
+  // 목록 [수정] → 그 캠페인 값을 폼에 로드 (생성 폼 재사용)
+  function handleEdit(camp) {
+    setForm({
+      clientName: camp.client_name || '',
+      target: camp.target || '',
+      periodStart: camp.period_start || '',
+      periodEnd: camp.period_end || '',
+      educationDate: camp.education_date || '',
+      memo: camp.memo || '',
+    });
+    setEditingId(camp.id);
+    setError('');
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleCancelEdit() {
+    setForm(EMPTY_FORM);
+    setEditingId(null);
+    setError('');
+  }
+
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!form.clientName.trim()) return;
     setCreating(true);
     setError('');
     try {
-      await createCampaign({
-        clientName: form.clientName.trim(),
-        target: form.target.trim(),
-        status: 'active',
-        periodStart: form.periodStart || null,
-        periodEnd: form.periodEnd || null,
-        educationDate: form.educationDate || null,
-        memo: form.memo.trim(),
-      });
+      if (editingId) {
+        // 수정 — code·status는 건드리지 않음 (링크 정체성 불변, status는 마감/재개 토글 담당)
+        await updateCampaign(editingId, {
+          client_name: form.clientName.trim(),
+          target: form.target.trim() || null,
+          period_start: form.periodStart || null,
+          period_end: form.periodEnd || null,
+          education_date: form.educationDate || null,
+          memo: form.memo.trim() || null,
+        });
+      } else {
+        await createCampaign({
+          clientName: form.clientName.trim(),
+          target: form.target.trim(),
+          status: 'active',
+          periodStart: form.periodStart || null,
+          periodEnd: form.periodEnd || null,
+          educationDate: form.educationDate || null,
+          memo: form.memo.trim(),
+        });
+      }
       setForm(EMPTY_FORM);
+      setEditingId(null);
       onChange();
     } catch (err) {
-      setError(err.message || '생성에 실패했습니다.');
+      setError(err.message || (editingId ? '수정에 실패했습니다.' : '생성에 실패했습니다.'));
     } finally {
       setCreating(false);
     }
@@ -75,8 +110,8 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
   return (
     <div className="campaign-pane">
       <div className="campaign-layout">
-      <form className="campaign-create" onSubmit={handleCreate}>
-        <h2 className="campaign-create-title">새 설문 캠페인</h2>
+      <form className="campaign-create" onSubmit={handleSubmit}>
+        <h2 className="campaign-create-title">{editingId ? '캠페인 수정' : '새 설문 캠페인'}</h2>
 
         <fieldset className="campaign-fieldset">
           <legend className="campaign-fieldset-label">기본 정보</legend>
@@ -118,10 +153,18 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
           </div>
         </fieldset>
 
+        {editingId && (
+          <div className="form-hint">코드(링크)와 진행 상태는 바뀌지 않습니다. 상태 변경은 목록의 마감/재개로.</div>
+        )}
         {error && <div className="landing-error">{error}</div>}
         <button type="submit" className="btn btn-primary" disabled={!form.clientName.trim() || creating}>
-          {creating ? '생성 중...' : '캠페인 생성 + 링크 발급'}
+          {creating ? (editingId ? '저장 중...' : '생성 중...') : (editingId ? '수정 저장' : '캠페인 생성 + 링크 발급')}
         </button>
+        {editingId && (
+          <button type="button" className="btn btn-secondary" onClick={handleCancelEdit} disabled={creating}>
+            취소
+          </button>
+        )}
       </form>
 
       <div className="campaign-list-col">
@@ -166,6 +209,13 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문 결과</button>
                   </td>
                   <td>
+                    <button
+                      className="btn-view-results"
+                      onClick={() => handleEdit(c)}
+                      disabled={editingId === c.id}
+                    >
+                      {editingId === c.id ? '수정 중' : '수정'}
+                    </button>
                     <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
                       {c.status === 'closed' ? '재개' : '마감'}
                     </button>

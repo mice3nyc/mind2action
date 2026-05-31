@@ -153,7 +153,9 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 ### 항목
 - [x] **참여기간 자동 차단** ✅ 5/31 — LandingPage 게이팅에 날짜 조건 추가. status==='active' 통과 후 클라 today(`todayStr()`, 로컬 YYYY-MM-DD) vs period_start/end 문자열 비교(사전식==시간순). 분기 2개 신설: `notstarted`("아직 설문 참여 기간이 아닙니다" + 기간 표시), `ended`("설문 참여 기간이 종료되었습니다" + 기간 표시). 기간 null이면 무제한(기존과 동일). [마감](status=closed)은 그대로 즉시 오버라이드로 유지(날짜보다 우선 — status 검사가 먼저). RPC가 이미 period_start·period_end 반환하므로 DB/서버 변경 없음. ⚠️ 클라 시계 기준이라 엄밀 차단 아님(MVP). 엄밀 차단 필요 시 RPC에서 날짜 검사해 status를 동적으로 내려주는 방식으로 승격 가능.
 - [ ] **진행상황 대시보드** — 캠페인별 참여 인원·종료 D-day·교육일 카운트다운. ⚠️ "참여율" 표시하려면 **목표 인원(target_count) 필드 추가** 필요 → 결정 포인트(절대 인원만 vs 목표 대비 %).
-- [ ] **캠페인 수정 폼** — 현재 마감/재개만. 기간·교육일·고객사명·메모 인라인 수정 추가.
+- [ ] **캠페인 수정 폼** (착수 5/31, 다음 우선) — 현재 마감/재개만. 한 번 만든 캠페인을 못 고침 = 오타·기간 변경 시 삭제+재생성뿐인데 그러면 배포된 링크(코드) 죽음. 실사용 구멍이라 대시보드보다 우선.
+  - **방식**: 왼쪽 생성 폼 재사용. 목록 행 [수정] → 그 캠페인 값이 폼에 로드 + `editingId` 세트 → 폼 제목 "캠페인 수정"·버튼 "수정 저장"+[취소]. 저장 = `updateCampaign(id, {client_name, target, period_start, period_end, education_date, memo})`(snake_case 직접). **code·status는 수정 대상 아님**(코드=링크 정체성이라 불변, status는 마감/재개 토글이 담당). 저장·취소 후 `EMPTY_FORM` 복귀+editingId 해제. DB/마이그레이션 변경 없음(updateCampaign 이미 존재).
+- [ ] **설문 ON/OFF 토글 UI 정리** (선택) — 마감/재개 버튼이 이미 토글(status active↔closed)이나 토글처럼 안 보임. 필요 시 ON/OFF 스위치 모양으로.
 - [ ] **단체별 리포트 일괄 PDF 저장** — 한 캠페인 전 참여자 리포트 묶음 PDF(고객사 전달용). 기존 로드맵 항목.
 
 > Phase 2 착수 시 결정: ① 목표 인원 필드 추가 여부 ② 기간 차단을 클라 today 기준으로 둘지 DB레벨 엄밀 차단까지 갈지 ③ 일괄 PDF 방식(브라우저 인쇄 묶음 vs 서버 생성)
