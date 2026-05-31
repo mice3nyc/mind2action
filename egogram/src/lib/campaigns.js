@@ -71,6 +71,20 @@ export async function updateCampaign(id, fields) {
   return data;
 }
 
+// 관리자: 캠페인 삭제 — 연결 응답 먼저, 그다음 캠페인 (FK 순서)
+export async function deleteCampaign(id) {
+  const { error: rErr } = await supabase.from('responses').delete().eq('campaign_id', id);
+  if (rErr) {
+    console.error('deleteCampaign(responses) failed:', rErr);
+    throw rErr;
+  }
+  const { error: cErr } = await supabase.from('campaigns').delete().eq('id', id);
+  if (cErr) {
+    console.error('deleteCampaign(campaign) failed:', cErr);
+    throw cErr;
+  }
+}
+
 // 설문 진입: code → 캠페인 단건 (anon, RPC — 전체 목록 비노출)
 export async function getCampaignByCode(code) {
   const { data, error } = await supabase.rpc('get_campaign_by_code', { p_code: code });

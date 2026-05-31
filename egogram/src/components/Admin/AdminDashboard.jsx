@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { loadResults, deleteResult, clearResults, saveResult } from '../../lib/storage';
-import { listCampaigns, createCampaign } from '../../lib/campaigns';
+import { loadResults, deleteResult, saveResult } from '../../lib/storage';
+import { listCampaigns, createCampaign, deleteCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import CampaignManager from './CampaignManager';
 import CampaignDashboard from './CampaignDashboard';
@@ -130,10 +130,21 @@ export default function AdminDashboard({ onLogout }) {
     setResults(updated);
   }
 
-  async function handleClearAll() {
-    if (!window.confirm(`전체 ${results.length}건을 삭제하시겠습니까?`)) return;
-    await clearResults();
-    setResults([]);
+  // 캠페인 삭제 — 백업(그 캠페인 응답 CSV) 자동 다운로드 후 삭제.
+  // 전체 일괄 삭제는 폐기, 캠페인 단위로만 (피터공 5/31).
+  async function handleDeleteCampaign(campaign) {
+    const campRows = results.filter(r => r.campaignId === campaign.id);
+    const ok = window.confirm(
+      `[${campaign.client_name}] 캠페인과 연결된 응답 ${campRows.length}건을 삭제합니다.\n\n` +
+      `삭제 전 이 캠페인 응답을 CSV로 백업 다운로드합니다. 계속할까요?`
+    );
+    if (!ok) return;
+    // 백업 먼저 (응답이 있을 때만)
+    if (campRows.length > 0) {
+      downloadResultsCSV(campRows, `backup_${campaign.client_name}_${new Date().toISOString().slice(0, 10)}.csv`);
+    }
+    await deleteCampaign(campaign.id);
+    await reload();
   }
 
   async function handleLoadSample() {
@@ -168,10 +179,11 @@ export default function AdminDashboard({ onLogout }) {
     await reload();
   }
 
-  function handleExportCSV() {
-    if (filtered.length === 0) return;
+  // 결과 행 배열 → CSV 다운로드 (내보내기·삭제 전 백업 공용)
+  function downloadResultsCSV(rows, filename) {
+    if (!rows || rows.length === 0) return;
     const headers = ['그룹', '이름', '생년월일', '경력(월)', '회사', '소속', '직무', '소득', '리크루팅', 'CP', 'NP', 'A', 'FC', 'AC', '총점', 'TOP1', 'TOP2', 'BOTTOM', '일시'];
-    const rows = filtered.map(r => [
+    const dataRows = rows.map(r => [
       r.group,
       r.name,
       r.birthDate,
@@ -190,14 +202,18 @@ export default function AdminDashboard({ onLogout }) {
     ]);
 
     const bom = '﻿';
-    const csv = bom + [headers, ...rows].map(row => row.join(',')).join('\n');
+    const csv = bom + [headers, ...dataRows].map(row => row.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `egogram_results_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+  }
+
+  function handleExportCSV() {
+    downloadResultsCSV(filtered, `egogram_results_${new Date().toISOString().slice(0, 10)}.csv`);
   }
 
   const egoKeys = ['CP', 'NP', 'A', 'FC', 'AC'];
@@ -219,7 +235,7 @@ export default function AdminDashboard({ onLogout }) {
       </div>
 
       {tab === 'campaigns' && (
-        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} />
+        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} onDeleteCampaign={handleDeleteCampaign} />
       )}
 
       {tab === 'dashboard' && (
@@ -248,9 +264,6 @@ export default function AdminDashboard({ onLogout }) {
               </button>
               <button className="btn btn-primary" onClick={handleExportCSV} disabled={filtered.length === 0}>
                 CSV 다운로드
-              </button>
-              <button className="btn btn-secondary" onClick={handleClearAll} disabled={results.length === 0}>
-                전체 삭제
               </button>
             </div>
           </div>

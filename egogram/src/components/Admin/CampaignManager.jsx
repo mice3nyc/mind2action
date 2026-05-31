@@ -21,7 +21,7 @@ function StatusBadge({ status }) {
   return <span className={`campaign-status campaign-status-${status}`}>{STATUS_LABEL[status] || status}</span>;
 }
 
-export default function CampaignManager({ campaigns, counts, onChange, onViewResults }) {
+export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onDeleteCampaign }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -246,6 +246,13 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                       </button>
                       <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
                         {c.status === 'closed' ? '재개' : '마감'}
+                      </button>
+                      <button
+                        className="btn-delete-action btn-delete-campaign"
+                        onClick={() => onDeleteCampaign(c)}
+                        title="이 캠페인과 응답을 삭제 (백업 후)"
+                      >
+                        삭제
                       </button>
                     </div>
                   </td>
