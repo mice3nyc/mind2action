@@ -76,32 +76,47 @@ export default function CampaignManager({ campaigns, counts, onChange }) {
     <div className="campaign-pane">
       <form className="campaign-create" onSubmit={handleCreate}>
         <h2 className="campaign-create-title">새 설문 캠페인</h2>
-        <div className="campaign-form-grid">
+
+        <fieldset className="campaign-fieldset">
+          <legend className="campaign-fieldset-label">기본 정보</legend>
           <div className="form-group">
             <label className="form-label">고객사 / 대상명 *</label>
             <input className="form-input" name="clientName" value={form.clientName} onChange={handleChange} placeholder="예: 한화생명 FC 1기" />
+            <div className="form-hint form-hint-public">설문 참여자에게 표시됩니다 ("○○ 설문")</div>
           </div>
           <div className="form-group">
             <label className="form-label">대상 설명</label>
             <input className="form-input" name="target" value={form.target} onChange={handleChange} placeholder="예: 신입 설계사 (선택)" />
+            <div className="form-hint">관리자 기록용 — 참여자에게는 보이지 않습니다</div>
           </div>
-          <div className="form-group">
-            <label className="form-label">참여 시작</label>
-            <input className="form-input" type="date" name="periodStart" value={form.periodStart} onChange={handleChange} />
+        </fieldset>
+
+        <fieldset className="campaign-fieldset">
+          <legend className="campaign-fieldset-label">일정</legend>
+          <div className="campaign-form-grid">
+            <div className="form-group">
+              <label className="form-label">참여 시작</label>
+              <input className="form-input" type="date" name="periodStart" value={form.periodStart} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">참여 종료</label>
+              <input className="form-input" type="date" name="periodEnd" value={form.periodEnd} onChange={handleChange} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">교육일</label>
+              <input className="form-input" type="date" name="educationDate" value={form.educationDate} onChange={handleChange} />
+            </div>
           </div>
+        </fieldset>
+
+        <fieldset className="campaign-fieldset">
+          <legend className="campaign-fieldset-label">메모</legend>
           <div className="form-group">
-            <label className="form-label">참여 종료</label>
-            <input className="form-input" type="date" name="periodEnd" value={form.periodEnd} onChange={handleChange} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">교육일</label>
-            <input className="form-input" type="date" name="educationDate" value={form.educationDate} onChange={handleChange} />
-          </div>
-          <div className="form-group">
-            <label className="form-label">메모</label>
             <input className="form-input" name="memo" value={form.memo} onChange={handleChange} placeholder="내부 메모 (선택)" />
+            <div className="form-hint">관리자 내부 메모 — 참여자·결과 화면에 보이지 않습니다</div>
           </div>
-        </div>
+        </fieldset>
+
         {error && <div className="landing-error">{error}</div>}
         <button type="submit" className="btn btn-primary" disabled={!form.clientName.trim() || creating}>
           {creating ? '생성 중...' : '캠페인 생성 + 링크 발급'}
@@ -130,6 +145,7 @@ export default function CampaignManager({ campaigns, counts, onChange }) {
                   <td className="td-name">
                     {c.client_name}
                     {c.target && <div className="campaign-target">{c.target}</div>}
+                    {c.memo && <div className="campaign-memo">메모: {c.memo}</div>}
                   </td>
                   <td><StatusBadge status={c.status} /></td>
                   <td className="td-small">{c.period_start || '-'}{c.period_end ? ` ~ ${c.period_end}` : ''}</td>

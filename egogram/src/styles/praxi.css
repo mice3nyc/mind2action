@@ -1092,25 +1092,57 @@ body:has(.report-bling) { background: #fff; }
 
 .campaign-create-title {
   font-size: 17px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+}
+
+.campaign-fieldset {
+  border: none;
+  border-top: 1px solid var(--border);
+  padding: 16px 0 4px;
+  margin: 0;
+}
+.campaign-fieldset:first-of-type { border-top: none; padding-top: 0; }
+
+.campaign-fieldset-label {
+  font-family: 'Paperlogy', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0;
+  margin-bottom: 12px;
 }
 
 .campaign-form-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px 18px;
-  margin-bottom: 18px;
 }
 
 @media (max-width: 720px) {
   .campaign-form-grid { grid-template-columns: 1fr; }
 }
 
+.form-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.form-hint-public { color: var(--accent-blue); }
+
 .campaign-target {
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
   white-space: normal;
+}
+.campaign-memo {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+  white-space: normal;
+  max-width: 280px;
 }
 
 .campaign-status {
