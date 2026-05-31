@@ -1223,15 +1223,15 @@ body:has(.report-bling) { background: #fff; }
 .campaign-table .campaign-memo {
   max-width: none;
 }
-.campaign-table .campaign-code {
-  display: block;
-  margin-left: 0;
-  margin-top: 4px;
-}
 .campaign-table .td-expected {
   color: var(--text-muted);
   font-weight: 400;
   margin-left: 1px;
+}
+.campaign-actions {
+  display: inline-flex;
+  gap: 8px;
+  justify-content: center;
 }
 
 /* 결과 확인: 캠페인 필터 풀다운 */

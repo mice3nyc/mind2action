@@ -215,22 +215,23 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     <button className="btn-copy-link" onClick={() => handleCopy(c)}>
                       {copiedId === c.id ? '복사됨 ✓' : '링크 복사'}
                     </button>
-                    <code className="campaign-code">?g={c.code}</code>
                   </td>
                   <td>
                     <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문 결과</button>
                   </td>
                   <td>
-                    <button
-                      className="btn-view-results"
-                      onClick={() => handleEdit(c)}
-                      disabled={editingId === c.id}
-                    >
-                      {editingId === c.id ? '수정 중' : '수정'}
-                    </button>
-                    <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
-                      {c.status === 'closed' ? '재개' : '마감'}
-                    </button>
+                    <div className="campaign-actions">
+                      <button
+                        className="btn-view-results"
+                        onClick={() => handleEdit(c)}
+                        disabled={editingId === c.id}
+                      >
+                        {editingId === c.id ? '수정 중' : '수정'}
+                      </button>
+                      <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
+                        {c.status === 'closed' ? '재개' : '마감'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
