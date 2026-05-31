@@ -124,8 +124,9 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - [x] 브랜딩 정리: 헤더 MIND2ACTION만(weight 700, 좌정렬)·"에고그램" 노출 전면 제거·EGOGRAM 배지→"소속:{고객사}"·결과 "성향 진단 결과"·"나를 알면 행동이 바뀝니다" 한 줄
 
 ### Phase 2 — 심화
-- [ ] 참여기간 자동 차단 (period_start/end 게이팅 + 마감 UI)
+- [x] 참여기간 자동 차단 (period_start/end 게이팅) — 5/31, LandingPage 날짜 분기
 - [ ] 진행상황 대시보드 (참여율·기간 D-day·교육일 카운트다운)
+- [ ] 캠페인 수정 폼
 - [ ] 단체별 리포트 일괄 PDF 저장 (기존 로드맵 항목)
 
 ## 8. 기술 주의
@@ -150,7 +151,7 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - RPC `get_campaign_by_code`가 이미 period_start·period_end 반환하므로 LandingPage에서 날짜 비교만 추가하면 됨(서버 시간 아닌 클라 today 기준 — 엄밀 차단 필요 시 RPC/DB레벨로).
 
 ### 항목
-- [ ] **참여기간 자동 차단** — LandingPage 게이팅에 날짜 조건 추가(시작 전/종료 후 안내 분기). [마감]은 그대로 즉시 오버라이드로 유지.
+- [x] **참여기간 자동 차단** ✅ 5/31 — LandingPage 게이팅에 날짜 조건 추가. status==='active' 통과 후 클라 today(`todayStr()`, 로컬 YYYY-MM-DD) vs period_start/end 문자열 비교(사전식==시간순). 분기 2개 신설: `notstarted`("아직 설문 참여 기간이 아닙니다" + 기간 표시), `ended`("설문 참여 기간이 종료되었습니다" + 기간 표시). 기간 null이면 무제한(기존과 동일). [마감](status=closed)은 그대로 즉시 오버라이드로 유지(날짜보다 우선 — status 검사가 먼저). RPC가 이미 period_start·period_end 반환하므로 DB/서버 변경 없음. ⚠️ 클라 시계 기준이라 엄밀 차단 아님(MVP). 엄밀 차단 필요 시 RPC에서 날짜 검사해 status를 동적으로 내려주는 방식으로 승격 가능.
 - [ ] **진행상황 대시보드** — 캠페인별 참여 인원·종료 D-day·교육일 카운트다운. ⚠️ "참여율" 표시하려면 **목표 인원(target_count) 필드 추가** 필요 → 결정 포인트(절대 인원만 vs 목표 대비 %).
 - [ ] **캠페인 수정 폼** — 현재 마감/재개만. 기간·교육일·고객사명·메모 인라인 수정 추가.
 - [ ] **단체별 리포트 일괄 PDF 저장** — 한 캠페인 전 참여자 리포트 묶음 PDF(고객사 전달용). 기존 로드맵 항목.
