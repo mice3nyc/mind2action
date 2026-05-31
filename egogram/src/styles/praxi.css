@@ -82,8 +82,8 @@ p {
 .header-brand {
   font-family: 'Paperlogy', sans-serif;
   font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 100;
+  letter-spacing: 0.12em;
   color: var(--accent-blue);
   text-transform: uppercase;
 }

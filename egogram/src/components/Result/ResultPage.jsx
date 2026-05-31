@@ -6,7 +6,7 @@ export default function ResultPage({ result, profile, onRestart }) {
 
   return (
     <section className="result-section">
-      <h1>{profile?.name}님의 에고그램</h1>
+      <h1>{profile?.name}님의 성향 진단 결과</h1>
       <p className="result-summary">
         가장 강한 성향은 <strong>{EGO_LABELS[top1]}</strong>({top1}),
         두 번째는 <strong>{EGO_LABELS[top2]}</strong>({top2})입니다.

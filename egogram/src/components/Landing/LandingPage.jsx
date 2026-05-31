@@ -41,7 +41,6 @@ export default function LandingPage({ onEnter }) {
   if (state === 'nolink' || state === 'invalid') {
     return (
       <section className="landing-section">
-        <div className="landing-badge">EGOGRAM</div>
         <h1>설문 링크를<br />확인해 주세요</h1>
         <p className="landing-desc">
           발급된 설문 링크로만 참여할 수 있습니다.<br />
@@ -54,7 +53,6 @@ export default function LandingPage({ onEnter }) {
   if (state === 'closed') {
     return (
       <section className="landing-section">
-        <div className="landing-badge">EGOGRAM</div>
         <h1>설문이<br />종료되었습니다</h1>
         <p className="landing-desc">현재 진행 중인 설문이 아닙니다.</p>
       </section>
@@ -64,9 +62,8 @@ export default function LandingPage({ onEnter }) {
   // ready
   return (
     <section className="landing-section">
-      <div className="landing-badge">EGOGRAM</div>
-      <div className="intro-group-badge">{campaign.client_name}</div>
-      <h1>나를 알면<br />행동이 바뀝니다</h1>
+      <div className="intro-group-badge">소속: {campaign.client_name}</div>
+      <h1>나를 알면 행동이 바뀝니다</h1>
       <p className="landing-desc">
         50문항 성향 진단 설문입니다.<br />
         약 5~10분 소요됩니다. 아래 버튼을 눌러 시작하세요.

@@ -44,7 +44,7 @@ export default function SurveyIntro({ group, onSubmit }) {
 
   return (
     <section className="intro-section">
-      {group && <div className="intro-group-badge">{group}</div>}
+      {group && <div className="intro-group-badge">소속: {group}</div>}
       <h2>기본 정보 입력</h2>
       <p>모든 개인 정보는 성향코칭 외에는 그 어디에도 활용되지 않습니다.</p>
       <form onSubmit={handleSubmit}>
