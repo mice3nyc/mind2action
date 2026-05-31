@@ -127,7 +127,7 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 ### Phase 2 — 심화
 - [x] 참여기간 자동 차단 (period_start/end 게이팅) — 5/31, LandingPage 날짜 분기
 - [x] 캠페인 수정 기능 — 5/31, 생성 폼 재사용 (code·status 불변)
-- [~] 진행상황 대시보드 — 5/31 코드 완료(커밋 `2d4d4ae`), ⚠️ DB 마이그레이션(expected_count 컬럼) 실행 후 배포 대기. 스타일은 라이브 보며 조정 예정
+- [~] 진행상황 대시보드 — 5/31 코드 완료(커밋 `059f0cc`), ⚠️ DB 마이그레이션(expected_count 컬럼) 실행 후 배포 대기. 스타일은 라이브 보며 조정 예정
 - [ ] 단체별 리포트 일괄 PDF 저장 (기존 로드맵 항목)
 
 ## 8. 기술 주의
@@ -156,7 +156,7 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 - [~] **진행상황 대시보드** (5/31 코드 완료, 배포 대기) — 관리자 [진행 현황] 탭 신설. 캠페인별 카드: 참여 N / 예상 M (진행률 %, 100% 초과 허용) + 참여기간 종료 D-day + 교육일 D-day. 진행중 먼저 → 종료 임박순 정렬. 예상 미설정이면 진행률 대신 참여 인원만.
   - **결정됨 (피터공)**: 참여 예상 인원 필드 추가 (`expected_count` int). 실제가 예상보다 적어도 많아도 무방(기준값일 뿐). `LandingPage` 게이팅과 무관, 대시보드 진행률 표시용.
   - **⚠️ DB 마이그레이션 필요**: `alter table campaigns add column if not exists expected_count int;` — 피터공 Supabase SQL Editor 실행. 단일 문장. 실행·확인 후 `npm run deploy`. (RLS 변경 없음 — campaigns는 authenticated만, 새 컬럼은 기존 정책 그대로 커버. RPC `get_campaign_by_code`는 설문 진입용이라 expected_count 미포함 = 변경 불필요.)
-  - **파일**: `CampaignDashboard.jsx` 신설, `AdminDashboard.jsx` 탭 추가, `CampaignManager.jsx`·`campaigns.js` expected_count 입력. 코드 `2d4d4ae` 푸시 완료.
+  - **파일**: `CampaignDashboard.jsx` 신설, `AdminDashboard.jsx` 탭 추가, `CampaignManager.jsx`·`campaigns.js` expected_count 입력. 코드 `059f0cc` 푸시 완료.
 - [x] **캠페인 수정 폼** ✅ 5/31 (커밋 `4c299f6`, 라이브) — 왼쪽 생성 폼 재사용. 목록 행 [수정] → 그 캠페인 값이 폼에 로드 + `editingId` 세트 → 폼 제목 "캠페인 수정"·버튼 "수정 저장"+[취소]·로드 시 상단 스크롤. 저장 = `updateCampaign(id, {client_name, target, period_start, period_end, education_date, memo})`(snake_case 직접, 빈값 null). **code·status는 수정 대상 아님**(코드=링크 정체성 불변, status는 마감/재개 토글 담당 — 폼에 안내 문구). 저장·취소 후 `EMPTY_FORM` 복귀+editingId 해제. 수정 중인 행 [수정] 버튼은 "수정 중"으로 disabled. DB/마이그레이션 변경 없음(updateCampaign 기존 함수). **해소한 구멍**: 한 번 만든 캠페인을 못 고쳐 오타·기간변경 시 삭제+재생성뿐 → 배포 링크 사망. 이제 링크 유지한 채 수정.
 - [ ] **설문 ON/OFF 토글 UI 정리** (선택) — 마감/재개 버튼이 이미 토글(status active↔closed)이나 토글처럼 안 보임. 필요 시 ON/OFF 스위치 모양으로.
 - [ ] **단체별 리포트 일괄 PDF 저장** — 한 캠페인 전 참여자 리포트 묶음 PDF(고객사 전달용). 기존 로드맵 항목.
