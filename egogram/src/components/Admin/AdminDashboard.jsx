@@ -94,6 +94,12 @@ export default function AdminDashboard({ onLogout }) {
     reload();
   }, []);
 
+  // 캠페인 목록에서 "설문 결과 확인" → 그 캠페인만 필터링된 결과 탭
+  function viewCampaignResults(clientName) {
+    setFilter(clientName || 'all');
+    setTab('results');
+  }
+
   // 캠페인별 참여수 (results 기준)
   const counts = {};
   for (const r of results) {
@@ -176,12 +182,12 @@ export default function AdminDashboard({ onLogout }) {
       </div>
 
       <div className="admin-tabs">
-        <button className={`admin-tab ${tab === 'campaigns' ? 'active' : ''}`} onClick={() => setTab('campaigns')}>캠페인</button>
-        <button className={`admin-tab ${tab === 'results' ? 'active' : ''}`} onClick={() => setTab('results')}>결과</button>
+        <button className={`admin-tab ${tab === 'campaigns' ? 'active' : ''}`} onClick={() => setTab('campaigns')}>캠페인 관리</button>
+        <button className={`admin-tab ${tab === 'results' ? 'active' : ''}`} onClick={() => setTab('results')}>결과 확인</button>
       </div>
 
       {tab === 'campaigns' && (
-        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} />
+        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} />
       )}
 
       {tab === 'results' && (

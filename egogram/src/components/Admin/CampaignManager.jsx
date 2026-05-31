@@ -20,7 +20,7 @@ function StatusBadge({ status }) {
   return <span className={`campaign-status campaign-status-${status}`}>{STATUS_LABEL[status] || status}</span>;
 }
 
-export default function CampaignManager({ campaigns, counts, onChange }) {
+export default function CampaignManager({ campaigns, counts, onChange, onViewResults }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -74,6 +74,7 @@ export default function CampaignManager({ campaigns, counts, onChange }) {
 
   return (
     <div className="campaign-pane">
+      <div className="campaign-layout">
       <form className="campaign-create" onSubmit={handleCreate}>
         <h2 className="campaign-create-title">새 설문 캠페인</h2>
 
@@ -123,6 +124,7 @@ export default function CampaignManager({ campaigns, counts, onChange }) {
         </button>
       </form>
 
+      <div className="campaign-list-col">
       {campaigns.length === 0 ? (
         <div className="admin-empty">아직 생성된 캠페인이 없습니다.</div>
       ) : (
@@ -158,9 +160,12 @@ export default function CampaignManager({ campaigns, counts, onChange }) {
                     <code className="campaign-code">?g={c.code}</code>
                   </td>
                   <td>
-                    <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
-                      {c.status === 'closed' ? '재개' : '마감'}
-                    </button>
+                    <div className="campaign-row-actions">
+                      <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문 결과</button>
+                      <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
+                        {c.status === 'closed' ? '재개' : '마감'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -168,6 +173,8 @@ export default function CampaignManager({ campaigns, counts, onChange }) {
           </table>
         </div>
       )}
+      </div>
+      </div>
     </div>
   );
 }
