@@ -1,6 +1,6 @@
 # SPEC — 고객사별 설문 캠페인 시스템 (mind2action 에고그램)
 
-> 작성: 아리공, 2026-05-31 · 상태: **Phase 1 + UI 조정 라이브 (5/31)**. Phase 2 진행 — 참여기간 자동 차단(`80400ad`) + 캠페인 수정 기능(`9adbf6b`) 라이브. 남음: 진행상황 대시보드 / 일괄 PDF
+> 작성: 아리공, 2026-05-31 · 상태: **Phase 1 + UI 조정 라이브 (5/31)**. Phase 2 진행 — 참여기간 자동 차단(`80400ad`) + 캠페인 수정 기능(`4c299f6`) 라이브. 남음: 진행상황 대시보드 / 일괄 PDF
 > 요청 배경: 단일 설문 → 고객사별 설문 캠페인 플랫폼. 설문 생성·링크 카피·고객사별 결과·진행상황/기간/교육일 관리.
 > 결정 (5/31, 피터공): ① 1차 = MVP ② 링크 코드 = 짧은 랜덤 ③ 진입 = 링크 전용 + 랜덤 코드 + 상태 게이팅 (타이핑 코드 중복이라 안 씀)
 
@@ -153,7 +153,7 @@ grant execute on function get_campaign_by_code(text) to anon, authenticated;
 ### 항목
 - [x] **참여기간 자동 차단** ✅ 5/31 — LandingPage 게이팅에 날짜 조건 추가. status==='active' 통과 후 클라 today(`todayStr()`, 로컬 YYYY-MM-DD) vs period_start/end 문자열 비교(사전식==시간순). 분기 2개 신설: `notstarted`("아직 설문 참여 기간이 아닙니다" + 기간 표시), `ended`("설문 참여 기간이 종료되었습니다" + 기간 표시). 기간 null이면 무제한(기존과 동일). [마감](status=closed)은 그대로 즉시 오버라이드로 유지(날짜보다 우선 — status 검사가 먼저). RPC가 이미 period_start·period_end 반환하므로 DB/서버 변경 없음. ⚠️ 클라 시계 기준이라 엄밀 차단 아님(MVP). 엄밀 차단 필요 시 RPC에서 날짜 검사해 status를 동적으로 내려주는 방식으로 승격 가능.
 - [ ] **진행상황 대시보드** — 캠페인별 참여 인원·종료 D-day·교육일 카운트다운. ⚠️ "참여율" 표시하려면 **목표 인원(target_count) 필드 추가** 필요 → 결정 포인트(절대 인원만 vs 목표 대비 %).
-- [x] **캠페인 수정 폼** ✅ 5/31 (커밋 `9adbf6b`, 라이브) — 왼쪽 생성 폼 재사용. 목록 행 [수정] → 그 캠페인 값이 폼에 로드 + `editingId` 세트 → 폼 제목 "캠페인 수정"·버튼 "수정 저장"+[취소]·로드 시 상단 스크롤. 저장 = `updateCampaign(id, {client_name, target, period_start, period_end, education_date, memo})`(snake_case 직접, 빈값 null). **code·status는 수정 대상 아님**(코드=링크 정체성 불변, status는 마감/재개 토글 담당 — 폼에 안내 문구). 저장·취소 후 `EMPTY_FORM` 복귀+editingId 해제. 수정 중인 행 [수정] 버튼은 "수정 중"으로 disabled. DB/마이그레이션 변경 없음(updateCampaign 기존 함수). **해소한 구멍**: 한 번 만든 캠페인을 못 고쳐 오타·기간변경 시 삭제+재생성뿐 → 배포 링크 사망. 이제 링크 유지한 채 수정.
+- [x] **캠페인 수정 폼** ✅ 5/31 (커밋 `4c299f6`, 라이브) — 왼쪽 생성 폼 재사용. 목록 행 [수정] → 그 캠페인 값이 폼에 로드 + `editingId` 세트 → 폼 제목 "캠페인 수정"·버튼 "수정 저장"+[취소]·로드 시 상단 스크롤. 저장 = `updateCampaign(id, {client_name, target, period_start, period_end, education_date, memo})`(snake_case 직접, 빈값 null). **code·status는 수정 대상 아님**(코드=링크 정체성 불변, status는 마감/재개 토글 담당 — 폼에 안내 문구). 저장·취소 후 `EMPTY_FORM` 복귀+editingId 해제. 수정 중인 행 [수정] 버튼은 "수정 중"으로 disabled. DB/마이그레이션 변경 없음(updateCampaign 기존 함수). **해소한 구멍**: 한 번 만든 캠페인을 못 고쳐 오타·기간변경 시 삭제+재생성뿐 → 배포 링크 사망. 이제 링크 유지한 채 수정.
 - [ ] **설문 ON/OFF 토글 UI 정리** (선택) — 마감/재개 버튼이 이미 토글(status active↔closed)이나 토글처럼 안 보임. 필요 시 ON/OFF 스위치 모양으로.
 - [ ] **단체별 리포트 일괄 PDF 저장** — 한 캠페인 전 참여자 리포트 묶음 PDF(고객사 전달용). 기존 로드맵 항목.
 
