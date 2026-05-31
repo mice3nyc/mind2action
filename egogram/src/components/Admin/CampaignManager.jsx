@@ -129,16 +129,18 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
         <div className="admin-empty">아직 생성된 캠페인이 없습니다.</div>
       ) : (
         <div className="admin-table-wrap">
-          <table className="admin-table">
+          <table className="admin-table campaign-table">
             <thead>
               <tr>
                 <th>고객사 / 대상</th>
                 <th>상태</th>
-                <th>참여기간</th>
+                <th>참여 시작</th>
+                <th>참여 종료</th>
                 <th>교육일</th>
                 <th>참여</th>
                 <th>설문 링크</th>
-                <th></th>
+                <th>설문 결과</th>
+                <th>관리</th>
               </tr>
             </thead>
             <tbody>
@@ -150,7 +152,8 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     {c.memo && <div className="campaign-memo">메모: {c.memo}</div>}
                   </td>
                   <td><StatusBadge status={c.status} /></td>
-                  <td className="td-small">{c.period_start || '-'}{c.period_end ? ` ~ ${c.period_end}` : ''}</td>
+                  <td className="td-small">{c.period_start || '-'}</td>
+                  <td className="td-small">{c.period_end || '-'}</td>
                   <td className="td-small">{c.education_date || '-'}</td>
                   <td className="td-score">{counts[c.id] || 0}</td>
                   <td>
@@ -160,12 +163,12 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     <code className="campaign-code">?g={c.code}</code>
                   </td>
                   <td>
-                    <div className="campaign-row-actions">
-                      <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문 결과</button>
-                      <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
-                        {c.status === 'closed' ? '재개' : '마감'}
-                      </button>
-                    </div>
+                    <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문 결과</button>
+                  </td>
+                  <td>
+                    <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
+                      {c.status === 'closed' ? '재개' : '마감'}
+                    </button>
                   </td>
                 </tr>
               ))}

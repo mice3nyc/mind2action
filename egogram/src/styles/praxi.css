@@ -1212,3 +1212,19 @@ body:has(.report-bling) { background: #fff; }
   transition: opacity 0.15s;
 }
 .btn-view-results:hover { opacity: 0.85; }
+
+/* 캠페인 목록: 레이블·데이터 중앙정렬 */
+.campaign-table th,
+.campaign-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+.campaign-table .campaign-target,
+.campaign-table .campaign-memo {
+  max-width: none;
+}
+.campaign-table .campaign-code {
+  display: block;
+  margin-left: 0;
+  margin-top: 4px;
+}
