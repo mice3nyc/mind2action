@@ -189,7 +189,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                 <th>참여 시작</th>
                 <th>참여 종료</th>
                 <th>교육일</th>
-                <th>참여</th>
+                <th>인원</th>
                 <th>설문 링크</th>
                 <th>설문 결과</th>
                 <th>관리</th>
@@ -207,7 +207,10 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                   <td className="td-small">{c.period_start || '-'}</td>
                   <td className="td-small">{c.period_end || '-'}</td>
                   <td className="td-small">{c.education_date || '-'}</td>
-                  <td className="td-score">{counts[c.id] || 0}</td>
+                  <td className="td-score">
+                    {counts[c.id] || 0}
+                    {c.expected_count ? <span className="td-expected">/{c.expected_count}</span> : null}
+                  </td>
                   <td>
                     <button className="btn-copy-link" onClick={() => handleCopy(c)}>
                       {copiedId === c.id ? '복사됨 ✓' : '링크 복사'}
