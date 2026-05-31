@@ -1,7 +1,8 @@
 import { supabase } from './supabase';
 
-export async function saveResult(profile, result) {
+export async function saveResult(profile, result, campaignId = null) {
   const row = {
+    campaign_id: campaignId,
     group_name: profile.group || '',
     name: profile.name,
     birth_date: profile.birthDate,
@@ -42,6 +43,7 @@ export async function loadResults() {
   return (data || []).map(r => ({
     id: r.id,
     timestamp: r.created_at,
+    campaignId: r.campaign_id,
     group: r.group_name,
     name: r.name,
     birthDate: r.birth_date,

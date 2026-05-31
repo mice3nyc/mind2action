@@ -7,38 +7,37 @@ import { saveResult } from '../lib/storage';
 
 export default function SurveyApp() {
   const [stage, setStage] = useState('landing');
-  const [group, setGroup] = useState(null);
+  const [campaign, setCampaign] = useState(null);
   const [profile, setProfile] = useState(null);
   const [result, setResult] = useState(null);
 
-  function handleCodeEnter(groupName) {
-    setGroup(groupName);
+  function handleEnter(camp) {
+    setCampaign(camp);
     setStage('intro');
   }
 
   function handleProfileSubmit(data) {
-    setProfile({ ...data, group });
+    setProfile({ ...data, group: campaign?.client_name || '' });
     setStage('survey');
   }
 
   async function handleSurveyComplete(resultData) {
-    const fullProfile = { ...profile, group };
-    await saveResult(fullProfile, resultData);
+    const fullProfile = { ...profile, group: campaign?.client_name || '' };
+    await saveResult(fullProfile, resultData, campaign?.id || null);
     setResult(resultData);
     setStage('result');
   }
 
   function handleRestart() {
     setStage('landing');
-    setGroup(null);
     setProfile(null);
     setResult(null);
   }
 
   return (
     <>
-      {stage === 'landing' && <LandingPage onEnter={handleCodeEnter} />}
-      {stage === 'intro' && <SurveyIntro group={group} onSubmit={handleProfileSubmit} />}
+      {stage === 'landing' && <LandingPage onEnter={handleEnter} />}
+      {stage === 'intro' && <SurveyIntro group={campaign?.client_name} onSubmit={handleProfileSubmit} />}
       {stage === 'survey' && <SurveyForm onComplete={handleSurveyComplete} />}
       {stage === 'result' && <ResultPage result={result} profile={profile} onRestart={handleRestart} />}
     </>

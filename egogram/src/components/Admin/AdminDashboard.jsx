@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { loadResults, deleteResult, clearResults, saveResult } from '../../lib/storage';
+import { listCampaigns } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
+import CampaignManager from './CampaignManager';
 
 const JOB_TO_REPORT = {
   sales: '보험설계사',
@@ -42,13 +44,16 @@ const EGO_COLORS = {
   AC: { bg: '#8b5cf6', light: '#f5f3ff', text: '#7c3aed' },
 };
 
-const GROUP_COLORS = {
-  '망원동': { bg: '#0012de', text: '#fff' },
-  '서교동': { bg: '#e11d48', text: '#fff' },
-  '합정동': { bg: '#059669', text: '#fff' },
-};
+// 고객사명 → 안정적 색 (하드코딩 GROUP_COLORS 대체)
+const GROUP_PALETTE = ['#0012de', '#e11d48', '#059669', '#d97706', '#7c3aed', '#0891b2', '#be185d', '#4338ca'];
+function colorFor(name) {
+  if (!name) return { bg: '#888', text: '#fff' };
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return { bg: GROUP_PALETTE[h % GROUP_PALETTE.length], text: '#fff' };
+}
 
-function ScoreCell({ ego, score, isTop, isBottom }) {
+function ScoreCell({ ego, score }) {
   const pct = (score / 20) * 100;
   const color = EGO_COLORS[ego];
   return (
@@ -69,17 +74,31 @@ function EgoTag({ ego, type }) {
 }
 
 function GroupBadge({ group }) {
-  const c = GROUP_COLORS[group] || { bg: '#888', text: '#fff' };
-  return <span className="group-badge" style={{ background: c.bg, color: c.text }}>{group}</span>;
+  const c = colorFor(group);
+  return <span className="group-badge" style={{ background: c.bg, color: c.text }}>{group || '-'}</span>;
 }
 
 export default function AdminDashboard({ onLogout }) {
+  const [tab, setTab] = useState('results');
   const [results, setResults] = useState([]);
+  const [campaigns, setCampaigns] = useState([]);
   const [filter, setFilter] = useState('all');
 
+  async function reload() {
+    const [r, c] = await Promise.all([loadResults(), listCampaigns()]);
+    setResults(r);
+    setCampaigns(c);
+  }
+
   useEffect(() => {
-    loadResults().then(setResults);
+    reload();
   }, []);
+
+  // 캠페인별 참여수 (results 기준)
+  const counts = {};
+  for (const r of results) {
+    if (r.campaignId) counts[r.campaignId] = (counts[r.campaignId] || 0) + 1;
+  }
 
   const groups = [...new Set(results.map(r => r.group).filter(Boolean))].sort();
   const filtered = filter === 'all' ? results : results.filter(r => r.group === filter);
@@ -150,115 +169,122 @@ export default function AdminDashboard({ onLogout }) {
     <section className="admin-section">
       <div className="admin-header">
         <div>
-          <h1>설문 결과</h1>
-          <p className="admin-count">총 {filtered.length}건 {filter !== 'all' && `(${filter})`}</p>
+          <h1>관리자</h1>
+          <p className="admin-count">설문 결과 {results.length}건 · 캠페인 {campaigns.length}개</p>
         </div>
         <button className="btn btn-secondary" onClick={onLogout}>로그아웃</button>
       </div>
 
-      <div className="admin-toolbar">
-        <div className="admin-filters">
-          <button
-            className={`filter-chip ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => setFilter('all')}
-          >
-            전체 ({results.length})
-          </button>
-          {groups.map(g => {
-            const gc = GROUP_COLORS[g] || { bg: '#888' };
-            return (
-              <button
-                key={g}
-                className={`filter-chip ${filter === g ? 'active' : ''}`}
-                onClick={() => setFilter(g)}
-                style={filter === g ? { background: gc.bg, borderColor: gc.bg, color: '#fff' } : { borderColor: gc.bg, color: gc.bg }}
-              >
-                {g} ({groupCounts[g] || 0})
-              </button>
-            );
-          })}
-        </div>
-        <div className="admin-actions">
-          <button className="btn btn-secondary" onClick={handleLoadSample}>
-            샘플 20명
-          </button>
-          <button className="btn btn-primary" onClick={handleExportCSV} disabled={filtered.length === 0}>
-            CSV 다운로드
-          </button>
-          <button className="btn btn-secondary" onClick={handleClearAll} disabled={results.length === 0}>
-            전체 삭제
-          </button>
-        </div>
+      <div className="admin-tabs">
+        <button className={`admin-tab ${tab === 'campaigns' ? 'active' : ''}`} onClick={() => setTab('campaigns')}>캠페인</button>
+        <button className={`admin-tab ${tab === 'results' ? 'active' : ''}`} onClick={() => setTab('results')}>결과</button>
       </div>
 
-      {filtered.length === 0 ? (
-        <div className="admin-empty">아직 설문 결과가 없습니다.</div>
-      ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>그룹</th>
-                <th>이름</th>
-                <th>생년월일</th>
-                <th>경력</th>
-                <th>회사</th>
-                <th>소속</th>
-                <th>직무</th>
-                <th>소득</th>
-                <th>리크루팅</th>
-                {egoKeys.map(e => (
-                  <th key={e} className="th-ego" style={{ color: EGO_COLORS[e].bg }}>{e}</th>
-                ))}
-                <th>총점</th>
-                <th>TOP1</th>
-                <th>BOT</th>
-                <th>일시</th>
-                <th>리포트</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(r => (
-                <tr key={r.id}>
-                  <td><GroupBadge group={r.group} /></td>
-                  <td className="td-name">{r.name}</td>
-                  <td>{r.birthDate}</td>
-                  <td>{r.careerMonths && `${r.careerMonths}개월`}</td>
-                  <td>{r.company || '-'}</td>
-                  <td>{r.department}</td>
-                  <td>{JOB_LABELS[r.jobType] || r.jobType}</td>
-                  <td className="td-small">{INCOME_LABELS[r.incomeRange] || '-'}</td>
-                  <td>{r.recruitCount || '-'}</td>
-                  {egoKeys.map(e => (
-                    <ScoreCell
-                      key={e}
-                      ego={e}
-                      score={r.scores?.[e] || 0}
-                      isTop={e === r.top1 || e === r.top2}
-                      isBottom={e === r.bottom}
-                    />
+      {tab === 'campaigns' && (
+        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} />
+      )}
+
+      {tab === 'results' && (
+        <>
+          <div className="admin-toolbar">
+            <div className="admin-filters">
+              <button
+                className={`filter-chip ${filter === 'all' ? 'active' : ''}`}
+                onClick={() => setFilter('all')}
+              >
+                전체 ({results.length})
+              </button>
+              {groups.map(g => {
+                const gc = colorFor(g);
+                return (
+                  <button
+                    key={g}
+                    className={`filter-chip ${filter === g ? 'active' : ''}`}
+                    onClick={() => setFilter(g)}
+                    style={filter === g ? { background: gc.bg, borderColor: gc.bg, color: '#fff' } : { borderColor: gc.bg, color: gc.bg }}
+                  >
+                    {g} ({groupCounts[g] || 0})
+                  </button>
+                );
+              })}
+            </div>
+            <div className="admin-actions">
+              <button className="btn btn-secondary" onClick={handleLoadSample}>
+                샘플 20명
+              </button>
+              <button className="btn btn-primary" onClick={handleExportCSV} disabled={filtered.length === 0}>
+                CSV 다운로드
+              </button>
+              <button className="btn btn-secondary" onClick={handleClearAll} disabled={results.length === 0}>
+                전체 삭제
+              </button>
+            </div>
+          </div>
+
+          {filtered.length === 0 ? (
+            <div className="admin-empty">아직 설문 결과가 없습니다.</div>
+          ) : (
+            <div className="admin-table-wrap">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>그룹</th>
+                    <th>이름</th>
+                    <th>생년월일</th>
+                    <th>경력</th>
+                    <th>회사</th>
+                    <th>소속</th>
+                    <th>직무</th>
+                    <th>소득</th>
+                    <th>리크루팅</th>
+                    {egoKeys.map(e => (
+                      <th key={e} className="th-ego" style={{ color: EGO_COLORS[e].bg }}>{e}</th>
+                    ))}
+                    <th>총점</th>
+                    <th>TOP1</th>
+                    <th>BOT</th>
+                    <th>일시</th>
+                    <th>리포트</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map(r => (
+                    <tr key={r.id}>
+                      <td><GroupBadge group={r.group} /></td>
+                      <td className="td-name">{r.name}</td>
+                      <td>{r.birthDate}</td>
+                      <td>{r.careerMonths && `${r.careerMonths}개월`}</td>
+                      <td>{r.company || '-'}</td>
+                      <td>{r.department}</td>
+                      <td>{JOB_LABELS[r.jobType] || r.jobType}</td>
+                      <td className="td-small">{INCOME_LABELS[r.incomeRange] || '-'}</td>
+                      <td>{r.recruitCount || '-'}</td>
+                      {egoKeys.map(e => (
+                        <ScoreCell key={e} ego={e} score={r.scores?.[e] || 0} />
+                      ))}
+                      <td className="td-score td-total">{r.total}</td>
+                      <td><EgoTag ego={r.top1} type="top" /></td>
+                      <td><EgoTag ego={r.bottom} type="bot" /></td>
+                      <td className="td-date">{new Date(r.timestamp).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
+                      <td>
+                        <div className="report-action-group">
+                          <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
+                            리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
+                          </a>
+                          <a href={`#/report-v2/${r.id}`} target="_blank" className="btn-report-v2" title="리디자인 v2 리포트">v2</a>
+                        </div>
+                      </td>
+                      <td>
+                        <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>
+                      </td>
+                    </tr>
                   ))}
-                  <td className="td-score td-total">{r.total}</td>
-                  <td><EgoTag ego={r.top1} type="top" /></td>
-                  <td><EgoTag ego={r.bottom} type="bot" /></td>
-                  <td className="td-date">{new Date(r.timestamp).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-                  <td>
-                    <div className="report-action-group">
-                      <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
-                        리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
-                      </a>
-                      <a href={`#/report-v2/${r.id}`} target="_blank" className="btn-report-v2" title="리디자인 v2 리포트">v2</a>
-                    </div>
-                  </td>
-                  <td>
-                    <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
     </section>
   );
