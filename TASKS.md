@@ -178,8 +178,10 @@
 
 - [x] v2 인프라 — `ReportPageV2.jsx`(v1 복제) + 라우트 `#/report-v2/:id` + admin `[v2]` 버튼 (v1 무손상, 나란히 비교)
 - [x] §1~§4 1차 — 정체성 우선(가장 강한 힘 "~의 힘" 부각 + top1+top2 종합), 부모/아이 메타포·조회 키 제거, §3 조율 텍스트 절감, §4 소제목 분절
-- [ ] 피터공 §1~§4 육안 검토 → 통과 섹션부터 4단계(정체성 20조합·유형명 yaml 데이터화)
-- ⚠️ SPEC.md 반영은 데이터 구조 확정(5단계) 후 — 그 전까지 명명·구조는 ReportPageV2 인라인 프로토타입
+- [x] v3 LLM 톤 비교 트랙 — `ReportPageV3` + `lookupReportLLM` + `cm_llm_sales.yaml`(컨설턴트 변주) PoC. **폐기 종결(26.0601)**: 기존 `cm_insurance`가 이미 손소장 LLM 리포트의 데이터화본이라 비교 무의미 ([[26.0601 에고그램 LLM 리포트 재점검 — 기존 데이터가 곧 그 LLM 리포트였다]])
+- [x] **v2 = 최종 리포트 확정 (26.0604)** — 정식 경로 `/report/:id` → `ReportPageV2` 렌더(버튼 href 정식 경로 그대로, 내용만 v2). admin v2·v3 곁버튼 제거 + 좌상단 "v2" 깃발 제거. 죽은 v1(`ReportPage`)·v3 라우트·import 정리(`ReportView` named export는 batch가 써서 파일 보존). SPEC 반영(`REPORT-V3-LLM.md` 결정 블록 + `SPEC.md §5`)
+- [ ] **다음 단계** — 일괄 PDF(`ReportBatchPage`)도 v2 기반으로 통일 (현재 v1 `ReportView` 사용)
+- 보류: 인라인 → yaml 데이터화(4단계) + §1 문장형 v2 흡수 = 손소장 논의 후. 재료는 `cm_llm_sales.yaml`에 보존
 
 ---
 
@@ -207,3 +209,5 @@
 | 5/25 | — | **v0.7 — 손소장 26.0525 수정 5건 + 리포트 정리** — 역할별 안전구간 `SAFE_RANGES`(그래프 경계선+조율 발동 통합) / 컨설턴트 CM6 공통 3섹션(`cm6_common_consultant.yaml`) / "코칭"→"조율" 라벨 / 결과화면 총점·재시도 삭제 / 상단 1줄·✉ 이메일·손용배 제거·하단 카피라이트. 다음 v0.8 = Archives xlsx 전체 CM 재변환(호칭 동시 해소) |
 | 5/28 | 0e46b1a | **리포트 v2 리디자인 무대** — `ReportPageV2`+라우트 `#/report-v2/:id`+admin `[v2]` 버튼(v1 무손상). 정체성 우선 §1~§4(가장 강한 힘 "~의 힘", top1+top2 종합, 메타포·조회 키 제거). 설계 짝 노트 2종 신설. push=소스, `npm run deploy`로 라이브 배포 완료 |
 | 5/25 | — | **v0.8 — 손소장 Archives xlsx 전체 CM 재변환 + 호칭 일원화** — `scripts/convert_cm.py`(라벨 앵커) 신설. cm2·cm3·cm4_1~4·cm5·cm7(3직군)+cm6(컨설턴트) 손소장 최신본 교체, cm1·cm8 보존. CM3 행위치 직군별 상이·CM6↔cm7 매핑·CM4-4 AC 이중컬럼·some_coaching 폐기 처리. 본문 옛 호칭 0건. 빌드 OK |
+| 6/1 | 508b503 | **v3 LLM 톤 리포트 PoC** — `ReportPageV3`+`lookupReportLLM`+`cm_llm_sales.yaml`(컨설턴트 변주)+라우트 `#/report-v3/:id`+admin `[v3]` 버튼. 비교용 세 번째 타입. → 비교 결과 무의미로 폐기 종결(기존 cm이 곧 손소장 LLM 데이터화본) |
+| 6/4 | — | **v2 = 최종 리포트 확정** — `/report/:id` 라우트를 `ReportPageV2`로 연결(정식 경로=v2). admin v2·v3 곁버튼 제거 + 좌상단 "v2" 깃발 제거. v1/v3 라우트·import 정리(`ReportView`는 batch가 써서 `ReportPage.jsx` 파일 보존). SPEC §5 라우팅 + `REPORT-V3-LLM.md` 결정 블록 반영. 빌드 OK. 다음=일괄 PDF v2 통일 |

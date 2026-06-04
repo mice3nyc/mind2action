@@ -319,8 +319,6 @@ export default function AdminDashboard({ onLogout }) {
                           <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
                             리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
                           </a>
-                          <a href={`#/report-v2/${r.id}`} target="_blank" className="btn-report-v2" title="리디자인 v2 리포트">v2</a>
-                          <a href={`#/report-v3/${r.id}`} target="_blank" className="btn-report-v2" title="LLM 톤 v3 리포트">v3</a>
                         </div>
                       </td>
                       <td>

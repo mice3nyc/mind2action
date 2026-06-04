@@ -215,7 +215,6 @@ export default function ReportPageV2() {
 
   return (
     <div className={`report-container ${bling ? 'report-bling' : ''}`}>
-      <span className="report-v2-flag">v2</span>
       <button className="bling-toggle" onClick={() => setBling(!bling)}>
         {bling ? '기본' : 'bling'}
       </button>
