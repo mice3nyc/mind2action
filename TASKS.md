@@ -180,7 +180,8 @@
 - [x] §1~§4 1차 — 정체성 우선(가장 강한 힘 "~의 힘" 부각 + top1+top2 종합), 부모/아이 메타포·조회 키 제거, §3 조율 텍스트 절감, §4 소제목 분절
 - [x] v3 LLM 톤 비교 트랙 — `ReportPageV3` + `lookupReportLLM` + `cm_llm_sales.yaml`(컨설턴트 변주) PoC. **폐기 종결(26.0601)**: 기존 `cm_insurance`가 이미 손소장 LLM 리포트의 데이터화본이라 비교 무의미 ([[26.0601 에고그램 LLM 리포트 재점검 — 기존 데이터가 곧 그 LLM 리포트였다]])
 - [x] **v2 = 최종 리포트 확정 (26.0604)** — 정식 경로 `/report/:id` → `ReportPageV2` 렌더(버튼 href 정식 경로 그대로, 내용만 v2). admin v2·v3 곁버튼 제거 + 좌상단 "v2" 깃발 제거. 죽은 v1(`ReportPage`)·v3 라우트·import 정리(`ReportView` named export는 batch가 써서 파일 보존). SPEC 반영(`REPORT-V3-LLM.md` 결정 블록 + `SPEC.md §5`)
-- [ ] **다음 단계** — 일괄 PDF(`ReportBatchPage`)도 v2 기반으로 통일 (현재 v1 `ReportView` 사용)
+- [x] **일괄 PDF v2 통일 (26.0604)** — `ReportPageV2`에서 `ReportViewV2`(row 받는 렌더부) 추출, `ReportBatchPage`가 그걸 사용. 단일·배치 리포트 모두 v2 한 형태. → v1 `ReportPage`(`ReportView` 포함)·v3 `ReportPageV3`는 어디서도 미사용(죽은 파일, 삭제 후보)
+- [x] **admin 버튼명 설명적으로 (26.0604)** — `설문 결과`→"설문결과 데이터 보기" / `전체 리포트`→"전체리포트 PDF 출력하기" / `수정`→"캠페인설정변경"(진행 중 "변경 중")
 - 보류: 인라인 → yaml 데이터화(4단계) + §1 문장형 v2 흡수 = 손소장 논의 후. 재료는 `cm_llm_sales.yaml`에 보존
 
 ---
@@ -210,4 +211,5 @@
 | 5/28 | 0e46b1a | **리포트 v2 리디자인 무대** — `ReportPageV2`+라우트 `#/report-v2/:id`+admin `[v2]` 버튼(v1 무손상). 정체성 우선 §1~§4(가장 강한 힘 "~의 힘", top1+top2 종합, 메타포·조회 키 제거). 설계 짝 노트 2종 신설. push=소스, `npm run deploy`로 라이브 배포 완료 |
 | 5/25 | — | **v0.8 — 손소장 Archives xlsx 전체 CM 재변환 + 호칭 일원화** — `scripts/convert_cm.py`(라벨 앵커) 신설. cm2·cm3·cm4_1~4·cm5·cm7(3직군)+cm6(컨설턴트) 손소장 최신본 교체, cm1·cm8 보존. CM3 행위치 직군별 상이·CM6↔cm7 매핑·CM4-4 AC 이중컬럼·some_coaching 폐기 처리. 본문 옛 호칭 0건. 빌드 OK |
 | 6/1 | 508b503 | **v3 LLM 톤 리포트 PoC** — `ReportPageV3`+`lookupReportLLM`+`cm_llm_sales.yaml`(컨설턴트 변주)+라우트 `#/report-v3/:id`+admin `[v3]` 버튼. 비교용 세 번째 타입. → 비교 결과 무의미로 폐기 종결(기존 cm이 곧 손소장 LLM 데이터화본) |
-| 6/4 | — | **v2 = 최종 리포트 확정** — `/report/:id` 라우트를 `ReportPageV2`로 연결(정식 경로=v2). admin v2·v3 곁버튼 제거 + 좌상단 "v2" 깃발 제거. v1/v3 라우트·import 정리(`ReportView`는 batch가 써서 `ReportPage.jsx` 파일 보존). SPEC §5 라우팅 + `REPORT-V3-LLM.md` 결정 블록 반영. 빌드 OK. 다음=일괄 PDF v2 통일 |
+| 6/4 | 0594127 | **v2 = 최종 리포트 확정** — `/report/:id` 라우트를 `ReportPageV2`로 연결(정식 경로=v2). admin v2·v3 곁버튼 제거 + 좌상단 "v2" 깃발 제거. v1/v3 라우트·import 정리. SPEC §5 라우팅 + `REPORT-V3-LLM.md` 결정 블록 반영 |
+| 6/4 | — | **일괄 PDF v2 통일 + admin 버튼명** — `ReportPageV2`에서 `ReportViewV2` 추출(fetch/렌더 분리), `ReportBatchPage`가 v2 사용 → 단일·배치 모두 v2 한 형태. 버튼명 설명적으로(설문결과 데이터 보기/전체리포트 PDF 출력하기/캠페인설정변경). v1 `ReportPage`·v3 `ReportPageV3` dead file화(삭제 후보). 빌드 OK |

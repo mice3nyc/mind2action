@@ -135,7 +135,7 @@ HashRouter 기반 (`react-router-dom`)
 - `/` — 참여자 플로우 (SurveyApp)
 - `/#/admin` — 관리자 플로우 (AdminApp)
 - `/#/report/:id` — 개인 리포트. **ReportPageV2 = 최종 형태** (26.0604 확정, v1/v3 폐기)
-- `/#/report-batch/:campaignId` — 단체 일괄 PDF (ReportBatchPage, 현재 v1 ReportView 기반 — v2 통일 예정)
+- `/#/report-batch/:campaignId` — 단체 일괄 PDF (ReportBatchPage → ReportViewV2, 단일 리포트와 v2 공유)
 
 관리자 화면은 max-width 제한 없음 (테이블 풀 너비)
 

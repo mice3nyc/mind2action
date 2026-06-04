@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { ReportView } from './ReportPage';
+import { ReportViewV2 } from './ReportPageV2';
 
 // 단체별 일괄 리포트 — 한 캠페인 전 참여자를 한 화면에 쌓아
 // 브라우저 "PDF로 저장"으로 단일 PDF를 뽑는다 (CAMPAIGNS.md §9).
@@ -95,7 +95,7 @@ export default function ReportBatchPage() {
       <div className="report-batch-body">
         {rows.slice(0, rendered).map(r => (
           <div key={r.id} className="report-batch-item">
-            <ReportView row={r} showToggle={false} />
+            <ReportViewV2 row={r} showToggle={false} />
           </div>
         ))}
       </div>

@@ -218,7 +218,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     </button>
                   </td>
                   <td>
-                    <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문 결과</button>
+                    <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문결과 데이터 보기</button>
                   </td>
                   <td>
                     {counts[c.id] > 0 ? (
@@ -229,10 +229,10 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                         rel="noopener noreferrer"
                         title="전 참여자 리포트를 한 화면에 모아 PDF로 저장"
                       >
-                        전체 리포트
+                        전체리포트 PDF 출력하기
                       </a>
                     ) : (
-                      <button className="btn-view-results" disabled title="참여자가 없습니다">전체 리포트</button>
+                      <button className="btn-view-results" disabled title="참여자가 없습니다">전체리포트 PDF 출력하기</button>
                     )}
                   </td>
                   <td>
@@ -242,7 +242,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                         onClick={() => handleEdit(c)}
                         disabled={editingId === c.id}
                       >
-                        {editingId === c.id ? '수정 중' : '수정'}
+                        {editingId === c.id ? '변경 중' : '캠페인설정변경'}
                       </button>
                       <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
                         {c.status === 'closed' ? '재개' : '마감'}

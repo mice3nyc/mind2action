@@ -12,9 +12,10 @@
 > - admin 곁버튼 v2·v3 제거, 리포트 좌상단 "v2" 깃발 제거 (최종이니 버전 표식 불필요).
 > - `/report-v2`·`/report-v3` 라우트 제거. `ReportPageV3.jsx`·`ReportPage.jsx`(default export)는 파일만 잔존(라우트 없음) — 추후 삭제 후보. `ReportView` named export는 `ReportBatchPage`가 아직 import하므로 `ReportPage.jsx` 파일 자체는 보존.
 >
-> **미해결 (다음 단계):**
-> - 일괄 PDF(`ReportBatchPage`)가 아직 v1 `ReportPage`의 `ReportView`를 쓴다 → v2 기반으로 통일 필요.
-> - §1 문장형(cm 키워드 → 문장) v2 흡수는 손소장 논의 후 (재료는 `cm_llm_sales.yaml`에 보존).
+> **완료 (26.0604 후속):** 일괄 PDF(`ReportBatchPage`)도 v2 통일. `ReportPageV2`에서 `ReportViewV2`(row 받는 렌더부)를 추출해 단일·배치가 공유 → 모든 리포트가 v2 한 형태. v1 `ReportPage`(`ReportView` 포함)·v3 `ReportPageV3`는 이제 어디서도 import되지 않는 dead file(삭제 후보). admin 버튼명도 설명적으로(설문결과 데이터 보기 / 전체리포트 PDF 출력하기 / 캠페인설정변경).
+>
+> **미해결 (손소장 논의 후):**
+> - §1 문장형(cm 키워드 → 문장) v2 흡수 (재료는 `cm_llm_sales.yaml`에 보존).
 
 ## 1. 목적과 배경
 
