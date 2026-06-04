@@ -186,6 +186,17 @@
 
 ---
 
+## 외부 데이터 적재 (26.0604~)
+
+손소장 구글폼 등 외부 설문 응답을 supabase `responses`에 캠페인 단위로 일괄 적재해 실제 응답과 같은 collection에서 다룬다. 명세·절차: [[DATA-IMPORT]] / 스크립트 `scripts/import_survey_csv.py`.
+
+- [x] 적재 파이프라인 + SPEC (26.0604) — CSV→SQL 변환 스크립트(점수 그대로, top/bottom scoreEngine 재현, 직군/소속/소득 매핑, 타임스탬프 보존), 캠페인 1건+응답 N건 `begin/commit` 트랜잭션 SQL. `DATA-IMPORT.md` 신설
+- [ ] **DB손해보험_260320(112명) Supabase SQL Editor 실행** — 피터공 (campaign insert는 RLS authenticated 전용이라 anon 불가 → SQL Editor 필수)
+- [ ] (손소장 확인) TCR·PA 직군 확정 → 애매 10명 `job_type` 정정
+- 재사용: 다음 외부 데이터는 스크립트 상수(CSV/CLIENT/CODE)만 바꿔 재실행
+
+---
+
 ## 빌드 히스토리
 
 | 날짜 | 커밋 | 내용 |
@@ -213,3 +224,4 @@
 | 6/1 | 508b503 | **v3 LLM 톤 리포트 PoC** — `ReportPageV3`+`lookupReportLLM`+`cm_llm_sales.yaml`(컨설턴트 변주)+라우트 `#/report-v3/:id`+admin `[v3]` 버튼. 비교용 세 번째 타입. → 비교 결과 무의미로 폐기 종결(기존 cm이 곧 손소장 LLM 데이터화본) |
 | 6/4 | 0594127 | **v2 = 최종 리포트 확정** — `/report/:id` 라우트를 `ReportPageV2`로 연결(정식 경로=v2). admin v2·v3 곁버튼 제거 + 좌상단 "v2" 깃발 제거. v1/v3 라우트·import 정리. SPEC §5 라우팅 + `REPORT-V3-LLM.md` 결정 블록 반영 |
 | 6/4 | — | **일괄 PDF v2 통일 + admin 버튼명** — `ReportPageV2`에서 `ReportViewV2` 추출(fetch/렌더 분리), `ReportBatchPage`가 v2 사용 → 단일·배치 모두 v2 한 형태. 버튼명 설명적으로(설문결과 데이터 보기/전체리포트 PDF 출력하기/캠페인설정변경). v1 `ReportPage`·v3 `ReportPageV3` dead file화(삭제 후보). 빌드 OK |
+| 6/4 | — | **외부 데이터 적재 파이프라인** — 외부 설문 CSV→`responses` 일괄 적재 체계(`scripts/import_survey_csv.py` + `DATA-IMPORT.md` SPEC). 점수 그대로·top/bottom 계산·직군/소속/소득 매핑·캠페인 트랜잭션 SQL. 첫 적용 DB손해보험_260320 112명(SQL Editor 실행 대기, 코드는 미배포 — 데이터 작업) |
