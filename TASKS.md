@@ -225,3 +225,4 @@
 | 6/4 | 0594127 | **v2 = 최종 리포트 확정** — `/report/:id` 라우트를 `ReportPageV2`로 연결(정식 경로=v2). admin v2·v3 곁버튼 제거 + 좌상단 "v2" 깃발 제거. v1/v3 라우트·import 정리. SPEC §5 라우팅 + `REPORT-V3-LLM.md` 결정 블록 반영 |
 | 6/4 | — | **일괄 PDF v2 통일 + admin 버튼명** — `ReportPageV2`에서 `ReportViewV2` 추출(fetch/렌더 분리), `ReportBatchPage`가 v2 사용 → 단일·배치 모두 v2 한 형태. 버튼명 설명적으로(설문결과 데이터 보기/전체리포트 PDF 출력하기/캠페인설정변경). v1 `ReportPage`·v3 `ReportPageV3` dead file화(삭제 후보). 빌드 OK |
 | 6/4 | — | **외부 데이터 적재 파이프라인** — 외부 설문 CSV→`responses` 일괄 적재 체계(`scripts/import_survey_csv.py` + `DATA-IMPORT.md` SPEC). 점수 그대로·top/bottom 계산·직군/소속/소득 매핑·캠페인 트랜잭션 SQL. 첫 적용 DB손해보험_260320 112명 적재 완료(26.0604, 관리화면 확인). 코드 배포 무관 — 데이터 작업 |
+| 6/4 | — | **v1·v3 리포트 _archive 이동** — 미사용 dead file `ReportPage`(v1)·`ReportPageV3`(v3)를 `egogram/_archive/`로 git mv(번들 제외, 히스토리·참고 보존 + README). 빌드 92 modules OK |
