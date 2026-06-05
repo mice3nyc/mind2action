@@ -107,21 +107,22 @@ export default function AdminDashboard({ onLogout }) {
     if (r.campaignId) counts[r.campaignId] = (counts[r.campaignId] || 0) + 1;
   }
 
-  const groups = [...new Set(results.map(r => r.group).filter(Boolean))].sort();
   const filtered = filter === 'all' ? results : results.filter(r => r.group === filter);
   const groupCounts = {};
   for (const r of results) {
     if (r.group) groupCounts[r.group] = (groupCounts[r.group] || 0) + 1;
   }
 
-  // 결과 필터 옵션: 캠페인을 일정(참여 시작)순 → 생성순, 그 뒤 레거시 그룹
+  // 결과 필터 옵션: 캠페인을 일정(참여 시작)순 → 생성순
   const orderedCampaignNames = [...new Set(
     campaigns.slice().sort((a, b) =>
       (a.period_start || '9999-99-99').localeCompare(b.period_start || '9999-99-99')
       || (a.created_at || '').localeCompare(b.created_at || '')
     ).map(c => c.client_name)
   )];
-  const filterOptions = [...orderedCampaignNames, ...groups.filter(g => !orderedCampaignNames.includes(g))];
+  // 실존 캠페인만 (삭제·레거시 group_name 잔재 제외 — 손소장 26.0604).
+  // group_name == client_name으로 적재되므로 필터 매칭은 그대로 유효.
+  const filterOptions = orderedCampaignNames;
 
   async function handleDelete(id) {
     const target = results.find(r => r.id === id);

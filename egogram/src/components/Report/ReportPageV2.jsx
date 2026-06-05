@@ -308,11 +308,7 @@ export function ReportViewV2({ row, showToggle = true }) {
               </div>
             ))}
 
-            {okEgos.length > 0 && (
-              <p className="report-coaching-ok-line">
-                지금 균형이 좋아 따로 조율할 것이 없는 성향: <strong>{okEgos.map(e => EGO_PLAIN_LABEL[e]).join(', ')}</strong>.
-              </p>
-            )}
+            {/* 조율 필요없는 성향 나열 줄 — 손소장 26.0604: 표기 안 함 (삭제) */}
 
             {report.cm4_3 && (
               <div className="report-coaching-message">
