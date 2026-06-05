@@ -48,6 +48,7 @@ alter table responses add column if not exists campaign_id uuid references campa
 ```
 - 신규 응답: `campaign_id` + `group_name`(= client_name) 둘 다 세팅. 고객사 이름 바뀌어도 campaign_id로 안 깨짐.
 - 기존 응답: campaign_id null, group_name 유지(레거시 표시).
+- **결과 필터 드롭다운 (v0.9, 6/5)**: 옵션을 **실존 캠페인(`campaigns` 테이블 client_name)만**으로 한정. 이전엔 응답 `group_name` distinct도 옵션에 더해 삭제·레거시 캠페인 잔재가 남았음. `deleteCampaign`은 hard delete(응답→캠페인)라 삭제분은 테이블에 없고, `group_name == client_name`이라 `r.group === filter` 매칭은 그대로 유효. 고아 group_name(campaign_id null) 응답은 "전체"엔 집계되나 개별 옵션은 안 뜸.
 
 ## 3. RLS / 접근 (보안)
 
