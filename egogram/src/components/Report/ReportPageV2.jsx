@@ -13,6 +13,29 @@ import uiTexts from '../../data/ui_texts.yaml';
 //        §2~ = 아직 v1과 동일(가이드 미확정).
 // ─────────────────────────────────────────────────────────────
 
+// 본문 안의 에고 라벨 "XX(한글,한글)"을 §1과 동일한 에고 색으로 입힌다.
+//   - 색·표기는 코드(CP/NP/A/FC/AC) 기준 → 손소장 본문의 FC(배려,공감) 오타가 화면에선 FC(친화·표현)로 자동 교정
+//   - 쉼표는 §1처럼 가운뎃점(·)으로 통일 (EGO_PLAIN_LABEL 사용)
+//   - 코드+한글을 한 덩어리로 색칠 → 조사(가/의)는 손대지 않아 문장 자연스러움 유지
+const EGO_LABEL_RE = /(CP|NP|FC|AC|A)\([가-힣,·]+\)/g;
+function colorizeEgo(text, kp) {
+  const parts = [];
+  let last = 0, i = 0, m;
+  EGO_LABEL_RE.lastIndex = 0;
+  while ((m = EGO_LABEL_RE.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    const code = m[1];
+    parts.push(
+      <span key={`${kp}-e${i++}`} style={{ color: EGO_COLORS[code], fontWeight: 600 }}>
+        {code}({EGO_PLAIN_LABEL[code]})
+      </span>
+    );
+    last = m.index + m[0].length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length ? parts : [text];
+}
+
 // breaks=true: 문단 안의 단일 줄바꿈도 <br>로 보존 (말투/화법 샘플이 개별 라인으로 보이게).
 //   기본(false)은 단일 줄바꿈을 공백으로 합쳐 산문 한 흐름으로 렌더.
 function Paragraphs({ text, breaks }) {
@@ -21,10 +44,13 @@ function Paragraphs({ text, breaks }) {
   if (breaks) {
     return paragraphs.map((p, i) => {
       const lines = p.split('\n').map(l => l.trim()).filter(Boolean);
-      return <p key={i}>{lines.flatMap((line, j) => j === 0 ? [line] : [<br key={`b${i}-${j}`} />, line])}</p>;
+      return <p key={i}>{lines.flatMap((line, j) => {
+        const content = colorizeEgo(line, `c${i}-${j}`);
+        return j === 0 ? content : [<br key={`b${i}-${j}`} />, ...content];
+      })}</p>;
     });
   }
-  return paragraphs.map((p, i) => <p key={i}>{p.replace(/\n/g, ' ').trim()}</p>);
+  return paragraphs.map((p, i) => <p key={i}>{colorizeEgo(p.replace(/\n/g, ' ').trim(), `c${i}`)}</p>);
 }
 
 // 본문 첫머리의 조회 키/분류 메타 괄호 제거 (원칙 2 — 내부 키·분류 노출 금지)
