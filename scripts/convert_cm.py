@@ -1,16 +1,33 @@
 #!/usr/bin/env python3
 """
-손소장 Archives xlsx → cm_*.yaml 재변환 (v0.8)
+손소장 xlsx → cm_*.yaml 재변환 (v0.9 — 26.0604 회의 반영)
 
-CM2~CM7 시트를 라벨 앵커로 읽어 yaml로 변환한다. 행 번호는 직군마다 다르므로
-"점수구간"·"구분 TOP 1/2/BOTTOM"·"에고그램 유형" 라벨을 찾아 그 아래 데이터를 읽는다.
-cm1(자아상태 키워드)·cm8(명언, 렌더 폐기)은 xlsx에 없으므로 기존 yaml에서 보존한다.
+CM2~CM6 + 신규 시트(CM4-5·CM5-1·마지막글)를 라벨 앵커로 읽어 yaml로 변환한다.
+행 번호는 직군마다 다르므로 "점수구간"·"구분 TOP 1/2/BOTTOM"·"에고그램 유형"
+라벨을 찾아 그 아래 데이터를 읽는다. cm1(자아상태 키워드)·cm8(명언, 렌더 폐기)은
+xlsx에 시트가 없어 기존 yaml에서 보존한다.
+
+v0.9 변경:
+- 원본 경로: Archives/{role}.xlsx → data_260604_{role}.xlsx
+- 신규 블록: cm4_5(단일), cm5_1(60조합 한 줄), closing(마지막글 단일)
+- cm6_common: 컨설턴트 CM6공통적용 시트 → cm6_common_consultant.yaml 동시 출력(계약체결 행 제거)
+- cm7 폐기: 리크루팅 시트가 전 직군에서 사라짐 → cm7 = {} (렌더는 이미 폐기)
+- 에고 라벨 정규화: 일부 콤보 라벨 셀에 "CP(기준,결단)" 한글 표기가 섞임 →
+  ego_code()로 코드만 추출해 조회 키 오염 방지
 
 사용: python3 convert_cm.py <코치|리더|컨설턴트> <기존yaml> <출력yaml>
 """
-import sys, openpyxl, yaml
+import sys, os, openpyxl, yaml
 
 EGOS = ['CP', 'NP', 'A', 'FC', 'AC']
+
+CM6_COMMON_OUT = '/Users/p.air15/Neo-Obsi-Sync/_dev/mind2action/egogram/src/data/cm6_common_consultant.yaml'
+
+
+def ego_code(s):
+    """라벨 셀에서 에고 코드만 추출. 'CP(기준,결단)'→'CP', 'AC '→'AC'."""
+    head = (s or '').split('(')[0].replace(' ', '').strip()
+    return head if head in EGOS else None
 
 # ---- yaml 출력: 멀티라인은 literal block(|), 그 외는 자동 인용 ----
 def str_presenter(dumper, data):
@@ -54,9 +71,9 @@ def ego_cols(ws, header_row):
     """헤더 행에서 자아상태가 있는 컬럼 인덱스 매핑 {ego: col}."""
     m = {}
     for c in range(2, ws.max_column + 1):
-        v = cell(ws, header_row, c)
-        if v in EGOS and v not in m:
-            m[v] = c
+        e = ego_code(cell(ws, header_row, c))
+        if e and e not in m:
+            m[e] = c
     return m
 
 
@@ -84,9 +101,10 @@ def parse_cm4_4(ws):
     # ego별 모든 컬럼 수집 (중복 허용)
     cols_by_ego = {e: [] for e in EGOS}
     for c in range(2, ws.max_column + 1):
-        v = cell(ws, hr, c)
-        if v in EGOS:
-            cols_by_ego[v].append(c)
+        e = ego_code(cell(ws, hr, c))
+        if e:
+            cols_by_ego[e].append(c)
+    # cols_by_ego는 위에서 v in EGOS로 수집 → ego_code로 보강
     out = {}
     for ego in EGOS:
         cands = cols_by_ego[ego]
@@ -163,9 +181,9 @@ def combo_keys(ws, ncols, r1, r2, rb):
     keys = []
     for i in range(ncols):
         c = 2 + i
-        t1, t2 = cell(ws, r1, c), cell(ws, r2, c)
+        t1, t2 = ego_code(cell(ws, r1, c)), ego_code(cell(ws, r2, c))
         if rb:
-            keys.append(f"{t1}_{t2}_{cell(ws, rb, c)}")
+            keys.append(f"{t1}_{t2}_{ego_code(cell(ws, rb, c))}")
         else:
             keys.append(f"{t1}_{t2}")
     return keys
@@ -194,10 +212,35 @@ def parse_cm5(ws):
     return out
 
 
+def parse_single(ws):
+    """CM4-5 / 마지막글: 첫 비어있지 않은 셀 하나(단일 본문)."""
+    for r in range(1, ws.max_row + 1):
+        for c in range(1, ws.max_column + 1):
+            v = cell(ws, r, c)
+            if v:
+                return v
+    return ''
+
+
+def parse_cm6_common(ws):
+    """CM6 공통적용: 헤더('상담 단계 | ...') 아래 (좌열 소제목, 우열 본문) 행들.
+
+    v0.9: 계약체결(최종 진행 멘트) 행은 손소장이 시트에서 제거 → 자연히 빠짐.
+    """
+    hr = find_row(ws, lambda v: '상담' in v and '단계' in v)
+    start = (hr + 1) if hr else 1
+    items = []
+    for r in range(start, ws.max_row + 1):
+        title, body = cell(ws, r, 1), cell(ws, r, 2)
+        if title and body:
+            items.append({'title': title, 'body': body})
+    return {'items': items}
+
+
 def convert(role, old_path, out_path):
     fn = {'코치': '코치', '리더': '리더', '컨설턴트': '컨설턴트'}[role]
-    base = '/Users/p.air15/Neo-Obsi-Sync/Assets/incoming/에고그램/data/Archives'
-    wb = openpyxl.load_workbook(f'{base}/{fn}.xlsx', data_only=True)
+    base = '/Users/p.air15/Neo-Obsi-Sync/Assets/incoming/에고그램/data'
+    wb = openpyxl.load_workbook(f'{base}/data_260604_{fn}.xlsx', data_only=True)
     old = yaml.safe_load(open(old_path))
 
     def sheet(name):
@@ -215,32 +258,44 @@ def convert(role, old_path, out_path):
     data = {
         'job_type': old['job_type'],
         'job_label': old['job_label'],
-        'cm1': old['cm1'],                                   # 유지
+        'cm1': old['cm1'],                                   # 유지(자아상태 키워드, 시트 없음)
         'cm2': parse_range_ego(sheet('CM2')),
         'cm3': parse_combo_single(sheet('CM3강점추가')),
         'cm4_1': parse_range_ego(sheet('CM4-1')),
         'cm4_2': parse_range_ego(sheet('CM4-2')),
         'cm4_3': parse_cm4_3(sheet('CM4-3'), old),
         'cm4_4': parse_cm4_4(sheet('CM4-4')),
+        'cm4_5': parse_single(sheet('CM4-5')),               # v0.9 신규 (단일)
         'cm5': parse_cm5(sheet('CM5')),                      # 시트명 공백 무시 매칭
+        'cm5_1': parse_combo_single(sheet('CM5-1')),         # v0.9 신규 (60조합 한 줄)
+        'closing': parse_single(sheet('마지막글')),           # v0.9 신규 (단일)
     }
     if role == '컨설턴트':
         data['cm6'] = parse_combo_single(sheet('CM6'))       # 클로징, TOP1_TOP2 (20)
-        data['cm7'] = parse_combo_single(sheet('CM7'))       # 리크루팅, 3레벨 (60)
     else:
-        data['cm6'] = old.get('cm6', {})                     # 코치/리더는 비어있음 유지
-        data['cm7'] = parse_combo_single(sheet('CM6'))       # 코치/리더 CM6 = 리크루팅 3레벨 → cm7
+        data['cm6'] = old.get('cm6', {}) or {}               # 코치/리더는 비어있음 유지
+    data['cm7'] = {}                                         # v0.9 폐기 (리크루팅 시트 사라짐)
     data['cm8'] = old['cm8']                                 # 유지(렌더 폐기)
 
     with open(out_path, 'w') as f:
         yaml.dump(data, f, allow_unicode=True, default_flow_style=False,
                   sort_keys=False, width=10**9)
 
+    # 컨설턴트면 cm6_common도 동시 출력 (계약체결 행 제거 반영)
+    if role == '컨설턴트':
+        cmc = parse_cm6_common(sheet('CM6공통적용'))
+        with open(CM6_COMMON_OUT, 'w') as f:
+            yaml.dump(cmc, f, allow_unicode=True, default_flow_style=False,
+                      sort_keys=False, width=10**9)
+        print(f"  cm6_common → {os.path.basename(CM6_COMMON_OUT)}: {len(cmc['items'])} items")
+
     # 요약
     print(f"[{role}] → {out_path}")
-    for k in ['cm2', 'cm3', 'cm4_1', 'cm4_2', 'cm4_3', 'cm4_4', 'cm5', 'cm6', 'cm7']:
+    for k in ['cm2', 'cm3', 'cm4_1', 'cm4_2', 'cm4_3', 'cm4_4', 'cm5', 'cm5_1', 'cm6', 'cm7']:
         v = data[k]
-        print(f"  {k}: {len(v)} keys")
+        n = len(v) if hasattr(v, '__len__') else v
+        print(f"  {k}: {len(v) if isinstance(v,(dict,list)) else 'str' } keys")
+    print(f"  cm4_5: {'있음' if data['cm4_5'] else '없음'} / closing: {'있음' if data['closing'] else '없음'}")
     wb.close()
 
 

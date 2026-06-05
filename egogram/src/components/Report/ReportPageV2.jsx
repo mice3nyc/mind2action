@@ -319,12 +319,21 @@ export function ReportViewV2({ row, showToggle = true }) {
                 <p>{report.cm4_3}</p>
               </div>
             )}
+
+            {report.cm4_5 && coaching.length > 0 && (
+              <div className="report-cm4-5">
+                <Paragraphs text={stripMeta(report.cm4_5).replace(/OOO/g, report.name)} />
+              </div>
+            )}
           </Section>
         );
       })()}
 
       {report.cm5 && (
         <Section number={4} title={report.isInsurance ? uiTexts.report.sections.s5_title_insurance : report.jobLabel === '관리자' ? uiTexts.report.sections.s5_title_manager : uiTexts.report.sections.s5_title_coach}>
+          {report.cm5_1 && (
+            <p className="report-cm5-oneliner">{stripMeta(report.cm5_1).replace(/OOO/g, report.name)}</p>
+          )}
           <div className="report-cm5">
             <Paragraphs text={report.cm5.manner} />
             <div className="report-cm5-improvement"><Paragraphs text={report.cm5.improvement} /></div>
@@ -353,7 +362,13 @@ export function ReportViewV2({ row, showToggle = true }) {
       {/* 신인 리크루팅 레벨업(cm7) 섹션 — v1과 동일하게 렌더 제거(데이터는 보존) */}
 
       <div className="report-closing">
-        <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>
+        {report.closing ? (
+          <div className="report-closing-message">
+            <Paragraphs text={report.closing.replace(/OOO/g, report.name)} />
+          </div>
+        ) : (
+          <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>
+        )}
       </div>
 
       <div className="report-footer-bar">
