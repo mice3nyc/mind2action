@@ -1,12 +1,14 @@
 import questions from '../data/questions.json';
 
 const EGO_STATES = ['CP', 'NP', 'A', 'FC', 'AC'];
+// 자아상태 라벨 — TA 정식명("통제적 부모" 등)은 부정적으로 읽혀 중립 키워드로 통일.
+// 리포트(ReportPageV2 EGO_PLAIN_LABEL)와 동일한 표기. 결과 화면·admin CSV가 이걸 쓴다.
 const EGO_LABELS = {
-  CP: '통제적 부모',
-  NP: '자상한 부모',
-  A: '어른 자아',
-  FC: '자유로운 아이',
-  AC: '순응하는 아이'
+  CP: '기준·결단',
+  NP: '배려·공감',
+  A: '이성·판단',
+  FC: '친화·표현',
+  AC: '협조·조율'
 };
 
 const TIE_PRIORITY = ['CP', 'A', 'NP', 'AC', 'FC'];
