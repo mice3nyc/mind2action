@@ -13,10 +13,18 @@ import uiTexts from '../../data/ui_texts.yaml';
 //        §2~ = 아직 v1과 동일(가이드 미확정).
 // ─────────────────────────────────────────────────────────────
 
-function Paragraphs({ text }) {
+// breaks=true: 문단 안의 단일 줄바꿈도 <br>로 보존 (말투/화법 샘플이 개별 라인으로 보이게).
+//   기본(false)은 단일 줄바꿈을 공백으로 합쳐 산문 한 흐름으로 렌더.
+function Paragraphs({ text, breaks }) {
   if (!text) return null;
-  const paragraphs = text.split(/\n\s*\n/).map(p => p.replace(/\n/g, ' ').trim()).filter(Boolean);
-  return paragraphs.map((p, i) => <p key={i}>{p}</p>);
+  const paragraphs = text.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
+  if (breaks) {
+    return paragraphs.map((p, i) => {
+      const lines = p.split('\n').map(l => l.trim()).filter(Boolean);
+      return <p key={i}>{lines.flatMap((line, j) => j === 0 ? [line] : [<br key={`b${i}-${j}`} />, line])}</p>;
+    });
+  }
+  return paragraphs.map((p, i) => <p key={i}>{p.replace(/\n/g, ' ').trim()}</p>);
 }
 
 // 본문 첫머리의 조회 키/분류 메타 괄호 제거 (원칙 2 — 내부 키·분류 노출 금지)
@@ -331,8 +339,8 @@ export function ReportViewV2({ row, showToggle = true }) {
             <p className="report-cm5-oneliner">{stripMeta(report.cm5_1).replace(/OOO/g, report.name)}</p>
           )}
           <div className="report-cm5">
-            <Paragraphs text={report.cm5.manner} />
-            <div className="report-cm5-improvement"><Paragraphs text={report.cm5.improvement} /></div>
+            <Paragraphs text={report.cm5.manner} breaks />
+            <div className="report-cm5-improvement"><Paragraphs text={report.cm5.improvement} breaks /></div>
           </div>
         </Section>
       )}
