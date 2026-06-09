@@ -53,6 +53,12 @@ function Paragraphs({ text, breaks }) {
   return paragraphs.map((p, i) => <p key={i}>{colorizeEgo(p.replace(/\n/g, ' ').trim(), `c${i}`)}</p>);
 }
 
+// 손소장 26.0607(4): CM4-2 본문에 "조율이 필요없는 구간" / "성향 에너지가 다소 강하지만 조율은 필요없는 구간"
+// 으로 표기한 높은/중간 점수대 = 조율 포인트 아님 → §3 카드에서 제외하는 센티넬.
+function isNoAdjust(text) {
+  return !!text && /조율[이은]?\s*필요\s*없는\s*구간/.test(text);
+}
+
 // 본문 첫머리의 조회 키/분류 메타 괄호 제거 (원칙 2 — 내부 키·분류 노출 금지)
 // 예: "(CP 통제적부모 & NP ...강점으로 발현됨.)" / "(원칙이 아주 강하고...성향)"
 function stripMeta(text) {
@@ -136,7 +142,8 @@ function getIdentity(top1, top2, name) {
   const hit = IDENTITY[`${top1}_${top2}`];
   if (hit) return hit;
   return {
-    title: `${EGO_STRENGTH[top1]}과(와) ${EGO_STRENGTH[top2]}이 함께 도드라지는 분`,
+    // 손소장 26.0607(14): EGO_STRENGTH 다섯 값 모두 받침으로 끝나 조사는 항상 '과' → 플레이스홀더 '과(와)' 고정
+    title: `${EGO_STRENGTH[top1]}과 ${EGO_STRENGTH[top2]}이 함께 도드라지는 분`,
     desc: '',
     fallback: true,
   };
@@ -263,6 +270,8 @@ export function ReportViewV2({ row, showToggle = true }) {
         <h3 className="report-subhead">한눈에 보는 다섯 성향</h3>
         <p className="report-scale-note">각 성향 0~20점</p>
         <ScoreChart scores={scores} jobType={data.job_type} />
+        {/* 손소장 26.0607(4): 점선 밴드가 무엇인지 알 수 있게 범례 표시 */}
+        <p className="report-chart-legend"><span className="report-chart-legend-mark" /> 점선 안 = 조율이 필요없는 구간</p>
 
         {/* 3. 성향별로 자세히 보기 — 강약 차등(원칙 8, 26.0529): 두드러진 성향(top1·top2)은 깊게,
             나머지는 점수 순 한 줄 묶음. 다섯 평등 리스트 → 인물 초상으로 흐르게. */}
@@ -313,7 +322,9 @@ export function ReportViewV2({ row, showToggle = true }) {
         const okEgos = [];
         EGO_STATES.forEach(ego => {
           const detailed = report.cm4_4.find(item => item.ego === ego);
-          const needs = needsCoaching(ego, scores[ego], data.job_type);
+          // 손소장 26.0607(4): cm4_2가 '조율 필요없는 구간' 센티넬이면 조율 포인트 아님 (17점↑ 강점 등 오노출 차단).
+          // detailed(cm4_4)는 우선이라 영향 없음 — AC 과조율 상세 카드는 유지.
+          const needs = needsCoaching(ego, scores[ego], data.job_type) && !isNoAdjust(report.cm4_2[ego]);
           if (detailed || needs) coaching.push({ ego, detailed, needs });
           else okEgos.push(ego);
         });
@@ -346,7 +357,8 @@ export function ReportViewV2({ row, showToggle = true }) {
 
             {report.cm4_3 && (
               <div className="report-coaching-message">
-                <p>{report.cm4_3}</p>
+                {/* 손소장 26.0607(5): 'OOO님은…' + 다단락 + ⚠️ 블록 한 셀 → 이름 치환 + 줄바꿈 보존 */}
+                <Paragraphs text={report.cm4_3.replace(/OOO/g, report.name)} />
               </div>
             )}
 
@@ -365,8 +377,13 @@ export function ReportViewV2({ row, showToggle = true }) {
             <p className="report-cm5-oneliner">{stripMeta(report.cm5_1).replace(/OOO/g, report.name)}</p>
           )}
           <div className="report-cm5">
+            {/* 손소장 26.0607(8·10): 컨설턴트 §4 소제목 두 개 (리디자인 때 빠진 것 복원) */}
+            {report.isInsurance && <h4 className="report-cm5-subhead">제안시 이 성향의 태도</h4>}
             <Paragraphs text={report.cm5.manner} breaks />
-            <div className="report-cm5-improvement"><Paragraphs text={report.cm5.improvement} breaks /></div>
+            <div className="report-cm5-improvement">
+              {report.isInsurance && <h4 className="report-cm5-subhead">개선에 도움이 되는 코칭과 화법예시</h4>}
+              <Paragraphs text={report.cm5.improvement} breaks />
+            </div>
           </div>
         </Section>
       )}

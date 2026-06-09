@@ -789,9 +789,14 @@ p {
 .report-chart-label strong { font-size: 15px; margin-right: 4px; }
 .report-chart-label span { font-size: 11px; color: var(--text-muted); }
 .report-chart-bar-wrap { flex: 1; height: 22px; border: 1px solid #ddd; position: relative; overflow: hidden; }
-.report-chart-success { position: absolute; top: 0; height: 100%; border-left: 1px dashed #111; border-right: 1px dashed #111; background: transparent; }
-.report-chart-bar { height: 100%; transition: width 0.5s ease; }
+.report-chart-success { position: absolute; top: 0; height: 100%; border-left: 1.5px dashed #111; border-right: 1.5px dashed #111; background: transparent; z-index: 2; pointer-events: none; }
+.report-chart-bar { position: relative; height: 100%; transition: width 0.5s ease; z-index: 1; }
 .report-chart-score { width: 32px; text-align: right; font-weight: 700; font-size: 16px; }
+/* 점선 밴드(조율 필요없는 구간) 범례 — 손소장 26.0607(4) */
+.report-chart-legend { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin: -14px 0 24px; }
+.report-chart-legend-mark { display: inline-block; width: 22px; height: 14px; border-left: 1.5px dashed #111; border-right: 1.5px dashed #111; flex-shrink: 0; }
+/* 컨설턴트 §4 소제목 — 손소장 26.0607(8·10) */
+.report-cm5-subhead { font-size: 14px; font-weight: 700; margin: 18px 0 8px; color: #333; }
 
 /* Traits (CM1) */
 .report-traits { display: flex; flex-direction: column; gap: 12px; }

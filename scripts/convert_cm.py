@@ -23,6 +23,15 @@ EGOS = ['CP', 'NP', 'A', 'FC', 'AC']
 
 CM6_COMMON_OUT = '/Users/p.air15/Neo-Obsi-Sync/_dev/mind2action/egogram/src/data/cm6_common_consultant.yaml'
 
+# 직군별 원본 xlsx 파일명. 파일명 패턴이 직군마다 달라 명시적 매핑으로 둔다.
+#   v0.9(6/5): data_260604_{코치|리더|컨설턴트}.xlsx
+#   v0.10(6/9): 손소장 260609 수정본 (260609_수정사항.md 14건 반영)
+ROLE_FILE = {
+    '리더':   '260609_리더로 수정 - 손소장.xlsx',
+    '컨설턴트': '260609_컨설턴트로 수정 - 손소장.xlsx',
+    '코치':   '260609_코치로 통합 수정-손소장.xlsx',
+}
+
 
 def ego_code(s):
     """라벨 셀에서 에고 코드만 추출. 'CP(기준,결단)'→'CP', 'AC '→'AC'."""
@@ -238,9 +247,11 @@ def parse_cm6_common(ws):
 
 
 def convert(role, old_path, out_path):
-    fn = {'코치': '코치', '리더': '리더', '컨설턴트': '컨설턴트'}[role]
     base = '/Users/p.air15/Neo-Obsi-Sync/Assets/incoming/에고그램/data'
-    wb = openpyxl.load_workbook(f'{base}/data_260604_{fn}.xlsx', data_only=True)
+    src = f'{base}/{ROLE_FILE[role]}'
+    if not os.path.exists(src):
+        raise FileNotFoundError(f"원본 xlsx 없음: {src}")
+    wb = openpyxl.load_workbook(src, data_only=True)
     old = yaml.safe_load(open(old_path))
 
     def sheet(name):
