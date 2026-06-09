@@ -16,7 +16,7 @@ import uiTexts from '../../data/ui_texts.yaml';
 // 본문 안의 에고 라벨 "XX(한글,한글)"을 §1과 동일한 에고 색으로 입힌다.
 //   - 색·표기는 코드(CP/NP/A/FC/AC) 기준 → 손소장 본문의 FC(배려,공감) 오타가 화면에선 FC(친화·표현)로 자동 교정
 //   - 쉼표는 §1처럼 가운뎃점(·)으로 통일 (EGO_PLAIN_LABEL 사용)
-//   - 코드+한글을 한 덩어리로 색칠 → 조사(가/의)는 손대지 않아 문장 자연스러움 유지
+//   - 코드(AC 등)·괄호는 빼고 한글 라벨만 색칠 (손소장 26.0609: "AC(협조·조율)" → "협조·조율") → 뒤 조사는 원문 유지
 const EGO_LABEL_RE = /(CP|NP|FC|AC|A)\([가-힣,·]+\)/g;
 function colorizeEgo(text, kp) {
   const parts = [];
@@ -27,7 +27,7 @@ function colorizeEgo(text, kp) {
     const code = m[1];
     parts.push(
       <span key={`${kp}-e${i++}`} style={{ color: EGO_COLORS[code], fontWeight: 600 }}>
-        {code}({EGO_PLAIN_LABEL[code]})
+        {EGO_PLAIN_LABEL[code]}
       </span>
     );
     last = m.index + m[0].length;
