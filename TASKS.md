@@ -284,3 +284,4 @@
 | 6/4 | — | **v1·v3 리포트 _archive 이동** — 미사용 dead file `ReportPage`(v1)·`ReportPageV3`(v3)를 `egogram/_archive/`로 git mv(번들 제외, 히스토리·참고 보존 + README). 빌드 92 modules OK |
 | 6/9 | 77f2fcb | **v0.10 후속 — 손소장 미반영 진단 + 3건 수정** — cm4_3 누락 버그 수정(`allNoCoaching` 화면 needs 일치, `isNoAdjust` 이관) / 손소장 수정(3) §1 나머지 성향 한 줄 `cm4_1`로 교체 / 빌드 식별자 `__BUILD_ID__` footer-bar 주입. 라이브 `index-BZs4tR0k.js` ("v0.10 · 0609-1650 · 77f2fcb") |
 | 6/9 | d36946b | **cm4_3/cm4_5 17점↑·최저 성향 안내문 개인화** — ⚠️ 이모지 제거 + 앞 본문과 한 줄 띄워 별도 문단. yaml 고정 ⚠️ 블록을 `stripWarnBlock`으로 떼고 `buildAdjustNote(scores, bottom, name)` 동적 생성: 실제 17점↑ 성향을 이름으로 명시(없으면 단락·"또한" 자동 생략), 최저 성향(bottom)도 §1 라벨로 구체화. `.report-adjust-note`. 라이브 `index-V1Ez1a1u.js` ("v0.10 · 0609-1751 · d36946b") |
+| 6/9 | 7b9c45b | **본문 에고 라벨 코드 제거** — `colorizeEgo`에서 "AC(협조·조율)" → "협조·조율"(코드·괄호 빼고 한글 유형명만, 색·볼드 유지). §2·§3·§4 등 전 본문 공통. 뒤 조사는 원문 유지. 라이브 `index-BmpcIUsP.js` ("v0.10 · 0609-1804 · 7b9c45b") |
