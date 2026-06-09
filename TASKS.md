@@ -25,6 +25,16 @@
 - [x] 커밋 `7b8e8ca` + 푸시(main). gh-pages 별도 배포
 - (참고) responses 테이블 0행(설문 마감) → 실데이터 리포트 없음. 검증은 빌드 번들·데이터 로직·§3 시뮬로 대체
 
+## v0.10 후속 — 손소장 26.0607 미반영 진단 (6/9, 세션453)
+
+> 손소장이 "(3)(4)(6)+모은경 CM4-3 누락"이 반영 안 됐다 했으나, 대조 결과 (4)·(6)·그래프는 세션451 빌드에 이미 반영(손소장이 구버전 캐시를 본 것으로 추정). 실제 미해결은 모은경 cm4_3 누락 하나뿐 → 3건 수정 배포. 커밋 `77f2fcb`, 라이브 `index-BZs4tR0k.js` ("v0.10 · 0609-1650 · 77f2fcb"). 명세 = SPEC §10 "v0.10 후속".
+- [x] 손소장 미반영 주장 대조 — (4)(6) 이미 세션451 반영 확인. 실제 미해결 = cm4_3 누락 1건
+- [x] cm4_3 누락 버그 수정: `allNoCoaching` 판정을 화면 needs와 일치시킴. `isNoAdjust()` `ReportPageV2` → `cmLookup` 이관(단일 소스)
+- [x] 손소장 수정사항(3) 반영: §1 나머지 성향 한 줄을 `plainTranslation` → `cm4_1` 텍스트로 교체(top1·top2 제외)
+- [x] 리포트 하단 빌드 식별자: `vite.config.js` `define`으로 `__BUILD_ID__` 주입 → footer-bar 우측 `.report-footer-build`
+- [x] 빌드 + 배포(`npm run deploy`) — 라이브 `index-BZs4tR0k.js` 확인
+- [x] 커밋 `77f2fcb` + 푸시(main)
+
 ## 인물상 20조합 데이터화 (신규 갈래, 6/9 세션451 발견 — 다음 세션)
 
 > 작업 계획 = [[인물상 20조합 데이터화 작업 계획]]. v0.10 마무리 후 피터공 구조 점검에서 발견: §1·§2 인물상(top1+top2 20조합)이 손소장 데이터가 아니라 아리공 v2 리디자인 프로토타입 인라인(`ReportPageV2.jsx IDENTITY`). 9개만 손질, 11개 fallback 자동.
@@ -272,3 +282,4 @@
 | 6/4 | — | **일괄 PDF v2 통일 + admin 버튼명** — `ReportPageV2`에서 `ReportViewV2` 추출(fetch/렌더 분리), `ReportBatchPage`가 v2 사용 → 단일·배치 모두 v2 한 형태. 버튼명 설명적으로(설문결과 데이터 보기/전체리포트 PDF 출력하기/캠페인설정변경). v1 `ReportPage`·v3 `ReportPageV3` dead file화(삭제 후보). 빌드 OK |
 | 6/4 | — | **외부 데이터 적재 파이프라인** — 외부 설문 CSV→`responses` 일괄 적재 체계(`scripts/import_survey_csv.py` + `DATA-IMPORT.md` SPEC). 점수 그대로·top/bottom 계산·직군/소속/소득 매핑·캠페인 트랜잭션 SQL. 첫 적용 DB손해보험_260320 112명 적재 완료(26.0604, 관리화면 확인). 코드 배포 무관 — 데이터 작업 |
 | 6/4 | — | **v1·v3 리포트 _archive 이동** — 미사용 dead file `ReportPage`(v1)·`ReportPageV3`(v3)를 `egogram/_archive/`로 git mv(번들 제외, 히스토리·참고 보존 + README). 빌드 92 modules OK |
+| 6/9 | 77f2fcb | **v0.10 후속 — 손소장 미반영 진단 + 3건 수정** — cm4_3 누락 버그 수정(`allNoCoaching` 화면 needs 일치, `isNoAdjust` 이관) / 손소장 수정(3) §1 나머지 성향 한 줄 `cm4_1`로 교체 / 빌드 식별자 `__BUILD_ID__` footer-bar 주입. 라이브 `index-BZs4tR0k.js` ("v0.10 · 0609-1650 · 77f2fcb") |

@@ -1,6 +1,7 @@
 # MIND2ACTION — 기술 명세 (SPEC)
 
-> **현재 빌드: v0.7** (5/25 기록됨) — 손소장 26.0525 수정 5건 + 리포트 헤더·마무리 정리. 역할별 안전구간 테이블(§1 그래프 경계선 + §3 조율 발동 통합), 컨설턴트 CM6 공통 3섹션, "코칭"→"조율" 라벨, 결과화면 총점·재시도 삭제. 호칭 일원화(②)는 드라이브 "에고그램 리포트 콘텐츠 데이터" 시트 수령 후 보류.
+> **현재 빌드: v0.10** (6/9, 세션453) — 손소장 26.0607 미반영 진단 + 3건 수정 배포. 빌드식별자 "v0.10 · 0609-1650 · 77f2fcb", 라이브 번들 `index-BZs4tR0k.js`. 상세 = §10 "v0.10 후속".
+> 이전: v0.10 (6/9, 세션451) — 손소장 26.0607 수정 14건. 이전: v0.7 (5/25) — 손소장 26.0525 수정 5건 + 리포트 헤더·마무리 정리. 역할별 안전구간 테이블(§1 그래프 경계선 + §3 조율 발동 통합), 컨설턴트 CM6 공통 3섹션, "코칭"→"조율" 라벨, 결과화면 총점·재시도 삭제. 호칭 일원화(②)는 드라이브 "에고그램 리포트 콘텐츠 데이터" 시트 수령 후 보류.
 > 이전 안정 빌드: v0.5 (`_dev/mind2action/egogram-v0.5/`)
 
 > Phase 1~2 반영. 이후 Phase 진입 시 확장.
@@ -91,7 +92,7 @@ console.log(interleaved.length + '문항 반영 완료');
 | 저 | 8~10 | 해당 성향 약함 |
 | 극저 | 0~7 | 해당 성향 매우 약함 |
 
-**안전구간 (조율 불필요, v0.7 역할별)** — §1 그래프 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준 (`scoreEngine.SAFE_RANGES`, 손소장 26.0525 확정):
+**안전구간 (조율 불필요, v0.7 역할별)** — §1 그래프 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준 (`scoreEngine.SAFE_RANGES`, 손소장 26.0525 확정). **cm4_3(`all_no_coaching`) 표시 조건은 화면 §3 조율 needs와 정확히 일치** — `allNoCoaching` = 모든 ego가 `!needsDetailedCoaching && !(needsCoaching && !isNoAdjust(cm4_2))`. v0.10 후속에서 단일화 완료.
 
 | 역할 (코드 키) | CP | NP | A | FC | AC |
 |----------------|----|----|---|----|----|
@@ -248,6 +249,10 @@ npm run deploy    # = vite build && gh-pages -d dist --dest egogram
 `vite.config.js`의 `base: '/mind2action/egogram/'`는 HTML 내 에셋 참조 경로를 결정한다.
 - 리포 이름(`/mind2action/`) + 서브폴더(`/egogram/`) = 전체 경로
 - 이 값을 변경하면 배포 경로도 맞춰야 함
+
+### 빌드 식별자 (v0.10 후속 추가)
+
+`vite.config.js`의 `define`으로 `__BUILD_ID__` 자동 주입 — `"v{버전} · {빌드시각} · {커밋해시7자리}"`. 리포트 footer-bar 우측 `.report-footer-build`(작은 회색 글씨)에 표시. "어느 빌드를 봤나" 라이브 추적용(구버전 캐시 오인 방지).
 
 ### 배포 후 확인
 
@@ -471,3 +476,11 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 | CM6 | 행6(TOP1), 행7(TOP2) | 행8 |
 | CM7 | 행3(TOP1), 행4(TOP2), 행5(BOTTOM) | 행6 |
 | CM8 | 행1(TOP), 행2(BOTTOM) | 행3(격려), 행4(개선) |
+
+### 리포트 렌더링 변경 (v0.10 후속 — 손소장 26.0607 미반영 진단)
+
+> 세션453. 손소장이 "(3)(4)(6)+모은경 CM4-3 누락"이 반영 안 됐다 했으나 대조 결과 (4)CM4-2 센티넬·(6)CM4-4 화법예시 삭제·그래프 점선은 세션451 빌드에 이미 반영돼 있었음(손소장이 구버전 캐시를 본 것으로 추정). 실제 미해결은 모은경 CM4-3 누락 하나뿐이었고 이번에 수정. 커밋 `77f2fcb`, 라이브 번들 `index-BZs4tR0k.js`.
+
+- **cm4_3 누락 버그 수정**: `cmLookup.js`의 `allNoCoaching` 판정이 `needsCoaching`(SAFE_RANGE 기준)만 보고, 화면 §3 조율카드 판정(`isNoAdjust` 센티넬 + `needsDetailedCoaching`)을 반영하지 않았음. 17점↑ 성향이 있는 경우(예: 모은경) 화면엔 5개 다 조율 불요인데 cm4_3 안내문이 누락되던 버그. 수정: `allNoCoaching = every ego: !needsDetailedCoaching && !(needsCoaching && !isNoAdjust(cm4_2))`. `isNoAdjust` 함수를 `ReportPageV2`에서 `cmLookup`으로 이관해 단일 소스 공유.
+- **손소장 수정사항(3) 반영**: §1 "성향별로 자세히 보기"의 나머지 성향(top1·top2 제외) 한 줄에 들어가던 `plainTranslation`(cm1 키워드 축약)을 `cm4_1` 텍스트(손소장이 다듬은 성향×점수구간별 한 줄 묘사)로 교체. top1·top2는 cm2 본문이 있어 그대로.
+- **리포트 하단 빌드 식별자**: `vite.config.js` `define`으로 `__BUILD_ID__` 자동 주입("v0.10 · 빌드시각 · 커밋해시7자리"). 리포트 footer-bar 우측 `.report-footer-build`(작은 회색 글씨). 라이브 구버전 캐시 오인 방지용.
