@@ -909,6 +909,7 @@ p {
 .report-footer-bar { display: flex; justify-content: space-between; align-items: center; border-top: 3px solid #111; padding: 16px 0 32px; }
 .report-footer-copyright { font-size: 12px; color: #333; font-weight: 600; letter-spacing: 1px; }
 .report-footer-email { font-size: 13px; color: #333; letter-spacing: 0.3px; }
+.report-footer-build { font-size: 10px; color: #c4c4c4; letter-spacing: 0.5px; font-variant-numeric: tabular-nums; }
 .report-contact-email { text-align: center !important; font-size: 15px; color: #333; letter-spacing: 0.3px; }
 .report-cover-brand { color: var(--accent); font-weight: 300; }
 .report-copyright { text-align: center; font-size: 11px; color: var(--text-muted); letter-spacing: 1px; padding: 8px 0 32px; }

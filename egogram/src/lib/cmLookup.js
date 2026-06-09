@@ -40,6 +40,12 @@ function needsDetailedCoaching(ego, score) {
   return score <= 7;
 }
 
+// 손소장 26.0607(4): CM4-2 본문이 "조율이 필요없는 구간" 센티넬이면 점수가 SAFE_RANGE를 벗어나도
+// 조율 포인트 아님(17점↑ 강점 등). 화면(§3 needs)과 cm4_3 allNoCoaching 판정이 이 함수를 공유한다.
+export function isNoAdjust(text) {
+  return !!text && /조율[이은]?\s*필요\s*없는\s*구간/.test(text);
+}
+
 export function lookupReport(result, jobType) {
   const cmKey = JOB_TO_CM[jobType] || 'sales';
   const cm = CM_DATA[cmKey];
@@ -65,7 +71,14 @@ export function lookupReport(result, jobType) {
     }
   }
 
-  const allNoCoaching = EGO_STATES.every(ego => !needsCoaching(ego, scores[ego], jobType));
+  // 손소장 26.0607(5): cm4_3(모든 점수 조율불요 안내문)은 §3 화면의 조율 카드 판정과 정확히 일치해야 한다.
+  // 화면 needs = needsCoaching && !isNoAdjust(cm4_2). 상세코칭(cm4_4)도 카드를 띄우므로 함께 반영.
+  // (이전엔 needsCoaching만 봐서, 17점↑ 성향이 있는 사람은 화면엔 5개 다 조율불요인데 cm4_3가 누락됐다 — 모은경 케이스)
+  const allNoCoaching = EGO_STATES.every(ego => {
+    const detailed = needsDetailedCoaching(ego, scores[ego]);
+    const needs = needsCoaching(ego, scores[ego], jobType) && !isNoAdjust(cm4_2[ego]);
+    return !detailed && !needs;
+  });
 
   const top1top2 = `${top1}_${top2}`;
   const top1top2bottom = `${top1}_${top2}_${bottom}`;
@@ -160,4 +173,4 @@ export function lookupReportLLM(result, jobType) {
   return out;
 }
 
-export { EGO_STATES, EGO_LABELS, getScoreRange, needsCoaching };
+export { EGO_STATES, EGO_LABELS, getScoreRange, needsCoaching, needsDetailedCoaching };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import { lookupReport, EGO_STATES, EGO_LABELS, needsCoaching } from '../../lib/cmLookup';
+import { lookupReport, EGO_STATES, EGO_LABELS, needsCoaching, isNoAdjust } from '../../lib/cmLookup';
 import { getSuccessRange } from '../../lib/scoreEngine';
 import uiTexts from '../../data/ui_texts.yaml';
 
@@ -53,11 +53,7 @@ function Paragraphs({ text, breaks }) {
   return paragraphs.map((p, i) => <p key={i}>{colorizeEgo(p.replace(/\n/g, ' ').trim(), `c${i}`)}</p>);
 }
 
-// 손소장 26.0607(4): CM4-2 본문에 "조율이 필요없는 구간" / "성향 에너지가 다소 강하지만 조율은 필요없는 구간"
-// 으로 표기한 높은/중간 점수대 = 조율 포인트 아님 → §3 카드에서 제외하는 센티넬.
-function isNoAdjust(text) {
-  return !!text && /조율[이은]?\s*필요\s*없는\s*구간/.test(text);
-}
+// isNoAdjust(CM4-2 "조율이 필요없는 구간" 센티넬)는 cmLookup으로 이관 — §3 화면과 cm4_3 판정이 공유.
 
 // 본문 첫머리의 조회 키/분류 메타 괄호 제거 (원칙 2 — 내부 키·분류 노출 금지)
 // 예: "(CP 통제적부모 & NP ...강점으로 발현됨.)" / "(원칙이 아주 강하고...성향)"
@@ -299,7 +295,7 @@ export function ReportViewV2({ row, showToggle = true }) {
                     <p key={ego} className="report-trait-rest-line">
                       <strong style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]}</strong>
                       <span className="report-trait-rest-score">{scores[ego]}점</span>
-                      <span className="report-trait-rest-text">{plainTranslation(ego, scores[ego], report.cm1)}</span>
+                      <span className="report-trait-rest-text">{stripMeta(report.cm4_1[ego])}</span>
                     </p>
                   ))}
                 </div>
@@ -423,6 +419,8 @@ export function ReportViewV2({ row, showToggle = true }) {
         {uiTexts.report.closing.contact.email && (
           <span className="report-footer-email">✉&nbsp;&nbsp;{uiTexts.report.closing.contact.email}</span>
         )}
+        {/* 빌드 식별 코드(우리만 식별) — 손소장 케이스처럼 "어느 빌드를 봤나" 추적용. vite define 자동 주입 */}
+        <span className="report-footer-build">{typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : ''}</span>
       </div>
     </div>
   );
