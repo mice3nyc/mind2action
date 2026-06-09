@@ -866,6 +866,10 @@ p {
 
 .report-coaching-message { border: 1px dotted #999; padding: 20px; margin: 24px 0; }
 .report-coaching-message p { margin: 0; }
+/* 동적 개인화 블록(17점↑/최저 성향) — 앞 본문과 한 줄 띄움 + 내부 문단 간격 (손소장 26.0609) */
+.report-adjust-note { margin-top: 18px; }
+.report-coaching-message .report-adjust-note p + p,
+.report-cm4-5 .report-adjust-note p + p { margin-top: 12px; }
 
 /* Detailed coaching (CM4-4) */
 .report-detailed-coaching { margin-top: 32px; }

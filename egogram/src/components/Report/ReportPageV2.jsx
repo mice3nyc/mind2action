@@ -148,6 +148,30 @@ function getIdentity(top1, top2, name) {
 // 그래프 라벨 — "통제적 부모" 같은 코드 정식명 대신 강점 평이어 (제안 2, 미스리딩 제거)
 const EGO_PLAIN_LABEL = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
 
+// 손소장 26.0609: cm4_3/cm4_5 끝의 "⚠️ 만약 17점 이상…/가장 낮은 성향…" 고정 블록을
+//   점수 기반으로 개인화. (1)이모지 제거 (2)한 줄 띄워 별도 문단 (3)실제 17점↑ 성향·최저 성향을 이름으로 명시.
+//   EGO_PLAIN_LABEL 다섯 값 모두 받침으로 끝나 조사는 항상 '과'.
+function joinEgoLabels(egos) {
+  const labels = egos.map(e => EGO_PLAIN_LABEL[e]);
+  if (labels.length <= 1) return labels.join('');
+  if (labels.length === 2) return `${labels[0]}과 ${labels[1]}`;
+  return labels.join(', ');
+}
+function buildAdjustNote(scores, bottom, name) {
+  const high = EGO_STATES.filter(ego => scores[ego] >= 17);
+  const low = EGO_PLAIN_LABEL[bottom];
+  const paras = [];
+  if (high.length > 0) {
+    paras.push(`${name}님은 ${joinEgoLabels(high)} 성향이 17점 이상입니다. 이는 큰 강점이 될 수 있지만, 상황에 따라 상대방이 다소 과하게 느낄 수도 있습니다. 이 부분만 의식적으로 조율하면 더욱 균형 잡힌 관계와 성과에 도움이 됩니다.`);
+  }
+  paras.push(`${high.length > 0 ? '또한 ' : ''}가장 낮은 ${low} 성향은 성과와 인간관계에서 반복적으로 나타나는 아쉬움의 원인이 될 수 있습니다. 가장 낮은 ${low} 성향을 잘 이해하고 의식적으로 활용하려는 노력이 더해지면 강점은 더욱 빛을 발하게 됩니다.`);
+  return paras.join('\n\n');
+}
+// yaml 본문 끝에 박힌 "⚠️ …" 고정 블록 제거 (동적 블록으로 대체하기 위해)
+function stripWarnBlock(text) {
+  return text ? text.replace(/⚠️[\s\S]*$/, '').trimEnd() : text;
+}
+
 // 유형 강점 명칭 ("~의 힘", 26.0528 피터공 선택). 가장 강한 유형(top1)을 이 이름으로 부각 — 손소장 강조점.
 // 부모/아이 메타포 제거, 강점 프레이밍. 프로토타입 인라인 — 4단계서 데이터화.
 const EGO_TYPE_NAME = { CP: '기준을 세우는 힘', NP: '마음을 살피는 힘', A: '흐름을 읽는 힘', FC: '분위기를 여는 힘', AC: '보폭을 맞추는 힘' };
@@ -353,14 +377,20 @@ export function ReportViewV2({ row, showToggle = true }) {
 
             {report.cm4_3 && (
               <div className="report-coaching-message">
-                {/* 손소장 26.0607(5): 'OOO님은…' + 다단락 + ⚠️ 블록 한 셀 → 이름 치환 + 줄바꿈 보존 */}
-                <Paragraphs text={report.cm4_3.replace(/OOO/g, report.name)} />
+                {/* 손소장 26.0607(5): 'OOO님은…' + 다단락 / ⚠️ 블록은 떼고 동적 개인화(26.0609) */}
+                <Paragraphs text={stripWarnBlock(report.cm4_3).replace(/OOO/g, report.name)} />
+                <div className="report-adjust-note">
+                  <Paragraphs text={buildAdjustNote(scores, bottom, report.name)} />
+                </div>
               </div>
             )}
 
             {report.cm4_5 && coaching.length > 0 && (
               <div className="report-cm4-5">
-                <Paragraphs text={stripMeta(report.cm4_5).replace(/OOO/g, report.name)} />
+                <Paragraphs text={stripWarnBlock(stripMeta(report.cm4_5)).replace(/OOO/g, report.name)} />
+                <div className="report-adjust-note">
+                  <Paragraphs text={buildAdjustNote(scores, bottom, report.name)} />
+                </div>
               </div>
             )}
           </Section>
