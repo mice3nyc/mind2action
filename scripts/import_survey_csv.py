@@ -15,7 +15,8 @@ DATA_DIR = "/Users/p.air15/Neo-Obsi-Sync/Assets/incoming/에고그램/data"
 CSV_FILE = f"{DATA_DIR}/Archives/성향분석 코칭 설문지(20260320)의 정석.csv"
 CLIENT   = "DB손해보험_260320"
 CODE     = "dbsj260320"     # 캠페인 code (unique). 일회성.
-MEMO     = "손소장 정석 데이터 (20260320 구글폼 응답) 재적재 — 아리공 26.0611 (v0.11 검증용, 새 동점 우선순위)"
+MEMO     = "손소장 정석 데이터 (20260320 구글폼 응답) 일괄 적재 — 아리공 26.0604"
+# ※ 26.0611: DB손해보험은 이미 적재돼 있음(재실행 금지 — 중복 적재). 다음 외부 데이터 적재 시 상수만 교체해 사용.
 OUT_FILE = f"{DATA_DIR}/import_{CLIENT}.sql"
 
 EGO = ['CP', 'NP', 'A', 'FC', 'AC']          # CSV 점수 컬럼 순서(col58~62)
