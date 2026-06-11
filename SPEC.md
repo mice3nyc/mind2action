@@ -312,6 +312,7 @@ egogram/
 | `src/data/cm_manager.yaml` | 리더(manager) | v0.8 전체 재변환 (cm1·cm8만 보존) |
 | `src/data/cm_coach.yaml` | 코치(coach) | v0.8 전체 재변환 (cm1·cm8만 보존) |
 | `src/data/cm6_common_consultant.yaml` | 컨설턴트 CM6 공통 | **5/25 재정정** — 소제목을 시트 좌열로 교체(고객의 실제 심리 해석/재질문 및 재결정 유도/최종 진행 멘트), 본문 2섹션 갱신 |
+| `src/data/identity.yaml` | 인물상 (직군 공통) | **26.0611 신설** — §1·§2 첫 정의 "OOO님은 ___한 분". top1_top2 20조합 `{title, desc}`. 원본: [[에고그램 인물상 20조합 검토 요청 - 손소장]](9 기존 + 11 신규, 손소장 26.0611 ㅇㅋ). `ReportPageV2`의 인라인 `IDENTITY` 폐지, yaml import로 교체. 미충원 조합 fallback 합성(`EGO_STRENGTH`)은 안전망으로 유지 |
 
 > **5/25 CM6 재정정**: 손소장 새 파일 `Assets/incoming/에고그램/data/컨설턴트로 수정 - 손소장.xlsx`(CM6 시트 + CM6 공통적용 시트 추가). CM6만 정정 요청 — cm6 클로징 9조합("고객님은~" → "이 상황에서 컨설턴트는~" 화자 정정) + cm6_common 3섹션(좌열=소제목, 우열=본문). cm2~cm5·cm7은 현재 yaml과 동일 확인하고 건드리지 않음. cm4_2 2셀("코칭이 필요없는 구간"→"조율이 필요없는 구간")은 별도 발견, 반영 여부 피터공 확인 대기
 

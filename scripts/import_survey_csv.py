@@ -12,14 +12,14 @@
 import csv, re, uuid, sys
 
 DATA_DIR = "/Users/p.air15/Neo-Obsi-Sync/Assets/incoming/에고그램/data"
-CSV_FILE = f"{DATA_DIR}/성향분석 코칭 설문지(20260320)의 정석.csv"
+CSV_FILE = f"{DATA_DIR}/Archives/성향분석 코칭 설문지(20260320)의 정석.csv"
 CLIENT   = "DB손해보험_260320"
 CODE     = "dbsj260320"     # 캠페인 code (unique). 일회성.
-MEMO     = "손소장 정석 데이터 (20260320 구글폼 응답) 일괄 적재 — 아리공 26.0604"
+MEMO     = "손소장 정석 데이터 (20260320 구글폼 응답) 재적재 — 아리공 26.0611 (v0.11 검증용, 새 동점 우선순위)"
 OUT_FILE = f"{DATA_DIR}/import_{CLIENT}.sql"
 
 EGO = ['CP', 'NP', 'A', 'FC', 'AC']          # CSV 점수 컬럼 순서(col58~62)
-TIE = ['CP', 'A', 'NP', 'AC', 'FC']          # scoreEngine TIE_PRIORITY
+TIE = ['A', 'CP', 'NP', 'FC', 'AC']          # scoreEngine TIE_PRIORITY (v0.11 — 손소장 26.0611 item 1)
 
 # 직무 자유텍스트 → 설문 직군 코드 (컨설턴트=sales / 리더=sales_leader / 코치=coach)
 JOB_MAP = {
