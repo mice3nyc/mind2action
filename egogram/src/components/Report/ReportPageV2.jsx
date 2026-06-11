@@ -16,8 +16,11 @@ import uiTexts from '../../data/ui_texts.yaml';
 // 본문 안의 에고 라벨 "XX(한글,한글)"을 §1과 동일한 에고 색으로 입힌다.
 //   - 색·표기는 코드(CP/NP/A/FC/AC) 기준 → 손소장 본문의 FC(배려,공감) 오타가 화면에선 FC(친화·표현)로 자동 교정
 //   - 쉼표는 §1처럼 가운뎃점(·)으로 통일 (EGO_PLAIN_LABEL 사용)
-//   - 코드(AC 등)·괄호는 빼고 한글 라벨만 색칠 (손소장 26.0609: "AC(협조·조율)" → "협조·조율") → 뒤 조사는 원문 유지
+//   - 코드(AC 등)·괄호는 빼고 한글 라벨만 색칠 (손소장 26.0609: "AC(협조·조율)" → "협조·조율")
+//   - 손소장 26.0611(4): 라벨 뒤에 "성향" 접미 ("배려·공감 성향"). 원문이 이미 "성향"으로 이어지면 생략.
+//     뒤 조사는 '성향'(받침 ㅇ) 기준으로 교정 — 가→이, 는→은, 를→을, 와→과, 로→으로.
 const EGO_LABEL_RE = /(CP|NP|FC|AC|A)\([가-힣,·]+\)/g;
+const JOSA_FIX = { '가': '이', '는': '은', '를': '을', '와': '과', '로': '으로' };
 function colorizeEgo(text, kp) {
   const parts = [];
   let last = 0, i = 0, m;
@@ -25,12 +28,18 @@ function colorizeEgo(text, kp) {
   while ((m = EGO_LABEL_RE.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
     const code = m[1];
+    let end = m.index + m[0].length;
+    const hasSuffix = /^ ?성향/.test(text.slice(end));
     parts.push(
       <span key={`${kp}-e${i++}`} style={{ color: EGO_COLORS[code], fontWeight: 600 }}>
-        {EGO_PLAIN_LABEL[code]}
+        {EGO_PLAIN_LABEL[code]}{hasSuffix ? '' : ' 성향'}
       </span>
     );
-    last = m.index + m[0].length;
+    if (!hasSuffix && JOSA_FIX[text[end]]) {
+      parts.push(JOSA_FIX[text[end]]);
+      end += 1;
+    }
+    last = end;
   }
   if (last < text.length) parts.push(text.slice(last));
   return parts.length ? parts : [text];
@@ -151,25 +160,43 @@ const EGO_PLAIN_LABEL = { CP: '기준·결단', NP: '배려·공감', A: '이성
 // 손소장 26.0609: cm4_3/cm4_5 끝의 "⚠️ 만약 17점 이상…/가장 낮은 성향…" 고정 블록을
 //   점수 기반으로 개인화. (1)이모지 제거 (2)한 줄 띄워 별도 문단 (3)실제 17점↑ 성향·최저 성향을 이름으로 명시.
 //   EGO_PLAIN_LABEL 다섯 값 모두 받침으로 끝나 조사는 항상 '과'.
+// 손소장 26.0611(3): 성향 이름을 평문 대신 "CODE(라벨)" 패턴으로 출력 →
+//   Paragraphs→colorizeEgo 기존 파이프라인이 색·"성향" 접미를 입힌다 (CM4-5 흑백 → 컬러).
+//   리터럴 " 성향"은 접미와 중복되므로 템플릿에서 제거.
+function egoPattern(e) {
+  return `${e}(${EGO_PLAIN_LABEL[e]})`;
+}
 function joinEgoLabels(egos) {
-  const labels = egos.map(e => EGO_PLAIN_LABEL[e]);
+  const labels = egos.map(egoPattern);
   if (labels.length <= 1) return labels.join('');
   if (labels.length === 2) return `${labels[0]}과 ${labels[1]}`;
   return labels.join(', ');
 }
 function buildAdjustNote(scores, bottom, name) {
   const high = EGO_STATES.filter(ego => scores[ego] >= 17);
-  const low = EGO_PLAIN_LABEL[bottom];
+  const low = egoPattern(bottom);
   const paras = [];
   if (high.length > 0) {
-    paras.push(`${name}님은 ${joinEgoLabels(high)} 성향이 17점 이상입니다. 이는 큰 강점이 될 수 있지만, 상황에 따라 상대방이 다소 과하게 느낄 수도 있습니다. 이 부분만 의식적으로 조율하면 더욱 균형 잡힌 관계와 성과에 도움이 됩니다.`);
+    paras.push(`${name}님은 ${joinEgoLabels(high)}이 17점 이상입니다. 이는 큰 강점이 될 수 있지만, 상황에 따라 상대방이 다소 과하게 느낄 수도 있습니다. 이 부분만 의식적으로 조율하면 더욱 균형 잡힌 관계와 성과에 도움이 됩니다.`);
   }
-  paras.push(`${high.length > 0 ? '또한 ' : ''}가장 낮은 ${low} 성향은 성과와 인간관계에서 반복적으로 나타나는 아쉬움의 원인이 될 수 있습니다. 가장 낮은 ${low} 성향을 잘 이해하고 의식적으로 활용하려는 노력이 더해지면 강점은 더욱 빛을 발하게 됩니다.`);
+  paras.push(`${high.length > 0 ? '또한 ' : ''}가장 낮은 ${low}은 성과와 인간관계에서 반복적으로 나타나는 아쉬움의 원인이 될 수 있습니다. 가장 낮은 ${low}을 잘 이해하고 의식적으로 활용하려는 노력이 더해지면 강점은 더욱 빛을 발하게 됩니다.`);
   return paras.join('\n\n');
 }
 // yaml 본문 끝에 박힌 "⚠️ …" 고정 블록 제거 (동적 블록으로 대체하기 위해)
 function stripWarnBlock(text) {
   return text ? text.replace(/⚠️[\s\S]*$/, '').trimEnd() : text;
+}
+
+// report 객체의 모든 텍스트 필드에서 OOO → 참여자 이름 치환 (손소장 26.0611 5·6·7)
+function deepReplaceOOO(node, name) {
+  if (typeof node === 'string') return node.replace(/OOO/g, name);
+  if (Array.isArray(node)) return node.map(v => deepReplaceOOO(v, name));
+  if (node && typeof node === 'object') {
+    const out = {};
+    for (const k of Object.keys(node)) out[k] = deepReplaceOOO(node[k], name);
+    return out;
+  }
+  return node;
 }
 
 // 유형 강점 명칭 ("~의 힘", 26.0528 피터공 선택). 가장 강한 유형(top1)을 이 이름으로 부각 — 손소장 강조점.
@@ -238,7 +265,9 @@ export function ReportViewV2({ row, showToggle = true }) {
     grades: row.grades,
   };
 
-  const report = lookupReport(result, row.job_type);
+  // 손소장 26.0611(5·6·7): OOO 플레이스홀더가 CM3·CM5·CM6 등 전 섹션에 유입 →
+  // 개별 replace 산재 대신 lookup 직후 report 전 텍스트 필드 일괄 치환.
+  const report = deepReplaceOOO(lookupReport(result, row.job_type), row.name || '');
   report.name = row.name;
 
   const data = { ...row, result };
@@ -378,19 +407,20 @@ export function ReportViewV2({ row, showToggle = true }) {
             {report.cm4_3 && (
               <div className="report-coaching-message">
                 {/* 손소장 26.0607(5): 'OOO님은…' + 다단락 / ⚠️ 블록은 떼고 동적 개인화(26.0609) */}
-                <Paragraphs text={stripWarnBlock(report.cm4_3).replace(/OOO/g, report.name)} />
+                <Paragraphs text={stripWarnBlock(report.cm4_3)} />
                 <div className="report-adjust-note">
                   <Paragraphs text={buildAdjustNote(scores, bottom, report.name)} />
                 </div>
               </div>
             )}
 
+            {/* 손소장 26.0611(2): 두 단락 순서 교체 — 동적 조율 안내 먼저, 격려 단락(cm4_5 본문)으로 마무리 */}
             {report.cm4_5 && coaching.length > 0 && (
               <div className="report-cm4-5">
-                <Paragraphs text={stripWarnBlock(stripMeta(report.cm4_5)).replace(/OOO/g, report.name)} />
                 <div className="report-adjust-note">
                   <Paragraphs text={buildAdjustNote(scores, bottom, report.name)} />
                 </div>
+                <Paragraphs text={stripWarnBlock(stripMeta(report.cm4_5))} />
               </div>
             )}
           </Section>
@@ -400,7 +430,7 @@ export function ReportViewV2({ row, showToggle = true }) {
       {report.cm5 && (
         <Section number={4} title={report.isInsurance ? uiTexts.report.sections.s5_title_insurance : report.jobLabel === '관리자' ? uiTexts.report.sections.s5_title_manager : uiTexts.report.sections.s5_title_coach}>
           {report.cm5_1 && (
-            <p className="report-cm5-oneliner">{stripMeta(report.cm5_1).replace(/OOO/g, report.name)}</p>
+            <p className="report-cm5-oneliner">{stripMeta(report.cm5_1)}</p>
           )}
           <div className="report-cm5">
             {/* 손소장 26.0607(8·10): 컨설턴트 §4 소제목 두 개 (리디자인 때 빠진 것 복원) */}
@@ -437,7 +467,7 @@ export function ReportViewV2({ row, showToggle = true }) {
       <div className="report-closing">
         {report.closing ? (
           <div className="report-closing-message">
-            <Paragraphs text={report.closing.replace(/OOO/g, report.name)} />
+            <Paragraphs text={report.closing} />
           </div>
         ) : (
           <p className="report-closing-greeting">{uiTexts.report.closing.greeting}</p>

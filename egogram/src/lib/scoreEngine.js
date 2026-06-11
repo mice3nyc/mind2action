@@ -11,7 +11,8 @@ const EGO_LABELS = {
   AC: '협조·조율'
 };
 
-const TIE_PRIORITY = ['CP', 'A', 'NP', 'AC', 'FC'];
+// 동점 시 우선순위 (TOP·BOTTOM 공통) — 손소장 26.0611(1): A 최우선으로 변경 (구: CP A NP AC FC)
+const TIE_PRIORITY = ['A', 'CP', 'NP', 'FC', 'AC'];
 
 const QUESTION_EGO = {};
 for (const q of questions) {
@@ -26,12 +27,14 @@ function getGrade(score) {
   return '극저';
 }
 
-// 역할별 × 자아상태별 "조율(코칭) 불필요 안전구간" (손소장 26.0525 확정)
-// §1 성향 그래프의 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준
+// "조율(코칭) 불필요 안전구간" — §1 성향 그래프의 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준
+// 손소장 26.0611(10·11): 역할별 표(v0.7) 폐기, 세 역할 공통 CP·NP·A·FC=11-20, AC=8-16.
+// 26.0611 xlsx CM4-2의 본문 셀 배치(CP·NP·A·FC 8-10, AC 17-20만 본문)가 이 구간을 전제한다.
+const UNIFIED_RANGES = { CP: [11, 20], NP: [11, 20], A: [11, 20], FC: [11, 20], AC: [8, 16] };
 const SAFE_RANGES = {
-  sales:   { CP: [11, 16], NP: [11, 16], A: [14, 20], FC: [11, 16], AC: [8, 16] },  // 컨설턴트
-  manager: { CP: [11, 16], NP: [14, 20], A: [14, 20], FC: [11, 16], AC: [8, 13] },  // 리더
-  coach:   { CP: [11, 16], NP: [14, 20], A: [11, 20], FC: [11, 16], AC: [11, 16] }, // 코치
+  sales:   UNIFIED_RANGES,  // 컨설턴트
+  manager: UNIFIED_RANGES,  // 리더
+  coach:   UNIFIED_RANGES,  // 코치
 };
 
 const JOB_TO_ROLE = {

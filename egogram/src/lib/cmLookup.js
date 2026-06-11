@@ -35,8 +35,9 @@ function needsCoaching(ego, score, jobType) {
   return score < low || score > high;
 }
 
+// 손소장 26.0611(8·9): AC 특례(17+) 폐지 — 전 성향 0~7점이 상세조율(cm4_4) 트리거.
+// AC 17점 이상은 일반 needsCoaching 경로로 cm4_2['17-20']['AC'] 신규 멘트가 표시된다.
 function needsDetailedCoaching(ego, score) {
-  if (ego === 'AC') return score >= 17;
   return score <= 7;
 }
 

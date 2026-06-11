@@ -92,18 +92,18 @@ console.log(interleaved.length + '문항 반영 완료');
 | 저 | 8~10 | 해당 성향 약함 |
 | 극저 | 0~7 | 해당 성향 매우 약함 |
 
-**안전구간 (조율 불필요, v0.7 역할별)** — §1 그래프 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준 (`scoreEngine.SAFE_RANGES`, 손소장 26.0525 확정). **cm4_3(`all_no_coaching`) 표시 조건은 화면 §3 조율 needs와 정확히 일치** — `allNoCoaching` = 모든 ego가 `!needsDetailedCoaching && !(needsCoaching && !isNoAdjust(cm4_2))`. v0.10 후속에서 단일화 완료.
+**안전구간 (조율 불필요, v0.11 전 역할 통일)** — §1 그래프 경계선 밴드 + §3 조율 발동 로직이 공유하는 단일 기준 (`scoreEngine.SAFE_RANGES`). **cm4_3(`all_no_coaching`) 표시 조건은 화면 §3 조율 needs와 정확히 일치** — `allNoCoaching` = 모든 ego가 `!needsDetailedCoaching && !(needsCoaching && !isNoAdjust(cm4_2))`. v0.10 후속에서 단일화 완료.
 
-| 역할 (코드 키) | CP | NP | A | FC | AC |
-|----------------|----|----|---|----|----|
-| 컨설턴트 (`sales`) | 11-16 | 11-16 | 14-20 | 11-16 | 8-16 |
-| 리더 (`manager`) | 11-16 | 14-20 | 14-20 | 11-16 | 8-13 |
-| 코치 (`coach`) | 11-16 | 14-20 | 11-20 | 11-16 | 11-16 |
+| 역할 | CP | NP | A | FC | AC |
+|------|----|----|---|----|----|
+| 세 역할 공통 (v0.11) | 11-20 | 11-20 | 11-20 | 11-20 | 8-16 |
 
-> 점수가 해당 역할×자아상태 구간 밖이면 조율 필요. `getSuccessRange(ego, jobType)` / `needsCoaching(ego, score, jobType)` 모두 이 표를 참조한다. jobType→role은 `roleFromJobType` (sales_leader 등 잔여 키 → manager).
+> **v0.11 (손소장 26.0611 item 10·11)**: v0.7의 역할별 표를 폐기하고 세 역할 공통 CP·NP·A·FC=11-20, AC=8-16으로 통일. 손소장이 제시한 두 옵션(그래프 점선 제거 / 구간 통일) 중 통일을 채택 — 26.0611 xlsx CM4-2 시트의 빈 셀 패턴(본문이 있는 셀 = CP·NP·A·FC 8-10, AC 17-20뿐)이 정확히 이 구간을 전제하고 있고, item 10(리더 AC 14-16 조율 카드 제거)도 함께 해소된다. 그래프 점선 밴드는 새 구간으로 유지.
+> 구버전 표(v0.7 역할별): 컨설턴트 CP/NP/FC 11-16·A 14-20·AC 8-16, 리더 CP/FC 11-16·NP/A 14-20·AC 8-13, 코치 CP/FC/AC 11-16·NP 14-20·A 11-20.
+> 점수가 구간 밖이면 조율 필요. `getSuccessRange(ego, jobType)` / `needsCoaching(ego, score, jobType)` 모두 이 표를 참조한다. jobType→role은 `roleFromJobType` (sales_leader 등 잔여 키 → manager).
 
 ### TOP / BOTTOM 결정
-- **동점 우선순위**: CP > A > NP > AC > FC (TOP, BOTTOM 모두 동일)
+- **동점 우선순위**: A > CP > NP > FC > AC (TOP, BOTTOM 모두 동일) — v0.11 손소장 26.0611 item 1로 변경 (구: CP > A > NP > AC > FC)
 
 ## §3 참여자 플로우
 
@@ -486,3 +486,25 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 - **리포트 하단 빌드 식별자**: `vite.config.js` `define`으로 `__BUILD_ID__` 자동 주입("v0.10 · 빌드시각 · 커밋해시7자리"). 리포트 footer-bar 우측 `.report-footer-build`(작은 회색 글씨). 라이브 구버전 캐시 오인 방지용.
 - **cm4_3/cm4_5 ⚠️ 블록 개인화** (`d36946b`): cm4_3(조율불요 안내문)·cm4_5(조율 포인트 있음) 끝의 고정 "⚠️ 만약 17점 이상…/가장 낮은 성향…" 블록을 점수 기반 동적 생성으로 교체. (1) ⚠️ 이모지 제거 (2) 앞 본문과 한 줄 띄워 별도 문단(`.report-adjust-note`, margin-top 18px) (3) 실제 17점↑ 성향을 이름(§1 `EGO_PLAIN_LABEL`)으로 명시 — 없으면 단락·"또한" 자동 생략, 최저 성향(`bottom`)도 구체화. 구현: yaml 본문 끝 ⚠️ 블록을 `stripWarnBlock(/⚠️[\s\S]*$/)`로 제거 + `buildAdjustNote(scores, bottom, name)` append. 손소장 데이터(yaml)는 무수정 — 코드에서 strip+동적 생성. 복수 17점↑은 `joinEgoLabels`(2개="A과 B", 3+=", " 나열).
 - **본문 에고 라벨 코드 제거** (`7b9c45b`): `colorizeEgo`가 본문의 "AC(협조·조율)"류를 그릴 때 코드(`AC`)·괄호를 빼고 한글 유형명("협조·조율")만 표시(색·볼드 유지). 출력 `{code}({EGO_PLAIN_LABEL[code]})` → `{EGO_PLAIN_LABEL[code]}`. `colorizeEgo` 쓰는 §2·§3·§4 전 본문 공통. 매치 정규식은 코드 기준 유지(손소장 FC 오타 자동교정 효과 그대로), 뒤 조사는 원문 유지.
+
+### 리포트 렌더링 변경 (v0.11 — 손소장 26.0611, 수정요청 11건)
+
+> 원본: `Assets/incoming/에고그램/data/26.0611_{리더로 수정 - 손소장|컨설턴트로 수정 - 손소장|코치로 통합 수정-손소장}.xlsx` + 수정요청 목록 `6월11일 수정요청 내용 - 정리.csv`(11건). 시트 구조는 v0.9·v0.10과 동일 — 변환기 `ROLE_FILE`만 26.0611 파일명으로 교체해 재변환.
+
+**데이터 (재변환으로 반영 — item 2 일부·5·6·7·9 본문)**:
+- **호칭 OOO화**: CM3(20조합 전부 "OOO님은…"으로 시작)·CM5·CM6(컨설턴트)에 OOO 플레이스홀더 대량 유입(리더 CM5 252개 등). "이 성향의 리더님/코치님/컨설턴트님" → 이름 직접 호명. CM4-3도 "OOO님은 모든 점수가…"로 재작성
+- **CM4-2 구조 개편 (item 8·9·10의 데이터 면)**: 본문 있는 셀 = CP·NP·A·FC 8-10점 + **AC 17점이상(신규 조율 멘트)**. 17점이상 CP는 센티넬("조율이 필요없는 구간"), 나머지 셀 전부 빈칸. 0~7점 행 빈칸(CM4-4가 담당). 컨설턴트 AC 0~7 셀의 "조율이 필요함 - 신설"은 손소장 주석 — 렌더에서 미사용(AC 0-7은 cm4_4가 우선)이라 그대로 보존
+- **CM4-4 전원 0~7점 (item 9)**: AC 컬럼이 17점이상 → 0~7점으로 교체(이중 컬럼 폐지). 다섯 성향 모두 0~7 조건 + 본문 재작성. script 행은 빈칸 유지
+
+**변환기 (`convert_cm.py`)**:
+- `ROLE_FILE` → `26.0611_*` 파일명
+- `parse_cm4_4` TRIGGER: AC `'17+'` → `'0-7'` (전 성향 0-7 단일 조건)
+
+**코드**:
+- **item 1 — 동점 우선순위 변경**: `scoreEngine.TIE_PRIORITY` `['CP','A','NP','AC','FC']` → `['A','CP','NP','FC','AC']` (TOP·BOTTOM 공통). 손소장: 어려우면 원안 유지 가능했으나 단순 변경이라 적용
+- **item 8·9 — AC 상세조율 트리거 반전**: `cmLookup.needsDetailedCoaching` = 전 성향 `score <= 7` (기존: CP/NP/A/FC ≤7 또는 AC ≥17). AC 0-7 → cm4_4 상세 카드, AC 17+ → 일반 needsCoaching 경로로 cm4_2['17-20']['AC'] 신규 멘트 표시
+- **item 10·11 — 안전구간 통일**: `SAFE_RANGES` 세 역할 공통 CP·NP·A·FC=[11,20], AC=[8,16] (§2 표 참조). 리더 AC 14-16 조율 카드 자동 소멸. 그래프 점선 밴드는 새 구간으로 유지(손소장 두 옵션 중 통일 채택)
+- **item 4 — 본문 에고 라벨 "성향" 접미 + 조사 교정**: `colorizeEgo` 출력 `{한글라벨}` → `{한글라벨} 성향`(색·볼드는 라벨+성향 한 덩어리). 원문에서 라벨 바로 뒤가 "성향"이면 중복 방지로 접미 생략. 라벨 뒤 조사는 '성향'(받침 ㅇ) 기준으로 교정: 가→이, 는→은, 를→을, 와→과, 로→으로 (이미 맞는 이/은/을/과는 그대로)
+- **item 3 — CM4-5 동적 안내문 컬러**: `buildAdjustNote`가 성향 이름을 평문 대신 `CODE(라벨)` 패턴으로 출력 → `Paragraphs`→`colorizeEgo` 기존 파이프라인이 색·"성향" 접미 처리. 템플릿의 리터럴 " 성향"은 제거(접미와 중복 방지). cm4_3 블록의 동적 안내문도 동일 적용(item 4 "리포트 전체"와 일관)
+- **item 2 — CM4-5 두 단락 순서 교체**: `.report-cm4-5` 블록에서 동적 조율 안내(`buildAdjustNote`)를 먼저, 기본 격려 단락(cm4_5 본문 "이미 인식하고 계시다면…")을 나중에 렌더. ⚠️ 해석 주의: 참고 링크(구글 시트 CM4-5 탭)가 비공개라 직접 확인 못 함. xlsx CM4-5 본문은 현행과 동일 → "두 단락" = 화면의 두 단락(기본 단락 ↔ 동적 안내)으로 해석. 조율 안내 먼저 → 격려로 마무리. cm4_3 블록은 대상 아님(언급 없음)
+- **item 5·6·7 — OOO 치환 전역화**: 개별 `.replace(/OOO/g, name)` 산재(cm4_3·cm4_5·cm5_1·closing) → `ReportViewV2`에서 lookup 직후 report 객체 전 텍스트 필드 일괄 치환(`deepReplaceOOO`). cm3·cm5·cm6 등 신규 OOO 유입 섹션 자동 커버, 기존 산재 replace 제거
