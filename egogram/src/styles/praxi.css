@@ -1202,6 +1202,10 @@ body:has(.report-bling) { background: #fff; }
 .campaign-status-active { background: #ecfdf5; color: #059669; border: 1px solid #05966940; }
 .campaign-status-draft { background: var(--surface); color: var(--text-muted); border: 1px solid var(--border); }
 .campaign-status-closed { background: #f5f5f5; color: #999; border: 1px solid #e0e0e0; }
+.campaign-status-ended { background: #fef2f2; color: #dc2626; border: 1px solid #dc262640; }
+
+/* 참여 종료일이 지난 캠페인의 종료 날짜 — 빨강 강조 */
+.td-period-ended { color: #dc2626; font-weight: 600; }
 
 .btn-copy-link {
   font-size: 12px;

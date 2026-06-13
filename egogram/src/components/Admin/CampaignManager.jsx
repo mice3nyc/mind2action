@@ -17,8 +17,23 @@ const EMPTY_FORM = {
   memo: '',
 };
 
-function StatusBadge({ status }) {
-  return <span className={`campaign-status campaign-status-${status}`}>{STATUS_LABEL[status] || status}</span>;
+// 로컬(클라) 기준 오늘 'YYYY-MM-DD' — 사전식 == 시간순이라 문자열 비교로 충분 (LandingPage와 동일 기준)
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// 참여 종료일이 지났는가 — 종료일 당일은 아직 진행(LandingPage 'ended' 기준 today > period_end와 일치)
+function isPastEnd(camp) {
+  return Boolean(camp.period_end) && todayStr() > camp.period_end;
+}
+
+function StatusBadge({ camp }) {
+  // 수동 [마감](closed)은 날짜보다 우선. active인데 종료일이 지났으면 자동 '설문종료'.
+  if (camp.status === 'active' && isPastEnd(camp)) {
+    return <span className="campaign-status campaign-status-ended">설문종료</span>;
+  }
+  return <span className={`campaign-status campaign-status-${camp.status}`}>{STATUS_LABEL[camp.status] || camp.status}</span>;
 }
 
 export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onDeleteCampaign }) {
@@ -204,9 +219,9 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     {c.target && <div className="campaign-target">{c.target}</div>}
                     {c.memo && <div className="campaign-memo">메모: {c.memo}</div>}
                   </td>
-                  <td><StatusBadge status={c.status} /></td>
+                  <td><StatusBadge camp={c} /></td>
                   <td className="td-small">{c.period_start || '-'}</td>
-                  <td className="td-small">{c.period_end || '-'}</td>
+                  <td className={`td-small${isPastEnd(c) ? ' td-period-ended' : ''}`}>{c.period_end || '-'}</td>
                   <td className="td-small">{c.education_date || '-'}</td>
                   <td className="td-score">
                     {counts[c.id] || 0}
