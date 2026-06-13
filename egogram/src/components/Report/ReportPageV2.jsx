@@ -63,6 +63,18 @@ function Paragraphs({ text, breaks }) {
   return paragraphs.map((p, i) => <p key={i}>{colorizeEgo(p.replace(/\n/g, ' ').trim(), `c${i}`)}</p>);
 }
 
+// 26.0613(4): 문단(들)을 한 줄 흐름으로 합쳐 colorizeEgo 적용 — 라벨과 같은 줄에 인라인으로 붙일 때.
+function inlineFlow(text, kp) {
+  if (!text) return null;
+  return colorizeEgo(text.replace(/\n\s*\n/g, ' ').replace(/\n/g, ' ').trim(), kp);
+}
+
+// 26.0613(5): "✔ 화법 ①" 라벨 줄과 바로 다음 내용 줄을 한 줄로 합친다(breaks 렌더에서 별개 줄로 갈리던 것).
+//   데이터(yaml)는 손대지 않고 렌더 직전에만 변환 — 재변환 안전.
+function joinSpeechLabels(text) {
+  return text ? text.replace(/(✔\s*화법\s*[①②③④⑤⑥⑦⑧⑨⑩0-9]+)\s*\n+/g, '$1 ') : text;
+}
+
 // isNoAdjust(CM4-2 "조율이 필요없는 구간" 센티넬)는 cmLookup으로 이관 — §3 화면과 cm4_3 판정이 공유.
 
 // 본문 첫머리의 조회 키/분류 메타 괄호 제거 (원칙 2 — 내부 키·분류 노출 금지)
@@ -277,11 +289,10 @@ export function ReportViewV2({ row, showToggle = true }) {
           <h1><span className="report-cover-brand">MIND2ACTION</span> 성향 코칭 리포트</h1>
         </div>
         <div className="report-cover-id">
-          <div className="report-cover-name">{report.name}님</div>
-          <div className="report-cover-meta">
-            {data.company && <span>{data.company}</span>}
-            {data.department && <span>{data.department}</span>}
-          </div>
+          {(data.company || data.department) && (
+            <span className="report-cover-meta">{[data.company, data.department].filter(Boolean).join(' ')}</span>
+          )}
+          <span className="report-cover-name">{report.name}님</span>
         </div>
       </div>
 
@@ -325,10 +336,13 @@ export function ReportViewV2({ row, showToggle = true }) {
               <div className="report-traits">
                 {deep.map(ego => (
                   <div key={ego} className="report-trait-item">
-                    <div className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
-                      {EGO_PLAIN_LABEL[ego]} <span>{scores[ego]}점</span>
-                    </div>
-                    <p className="report-trait-plain">{plainTranslation(ego, scores[ego], report.cm1)}</p>
+                    {/* 26.0613(3): 라벨·점수와 한 줄 평이를 ' : '로 한 줄에 (기존 2줄). */}
+                    <p className="report-trait-ego" style={{ borderColor: EGO_COLORS[ego] }}>
+                      <span className="report-trait-ego-name" style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]}</span>
+                      <span className="report-trait-ego-score">{scores[ego]}점</span>
+                      <span className="report-trait-ego-sep">:</span>
+                      <span className="report-trait-ego-plain">{plainTranslation(ego, scores[ego], report.cm1)}</span>
+                    </p>
                     <Paragraphs text={report.cm2[ego]} />
                   </div>
                 ))}
@@ -372,10 +386,15 @@ export function ReportViewV2({ row, showToggle = true }) {
           <Section number={3} title={uiTexts.report.sections.s4_title}>
             {coaching.map(({ ego, detailed, needs }) => (
               <div key={ego} className="report-coaching-item">
-                <h4 style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]} <span className="report-coaching-score">{scores[ego]}점</span></h4>
+                {/* 26.0613(4): 라벨·점수와 설명 첫머리를 ' : '로 한 줄에. 상세=trait, 단순=cm4_1. */}
                 {detailed ? (
                   <div className="report-coaching-detailed">
-                    <div className="report-detailed-trait">{stripMeta(detailed.trait)}</div>
+                    <p className="report-coaching-head">
+                      <span className="report-coaching-ego" style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]}</span>
+                      <span className="report-coaching-score">{scores[ego]}점</span>
+                      <span className="report-coaching-sep">:</span>
+                      <span className="report-coaching-headtext">{inlineFlow(stripMeta(detailed.trait), `ct${ego}`)}</span>
+                    </p>
                     <Paragraphs text={detailed.coaching} />
                     {detailed.script && (
                       <div className="report-detailed-script">
@@ -386,7 +405,12 @@ export function ReportViewV2({ row, showToggle = true }) {
                   </div>
                 ) : needs ? (
                   <>
-                    <Paragraphs text={stripMeta(report.cm4_1[ego])} />
+                    <p className="report-coaching-head">
+                      <span className="report-coaching-ego" style={{ color: EGO_COLORS[ego] }}>{EGO_PLAIN_LABEL[ego]}</span>
+                      <span className="report-coaching-score">{scores[ego]}점</span>
+                      <span className="report-coaching-sep">:</span>
+                      <span className="report-coaching-headtext">{inlineFlow(stripMeta(report.cm4_1[ego]), `cn${ego}`)}</span>
+                    </p>
                     {report.cm4_2[ego] && <div className="report-coaching-detail"><Paragraphs text={stripMeta(report.cm4_2[ego])} /></div>}
                   </>
                 ) : null}
@@ -426,10 +450,10 @@ export function ReportViewV2({ row, showToggle = true }) {
           <div className="report-cm5">
             {/* 손소장 26.0607(8·10): 컨설턴트 §4 소제목 두 개 (리디자인 때 빠진 것 복원) */}
             {report.isInsurance && <h4 className="report-cm5-subhead">제안시 이 성향의 태도</h4>}
-            <Paragraphs text={report.cm5.manner} breaks />
+            <Paragraphs text={joinSpeechLabels(report.cm5.manner)} breaks />
             <div className="report-cm5-improvement">
               {report.isInsurance && <h4 className="report-cm5-subhead">개선에 도움이 되는 코칭과 화법예시</h4>}
-              <Paragraphs text={report.cm5.improvement} breaks />
+              <Paragraphs text={joinSpeechLabels(report.cm5.improvement)} breaks />
             </div>
           </div>
         </Section>

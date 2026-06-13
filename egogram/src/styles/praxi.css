@@ -767,13 +767,13 @@ p {
 .report-cover-title { padding: 28px 0; border-bottom: 3px solid #111; }
 .report-cover h1 { font-size: 28px; font-weight: 800; margin: 0; letter-spacing: -0.5px; }
 .report-cover-id { padding: 28px 0; border-bottom: 1px dotted #999; }
-.report-cover-name { font-size: 20px; font-weight: 400; margin-bottom: 6px; }
-.report-cover-meta { font-size: 13px; color: var(--text-muted); }
-.report-cover-meta span + span::before { content: ' · '; }
+/* 26.0613(1): 소속(얇게) + 이름(볼드) 한 줄. 기존 이름↵소속 2줄 → 인라인. */
+.report-cover-name { font-size: 20px; font-weight: 700; margin: 0; }
+.report-cover-meta { font-size: 14px; font-weight: 300; color: var(--text-muted); margin-right: 10px; }
 
 /* Intro */
 .report-intro { padding: 0 0 20px; margin-bottom: 40px; border-bottom: 1px dotted #999; }
-.report-intro h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.report-intro h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
 .report-intro h3 { font-size: 16px; font-weight: 700; margin: 28px 0 12px; }
 .report-intro ol { padding-left: 20px; margin-bottom: 0; }
 .report-intro li { margin-bottom: 10px; }
@@ -803,8 +803,12 @@ p {
 /* Traits (CM1) */
 .report-traits { display: flex; flex-direction: column; gap: 12px; }
 .report-trait-item { padding: 14px 16px; border: 1px solid #ddd; }
-.report-trait-ego { font-weight: 700; font-size: 13px; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dotted #bbb; }
-.report-trait-ego span { font-weight: 400; color: var(--text-muted); margin-left: 8px; font-size: 12px; }
+/* 26.0613(3): 라벨 + 점수 + ' : ' + 한 줄 평이를 한 줄에. (.report-trait-item p{margin:0}보다 특정성 높게) */
+.report-trait-item .report-trait-ego { font-size: 13px; line-height: 1.6; margin: 0 0 8px; padding-bottom: 6px; border-bottom: 1px dotted #bbb; }
+.report-trait-ego-name { font-weight: 700; }
+.report-trait-ego-score { font-weight: 400; color: var(--text-muted); margin-left: 8px; font-size: 12px; }
+.report-trait-ego-sep { color: var(--text-muted); margin: 0 7px 0 9px; }
+.report-trait-ego-plain { font-weight: 600; color: var(--text); }
 .report-trait-item p { margin: 0; }
 
 /* v2 리디자인 (ReportPageV2) */
@@ -823,7 +827,8 @@ p {
 .btn-report-v2:hover { background: #1a6b5c; color: #fff; }
 /* intro 서술형 */
 .report-intro-v2 ol { display: none; }
-.report-intro-v2 p { margin: 0 0 12px; line-height: 1.7; }
+/* 26.0613(6): 단문 단락이 빈 줄처럼 벌어져 보여 간격 축소 — 제목·본문 리듬 통일. */
+.report-intro-v2 p { margin: 0 0 6px; line-height: 1.65; }
 .report-intro-v2 p:last-child { margin-bottom: 0; }
 /* §1 종합 정체성 카드 */
 .report-identity { padding: 20px 22px; border: 1.5px solid var(--text); margin-bottom: 28px; }
@@ -831,7 +836,7 @@ p {
 .report-identity-top { font-size: 26px; font-weight: 800; line-height: 1.25; margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid #e3e3e3; }
 .report-identity-line { font-size: 19px; line-height: 1.5; margin: 0; }
 .report-identity-line strong { font-weight: 800; }
-.report-identity-desc { font-size: 14px; line-height: 1.7; color: var(--text); margin: 12px 0 0; }
+.report-identity-desc { font-size: 14px; line-height: 1.7; color: var(--text); margin: 4px 0 0; }
 /* 관점 소제목 */
 .report-subhead { font-size: 14px; font-weight: 700; margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
 /* 그래프 ego 코드 (보조, 흐리게) */
@@ -862,6 +867,11 @@ p {
 /* Coaching */
 .report-coaching-item { margin-bottom: 20px; }
 .report-coaching-item h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+/* 26.0613(4): 조율 라벨 + 점수 + ' : ' + 설명 첫머리 한 줄. */
+.report-coaching-head { font-size: 14px; line-height: 1.7; margin: 0 0 8px; }
+.report-coaching-ego { font-weight: 700; }
+.report-coaching-sep { color: var(--text-muted); margin: 0 7px 0 9px; }
+.report-coaching-headtext { font-weight: 400; }
 .report-coaching-item p { margin-bottom: 8px; }
 .report-coaching-ok { color: var(--text-muted); }
 .report-coaching-detail { margin-top: 8px; padding-left: 16px; border-left: 2px solid #111; }
