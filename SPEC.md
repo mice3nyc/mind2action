@@ -509,3 +509,7 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 - **item 3 — CM4-5 동적 안내문 컬러**: `buildAdjustNote`가 성향 이름을 평문 대신 `CODE(라벨)` 패턴으로 출력 → `Paragraphs`→`colorizeEgo` 기존 파이프라인이 색·"성향" 접미 처리. 템플릿의 리터럴 " 성향"은 제거(접미와 중복 방지). cm4_3 블록의 동적 안내문도 동일 적용(item 4 "리포트 전체"와 일관)
 - **item 2 — CM4-5 두 단락 순서 교체**: `.report-cm4-5` 블록에서 동적 조율 안내(`buildAdjustNote`)를 먼저, 기본 격려 단락(cm4_5 본문 "이미 인식하고 계시다면…")을 나중에 렌더. ⚠️ 해석 주의: 참고 링크(구글 시트 CM4-5 탭)가 비공개라 직접 확인 못 함. xlsx CM4-5 본문은 현행과 동일 → "두 단락" = 화면의 두 단락(기본 단락 ↔ 동적 안내)으로 해석. 조율 안내 먼저 → 격려로 마무리. cm4_3 블록은 대상 아님(언급 없음)
 - **item 5·6·7 — OOO 치환 전역화**: 개별 `.replace(/OOO/g, name)` 산재(cm4_3·cm4_5·cm5_1·closing) → `ReportViewV2`에서 lookup 직후 report 객체 전 텍스트 필드 일괄 치환(`deepReplaceOOO`). cm3·cm5·cm6 등 신규 OOO 유입 섹션 자동 커버, 기존 산재 replace 제거
+
+### 리포트 렌더링 변경 (v0.12 — 피터공 26.0613, 섹션 폭 통일)
+
+- **본문 문단 폭 통일 (④)**: 리포트 섹션 본문이 섹션 구분 점선(`.report-section` border-bottom, 컨테이너 폭 `.main-report` 720px − 좌우 패딩 24px = 약 672px) 끝까지 가지 못하고 우측에 갭이 생기던 문제. 원인 = 전역 `p { max-width: 600px }`(`praxi.css` line 62, 설문·랜딩·결과 페이지 가독 줄길이용)가 리포트 문단에도 적용돼 600px에서 조기 줄바꿈. **수정**: `.report-container p { max-width: none }` 추가(line 759 직후) — 리포트 안에서만 전역 제한 해제, 다른 페이지 무영향. 가운데 정렬 마무리(`.report-closing p { max-width: 680px }`, line 911)는 더 뒤 규칙이라 그대로 유지. CSS 한 줄 변경, 데이터·JSX 무변경

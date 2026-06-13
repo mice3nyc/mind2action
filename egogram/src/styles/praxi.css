@@ -756,6 +756,8 @@ p {
 .main-report { max-width: 720px; margin: 0 auto; padding: 0 24px; }
 
 .report-container { font-family: 'Paperlogy', sans-serif; color: var(--text); line-height: 1.85; font-size: 15px; }
+/* 전역 p { max-width: 600px }(설문·랜딩 가독성용)는 리포트에서 본문이 섹션 점선 폭(672px)에 못 미쳐 우측 갭을 만든다 → 리포트 안에서만 해제해 점선 끝까지 채운다. 가운데 정렬 마무리(.report-closing p, 아래)는 자체 규칙 유지. */
+.report-container p { max-width: none; }
 
 .report-loading, .report-error { text-align: center; padding: 80px 20px; font-size: 18px; color: var(--text-muted); }
 
