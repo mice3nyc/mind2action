@@ -20,6 +20,11 @@ export default function ResultPage({ result, profile }) {
 
   return (
     <section className="result-section">
+      {profile?.group && (
+        <div className="result-badge-row">
+          <div className="intro-group-badge">소속: {profile.group}</div>
+        </div>
+      )}
       <h1>{profile?.name}님, 감사합니다<br />Mind2Action 성향 설문을 완료했습니다.</h1>
       <p className="result-summary">
         {profile?.name}님, 가장 강한 성향은 <EgoName ego={top1} />,

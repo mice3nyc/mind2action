@@ -16,5 +16,6 @@ export default function PreviewResultPage() {
   const [params] = useSearchParams();
   const name = params.get('name') || '테스트';
   const jobType = params.get('job') || '관리자';
-  return <ResultPage result={MOCK_RESULT} profile={{ name, jobType }} />;
+  const group = params.get('group') || '테스트 고객사'; // 가상 소속(테스트용)
+  return <ResultPage result={MOCK_RESULT} profile={{ name, jobType, group }} />;
 }
