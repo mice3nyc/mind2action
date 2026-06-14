@@ -367,6 +367,12 @@ egogram/
 - **점수 옆 등급 삭제**: `score-grade`(극고/고/중/저/극저) 렌더 제거. `result.grades` 미사용 → destructure에서 제외. `scoreEngine.getGrade`는 유지(다른 소비자 영향 없음).
 - **색 출처**: `EGO_COLORS`(CP #ef4444·NP #f59e0b·A #38bdf8·FC #10b981·AC #8b5cf6)는 ReportPageV2와 동일 값을 ResultPage에 로컬 복제(EGO_LABELS/EGO_PLAIN_LABEL 중복 선례와 동일 패턴). DB·로직·점수 무변.
 
+#### 6/14 추가 3건 (리포트 유도 + 라벨 크기 + 태그 표기)
+
+- **요약 뒤 리포트 유도 문구**: 요약 문단 아래 `.result-summary-cta` "자세한 성향 코칭은 Mind2Action 성향리포트에서 확인하세요." 추가.
+- **그래프 라벨/수치 크기**: `.score-label-ego` 14→16px(2pt 키움). `.score-value`는 라벨과 같은 크기로 22→16px.
+- **TOP/BOTTOM 태그 표기**: 에고 코드(NP 등) 제거. `TOP1 <span>NP</span> 배려·공감` → `TOP 1. 배려·공감 성향` / `TOP 2. …` / `BOTTOM. 이성·판단 성향`(라벨 뒤 ' 성향' 접미, 코드 span 폐지 → `.result-tag span` CSS 미사용 잔존).
+
 ### 리포트 렌더링 변경 (v0.8 — 손소장 26.0525 라이브 확인)
 
 - **§1 점수 뒤 구간 표기 제거**: `report-trait-ego`에서 `{점수}점 (11-13)` → `{점수}점`. 구간 라벨 괄호 삭제. `getScoreRange` import도 ReportPage에서 제거(미사용)

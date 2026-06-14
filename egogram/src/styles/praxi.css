@@ -386,8 +386,15 @@ p {
 .result-summary {
   font-size: 16px;
   color: var(--text-strong);
-  margin-bottom: 40px;
+  margin-bottom: 12px;
   line-height: 1.7;
+}
+
+.result-summary-cta {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  line-height: 1.6;
 }
 
 .score-grid {
@@ -410,7 +417,7 @@ p {
 
 .score-label-ego {
   font-family: 'Paperlogy', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-strong);
 }
@@ -462,7 +469,7 @@ p {
   text-align: right;
   flex-shrink: 0;
   font-family: 'Paperlogy', sans-serif;
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
 }
 

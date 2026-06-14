@@ -26,6 +26,7 @@ export default function ResultPage({ result, profile }) {
         두 번째는 <EgoName ego={top2} />입니다.
         가장 약한 성향은 <EgoName ego={bottom} />입니다.
       </p>
+      <p className="result-summary-cta">자세한 성향 코칭은 Mind2Action 성향리포트에서 확인하세요.</p>
 
       <div className="score-grid">
         {EGO_STATES.map(ego => {
@@ -64,9 +65,9 @@ export default function ResultPage({ result, profile }) {
       </div>
 
       <div className="result-tags">
-        <div className="result-tag tag-top">TOP1 <span>{top1}</span> {EGO_LABELS[top1]}</div>
-        <div className="result-tag tag-top">TOP2 <span>{top2}</span> {EGO_LABELS[top2]}</div>
-        <div className="result-tag tag-bottom">BOTTOM <span>{bottom}</span> {EGO_LABELS[bottom]}</div>
+        <div className="result-tag tag-top">TOP 1. {EGO_LABELS[top1]} 성향</div>
+        <div className="result-tag tag-top">TOP 2. {EGO_LABELS[top2]} 성향</div>
+        <div className="result-tag tag-bottom">BOTTOM. {EGO_LABELS[bottom]} 성향</div>
       </div>
 
     </section>
