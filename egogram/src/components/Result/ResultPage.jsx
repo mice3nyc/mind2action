@@ -1,16 +1,30 @@
 import { EGO_STATES, EGO_LABELS, getSuccessRange } from '../../lib/scoreEngine';
 
-export default function ResultPage({ result, profile, onRestart }) {
-  const { scores, grades, top1, top2, bottom } = result;
+// 리포트(ReportPageV2 EGO_COLORS)와 동일 값을 로컬 복제 — 성향 이름 컬러 표시용
+const EGO_COLORS = {
+  CP: '#ef4444',
+  NP: '#f59e0b',
+  A: '#38bdf8',
+  FC: '#10b981',
+  AC: '#8b5cf6',
+};
+
+// 성향 이름 — 리포트처럼 컬러+볼드 (코드 없이)
+function EgoName({ ego }) {
+  return <strong style={{ color: EGO_COLORS[ego] }}>{EGO_LABELS[ego]}</strong>;
+}
+
+export default function ResultPage({ result, profile }) {
+  const { scores, top1, top2, bottom } = result;
   const maxScore = 20;
 
   return (
     <section className="result-section">
       <h1>{profile?.name}님의 성향 진단 결과</h1>
       <p className="result-summary">
-        가장 강한 성향은 <strong>{EGO_LABELS[top1]}</strong>({top1}),
-        두 번째는 <strong>{EGO_LABELS[top2]}</strong>({top2})입니다.
-        가장 약한 성향은 <strong>{EGO_LABELS[bottom]}</strong>({bottom})입니다.
+        {profile?.name}님, 가장 강한 성향은 <EgoName ego={top1} />,
+        두 번째는 <EgoName ego={top2} />입니다.
+        가장 약한 성향은 <EgoName ego={bottom} />입니다.
       </p>
 
       <div className="score-grid">
@@ -26,8 +40,7 @@ export default function ResultPage({ result, profile, onRestart }) {
           return (
             <div key={ego} className="score-row">
               <div className="score-label">
-                <div className="score-label-ego">{ego}</div>
-                <div className="score-label-kr">{EGO_LABELS[ego]}</div>
+                <div className="score-label-ego" style={{ color: EGO_COLORS[ego] }}>{EGO_LABELS[ego]}성향</div>
               </div>
               <div className="score-bar-wrap">
                 <div
@@ -44,7 +57,6 @@ export default function ResultPage({ result, profile, onRestart }) {
               </div>
               <div className="score-value">
                 {scores[ego]}
-                <span className="score-grade">{grades[ego]}</span>
               </div>
             </div>
           );

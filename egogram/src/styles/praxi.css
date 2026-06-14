@@ -385,7 +385,7 @@ p {
 
 .result-summary {
   font-size: 16px;
-  color: var(--text-muted);
+  color: var(--text-strong);
   margin-bottom: 40px;
   line-height: 1.7;
 }
@@ -410,7 +410,7 @@ p {
 
 .score-label-ego {
   font-family: 'Paperlogy', sans-serif;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-strong);
 }

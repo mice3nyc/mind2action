@@ -358,6 +358,15 @@ egogram/
 - **하단 카피라이트**: report-container 맨 아래 `<div class="report-copyright">© 2026 MIND2ACTION</div>` (작은 회색 중앙)
 - **참여자 결과화면(ResultPage)**: 총점(`result-total`) + "처음부터 다시" 버튼 삭제 (총점 높낮이 ≠ 성향 우열 / 재시도 = 성향 왜곡). 그래프 경계선은 `profile?.jobType` 반영
 
+### 참여자 결과화면 변경 (6/14 — 리포트 톤 정렬)
+
+> 결과 화면(ResultPage)을 리포트(ReportPageV2)와 같은 톤으로. 피터공 6/14.
+
+- **요약 문장(`result-summary`)**: (1) 기본 폰트 회색(`--text-muted`) → 검정(`--text-strong`) (2) `{이름}님,`으로 시작(호칭) (3) TA 코드 괄호 `(CP)`/`(NP)`/`(A)` 삭제 (4) 성향 이름은 리포트와 동일하게 컬러+볼드(`EGO_COLORS` 인라인). 요약은 "가장 강한 성향은 …"이라 라벨에 '성향' 접미는 붙이지 않음(중복).
+- **그래프 라벨**: 코드 줄(`score-label-ego`의 CP/NP…) 제거 + 한글 라벨에 '성향' 접미(5개 전부: 기준·결단성향/배려·공감성향/이성·판단성향/친화·표현성향/협조·조율성향) + 리포트처럼 `EGO_COLORS` 컬러. 단일 라벨로 통합.
+- **점수 옆 등급 삭제**: `score-grade`(극고/고/중/저/극저) 렌더 제거. `result.grades` 미사용 → destructure에서 제외. `scoreEngine.getGrade`는 유지(다른 소비자 영향 없음).
+- **색 출처**: `EGO_COLORS`(CP #ef4444·NP #f59e0b·A #38bdf8·FC #10b981·AC #8b5cf6)는 ReportPageV2와 동일 값을 ResultPage에 로컬 복제(EGO_LABELS/EGO_PLAIN_LABEL 중복 선례와 동일 패턴). DB·로직·점수 무변.
+
 ### 리포트 렌더링 변경 (v0.8 — 손소장 26.0525 라이브 확인)
 
 - **§1 점수 뒤 구간 표기 제거**: `report-trait-ego`에서 `{점수}점 (11-13)` → `{점수}점`. 구간 라벨 괄호 삭제. `getScoreRange` import도 ReportPage에서 제거(미사용)
