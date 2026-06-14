@@ -373,6 +373,12 @@ egogram/
 - **그래프 라벨/수치 크기**: `.score-label-ego` 14→16px(2pt 키움). `.score-value`는 라벨과 같은 크기로 22→16px.
 - **TOP/BOTTOM 태그 표기**: 에고 코드(NP 등) 제거. `TOP1 <span>NP</span> 배려·공감` → `TOP 1. 배려·공감 성향` / `TOP 2. …` / `BOTTOM. 이성·판단 성향`(라벨 뒤 ' 성향' 접미, 코드 span 폐지 → `.result-tag span` CSS 미사용 잔존).
 
+#### 6/14 추가 4건 (타이틀 문구 + 줄바꿈 + 중앙정렬)
+
+- **타이틀(h1)**: `{이름}님의 성향 진단 결과` → 2줄 `{이름}님, 감사합니다`<br>`Mind2Action 성향 설문을 완료했습니다.`(`<br />`).
+- **요약 줄바꿈**: 두 번째 성향 문장 뒤(`…입니다.`)에 `<br />` → "가장 약한 성향은 …" 줄 분리.
+- **중앙정렬**: 타이틀·안내 멘트만 가운데. `.result-section h1`·`.result-summary`·`.result-summary-cta`에 `text-align: center`(그래프·태그는 그대로).
+
 ### 리포트 렌더링 변경 (v0.8 — 손소장 26.0525 라이브 확인)
 
 - **§1 점수 뒤 구간 표기 제거**: `report-trait-ego`에서 `{점수}점 (11-13)` → `{점수}점`. 구간 라벨 괄호 삭제. `getScoreRange` import도 ReportPage에서 제거(미사용)

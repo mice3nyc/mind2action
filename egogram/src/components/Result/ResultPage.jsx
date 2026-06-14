@@ -20,10 +20,10 @@ export default function ResultPage({ result, profile }) {
 
   return (
     <section className="result-section">
-      <h1>{profile?.name}님의 성향 진단 결과</h1>
+      <h1>{profile?.name}님, 감사합니다<br />Mind2Action 성향 설문을 완료했습니다.</h1>
       <p className="result-summary">
         {profile?.name}님, 가장 강한 성향은 <EgoName ego={top1} />,
-        두 번째는 <EgoName ego={top2} />입니다.
+        두 번째는 <EgoName ego={top2} />입니다.<br />
         가장 약한 성향은 <EgoName ego={bottom} />입니다.
       </p>
       <p className="result-summary-cta">자세한 성향 코칭은 Mind2Action 성향리포트에서 확인하세요.</p>

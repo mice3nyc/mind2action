@@ -381,6 +381,7 @@ p {
 
 .result-section h1 {
   margin-bottom: 8px;
+  text-align: center;
 }
 
 .result-summary {
@@ -388,6 +389,7 @@ p {
   color: var(--text-strong);
   margin-bottom: 12px;
   line-height: 1.7;
+  text-align: center;
 }
 
 .result-summary-cta {
@@ -395,6 +397,7 @@ p {
   color: var(--text-muted);
   margin-bottom: 40px;
   line-height: 1.6;
+  text-align: center;
 }
 
 .score-grid {
