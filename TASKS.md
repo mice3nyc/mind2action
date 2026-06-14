@@ -15,8 +15,11 @@
 - [x] 배포 캐시 레이스 영구 방지: `gh-pages --add` + `deploy:clean` 분리 — 커밋 `8d59d75`. 검증: gh-pages assets에 옛/새 JS 공존·둘 다 200
 - [x] 결과 화면 3건(리포트 유도 문구 / 라벨 16px·수치 16px / TOP·BOTTOM 코드 제거) — 커밋 `545516f`
 - [x] 타이틀 2줄("{이름}님, 감사합니다 / Mind2Action 성향 설문을 완료했습니다.") + 요약 줄바꿈 + 중앙정렬 — 커밋 `0155637`
-- [x] 타이틀 강조(clamp 36~50px·weight 800) + **테스트용 결과 미리보기 `/#/preview/result`**(PreviewResultPage, 고정 목 데이터, `?name=` 변경) — 커밋 `7ed9c43`
-- [x] 빌드 1,204KB·변경 파일 린트 0·`npm run deploy`(--add) 라이브. 최종 `7ed9c43` 서빙
+- [x] 타이틀 강조(weight 800) + **테스트용 결과 미리보기 `/#/preview/result`**(PreviewResultPage, 고정 목 데이터, `?name=`·`?group=` 변경) — 커밋 `7ed9c43`
+- [x] 타이틀 크기 절반(`clamp(36,5.5vw,50)` → `clamp(18,2.75vw,25)`, "너무 크다" 피드백) — 커밋 `9dec9f1`
+- [x] 결과 화면 상단 **소속 배지**(`소속: {profile.group}`, intro 노랑 배지 재사용+중앙정렬, 개인화) — 커밋 `affd5c0`
+- [x] 빌드 1,204KB·변경 파일 린트 0·`npm run deploy`(--add) 라이브. 최종 `affd5c0` 서빙
+- (캐시 팁) 테스트 시 해시 앞 쿼리(`/?r=N#/preview/result`)로 10분 HTML 캐시 우회. 수정 후 "안 바뀜"은 하드 리프레시(Cmd+Shift+R)
 
 ## v0.10 — 손소장 26.0607 수정 14건 (6/9, 세션451)
 
