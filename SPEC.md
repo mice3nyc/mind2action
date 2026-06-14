@@ -379,6 +379,11 @@ egogram/
 - **요약 줄바꿈**: 두 번째 성향 문장 뒤(`…입니다.`)에 `<br />` → "가장 약한 성향은 …" 줄 분리.
 - **중앙정렬**: 타이틀·안내 멘트만 가운데. `.result-section h1`·`.result-summary`·`.result-summary-cta`에 `text-align: center`(그래프·태그는 그대로).
 
+#### 6/14 추가 (타이틀 강조 + 결과 미리보기 라우트)
+
+- **타이틀 강조**: `.result-section h1` 더 크고 볼드 — `font-size: clamp(36px, 5.5vw, 50px)` + `font-weight: 800`(전역 h1 44px/700 위로). 2줄("{이름}님, 감사합니다" / "Mind2Action 성향 설문을 완료했습니다.") 둘 다 적용.
+- **결과 미리보기 라우트(테스트 전용)**: `/#/preview/result` — 설문 없이 결과 화면 레이아웃 확인용. `PreviewResultPage.jsx`가 고정 목 데이터로 `ResultPage` 렌더. 어디에도 링크 안 됨(해시 직접 입력). `?name=` 쿼리로 이름 변경(기본 "테스트"), `?job=`으로 jobType(기본 "관리자"). 가짜 데이터라 실데이터 노출 없음. App.jsx 라우트는 catch-all `/*`(SurveyApp) 앞에 둠.
+
 ### 리포트 렌더링 변경 (v0.8 — 손소장 26.0525 라이브 확인)
 
 - **§1 점수 뒤 구간 표기 제거**: `report-trait-ego`에서 `{점수}점 (11-13)` → `{점수}점`. 구간 라벨 괄호 삭제. `getScoreRange` import도 ReportPage에서 제거(미사용)
