@@ -4,6 +4,7 @@ import { listCampaigns, createCampaign, deleteCampaign } from '../../lib/campaig
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import CampaignManager from './CampaignManager';
 import CampaignDashboard from './CampaignDashboard';
+import CampaignAnalytics from './CampaignAnalytics';
 
 const JOB_TO_REPORT = {
   sales: '보험설계사',
@@ -84,6 +85,7 @@ export default function AdminDashboard({ onLogout }) {
   const [results, setResults] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [filter, setFilter] = useState('all');
+  const [analyticsCampId, setAnalyticsCampId] = useState(null);
 
   async function reload() {
     const [r, c] = await Promise.all([loadResults(), listCampaigns()]);
@@ -99,6 +101,12 @@ export default function AdminDashboard({ onLogout }) {
   function viewCampaignResults(clientName) {
     setFilter(clientName || 'all');
     setTab('results');
+  }
+
+  // 캠페인 목록에서 "분석 보기" → 그 캠페인 분석 탭
+  function viewCampaignAnalytics(campaignId) {
+    setAnalyticsCampId(campaignId);
+    setTab('analytics');
   }
 
   // 캠페인별 참여수 (results 기준)
@@ -233,14 +241,19 @@ export default function AdminDashboard({ onLogout }) {
         <button className={`admin-tab ${tab === 'campaigns' ? 'active' : ''}`} onClick={() => setTab('campaigns')}>캠페인 관리</button>
         <button className={`admin-tab ${tab === 'dashboard' ? 'active' : ''}`} onClick={() => setTab('dashboard')}>진행 현황</button>
         <button className={`admin-tab ${tab === 'results' ? 'active' : ''}`} onClick={() => setTab('results')}>결과 확인</button>
+        <button className={`admin-tab ${tab === 'analytics' ? 'active' : ''}`} onClick={() => setTab('analytics')}>캠페인 분석</button>
       </div>
 
       {tab === 'campaigns' && (
-        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} onDeleteCampaign={handleDeleteCampaign} />
+        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} />
       )}
 
       {tab === 'dashboard' && (
         <CampaignDashboard campaigns={campaigns} counts={counts} />
+      )}
+
+      {tab === 'analytics' && (
+        <CampaignAnalytics campaigns={campaigns} results={results} campId={analyticsCampId} onCampId={setAnalyticsCampId} />
       )}
 
       {tab === 'results' && (

@@ -36,7 +36,7 @@ function StatusBadge({ camp }) {
   return <span className={`campaign-status campaign-status-${camp.status}`}>{STATUS_LABEL[camp.status] || camp.status}</span>;
 }
 
-export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onDeleteCampaign }) {
+export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onViewAnalytics, onDeleteCampaign }) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -207,6 +207,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                 <th>인원</th>
                 <th>설문 링크</th>
                 <th>설문 결과</th>
+                <th>분석</th>
                 <th>전체 PDF</th>
                 <th>관리</th>
               </tr>
@@ -217,7 +218,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                   <td className="td-name">
                     {c.client_name}
                     {c.target && <div className="campaign-target">{c.target}</div>}
-                    {c.memo && <div className="campaign-memo">메모: {c.memo}</div>}
+                    {c.memo && <div className="campaign-memo" style={{ whiteSpace: 'pre-wrap', maxWidth: 170, wordBreak: 'break-word', lineHeight: 1.35 }}>메모: {c.memo}</div>}
                   </td>
                   <td><StatusBadge camp={c} /></td>
                   <td className="td-small">{c.period_start || '-'}</td>
@@ -234,6 +235,13 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                   </td>
                   <td>
                     <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문결과 데이터 보기</button>
+                  </td>
+                  <td>
+                    {counts[c.id] > 0 ? (
+                      <button className="btn-view-results" onClick={() => onViewAnalytics(c.id)} title="이 캠페인의 집단 특성·성과 분석">분석 보기</button>
+                    ) : (
+                      <button className="btn-view-results" disabled title="참여자가 없습니다">분석 보기</button>
+                    )}
                   </td>
                   <td>
                     {counts[c.id] > 0 ? (
