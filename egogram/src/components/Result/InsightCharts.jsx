@@ -1,0 +1,160 @@
+import { getSuccessRange } from '../../lib/scoreEngine';
+
+// 결과 화면 인사이트 팝업용 시각화 (검토 프로토타입, 26.0616).
+//   - MyRadar: 개인 5축 펜타곤 레이더 ('내 성향의 모양') + 조율 불필요 구간 가이드 밴드
+//   - GroupCompare: 개인 vs 그룹 평균 오버레이 레이더 + 축별 차이 막대 ('전체 속 내 위치')
+// 라이브 리포트/설문 점수 로직엔 영향 없음. 같은 색·라벨 규칙(ReportPageV2)을 로컬 복제.
+
+const EGO_KEYS = ['CP', 'NP', 'A', 'FC', 'AC'];
+const EGO_COLORS = { CP: '#ef4444', NP: '#f59e0b', A: '#38bdf8', FC: '#10b981', AC: '#8b5cf6' };
+const EGO_PLAIN_LABEL = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
+const ACCENT = '#0012de'; // 개인 점수 강조색 (분석 레이더와 동일 톤)
+const MAX = 20;
+
+// 펜타곤 좌표 계산기 — 위 꼭짓점(-90도)에서 시계방향.
+function makeGeo(size, R) {
+  const cx = size / 2, cy = size / 2;
+  const angle = (i) => (Math.PI * 2 * i) / 5 - Math.PI / 2;
+  const pt = (i, v) => {
+    const r = (v / MAX) * R, a = angle(i);
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  };
+  const axisEnd = (i, mul = 1) => {
+    const a = angle(i);
+    return [cx + R * mul * Math.cos(a), cy + R * mul * Math.sin(a)];
+  };
+  return { cx, cy, pt, axisEnd };
+}
+
+const polyStr = (scores, geo) => EGO_KEYS.map((k, i) => geo.pt(i, scores[k]).join(',')).join(' ');
+
+// 그리드(동심 펜타곤 + 축선)
+function Grid({ geo }) {
+  return (
+    <>
+      {[0.25, 0.5, 0.75, 1].map((m) => (
+        <polygon key={m}
+          points={EGO_KEYS.map((_, i) => geo.axisEnd(i, m).join(',')).join(' ')}
+          fill="none" stroke="#e8e8e8" strokeWidth="1" strokeDasharray="2 3" />
+      ))}
+      {EGO_KEYS.map((k, i) => {
+        const [x, y] = geo.axisEnd(i);
+        return <line key={k} x1={geo.cx} y1={geo.cy} x2={x} y2={y} stroke="#ececec" strokeWidth="1" />;
+      })}
+    </>
+  );
+}
+
+// 축 라벨 (평이 라벨 + 점수)
+function AxisLabels({ geo, scores }) {
+  return EGO_KEYS.map((k, i) => {
+    const [lx, ly] = geo.axisEnd(i, 1.26);
+    return (
+      <text key={k} x={lx} y={ly} textAnchor="middle" dominantBaseline="middle"
+        fontSize="12" fontWeight="700" fill={EGO_COLORS[k]}>
+        <tspan x={lx} dy="-0.35em">{EGO_PLAIN_LABEL[k]}</tspan>
+        {scores && <tspan x={lx} dy="1.25em" fontSize="11" fill="#888">{scores[k]}</tspan>}
+      </text>
+    );
+  });
+}
+
+// ── 내 성향의 모양 ───────────────────────────────────────────
+export function MyRadar({ scores, jobType }) {
+  const size = 300, R = 92;
+  const geo = makeGeo(size, R);
+
+  // 조율 불필요(정상) 구간을 밴드로 — 직무별 [low, high]. 바깥(high)−안쪽(low) 링.
+  const lowScores = {}, highScores = {};
+  EGO_KEYS.forEach((k) => {
+    const [lo, hi] = getSuccessRange(k, jobType);
+    lowScores[k] = lo; highScores[k] = hi;
+  });
+  const bandPath = `M${polyStr(highScores, geo).replace(/ /g, 'L')}Z M${polyStr(lowScores, geo).replace(/ /g, 'L')}Z`;
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block', margin: '0 auto', maxWidth: '100%' }}>
+      <Grid geo={geo} />
+      <path d={bandPath} fillRule="evenodd" fill="#10b98114" stroke="none" />
+      <polygon points={polyStr(scores, geo)} fill={`${ACCENT}1f`} stroke={ACCENT} strokeWidth="2.5" strokeLinejoin="round" />
+      {EGO_KEYS.map((k, i) => {
+        const [px, py] = geo.pt(i, scores[k]);
+        return <circle key={k} cx={px} cy={py} r="4" fill={EGO_COLORS[k]} stroke="#fff" strokeWidth="1.5" />;
+      })}
+      <AxisLabels geo={geo} scores={scores} />
+    </svg>
+  );
+}
+
+// ── 전체 속 내 위치: 오버레이 레이더 ──────────────────────────
+export function GroupRadar({ scores, groupAvg }) {
+  const size = 300, R = 92;
+  const geo = makeGeo(size, R);
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block', margin: '0 auto', maxWidth: '100%' }}>
+      <Grid geo={geo} />
+      {/* 그룹 평균 — 점선 회색, 채움 없음 */}
+      <polygon points={polyStr(groupAvg, geo)} fill="none" stroke="#9aa0a6" strokeWidth="2" strokeDasharray="5 4" strokeLinejoin="round" />
+      {/* 나 — 강조색 채움 */}
+      <polygon points={polyStr(scores, geo)} fill={`${ACCENT}1f`} stroke={ACCENT} strokeWidth="2.5" strokeLinejoin="round" />
+      {EGO_KEYS.map((k, i) => {
+        const [px, py] = geo.pt(i, scores[k]);
+        return <circle key={k} cx={px} cy={py} r="4" fill={EGO_COLORS[k]} stroke="#fff" strokeWidth="1.5" />;
+      })}
+      <AxisLabels geo={geo} />
+    </svg>
+  );
+}
+
+// ── 전체 속 내 위치: 축별 차이 막대 ──────────────────────────
+export function DiffBars({ scores, groupAvg }) {
+  return (
+    <div style={{ marginTop: 4 }}>
+      {EGO_KEYS.map((k) => {
+        const me = scores[k];
+        const avg = groupAvg[k];
+        const diff = Math.round((me - avg) * 10) / 10;
+        const sign = diff > 0 ? '+' : '';
+        const diffColor = diff > 0 ? '#0a7d33' : diff < 0 ? '#b4231f' : '#999';
+        return (
+          <div key={k} style={{ margin: '11px 0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: EGO_COLORS[k] }}>{EGO_PLAIN_LABEL[k]}</span>
+              <span style={{ fontSize: 12, color: '#555' }}>
+                나 <b style={{ color: EGO_COLORS[k] }}>{me}</b>
+                <span style={{ color: '#bbb' }}> · 평균 {Math.round(avg * 10) / 10}</span>
+                <b style={{ color: diffColor, marginLeft: 6 }}>{diff === 0 ? '평균' : `${sign}${diff}`}</b>
+              </span>
+            </div>
+            <div style={{ position: 'relative', height: 14, background: '#f4f4f4', borderRadius: 7 }}>
+              {/* 내 막대 */}
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: `${(me / MAX) * 100}%`, background: EGO_COLORS[k], borderRadius: 7, opacity: 0.85 }} />
+              {/* 그룹 평균 눈금 */}
+              <div style={{ position: 'absolute', left: `${(avg / MAX) * 100}%`, top: -3, bottom: -3, width: 2, marginLeft: -1, background: '#444' }} />
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ display: 'flex', gap: 14, marginTop: 12, fontSize: 11, color: '#888' }}>
+        <span><span style={{ display: 'inline-block', width: 14, height: 8, background: '#bbb', borderRadius: 4, verticalAlign: 'middle', marginRight: 4 }} />막대 = 내 점수</span>
+        <span><span style={{ display: 'inline-block', width: 2, height: 12, background: '#444', verticalAlign: 'middle', marginRight: 4 }} />세로선 = 그룹 평균</span>
+      </div>
+    </div>
+  );
+}
+
+// 그룹 평균 대비 두드러진 차이 한 줄 요약 (위로 가장 큰 것 + 아래로 가장 큰 것)
+export function diffHeadline(scores, groupAvg) {
+  const diffs = EGO_KEYS.map((k) => ({ k, d: scores[k] - groupAvg[k] }));
+  const up = [...diffs].sort((a, b) => b.d - a.d)[0];
+  const down = [...diffs].sort((a, b) => a.d - b.d)[0];
+  const high = up.d >= 1.5 ? EGO_PLAIN_LABEL[up.k] : null;
+  const low = down.d <= -1.5 ? EGO_PLAIN_LABEL[down.k] : null;
+  // 다섯 평이 라벨은 모두 받침으로 끝남 → 조사는 항상 '이'/'은'
+  if (high && low) return `그룹 평균보다 ${high}이 높고, ${low}은 낮은 편입니다.`;
+  if (high) return `그룹 평균보다 ${high} 성향이 두드러집니다.`;
+  if (low) return `그룹 평균보다 ${low} 성향이 낮은 편입니다.`;
+  return '그룹 평균과 전반적으로 비슷한 분포입니다.';
+}
+
+export { EGO_COLORS, EGO_PLAIN_LABEL };

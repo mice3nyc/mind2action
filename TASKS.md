@@ -10,6 +10,22 @@
 
 > 현재 단계: **Phase 1 ✅ + Phase 2 부분 완료 + Phase 3 보험설계사 1차 + 5/18 회의 반영**
 
+## 결과 화면 성향 인사이트 팝업 (검토 프로토타입) — 6/16 (세션492)
+
+> 개인 리포트 만족도용 두 그래프 시험. **관리자 결과 테이블 개인 행 "그래프 보기" 버튼** → 모달 2탭. 라이브 설문/리포트/점수 무변. 명세 = `egogram/docs/SPEC-result-insight.md`. 요청 노트 [[요청.26.0616.1620-결과화면인사이트팝업]].
+> ⚠️ 26.0616 정정: 처음 참가자 결과 화면(ResultPage)에 달았다가 — 참가자 노출 금지 지적 — 관리자 페이지로 이동. ResultPage/SurveyApp/PreviewResultPage 원복.
+- [x] `storage.js` — `loadCampaignAverage(campaignId)` 신설(캠페인 5축 평균+표본 n 집계 조회)
+- [x] `InsightCharts.jsx` 신설 — MyRadar(개인 레이더+조율 구간 밴드)·GroupRadar(나 vs 평균 오버레이)·DiffBars(축별 차이)·diffHeadline
+- [x] `ResultInsightModal.jsx` 신설 — 탭2개(내 성향의 모양 / 전체 속 내 위치), campaignId 라이브 조회
+- [x] `AdminDashboard.jsx` 결과 테이블 개인 행에 "그래프 보기" 버튼 + 모달 연결(insightRow state, 행 r에서 scores·top1·top2·bottom·jobType·name·group·campaignId 전달)
+- [x] 참가자 화면 원복: ResultPage 버튼/모달 제거, SurveyApp campaignId 전달 제거, PreviewResultPage 예시 평균 제거
+- [x] 모달 이전/다음 사람 이동(상단 nav 바 + 키보드 ←→, Esc 닫기, `insightIdx` 인덱스 추적, 끝 비활성)
+- [x] 결과 테이블 손질: `.admin-table-wrap` 중복 규칙 제거→`overflow-x:auto`(창 폭 초과 방지) / 소속 셀 `.td-dept` 줄바꿈 / "그래프 보기" 버튼 2줄
+- [x] "샘플 20명" 버튼 삭제(더 이상 불필요) + 죽은 `handleLoadSample`·`sampleData`/`saveResult`/`createCampaign` import 정리 (96모듈)
+- [x] vite build 통과. CDP 헤드리스로 모달 단독 검증(두 탭 렌더·폴리곤·헤드라인·JS 에러 0). admin은 로그인이라 육안 검토.
+- [x] 커밋·푸시 + 라이브 배포(`npm run deploy`) — 피터공 요청 6/16
+- [ ] 피터공 육안 검토 (`#/admin` → 결과 확인 → 행 "그래프 보기" + 이전/다음 이동) → 유지/가감·리포트 편입 여부
+
 ## 캠페인 분석 페이지 (강사 사전 준비용) — 6/16
 
 > 추가 모니터링 화면. admin `#/admin` 탭 신설("캠페인 분석"). 라이브 설문/리포트/점수 로직 무변, admin 표시만 추가. 명세 = `egogram/docs/SPEC-analytics.md`. 요청 노트 [[요청.26.0616.1528-에고그램분석대시보드]].

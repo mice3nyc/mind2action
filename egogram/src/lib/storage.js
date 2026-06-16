@@ -62,6 +62,23 @@ export async function loadResults() {
   }));
 }
 
+// 캠페인 평균 5축 점수 + 표본 수. 집계만 조회(타인 개별 데이터 비노출).
+// 결과 화면 "전체 속 내 위치" 비교용. campaignId 없으면 null.
+export async function loadCampaignAverage(campaignId) {
+  if (!campaignId) return null;
+  const { data, error } = await supabase
+    .from('responses')
+    .select('score_cp, score_np, score_a, score_fc, score_ac')
+    .eq('campaign_id', campaignId);
+  if (error || !data || data.length === 0) return null;
+  const cols = { CP: 'score_cp', NP: 'score_np', A: 'score_a', FC: 'score_fc', AC: 'score_ac' };
+  const avg = {};
+  for (const [k, col] of Object.entries(cols)) {
+    avg[k] = data.reduce((s, r) => s + (r[col] ?? 0), 0) / data.length;
+  }
+  return { avg, n: data.length };
+}
+
 export async function deleteResult(id) {
   const { error } = await supabase.from('responses').delete().eq('id', id);
   if (error) console.error('Delete failed:', error);

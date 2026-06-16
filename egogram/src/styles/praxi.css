@@ -618,13 +618,10 @@ p {
 }
 
 .admin-table-wrap {
-  overflow-x: auto;
+  overflow-x: auto;          /* 테이블이 넓으면 창 밖으로 밀지 않고 이 영역 안에서 가로 스크롤 */
+  max-width: 100%;
   border: 1px solid var(--border);
   border-radius: 8px;
-}
-
-.admin-table-wrap {
-  overflow-x: visible;
 }
 
 .admin-table {
@@ -673,6 +670,14 @@ p {
 .td-name {
   font-weight: 600;
   font-size: 15px;
+}
+
+/* 소속(부서)은 길면 줄바꿈 — 한 줄 강제(nowrap)에서 예외, 폭 상한 */
+.td-dept {
+  white-space: normal;
+  word-break: keep-all;
+  max-width: 140px;
+  min-width: 80px;
 }
 
 .td-score {

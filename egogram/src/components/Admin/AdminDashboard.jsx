@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { loadResults, deleteResult, saveResult } from '../../lib/storage';
-import { listCampaigns, createCampaign, deleteCampaign } from '../../lib/campaigns';
+import { loadResults, deleteResult } from '../../lib/storage';
+import { listCampaigns, deleteCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import CampaignManager from './CampaignManager';
 import CampaignDashboard from './CampaignDashboard';
 import CampaignAnalytics from './CampaignAnalytics';
+import ResultInsightModal from '../Result/ResultInsightModal';
 
 const JOB_TO_REPORT = {
   sales: '보험설계사',
@@ -15,7 +16,6 @@ const JOB_TO_REPORT = {
   division_head: '관리자',
   executive: '관리자',
 };
-import sampleData from '../../data/sampleResults.json';
 
 const JOB_LABELS = {
   sales: '고객 컨설팅 영업',
@@ -86,6 +86,7 @@ export default function AdminDashboard({ onLogout }) {
   const [campaigns, setCampaigns] = useState([]);
   const [filter, setFilter] = useState('all');
   const [analyticsCampId, setAnalyticsCampId] = useState(null);
+  const [insightIdx, setInsightIdx] = useState(null); // 개인 인사이트 팝업 — filtered 내 인덱스 (검토 프로토타입 26.0616)
 
   async function reload() {
     const [r, c] = await Promise.all([loadResults(), listCampaigns()]);
@@ -153,38 +154,6 @@ export default function AdminDashboard({ onLogout }) {
       downloadResultsCSV(campRows, `backup_${campaign.client_name}_${new Date().toISOString().slice(0, 10)}.csv`);
     }
     await deleteCampaign(campaign.id);
-    await reload();
-  }
-
-  async function handleLoadSample() {
-    // 샘플 그룹별로 캠페인 확보 (없으면 생성, 있으면 재사용) → 응답에 연결
-    const existing = await listCampaigns();
-    const byName = {};
-    for (const c of existing) byName[c.client_name] = c;
-    const sampleGroups = [...new Set(sampleData.map(r => r.group))];
-    const idByGroup = {};
-    let idx = 0;
-    for (const g of sampleGroups) {
-      if (byName[g]) {
-        idByGroup[g] = byName[g].id;
-      } else {
-        const periodStart = new Date(Date.now() + idx * 7 * 86400000).toISOString().slice(0, 10);
-        const camp = await createCampaign({
-          clientName: g, target: '샘플 캠페인', status: 'active',
-          periodStart, periodEnd: null, educationDate: null, memo: '테스트용 샘플 데이터',
-        });
-        idByGroup[g] = camp.id;
-      }
-      idx++;
-    }
-    // 샘플 응답 저장 (campaign_id 연결)
-    for (const r of sampleData) {
-      await saveResult(
-        { group: r.group, name: r.name, birthDate: r.birthDate, careerMonths: r.careerMonths, company: r.company || '', department: r.department, jobType: r.jobType, incomeRange: r.incomeRange, recruitCount: r.recruitCount },
-        { scores: r.scores, grades: r.grades, top1: r.top1, top2: r.top2, bottom: r.bottom, total: r.total },
-        idByGroup[r.group] || null
-      );
-    }
     await reload();
   }
 
@@ -273,9 +242,6 @@ export default function AdminDashboard({ onLogout }) {
               </select>
             </div>
             <div className="admin-actions">
-              <button className="btn btn-secondary" onClick={handleLoadSample}>
-                샘플 20명
-              </button>
               <button className="btn btn-primary" onClick={handleExportCSV} disabled={filtered.length === 0}>
                 CSV 다운로드
               </button>
@@ -310,14 +276,14 @@ export default function AdminDashboard({ onLogout }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map(r => (
+                  {filtered.map((r, ri) => (
                     <tr key={r.id}>
                       <td><GroupBadge group={r.group} /></td>
                       <td className="td-name">{r.name}</td>
                       <td>{r.birthDate}</td>
                       <td>{r.careerMonths && `${r.careerMonths}개월`}</td>
                       <td>{r.company || '-'}</td>
-                      <td>{r.department}</td>
+                      <td className="td-dept">{r.department}</td>
                       <td>{JOB_LABELS[r.jobType] || r.jobType}</td>
                       <td className="td-small">{INCOME_LABELS[r.incomeRange] || '-'}</td>
                       <td>{r.recruitCount || '-'}</td>
@@ -333,6 +299,10 @@ export default function AdminDashboard({ onLogout }) {
                           <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
                             리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
                           </a>
+                          {/* 성향 인사이트 팝업 (검토 프로토타입 26.0616) */}
+                          <button type="button" className="btn-report-action btn-graph-action" onClick={() => setInsightIdx(ri)}>
+                            그래프<br />보기
+                          </button>
                         </div>
                       </td>
                       <td>
@@ -346,6 +316,23 @@ export default function AdminDashboard({ onLogout }) {
           )}
         </>
       )}
+
+      {/* 개인 성향 인사이트 팝업 (검토 프로토타입 26.0616) — 결과 행 "그래프 보기" + 이전/다음 이동 */}
+      {(() => {
+        const cur = insightIdx != null ? filtered[insightIdx] : null;
+        return (
+          <ResultInsightModal
+            open={insightIdx != null && !!cur}
+            onClose={() => setInsightIdx(null)}
+            result={cur ? { scores: cur.scores, top1: cur.top1, top2: cur.top2, bottom: cur.bottom } : { scores: {} }}
+            profile={cur ? { name: cur.name, jobType: cur.jobType, group: cur.group } : null}
+            campaignId={cur?.campaignId || null}
+            position={insightIdx != null ? `${insightIdx + 1} / ${filtered.length}` : ''}
+            onPrev={insightIdx > 0 ? () => setInsightIdx(insightIdx - 1) : null}
+            onNext={insightIdx != null && insightIdx < filtered.length - 1 ? () => setInsightIdx(insightIdx + 1) : null}
+          />
+        );
+      })()}
     </section>
   );
 }
