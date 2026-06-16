@@ -21,6 +21,33 @@ import sys, os, openpyxl, yaml
 
 EGOS = ['CP', 'NP', 'A', 'FC', 'AC']
 
+# 손소장 원본 엑셀에 잔존하는 명백한 오타 일괄 교정 (v0.12.2, 6/16).
+# 모두 정상 텍스트엔 나타나지 않는 안전한 정확 문자열 치환이라 어떤 엑셀이 와도 자동 교정된다.
+# 교정안이 불확실한 건(코치 FC_NP_A "활을", FC_A_AC 고아문장, 컨설턴트 NP_FC_AC "충분합니다,")은
+# 손소장 확인 전까지 제외 — 여기 넣지 않는다.
+TYPO_FIXES = [
+    ('위헤서', '위해서'),
+    ('즉즉,', '즉,'),
+    ('조직의 조직의 원칙과', '조직의 원칙과'),
+    ('점수가 높기 현재', '점수가 높기 때문에 현재'),
+    ('상태을', '상태를'),
+    ('됩니다。', '됩니다.'),
+    ('훌륭합니다.여기에', '훌륭합니다. 여기에'),
+    ('이 상황애서', '이 상황에서'),
+]
+
+
+def fix_typos(obj):
+    if isinstance(obj, dict):
+        return {k: fix_typos(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [fix_typos(v) for v in obj]
+    if isinstance(obj, str):
+        for a, b in TYPO_FIXES:
+            obj = obj.replace(a, b)
+        return obj
+    return obj
+
 CM6_COMMON_OUT = '/Users/p.air15/Neo-Obsi-Sync/_dev/mind2action/egogram/src/data/cm6_common_consultant.yaml'
 
 # 직군별 원본 xlsx 파일명. 파일명 패턴이 직군마다 달라 명시적 매핑으로 둔다.
@@ -294,13 +321,15 @@ def convert(role, old_path, out_path):
     data['cm7'] = {}                                         # v0.9 폐기 (리크루팅 시트 사라짐)
     data['cm8'] = old['cm8']                                 # 유지(렌더 폐기)
 
+    data = fix_typos(data)                                   # v0.12.2 명백 오타 일괄 교정
+
     with open(out_path, 'w') as f:
         yaml.dump(data, f, allow_unicode=True, default_flow_style=False,
                   sort_keys=False, width=10**9)
 
     # 컨설턴트면 cm6_common도 동시 출력 (계약체결 행 제거 반영)
     if role == '컨설턴트':
-        cmc = parse_cm6_common(sheet('CM6공통적용'))
+        cmc = fix_typos(parse_cm6_common(sheet('CM6공통적용')))
         with open(CM6_COMMON_OUT, 'w') as f:
             yaml.dump(cmc, f, allow_unicode=True, default_flow_style=False,
                       sort_keys=False, width=10**9)
