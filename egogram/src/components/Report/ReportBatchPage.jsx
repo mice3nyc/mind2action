@@ -1,12 +1,19 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { ReportViewV2 } from './ReportPageV2';
+import { sortRows, isValidSortKey } from '../../lib/resultLabels';
 
 // 단체별 일괄 리포트 — 한 캠페인 전 참여자를 한 화면에 쌓아
 // 브라우저 "PDF로 저장"으로 단일 PDF를 뽑는다 (CAMPAIGNS.md §9).
+// 결과 테이블(AdminDashboard)에서 정렬 중이던 기준(?sortKey=&sortDir=)이 있으면 그 순서를 그대로 따른다 (7/3).
 export default function ReportBatchPage() {
   const { campaignId } = useParams();
+  const [searchParams] = useSearchParams();
+  const sortKeyParam = searchParams.get('sortKey');
+  const sortConfig = isValidSortKey(sortKeyParam)
+    ? { key: sortKeyParam, dir: searchParams.get('sortDir') === 'desc' ? 'desc' : 'asc' }
+    : null;
   const [campaign, setCampaign] = useState(null);
   const [rows, setRows] = useState(null); // null=로딩, []=참여자 없음
   const [error, setError] = useState(null);
@@ -30,9 +37,11 @@ export default function ReportBatchPage() {
         return;
       }
       setCampaign(camp || null);
-      setRows(resp || []);
+      setRows(sortRows(resp || [], sortConfig));
     }
     load();
+    // sortConfig는 URL(searchParams)에서 매 렌더 새로 만들어지지만 값은 campaignId 로드 시점 것으로 충분 — 정렬 자체는 로드 후 1회만 적용
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [campaignId]);
 
   // 점진 렌더 — 한 번에 다 마운트하면 큰 단체(40명+)에서 멈칫.

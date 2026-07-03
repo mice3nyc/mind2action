@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { loadResults, deleteResult } from '../../lib/storage';
 import { listCampaigns, deleteCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
+import { JOB_LABELS, INCOME_LABELS, sortRows } from '../../lib/resultLabels';
 import CampaignManager from './CampaignManager';
 import CampaignDashboard from './CampaignDashboard';
 import CampaignAnalytics from './CampaignAnalytics';
@@ -16,30 +17,6 @@ const JOB_TO_REPORT = {
   division_head: '관리자',
   executive: '관리자',
 };
-
-const JOB_LABELS = {
-  sales: '고객 컨설팅 영업',
-  coach: '신인 육성 코칭',
-  sales_leader: '조직운영 리더',
-  branch_manager: '지점장/지사장',
-  training_leader: '교육팀장/지원팀장',
-  division_head: '사업단장/부장',
-  executive: '본부장',
-};
-
-const INCOME_LABELS = {
-  under200: '200만 미만',
-  '200-400': '200~400만',
-  '400-600': '400~600만',
-  '600-800': '600~800만',
-  '800-1000': '800~1000만',
-  '1000-1500': '1000~1500만',
-  '1500-2000': '1500~2000만',
-  over2000: '2000만 이상',
-};
-
-// 소득 구간 실제 크기 순서 (사전순 아님 — 1000-1500이 200-400보다 커야 함)
-const INCOME_ORDER = ['under200', '200-400', '400-600', '600-800', '800-1000', '1000-1500', '1500-2000', 'over2000'];
 
 const EGO_COLORS = {
   CP: { bg: '#ef4444', light: '#fef2f2', text: '#dc2626' },
@@ -143,23 +120,7 @@ export default function AdminDashboard({ onLogout }) {
     });
   }
 
-  function sortValue(r, key) {
-    if (key === 'department') return r.department || '';
-    if (key === 'jobType') return JOB_LABELS[r.jobType] || r.jobType || '';
-    if (key === 'incomeRange') return INCOME_ORDER.indexOf(r.incomeRange);
-    return '';
-  }
-
-  const sorted = sortConfig
-    ? filtered.slice().sort((a, b) => {
-        const va = sortValue(a, sortConfig.key);
-        const vb = sortValue(b, sortConfig.key);
-        const cmp = typeof va === 'number' && typeof vb === 'number'
-          ? va - vb
-          : String(va).localeCompare(String(vb), 'ko');
-        return sortConfig.dir === 'asc' ? cmp : -cmp;
-      })
-    : filtered;
+  const sorted = sortRows(filtered, sortConfig);
 
   const groupCounts = {};
   for (const r of results) {
@@ -258,7 +219,7 @@ export default function AdminDashboard({ onLogout }) {
       </div>
 
       {tab === 'campaigns' && (
-        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} />
+        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} sortConfig={sortConfig} />
       )}
 
       {tab === 'dashboard' && (

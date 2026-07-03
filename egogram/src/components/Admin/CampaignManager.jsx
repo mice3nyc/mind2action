@@ -36,7 +36,9 @@ function StatusBadge({ camp }) {
   return <span className={`campaign-status campaign-status-${camp.status}`}>{STATUS_LABEL[camp.status] || camp.status}</span>;
 }
 
-export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onViewAnalytics, onDeleteCampaign }) {
+export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onViewAnalytics, onDeleteCampaign, sortConfig }) {
+  // 결과 테이블에서 정렬 중이면 전체 PDF도 같은 기준으로 — 쿼리스트링으로 전달
+  const batchLinkParams = sortConfig ? `?sortKey=${sortConfig.key}&sortDir=${sortConfig.dir}` : '';
   const [form, setForm] = useState(EMPTY_FORM);
   const [creating, setCreating] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -247,7 +249,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     {counts[c.id] > 0 ? (
                       <a
                         className="btn-view-results"
-                        href={`#/report-batch/${c.id}`}
+                        href={`#/report-batch/${c.id}${batchLinkParams}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         title="전 참여자 리포트를 한 화면에 모아 PDF로 저장"
