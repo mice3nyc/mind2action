@@ -38,6 +38,9 @@ const INCOME_LABELS = {
   over2000: '2000만 이상',
 };
 
+// 소득 구간 실제 크기 순서 (사전순 아님 — 1000-1500이 200-400보다 커야 함)
+const INCOME_ORDER = ['under200', '200-400', '400-600', '600-800', '800-1000', '1000-1500', '1500-2000', 'over2000'];
+
 const EGO_COLORS = {
   CP: { bg: '#ef4444', light: '#fef2f2', text: '#dc2626' },
   NP: { bg: '#f59e0b', light: '#fffbeb', text: '#d97706' },
@@ -80,6 +83,19 @@ function GroupBadge({ group }) {
   return <span className="group-badge" style={{ background: c.bg, color: c.text }}>{group || '-'}</span>;
 }
 
+// 클릭 정렬 헤더 — 소속/직무/소득에서 재사용. 버튼 형태로 정렬 가능함을 항상 표시(⇅)
+function SortableTh({ label, sortKey, sortConfig, onSort }) {
+  const active = sortConfig?.key === sortKey;
+  const arrow = active ? (sortConfig.dir === 'asc' ? '▲' : '▼') : '⇅';
+  return (
+    <th className="th-sortable">
+      <button type="button" className={`th-sort-btn ${active ? 'th-sort-btn-active' : ''}`} onClick={() => onSort(sortKey)}>
+        {label}<span className="th-sort-arrow">{arrow}</span>
+      </button>
+    </th>
+  );
+}
+
 export default function AdminDashboard({ onLogout }) {
   const [tab, setTab] = useState('results');
   const [results, setResults] = useState([]);
@@ -87,6 +103,7 @@ export default function AdminDashboard({ onLogout }) {
   const [filter, setFilter] = useState('all');
   const [analyticsCampId, setAnalyticsCampId] = useState(null);
   const [insightIdx, setInsightIdx] = useState(null); // 개인 인사이트 팝업 — filtered 내 인덱스 (검토 프로토타입 26.0616)
+  const [sortConfig, setSortConfig] = useState(null); // { key: 'department'|'jobType'|'incomeRange', dir: 'asc'|'desc' } — null=기본(입력순)
 
   async function reload() {
     const [r, c] = await Promise.all([loadResults(), listCampaigns()]);
@@ -117,6 +134,33 @@ export default function AdminDashboard({ onLogout }) {
   }
 
   const filtered = filter === 'all' ? results : results.filter(r => r.group === filter);
+
+  // 헤더 클릭 정렬 — 소속/직무/소득 3개 지원. 같은 헤더 재클릭 시 오름↔내림 토글, 다른 헤더 클릭 시 오름차순부터.
+  function handleSort(key) {
+    setSortConfig(prev => {
+      if (prev?.key === key) return { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' };
+      return { key, dir: 'asc' };
+    });
+  }
+
+  function sortValue(r, key) {
+    if (key === 'department') return r.department || '';
+    if (key === 'jobType') return JOB_LABELS[r.jobType] || r.jobType || '';
+    if (key === 'incomeRange') return INCOME_ORDER.indexOf(r.incomeRange);
+    return '';
+  }
+
+  const sorted = sortConfig
+    ? filtered.slice().sort((a, b) => {
+        const va = sortValue(a, sortConfig.key);
+        const vb = sortValue(b, sortConfig.key);
+        const cmp = typeof va === 'number' && typeof vb === 'number'
+          ? va - vb
+          : String(va).localeCompare(String(vb), 'ko');
+        return sortConfig.dir === 'asc' ? cmp : -cmp;
+      })
+    : filtered;
+
   const groupCounts = {};
   for (const r of results) {
     if (r.group) groupCounts[r.group] = (groupCounts[r.group] || 0) + 1;
@@ -233,7 +277,7 @@ export default function AdminDashboard({ onLogout }) {
               <select
                 className="form-input results-filter-select"
                 value={filter}
-                onChange={e => setFilter(e.target.value)}
+                onChange={e => { setFilter(e.target.value); setSortConfig(null); }}
               >
                 <option value="all">전체 ({results.length})</option>
                 {filterOptions.map(g => (
@@ -260,9 +304,9 @@ export default function AdminDashboard({ onLogout }) {
                     <th>생년월일</th>
                     <th>경력</th>
                     <th>회사</th>
-                    <th>소속</th>
-                    <th>직무</th>
-                    <th>소득</th>
+                    <SortableTh label="소속" sortKey="department" sortConfig={sortConfig} onSort={handleSort} />
+                    <SortableTh label="직무" sortKey="jobType" sortConfig={sortConfig} onSort={handleSort} />
+                    <SortableTh label="소득" sortKey="incomeRange" sortConfig={sortConfig} onSort={handleSort} />
                     <th>리크루팅</th>
                     {egoKeys.map(e => (
                       <th key={e} className="th-ego" style={{ color: EGO_COLORS[e].bg }}>{e}</th>
@@ -276,7 +320,7 @@ export default function AdminDashboard({ onLogout }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((r, ri) => (
+                  {sorted.map((r, ri) => (
                     <tr key={r.id}>
                       <td><GroupBadge group={r.group} /></td>
                       <td className="td-name">{r.name}</td>
@@ -319,7 +363,7 @@ export default function AdminDashboard({ onLogout }) {
 
       {/* 개인 성향 인사이트 팝업 (검토 프로토타입 26.0616) — 결과 행 "그래프 보기" + 이전/다음 이동 */}
       {(() => {
-        const cur = insightIdx != null ? filtered[insightIdx] : null;
+        const cur = insightIdx != null ? sorted[insightIdx] : null;
         return (
           <ResultInsightModal
             open={insightIdx != null && !!cur}
@@ -327,9 +371,9 @@ export default function AdminDashboard({ onLogout }) {
             result={cur ? { scores: cur.scores, top1: cur.top1, top2: cur.top2, bottom: cur.bottom } : { scores: {} }}
             profile={cur ? { name: cur.name, jobType: cur.jobType, group: cur.group } : null}
             campaignId={cur?.campaignId || null}
-            position={insightIdx != null ? `${insightIdx + 1} / ${filtered.length}` : ''}
+            position={insightIdx != null ? `${insightIdx + 1} / ${sorted.length}` : ''}
             onPrev={insightIdx > 0 ? () => setInsightIdx(insightIdx - 1) : null}
-            onNext={insightIdx != null && insightIdx < filtered.length - 1 ? () => setInsightIdx(insightIdx + 1) : null}
+            onNext={insightIdx != null && insightIdx < sorted.length - 1 ? () => setInsightIdx(insightIdx + 1) : null}
           />
         );
       })()}
