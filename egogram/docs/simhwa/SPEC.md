@@ -96,7 +96,8 @@ status: v0.2 (뼈대 완료 2026-07-11 — yaml 3종·buildSimhwa·SimhwaReportV
 ### 6. 렌더
 
 - 신규 `SimhwaReportView({ row })` (ReportViewV2 형제). 9섹션 렌더러. 공용 `EGO_COLORS`·`colorizeEgo`·`Paragraphs`·`ScoreChart`·`deepReplaceOOO` 재사용. 룩=🍀 샘플 md(이모지 소제목 🔴🌿💼🗣🚫📌🍀 컬러 헤더, 컴팩트 줄간격, A4 print).
-- 라우트 `/simhwa/:id` (HashRouter), 배치 `/simhwa-batch/:campaignId`.
+- 라우트 `/simhwa/:id` (HashRouter), 배치 `/simhwa-batch/:campaignId`(후순위).
+- **admin 진입 (2026-07-11 배선)**: `AdminDashboard.jsx` 리포트 셀 `report-action-group`에 `[심화코칭]` 링크(`#/simhwa/:id`, 새 탭) — [리포트 보기] 옆. **sales(보험설계사)만 노출**(D5: 심화는 sales 전용). manager/coach는 심화 없음.
 - 프로토타이핑 진입점 = `PreviewResultPage` 패턴 재사용(설문 없이 MOCK 5점수로 레이아웃 확인). **5샘플 점수를 MOCK으로 넣어 원본 md와 대조 검증**(회귀 정답지).
 - print: praxi.css `@media print` 심화 섹션 추가(`print-color-adjust:exact`).
 

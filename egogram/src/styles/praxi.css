@@ -1001,6 +1001,9 @@ p {
 .btn-report-type[data-type="코치/멘토"] { color: #059669; }
 .btn-report-type[data-type="관리자"] { color: #d97706; }
 .btn-report-action:hover .btn-report-type { color: #fff; }
+/* 심화코칭 진입 — 기본 리포트와 구분되는 핑크 톤(브랜드 accent) */
+.btn-simhwa-action { border-color: #E84A8A; color: #E84A8A; }
+.btn-simhwa-action:hover { background: #E84A8A; color: #fff; border-color: #E84A8A; }
 .btn-delete-action { font-size: 11px; font-weight: 600; padding: 4px 10px; cursor: pointer; border: 1px solid #ef4444; color: #ef4444; background: transparent; }
 .btn-delete-action:hover { background: #ef4444; color: #fff; border-color: #ef4444; }
 

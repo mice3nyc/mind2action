@@ -304,6 +304,12 @@ export default function AdminDashboard({ onLogout }) {
                           <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
                             리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
                           </a>
+                          {/* 심화코칭 리포트 — 보험설계사(sales)만 (심화는 sales 전용, SPEC §11 D5) */}
+                          {(JOB_TO_REPORT[r.jobType] || '보험설계사') === '보험설계사' && (
+                            <a href={`#/simhwa/${r.id}`} target="_blank" className="btn-report-action btn-simhwa-action">
+                              심화코칭
+                            </a>
+                          )}
                           {/* 성향 인사이트 팝업 (검토 프로토타입 26.0616) */}
                           <button type="button" className="btn-report-action btn-graph-action" onClick={() => setInsightIdx(ri)}>
                             그래프<br />보기
