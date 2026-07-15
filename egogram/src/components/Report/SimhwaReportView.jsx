@@ -92,7 +92,7 @@ function CustomerBlock({ c, nameLabel }) {
 
       {c.synergy && (
         <div className="simhwa-block">
-          <IconHead tint="#10b981">{nameLabel}과 잘 맞는 부분</IconHead>
+          <IconHead>{nameLabel}과 잘 맞는 부분</IconHead>
           <Paras text={c.synergy} />
         </div>
       )}
