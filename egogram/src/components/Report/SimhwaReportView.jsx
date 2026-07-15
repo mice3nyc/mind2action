@@ -51,20 +51,6 @@ function IconHead({ icon, children, tint }) {
   );
 }
 
-// [규칙] 저성향 세트 카드 — 낮은 트레잇의 행동 메뉴 + 실현 멘트.
-function LowTraitSet({ set }) {
-  return (
-    <div className="simhwa-lowset">
-      <p className="simhwa-lowset-head">
-        <span className="simhwa-lowset-label" style={{ color: EGO_COLORS[set.trait] }}>{set.label}</span>
-        <span className="simhwa-lowset-note">성향이 낮을 때 — 의식적으로 다음을 행동으로 보완하십시오</span>
-      </p>
-      <LineList items={set.menu} className="simhwa-lowset-menu" />
-      {set.mentions.length > 0 && <LineList items={set.mentions} className="simhwa-lowset-mentions" />}
-    </div>
-  );
-}
-
 function CustomerBlock({ c, nameLabel }) {
   return (
     <div className="simhwa-customer">
@@ -118,7 +104,6 @@ export function SimhwaView({ row }) {
   const r = buildSimhwa(result);
   const { name, honorificLabel, scores } = r.meta;
   const nameLabel = `${name} ${honorificLabel}`;
-  const rd = r.rejectDeep;
   const rf = r.referral;
 
   return (
@@ -144,65 +129,31 @@ export function SimhwaView({ row }) {
         </div>
       </div>
 
-      {/* ① 리포트의 목적 */}
-      <Section num="①" title="리포트의 목적">
+      {/* 1. 리포트의 목적 */}
+      <Section num="1." title="리포트의 목적">
         <Paras text={r.purpose} />
       </Section>
 
-      {/* ② 상담스타일의 강점과 조율포인트 */}
-      <Section num="②" title="상담스타일의 강점과 조율포인트">
-        {r.section2.strength && <Paras text={r.section2.strength} />}
-        {r.section2.adjust && (
-          <div className="simhwa-block"><Paras text={r.section2.adjust} /></div>
-        )}
-        {r.section2.lowMenus.map(set => <LowTraitSet key={set.trait} set={set} />)}
-        {r.section2.core && (
-          <div className="simhwa-core">
-            <IconHead icon="📌">핵심 코칭</IconHead>
-            <Paras text={r.section2.core} />
+      {/* 2. 상담 시 성향 점수별 에너지 발현 상태 (7/13 수정요청 #4) */}
+      <Section num="2." title="상담 시 성향 점수별 에너지 발현 상태">
+        {r.section2.energyStates.map(es => (
+          <div className="simhwa-energy" key={es.trait}>
+            <h3 className="simhwa-energy-head" style={{ color: EGO_COLORS[es.trait] }}>
+              <span className="simhwa-energy-name">{es.trait}({EGO_PLAIN[es.trait]})</span>
+              <span className="simhwa-energy-band">{es.band} · {es.score}점</span>
+            </h3>
+            <Paras text={es.text} className="simhwa-intro" />
           </div>
-        )}
+        ))}
       </Section>
 
-      {/* ③~⑦ 다섯 고객유형별 상담코칭 */}
-      <Section num="③~⑦" title="고객 유형별 상담 코칭">
+      {/* 3. 다섯 고객유형별 상담코칭 */}
+      <Section num="3." title="고객 유형별 상담 코칭">
         {r.customers.map(c => <CustomerBlock key={c.type} c={c} nameLabel={nameLabel} />)}
       </Section>
 
-      {/* ⑧ 고객 거절 대응 심화 */}
-      <Section num="⑧" title="고객 거절 대응 심화">
-        <Paras text={rd.intro} />
-        {rd.diagnosis && (
-          <div className="simhwa-block">
-            <IconHead icon="🔎">강점과 약점 진단</IconHead>
-            <Paras text={rd.diagnosis} />
-          </div>
-        )}
-        <div className="simhwa-stock">
-          <div className="simhwa-block">
-            <IconHead icon="❓">확인 질문</IconHead>
-            <LineList items={rd.questions} className="simhwa-talk" />
-          </div>
-          <div className="simhwa-block">
-            <IconHead icon="🤝">공감</IconHead>
-            <LineList items={rd.empathy} className="simhwa-talk" />
-          </div>
-          <div className="simhwa-block">
-            <IconHead icon="➡️">방향 제시</IconHead>
-            <LineList items={rd.direction} className="simhwa-talk" />
-          </div>
-        </div>
-        {rd.lowInserts.map(set => <LowTraitSet key={set.trait} set={set} />)}
-        {rd.core && (
-          <div className="simhwa-core">
-            <IconHead icon="📌">핵심 코칭</IconHead>
-            <Paras text={rd.core} />
-          </div>
-        )}
-      </Section>
-
-      {/* ⑨ 소개를 만드는 고객관리 */}
-      <Section num="⑨" title="소개를 만드는 고객관리">
+      {/* 4. 소개를 만드는 고객관리 */}
+      <Section num="4." title="소개를 만드는 고객관리">
         <Paras text={rf.intro} />
         {rf.strength && (
           <div className="simhwa-block"><Paras text={rf.strength} /></div>

@@ -1417,19 +1417,19 @@ body:has(.report-bling) { background: #fff; }
   padding: 40px 44px 64px;
   color: #1f2733;
   font-size: 15px;
-  line-height: 1.62;
+  line-height: 1.85;                 /* 7/13 수정요청 #9: 성향리포트 수준으로 넓힘 */
   background: #fff;
 }
-.simhwa-container p { margin: 0 0 8px; }
+.simhwa-container p { margin: 0 0 11px; }
 
-/* 표지 */
-.simhwa-cover { border-bottom: 2px solid #1f2733; padding-bottom: 16px; margin-bottom: 28px; }
-.simhwa-cover-title { font-size: 21px; font-weight: 700; margin: 0 0 12px; letter-spacing: -0.01em; }
+/* 표지 — 7/13 수정요청 #2: 제목·이름 좌상단 → 아래·중앙 */
+.simhwa-cover { text-align: center; border-bottom: 2px solid #1f2733; padding: 52px 16px 22px; margin-bottom: 32px; }
+.simhwa-cover-title { font-size: 21px; font-weight: 700; margin: 0 0 14px; letter-spacing: -0.01em; }
 .simhwa-cover-brand { color: #E84A8A; letter-spacing: 0.04em; margin-right: 4px; }
-.simhwa-cover-id { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.simhwa-cover-id { display: flex; align-items: baseline; justify-content: center; gap: 12px; flex-wrap: wrap; }
 .simhwa-cover-meta { font-size: 13px; color: #6b7280; }
 .simhwa-cover-name { font-size: 18px; font-weight: 700; }
-.simhwa-scoreline { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; }
+.simhwa-scoreline { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 12px; }
 .simhwa-score-chip { font-size: 12.5px; }
 .simhwa-score-chip b { font-size: 13.5px; }
 
@@ -1443,6 +1443,12 @@ body:has(.report-bling) { background: #fff; }
 .simhwa-section-num { color: #E84A8A; font-weight: 700; }
 .simhwa-block { margin: 12px 0; }
 .simhwa-intro { color: #374151; }
+
+/* ② 성향 점수별 에너지 발현 상태 (7/13 수정요청 #4·#5 — 성향명 컬러) */
+.simhwa-energy { margin: 16px 0 20px; padding: 14px 18px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fcfcfd; }
+.simhwa-energy-head { font-size: 15.5px; font-weight: 700; margin: 0 0 8px; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.simhwa-energy-name { font-weight: 700; }
+.simhwa-energy-band { font-size: 12.5px; font-weight: 600; color: #6b7280; }
 
 /* 이모지 소제목 */
 .simhwa-icon-head { font-size: 14.5px; font-weight: 700; margin: 14px 0 6px; display: flex; align-items: baseline; gap: 6px; }
@@ -1482,9 +1488,9 @@ body:has(.report-bling) { background: #fff; }
 .simhwa-footer-bar { margin-top: 40px; padding-top: 14px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; font-size: 12px; color: #9ca3af; }
 
 @media print {
-  .simhwa-container { padding: 0; font-size: 12.5px; line-height: 1.5; max-width: none; }
-  .simhwa-section, .simhwa-customer, .simhwa-core, .simhwa-lowset, .simhwa-clover { break-inside: avoid; page-break-inside: avoid; }
-  .simhwa-customer, .simhwa-core, .simhwa-lowset, .simhwa-clover, .simhwa-cover, .simhwa-section-num, .simhwa-cover-brand, .simhwa-customer-title, .simhwa-score-chip {
+  .simhwa-container { padding: 0; font-size: 12.5px; line-height: 1.62; max-width: none; }
+  .simhwa-section, .simhwa-customer, .simhwa-core, .simhwa-energy, .simhwa-clover { break-inside: avoid; page-break-inside: avoid; }
+  .simhwa-customer, .simhwa-core, .simhwa-energy, .simhwa-clover, .simhwa-cover, .simhwa-section-num, .simhwa-cover-brand, .simhwa-customer-title, .simhwa-energy-head, .simhwa-score-chip {
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
 }

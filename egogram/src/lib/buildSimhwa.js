@@ -5,6 +5,7 @@
 import staticData from '../data/simhwa_static.yaml';
 import lowtraitData from '../data/simhwa_lowtrait.yaml';
 import genData from '../data/simhwa_gen.yaml';
+import energyData from '../data/simhwa_energy.yaml';
 import { EGO_STATES } from './scoreEngine';
 
 // 동점 우선순위 — scoreEngine.TIE_PRIORITY와 동일(A 최우선).
@@ -24,10 +25,19 @@ function lines(block) {
   return block ? String(block).split('\n').map(s => s.trim()).filter(Boolean) : [];
 }
 
-// {이름}·{호칭} 전역 슬롯 치환. name="김정임", honorificLabel="PA님".
+// {이름}·{호칭} 전역 슬롯 치환. name="김정임", honorificLabel="님".
 function tokens(text, name, honorificLabel) {
   if (typeof text !== 'string') return text;
   return text.replace(/\{이름\}/g, name).replace(/\{호칭\}/g, honorificLabel);
+}
+
+// ② 에너지 발현 — 점수구간 매핑(내림차순 min 경계). score>=min이면 그 구간(7/13 수정요청 #4).
+function energyBandIndex(score) {
+  const bands = energyData.bands || [];
+  for (let i = 0; i < bands.length; i++) {
+    if (score >= bands[i].min) return i;
+  }
+  return Math.max(0, bands.length - 1);
 }
 
 // 강점 조합키 산출 (SPEC §1-B, AC 억제). 비-AC 4성향 중 점수 상위 2 → `top_second`.
@@ -46,12 +56,23 @@ export function strengthKeyOf(scores) {
 export function buildSimhwa(result) {
   const { scores, top1, top2, bottom } = result;
   const name = result.name || '';
-  const honorificLabel = `${result.honorific || 'PA'}님`;
+  const honorificLabel = '님';                // 7/13 수정요청 #1: PA님/TCR님 → 님
   const tk = (t) => tokens(t, name, honorificLabel);
 
   const strengthKey = strengthKeyOf(scores);
   const lowTraits = EGO_STATES.filter(e => scores[e] <= LOW_MAX);
   const isLowA = scores.A <= LOW_MAX;
+
+  // ② 성향 점수별 에너지 발현 상태 — 5성향 각각 점수→구간→문장(7/13 수정요청 #4, CM2 시트).
+  const energyStates = CUSTOMER_ORDER.map(trait => {
+    const idx = energyBandIndex(scores[trait]);
+    return {
+      trait,
+      score: scores[trait],
+      band: (energyData.bands[idx] || {}).label || '',
+      text: (energyData.energy[trait] || [])[idx] || '',
+    };
+  });
 
   const gen = genData;
   // 생성 슬롯 fallback: 조합키·변주 누락 시 빈 문자열(렌더러가 스킵 → 빈 화면 방지, SPEC §5.2).
@@ -98,12 +119,10 @@ export function buildSimhwa(result) {
     // ① 목적 [고정]
     purpose: tk(staticData.purpose),
 
-    // ② 상담스타일의 강점과 조율포인트
+    // ② 상담 시 성향 점수별 에너지 발현 상태 (7/13 수정요청 #4 — 기존 강점·조율 대체)
+    //   성향리포트와 중복이라 삭제, CM2 시트의 점수구간별 에너지 발현으로 교체.
     section2: {
-      strength: tk(g(gen.strength, strengthKey)),                 // G1 강점 문단
-      adjust: tk(g(gen.adjust, bottom)),                          // G2 조율 문단(최저 성향)
-      lowMenus,                                                   // [규칙] 저성향 세트
-      core: tk(g(gen.core_section2, strengthKey, bottom)),        // G3 📌 핵심코칭
+      energyStates,                                              // 5성향 × 점수구간 조회
     },
 
     // ③~⑦ 다섯 고객유형별 상담코칭

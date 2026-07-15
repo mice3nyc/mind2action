@@ -3,12 +3,14 @@ author: 아리공
 project: M2A 성향별 심화코칭 리포트 생성기
 created: 2026-07-11
 type: SPEC (선문후코 — 뼈대 착수 반영)
-status: v0.2 (뼈대 완료 2026-07-11 — yaml 3종·buildSimhwa·SimhwaReportView·라우트·5샘플 회귀 통과)
+status: v0.3 (2026-07-15 — 손소장 7/13 수정요청 반영: 9섹션→4섹션 재구성, ② 에너지 발현 테이블)
 ---
 
 ## SPEC — M2A 성향별 심화코칭 리포트 생성기
 
 > 선문후코. 이 문서 확정 후 코드 착수. 레퍼런스 전량은 `REFERENCES.md`. 고정 문자열·저성향 세트·생성슬롯 규칙 원본은 `source/고정블록대장.md`.
+
+> ⚠️ **2026-07-15 구조 변경 — §13 참조.** 손소장 7/13 수정요청으로 **9섹션(①~⑨) → 4섹션(1~4)** 재구성. ② "강점·조율"(생성문단)이 성향리포트와 중복이라 삭제되고, **CM2 시트의 "성향 점수별 에너지 발현 상태"(5성향×5구간 결정적 조회, `simhwa_energy.yaml`)로 대체.** ⑧ 거절 심화 삭제. 아래 §3·§5의 ②·⑧ 관련 서술은 옛 구조 기준(생성엔진 이력 보존) — 현행은 §13이 정본.
 
 ### 1. 목적·아키텍처
 
@@ -145,5 +147,30 @@ egogram/ 에서 `npm run deploy`(gh-pages)→survey.mind2action.kr, 수동. 빌�
 - **강점키**: `strengthKeyOf(scores)` = 비-AC 4성향 점수 desc top2, tie=`['A','CP','NP','FC','AC']`. AC 무조건 배제.
 - **화법 A-스왑**: `scores.A<=10`이면 **CP·NP·FC 고객** 화법 풀 마지막 줄을 `talk_swap.low_a_line`로 교체(A·AC 고객 풀은 유지).
 - **저성향 트리거**: `scores[e]<=10`인 트레잇마다 `low.{e}` 세트 삽입(②·⑧). ⑧ lowInserts는 A·AC만.
-- **토큰**: `{이름}`→name, `{호칭}`→`${honorific}님`(기본 PA). deepReplace 아닌 정규식 치환.
+- **토큰**: `{이름}`→name, `{호칭}`→`${honorific}님`(기본 PA). deepReplace 아닌 정규식 치환. *(→ §13: 호칭은 `님` 고정으로 변경)*
 - **fallback**: 생성 슬롯 누락 시 빈 문자열 → 렌더러 조건부 스킵(빈 화면 0).
+
+### 13. 손소장 7/13 수정요청 반영 (2026-07-15, v0.3) — 현행 정본
+
+출처: `Assets/incoming/mind2action/inbox/수정요청/7월13일 수정요청 내용 - 시트1.csv`(9항목) + 링크시트 `컨설턴트로- 심화 코칭 - CM2.csv`. 요청노트 `요청.26.0715.0635`.
+
+**구조: 9섹션(①~⑨) → 4섹션(1~4), 원문자→아라비아 재번호.**
+`표지 → 1.리포트의 목적 → 2.상담 시 성향 점수별 에너지 발현 상태 → 3.고객 유형별 상담 코칭 → 4.소개를 만드는 고객관리`
+
+| # | 요청 | 반영 |
+|---|------|------|
+| 1 | 호칭 `PA님`/`TCR님` → `님` | `buildSimhwa.js` `honorificLabel = '님'` 고정 |
+| 2 | 표지 제목·이름 좌상단 → 아래·중앙 | `.simhwa-cover` text-align center + padding-top 52px |
+| 3 | ① 목적 세번째 단락 삭제("보험은 상품을 판매하는…") | `simhwa_static.yaml` purpose 3→2문단 |
+| **4** | ② "강점·조율" 삭제 → "상담 시 성향 점수별 에너지 발현 상태" | **신규 `simhwa_energy.yaml`**(5성향×5구간=25셀, CM2 verbatim). `energyBandIndex(score)` 내림차순 경계(17/14/11/8/0). `section2.energyStates`=CP·NP·A·FC·AC 순 5블록. **기존 gen.strength/adjust/core_section2·lowMenus 렌더 제거**(gen yaml은 ③~⑦·④가 계속 사용) |
+| 5 | 성향 흑백 → 컬러 `예) FC(친화,표현)` | ② 블록 헤더 `EGO_COLORS` + `CP(기준·결단)` 라벨 |
+| 6 | `③~⑦` → `3.` | Section num |
+| 7 | ⑧ 고객 거절 대응 심화 삭제 | 렌더 제거(`buildSimhwa.rejectDeep`는 잔존, 미사용). `LowTraitSet` 컴포넌트 제거 |
+| 8 | `⑨` → `4.` | Section num |
+| 9 | 줄간격 넓히기(성향리포트 수준) | `.simhwa-container` line-height 1.62→1.85, p margin 8→11px |
+
+**②의 성격 전환**: 옛 ②는 강점키(AC억제) 기반 **개인별 생성문단**(성향리포트와 중복). 신규 ②는 각 성향 점수를 구간에 매핑하는 **결정적 조회 테이블** — 외부 LLM 불필요, `simhwa_energy.yaml`만 수정하면 문구 갱신. `strengthKeyOf`·AC억제 규칙(§1-B)은 ③~⑦ synergy/core에서 계속 사용(존치).
+
+**검증(2026-07-15)**: vite build clean(css 37.62kB) / 헤드리스 preview(김정임 CP14·NP13·A18·FC14·AC6) 구간매핑 5/5 정확·호칭 "님"·목적 2문단·②5블록 컬러·⑧부재·1~4번호·콘솔에러0.
+
+**미해결**: CM2 원문 오타 3곳(NP0~10 "관게/뷰드러", A0~7 "받아드리지", FC11~13 "전문가 답다") verbatim 보존 — 손소장 확인 후 수정. 수정요청 항목 10~12(검토필요)는 내용 도착 시 처리.
