@@ -13,11 +13,42 @@ import { buildSimhwa } from '../../lib/buildSimhwa';
 const EGO_COLORS = { CP: '#ef4444', NP: '#f59e0b', A: '#38bdf8', FC: '#10b981', AC: '#8b5cf6' };
 const EGO_PLAIN = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
 
+// 본문 성향명 컬러 코딩 + 에고 코드 제거 (SPEC §14-③). **기존 성향리포트 colorizeEgo와 100% 동일 로직**
+//   (피터공 확정: 기존 리포트에 맞춤). 심화 확장 = 코드 없는 맨 라벨("기준·결단")도 매칭.
+//   두 형태: (1) "CP(기준·결단)" 정순 코드형 → 코드·괄호 제거 / (2) 맨 라벨 "기준·결단".
+//   손소장 규칙(base 동일): 라벨만 색칠. 뒤에 '성향'이 이미 있으면 그 '성향'은 무색으로 둠(hasSuffix).
+//   '성향'이 없으면 라벨 뒤에 무색 아닌 접미 " 성향"을 붙이고 조사 교정(성향=받침ㅇ).
+const LABEL_TO_CODE = { '기준·결단': 'CP', '배려·공감': 'NP', '이성·판단': 'A', '친화·표현': 'FC', '협조·조율': 'AC' };
+const COLOR_RE = new RegExp(`(?:(CP|NP|FC|AC|A)\\([가-힣·,]+\\))|(${Object.keys(LABEL_TO_CODE).join('|')})`, 'g');
+const JOSA_FIX = { '가': '이', '는': '은', '를': '을', '와': '과', '로': '으로' };
+
+function colorize(text, kp) {
+  if (typeof text !== 'string') return text;
+  const parts = [];
+  let last = 0, i = 0, m;
+  COLOR_RE.lastIndex = 0;
+  while ((m = COLOR_RE.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    const code = m[1] || LABEL_TO_CODE[m[2]];
+    let end = m.index + m[0].length;
+    const hasSuffix = /^ ?성향/.test(text.slice(end));   // 원문에 '성향'이 이어지면 그건 색 밖(무색)에 둔다
+    parts.push(
+      <span key={`${kp}-e${i++}`} style={{ color: EGO_COLORS[code], fontWeight: 600 }}>
+        {EGO_PLAIN[code]}{hasSuffix ? '' : ' 성향'}
+      </span>
+    );
+    if (!hasSuffix && JOSA_FIX[text[end]]) { parts.push(JOSA_FIX[text[end]]); end += 1; }
+    last = end;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length ? parts : text;
+}
+
 // 블록 문단(빈 줄 구분)을 <p>들로.
 function Paras({ text, className }) {
   if (!text) return null;
   const paras = String(text).split(/\n\s*\n/).map(p => p.trim()).filter(Boolean);
-  return paras.map((p, i) => <p key={i} className={className}>{p.replace(/\n/g, ' ')}</p>);
+  return paras.map((p, i) => <p key={i} className={className}>{colorize(p.replace(/\n/g, ' '), `p${i}`)}</p>);
 }
 
 // 줄 배열을 개별 라인(<p>)으로 — 화법·멘트·체크리스트 등.
@@ -25,7 +56,7 @@ function LineList({ items, className }) {
   if (!items || items.length === 0) return null;
   return (
     <div className={className}>
-      {items.map((line, i) => <p key={i} className="simhwa-line">{line}</p>)}
+      {items.map((line, i) => <p key={i} className="simhwa-line">{colorize(line, `l${i}`)}</p>)}
     </div>
   );
 }
@@ -139,7 +170,7 @@ export function SimhwaView({ row }) {
         {r.section2.energyStates.map(es => (
           <div className="simhwa-energy" key={es.trait}>
             <h3 className="simhwa-energy-head" style={{ color: EGO_COLORS[es.trait] }}>
-              <span className="simhwa-energy-name">{es.trait}({EGO_PLAIN[es.trait]})</span>
+              <span className="simhwa-energy-name">{EGO_PLAIN[es.trait]} 성향</span>
               <span className="simhwa-energy-band">{es.band} · {es.score}점</span>
             </h3>
             <Paras text={es.text} className="simhwa-intro" />
