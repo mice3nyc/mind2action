@@ -59,7 +59,8 @@ type: TASKS (진행 작업, live 체크리스트)
 - [x] 자가검증 — build clean·헤드리스 preview 5/5 구간매핑·콘솔0
 - [x] 피터공 승인 → 커밋 `0cfae33`·`npm run deploy` 라이브 배포·검증(이서연 5/5·푸터 0cfae33)
 - [x] CM2 원문 오타 3곳 수정(피터공 지시, 7/15) — 커밋 `8262932`·배포·라이브 검증(footer 8262932·3곳 반영)
-- [ ] 수정요청 10~12(검토필요) = 손소장이 채울 빈 행 — 내용 도착 시 처리 (7/15 16시 M2A 회의)
+
+> 수정요청 10~12번(검토필요)은 내용이 비어 있는 빈 행 — 손소장이 채우면 그때 새 요청. 추적/대기 대상 아님.
 
 ### 빌드 기록
 - 2026-07-15 손소장 7/13 수정요청 반영(v0.3) — 신규 `src/data/simhwa_energy.yaml`(5성향×5구간 CM2 verbatim). 수정: `buildSimhwa.js`(호칭 님·energyBandIndex·section2.energyStates), `SimhwaReportView.jsx`(4섹션 재번호·② 에너지렌더·⑧ 제거·LowTraitSet 제거), `simhwa_static.yaml`(purpose 3→2문단), `praxi.css`(표지 중앙·line-height 1.85·.simhwa-energy). `vite build` clean(104 modules, css 37.62kB, js 1233kB). 헤드리스 preview(김정임) 구간매핑 5/5·호칭 님·콘솔0. **커밋 `0cfae33`(main push, mice3nyc/mind2action)·`npm run deploy` gh-pages `--add`.** 라이브 검증 = 이서연(CP6·NP16·A8·FC14·AC17) 구간매핑 5/5·4섹션·⑧부재·푸터 0cfae33. 라이브 `survey.mind2action.kr/#/simhwa/:id`(admin)·`/#/preview/simhwa?s=이름`(MOCK).
