@@ -12,9 +12,8 @@ import { EGO_STATES } from './scoreEngine';
 const TIE_PRIORITY = ['A', 'CP', 'NP', 'FC', 'AC'];
 // 강점 조합키 후보 = 비-AC 4성향. AC는 강점으로 세우지 않는다(SPEC §1-B).
 const NON_AC = ['CP', 'NP', 'A', 'FC'];
-// ③~⑦ 고객유형 등장 순서 + 이모지(대장 §2-2 헤더).
+// ③~⑦ 고객유형 등장 순서(대장 §2-2 헤더). 유형 구분은 EGO_COLORS 색으로(이모지 미사용, SPEC §14).
 const CUSTOMER_ORDER = ['CP', 'NP', 'A', 'FC', 'AC'];
-const CUSTOMER_EMOJI = { CP: '🔴', NP: '🟠', A: '🔵', FC: '🟢', AC: '🟣' };
 // 생성 yaml synergy/core_customer의 고객유형 키(metadata.customer_keys).
 const CUSTOMER_GENKEY = { CP: 'CP고객', NP: 'NP고객', A: 'A고객', FC: 'FC고객', AC: 'AC고객' };
 // 저성향 판정 경계 — 0~10점이면 조율 대상(지침 §6).
@@ -93,7 +92,7 @@ export function buildSimhwa(result) {
     };
   });
 
-  // 🗣 화법 — 유형별 고정 풀 + 저-A 스왑(A 낮으면 CP·NP·FC 풀 마지막 줄을 '이유 강조'로 교체, 대장 §3).
+  //  화법 — 유형별 고정 풀 + 저-A 스왑(A 낮으면 CP·NP·FC 풀 마지막 줄을 '이유 강조'로 교체, 대장 §3).
   const talkOf = (type) => {
     const pool = lines(staticData.talk_pool[type]).map(tk);
     if (isLowA && (type === 'CP' || type === 'NP' || type === 'FC') && pool.length > 0) {
@@ -104,13 +103,12 @@ export function buildSimhwa(result) {
 
   const customers = CUSTOMER_ORDER.map(type => ({
     type,
-    emoji: CUSTOMER_EMOJI[type],
     title: tk(staticData.customer_title[type]),
     intro: tk(staticData.customer_intro[type]),                              // [고정] 도입부
-    synergy: tk(g(gen.synergy, strengthKey, CUSTOMER_GENKEY[type])),         // G4 🌿
-    talk: talkOf(type),                                                      // 🗣 [규칙]
-    reject: lines(staticData.reject_pool[type]).map(tk),                     // 🚫 [규칙]
-    core: tk(g(gen.core_customer, strengthKey, CUSTOMER_GENKEY[type])),      // G6 📌
+    synergy: tk(g(gen.synergy, strengthKey, CUSTOMER_GENKEY[type])),         // G4 잘 맞는 부분
+    talk: talkOf(type),                                                      // 상담 화법 [규칙]
+    reject: lines(staticData.reject_pool[type]).map(tk),                     // 거절 대응 [규칙]
+    core: tk(g(gen.core_customer, strengthKey, CUSTOMER_GENKEY[type])),      // G6 핵심 코칭
   }));
 
   return {
@@ -137,7 +135,7 @@ export function buildSimhwa(result) {
       direction: lines(staticData.reject_deep.direction).map(tk), // [고정] 방향 3
       // [규칙] 저성향 삽입 — A 낮음→이유설명, AC 낮음→확인질문(대장 블록#16).
       lowInserts: lowMenus.filter(m => m.trait === 'A' || m.trait === 'AC'),
-      core: tk(g(gen.core_reject, strengthKey, bottom)),          // G8 📌
+      core: tk(g(gen.core_reject, strengthKey, bottom)),          // G8 
     },
 
     // ⑨ 소개를 만드는 고객관리
@@ -148,8 +146,8 @@ export function buildSimhwa(result) {
       request: lines(staticData.referral.request).map(tk),       // [고정] 요청 멘트 3
       checklist: lines(staticData.referral.checklist),           // [고정] 체크리스트 6
       thanks: lines(staticData.referral.thanks).map(tk),         // [고정] 감사 멘트 2
-      core: tk(g(gen.core_referral, strengthKey, bottom)),       // G11 📌
-      clover: tk(g(gen.clover, strengthKey)),                    // G12 🍀
+      core: tk(g(gen.core_referral, strengthKey, bottom)),       // G11 
+      clover: tk(g(gen.clover, strengthKey)),                    // G12 
     },
   };
 }

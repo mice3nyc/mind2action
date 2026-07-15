@@ -4,10 +4,10 @@ import { supabase } from '../../lib/supabase';
 import { buildSimhwa } from '../../lib/buildSimhwa';
 
 // ─────────────────────────────────────────────────────────────
-// SimhwaReportView — M2A 성향별 심화코칭 리포트 9섹션 렌더러 (ReportViewV2 형제).
+// SimhwaReportView — M2A 성향별 심화코칭 리포트 렌더러 (ReportViewV2 형제).
 //   병렬 오버레이: 기존 성향리포트 엔진과 별개 데이터셋(simhwa_*.yaml)을 buildSimhwa로 조립.
-//   룩: 🍀 샘플 md 계승 — 이모지 컬러 헤더(🔴🟠🔵🟢🟣 / 🌿💼🗣🚫📌🍀), 컴팩트 줄간격, A4 print.
-//   SPEC: docs/simhwa/SPEC.md §6. 스타일: styles/praxi.css .simhwa-*.
+//   룩: 성향명 색 헤더(EGO_COLORS) + 텍스트 소제목. 이모지·엠대시 미사용(SPEC §14, 손소장 요청).
+//   SPEC: docs/simhwa/SPEC.md §6·§14. 스타일: styles/praxi.css .simhwa-*.
 // ─────────────────────────────────────────────────────────────
 
 const EGO_COLORS = { CP: '#ef4444', NP: '#f59e0b', A: '#38bdf8', FC: '#10b981', AC: '#8b5cf6' };
@@ -42,11 +42,11 @@ function Section({ num, title, children }) {
   );
 }
 
-// 이모지 소제목 (🌿/🗣/🚫/📌/🍀 등).
-function IconHead({ icon, children, tint }) {
+// 텍스트 소제목 (이모지 없음, SPEC §14). tint는 색 강조용(트레잇 색 등).
+function IconHead({ children, tint }) {
   return (
     <h4 className="simhwa-icon-head" style={tint ? { color: tint } : undefined}>
-      <span className="simhwa-icon">{icon}</span>{children}
+      {children}
     </h4>
   );
 }
@@ -55,34 +55,34 @@ function CustomerBlock({ c, nameLabel }) {
   return (
     <div className="simhwa-customer">
       <h3 className="simhwa-customer-title" style={{ color: EGO_COLORS[c.type] }}>
-        <span className="simhwa-icon">{c.emoji}</span>{c.title}
+        {c.title}
       </h3>
       <Paras text={c.intro} className="simhwa-intro" />
 
       {c.synergy && (
         <div className="simhwa-block">
-          <IconHead icon="🌿" tint="#10b981">{nameLabel}과 잘 맞는 부분</IconHead>
+          <IconHead tint="#10b981">{nameLabel}과 잘 맞는 부분</IconHead>
           <Paras text={c.synergy} />
         </div>
       )}
 
       {c.talk.length > 0 && (
         <div className="simhwa-block">
-          <IconHead icon="🗣">상담 화법</IconHead>
+          <IconHead>상담 화법</IconHead>
           <LineList items={c.talk} className="simhwa-talk" />
         </div>
       )}
 
       {c.reject.length > 0 && (
         <div className="simhwa-block">
-          <IconHead icon="🚫">고객 거절 대응</IconHead>
+          <IconHead>고객 거절 대응</IconHead>
           <LineList items={c.reject} className="simhwa-reject" />
         </div>
       )}
 
       {c.core && (
         <div className="simhwa-core">
-          <IconHead icon="📌">핵심 코칭</IconHead>
+          <IconHead>핵심 코칭</IconHead>
           <Paras text={c.core} />
         </div>
       )}
@@ -162,20 +162,20 @@ export function SimhwaView({ row }) {
           <div className="simhwa-block"><Paras text={rf.lowtrait} /></div>
         )}
         <div className="simhwa-block">
-          <IconHead icon="🗣">소개 요청 멘트</IconHead>
+          <IconHead>소개 요청 멘트</IconHead>
           <LineList items={rf.request} className="simhwa-talk" />
         </div>
         <div className="simhwa-block">
-          <IconHead icon="✔">고객관리 체크리스트</IconHead>
+          <IconHead>고객관리 체크리스트</IconHead>
           <LineList items={rf.checklist} className="simhwa-checklist" />
         </div>
         <div className="simhwa-block">
-          <IconHead icon="💌">감사 멘트</IconHead>
+          <IconHead>감사 멘트</IconHead>
           <LineList items={rf.thanks} className="simhwa-talk" />
         </div>
         {rf.core && (
           <div className="simhwa-core">
-            <IconHead icon="📌">핵심 코칭</IconHead>
+            <IconHead>핵심 코칭</IconHead>
             <Paras text={rf.core} />
           </div>
         )}

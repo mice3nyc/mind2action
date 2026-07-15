@@ -62,7 +62,17 @@ type: TASKS (진행 작업, live 체크리스트)
 
 > 수정요청 10~12번(검토필요)은 내용이 비어 있는 빈 행 — 손소장이 채우면 그때 새 요청. 추적/대기 대상 아님.
 
+### Phase 8 — 손소장 추가 수정요청 (2026-07-15 오후, v0.4 — SPEC §14, 요청.26.0715.1249)
+- [x] ① 성향명 색상 — **이미 구현 확인**. EGO_COLORS(CP 빨강·NP 오렌지·A 파랑…)가 손소장 지시와 일치, 표지·②헤드·③타이틀 전부 적용. 추가 조치 없음(본문 산문 낱말 색칠은 오발색 위험이라 보류, 피터공 확인 항목)
+- [x] ② 이모지 전면 제거 — `SimhwaReportView.jsx`(고객 이모지·IconHead 소제목 이모지), `buildSimhwa.js`(CUSTOMER_EMOJI 제거), `simhwa_static.yaml`(체크리스트 ✔), `simhwa_gen.yaml`(클로버 🍀 12줄→값 single-quote), `simhwa_lowtrait.yaml`(메뉴 ✔). 코드 주석 이모지도 정리
+- [x] 엠대시(—) — grep 결과 코드/yaml 주석에만 존재, 리포트 출력엔 원래 없음(출력 클린). 앱 `<title>` "MIND2ACTION — 에고그램 설문"의 —는 리포트 콘텐츠 아님(범위 밖)
+- [x] 자가검증 — vite build clean·헤드리스 preview(김정임) 렌더 DOM 이모지 0·성향명 색 rgb 정확(239,68,68/245,158,11/56,189,248)·헤더 전부 텍스트·콘솔0
+- [ ] 피터공 확인 → `npm run deploy` 라이브 (16시 M2A 회의 전 목표)
+
 ### 빌드 기록
+- 2026-07-15 손소장 추가 수정요청(v0.4, 이모지 제거+색 확인) — 수정: `SimhwaReportView.jsx`(IconHead 이모지 제거·고객 이모지 span 제거), `buildSimhwa.js`(CUSTOMER_EMOJI 상수·emoji 필드 제거), `simhwa_static.yaml`(체크리스트 ✔ 제거), `simhwa_gen.yaml`(클로버 🍀 12줄 제거→값 single-quote, YAML flow-map 오해 방지), `simhwa_lowtrait.yaml`(✔ 제거), `SPEC.md`(§14 신설). `vite build` clean(css 37.62kB). 헤드리스 preview(김정임 CP14·NP13·A18·FC14·AC6) 렌더 DOM: 이모지 0·성향명 색 정확(빨강/오렌지/파랑)·전 헤더 텍스트화·엠대시 0(앱 title 제외). **배포 대기 — 피터공 확인 후.**
+
+### 빌드 기록 (이전)
 - 2026-07-15 손소장 7/13 수정요청 반영(v0.3) — 신규 `src/data/simhwa_energy.yaml`(5성향×5구간 CM2 verbatim). 수정: `buildSimhwa.js`(호칭 님·energyBandIndex·section2.energyStates), `SimhwaReportView.jsx`(4섹션 재번호·② 에너지렌더·⑧ 제거·LowTraitSet 제거), `simhwa_static.yaml`(purpose 3→2문단), `praxi.css`(표지 중앙·line-height 1.85·.simhwa-energy). `vite build` clean(104 modules, css 37.62kB, js 1233kB). 헤드리스 preview(김정임) 구간매핑 5/5·호칭 님·콘솔0. **커밋 `0cfae33`(main push, mice3nyc/mind2action)·`npm run deploy` gh-pages `--add`.** 라이브 검증 = 이서연(CP6·NP16·A8·FC14·AC17) 구간매핑 5/5·4섹션·⑧부재·푸터 0cfae33. 라이브 `survey.mind2action.kr/#/simhwa/:id`(admin)·`/#/preview/simhwa?s=이름`(MOCK).
 - 2026-07-11 뼈대 착수 — 신규 파일 6종: `src/data/simhwa_static.yaml`·`simhwa_lowtrait.yaml`·`simhwa_gen.yaml`(101KB, 코덱스 v0.2), `src/lib/buildSimhwa.js`, `src/components/Report/SimhwaReportView.jsx`, `src/pages/PreviewSimhwaPage.jsx`. 수정: `App.jsx`(라우트 2·isReport), `styles/praxi.css`(.simhwa-* +print). `vite build` clean(103 modules, css 37KB).
 - 2026-07-11 커밋·배포 — commit `6a292d4`(main push), `npm run deploy` gh-pages `--add`. 라이브 = `survey.mind2action.kr/#/simhwa/:id`(실데이터)·`/#/preview/simhwa?s=이름`(MOCK). 번들 index-DMu057IO.js. 라이브 렌더 검증: 이서연 9섹션 정상·AC억제·콘솔에러 0·푸터 6a292d4. **생성슬롯 미동결(손소장 톤 검토 전) — 리뷰 배포 성격.**
