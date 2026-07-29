@@ -1,13 +1,14 @@
 import { getSuccessRange } from '../../lib/scoreEngine';
+import { EGO_ORDER, EGO_COLOR, EGO_LABEL } from '../../lib/egoTerms';
 
 // 결과 화면 인사이트 팝업용 시각화 (검토 프로토타입, 26.0616).
 //   - MyRadar: 개인 5축 펜타곤 레이더 ('내 성향의 모양') + 조율 불필요 구간 가이드 밴드
 //   - GroupCompare: 개인 vs 그룹 평균 오버레이 레이더 + 축별 차이 막대 ('전체 속 내 위치')
-// 라이브 리포트/설문 점수 로직엔 영향 없음. 같은 색·라벨 규칙(ReportPageV2)을 로컬 복제.
+// 라이브 리포트/설문 점수 로직엔 영향 없음. 색·라벨은 용어 사전(data/ego_terms.yaml)에서 온다.
 
-const EGO_KEYS = ['CP', 'NP', 'A', 'FC', 'AC'];
-const EGO_COLORS = { CP: '#ef4444', NP: '#f59e0b', A: '#38bdf8', FC: '#10b981', AC: '#8b5cf6' };
-const EGO_PLAIN_LABEL = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
+const EGO_KEYS = EGO_ORDER;
+const EGO_COLORS = EGO_COLOR;
+const EGO_PLAIN_LABEL = EGO_LABEL;
 const ACCENT = '#0012de'; // 개인 점수 강조색 (분석 레이더와 동일 톤)
 const MAX = 20;
 

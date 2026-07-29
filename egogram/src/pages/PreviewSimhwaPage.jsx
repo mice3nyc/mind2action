@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { SimhwaView } from '../components/Report/SimhwaReportView';
+import { EGO_ORDER, TIE_PRIORITY } from '../lib/egoTerms';
 
 // 테스트 전용 — 설문 없이 심화코칭 리포트 레이아웃/회귀를 확인한다. 어디에도 링크되지 않음.
 //   /#/preview/simhwa            (김정임 샘플)
@@ -16,8 +17,7 @@ const SAMPLES = {
   허진랑: { CP: 18, NP: 18, A: 16, FC: 18, AC: 10, honorific: 'TCR' },
 };
 
-const TIE_PRIORITY = ['A', 'CP', 'NP', 'FC', 'AC'];
-const EGO = ['CP', 'NP', 'A', 'FC', 'AC'];
+const EGO = EGO_ORDER;   // 순서·동점 규칙도 용어 사전이 단일 출처
 
 // 점수 → top1/top2/bottom (scoreEngine과 동일 tie-break).
 function rank(scores) {

@@ -7,13 +7,12 @@ import lowtraitData from '../data/simhwa_lowtrait.yaml';
 import genData from '../data/simhwa_gen.yaml';
 import energyData from '../data/simhwa_energy.yaml';
 import { EGO_STATES } from './scoreEngine';
+import { EGO_ORDER, TIE_PRIORITY, customerTitle } from './egoTerms';
 
-// 동점 우선순위 — scoreEngine.TIE_PRIORITY와 동일(A 최우선).
-const TIE_PRIORITY = ['A', 'CP', 'NP', 'FC', 'AC'];
 // 강점 조합키 후보 = 비-AC 4성향. AC는 강점으로 세우지 않는다(SPEC §1-B).
 const NON_AC = ['CP', 'NP', 'A', 'FC'];
-// ③~⑦ 고객유형 등장 순서(대장 §2-2 헤더). 유형 구분은 EGO_COLORS 색으로(이모지 미사용, SPEC §14).
-const CUSTOMER_ORDER = ['CP', 'NP', 'A', 'FC', 'AC'];
+// ③~⑦ 고객유형 등장 순서. 유형 구분은 색으로(이모지 미사용, SPEC §14).
+const CUSTOMER_ORDER = EGO_ORDER;
 // 생성 yaml synergy/core_customer의 고객유형 키(metadata.customer_keys).
 const CUSTOMER_GENKEY = { CP: 'CP고객', NP: 'NP고객', A: 'A고객', FC: 'FC고객', AC: 'AC고객' };
 // 저성향 판정 경계 — 0~10점이면 조율 대상(지침 §6).
@@ -103,7 +102,7 @@ export function buildSimhwa(result) {
 
   const customers = CUSTOMER_ORDER.map(type => ({
     type,
-    title: tk(staticData.customer_title[type]),
+    title: customerTitle(type),                                              // 사전 틀로 조립(옛 이름 박제 방지)
     intro: tk(staticData.customer_intro[type]),                              // [고정] 도입부
     synergy: tk(g(gen.synergy, strengthKey, CUSTOMER_GENKEY[type])),         // G4 잘 맞는 부분
     talk: talkOf(type),                                                      // 상담 화법 [규칙]

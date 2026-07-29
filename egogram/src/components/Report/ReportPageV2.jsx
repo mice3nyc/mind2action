@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { lookupReport, EGO_STATES, EGO_LABELS, needsCoaching, isNoAdjust } from '../../lib/cmLookup';
 import { getSuccessRange } from '../../lib/scoreEngine';
+import { EGO_COLOR, EGO_LABEL, EGO_STRENGTH, EGO_TYPE_NAME, LABEL_TO_CODE, egoTermRe, withJosa } from '../../lib/egoTerms';
 import uiTexts from '../../data/ui_texts.yaml';
 import identityData from '../../data/identity.yaml';
 
@@ -20,15 +21,15 @@ import identityData from '../../data/identity.yaml';
 //   - 코드(AC 등)·괄호는 빼고 한글 라벨만 색칠 (손소장 26.0609: "AC(협조·조율)" → "협조·조율")
 //   - 손소장 26.0611(4): 라벨 뒤에 "성향" 접미 ("배려·공감 성향"). 원문이 이미 "성향"으로 이어지면 생략.
 //     뒤 조사는 '성향'(받침 ㅇ) 기준으로 교정 — 가→이, 는→은, 를→을, 와→과, 로→으로.
-const EGO_LABEL_RE = /(CP|NP|FC|AC|A)\([가-힣,·]+\)/g;
+//   매칭 규칙은 용어 사전이 만든다(egoTermRe) — 심화 리포트와 같은 정규식 하나를 쓴다.
 const JOSA_FIX = { '가': '이', '는': '은', '를': '을', '와': '과', '로': '으로' };
 function colorizeEgo(text, kp) {
   const parts = [];
   let last = 0, i = 0, m;
-  EGO_LABEL_RE.lastIndex = 0;
-  while ((m = EGO_LABEL_RE.exec(text)) !== null) {
+  const re = egoTermRe();
+  while ((m = re.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
-    const code = m[1];
+    const code = m[1] || LABEL_TO_CODE[m[2]];
     let end = m.index + m[0].length;
     const hasSuffix = /^ ?성향/.test(text.slice(end));
     parts.push(
@@ -84,13 +85,7 @@ function stripMeta(text) {
   return text.replace(/^\s*\([^)]*(?:성향|첫번째|두번째|높아|발현|BOTTOM|TOP)[^)]*\)\s*/g, '').trim();
 }
 
-const EGO_COLORS = {
-  CP: '#ef4444',
-  NP: '#f59e0b',
-  A: '#38bdf8',
-  FC: '#10b981',
-  AC: '#8b5cf6',
-};
+const EGO_COLORS = EGO_COLOR;   // 용어 사전(data/ego_terms.yaml)이 단일 출처
 
 // 점수 → cm1 구간 (cmLookup.scoreRange와 동일 기준)
 function scoreRange(score) {
@@ -143,22 +138,22 @@ function plainTranslation(ego, score, cm1) {
 // 26.0611: 인라인 9조합 → identity.yaml 20조합 외부화 (손소장 검토 승인분).
 const IDENTITY = identityData;
 
-// 미충원 조합 fallback — 두 강점을 합성 (빈 화면 방지)
-const EGO_STRENGTH = { CP: '또렷한 기준', NP: '따뜻한 공감', A: '차분한 분석', FC: '밝은 표현력', AC: '세심한 조율' };
+// 미충원 조합 fallback — 두 강점을 합성 (빈 화면 방지). 강점명은 용어 사전에서 온다.
 
 function getIdentity(top1, top2, name) {
   const hit = IDENTITY[`${top1}_${top2}`];
   if (hit) return hit;
   return {
-    // 손소장 26.0607(14): EGO_STRENGTH 다섯 값 모두 받침으로 끝나 조사는 항상 '과' → 플레이스홀더 '과(와)' 고정
-    title: `${EGO_STRENGTH[top1]}과 ${EGO_STRENGTH[top2]}이 함께 도드라지는 분`,
+    // 손소장 26.0607(14): 강점명 뒤 조사. 예전엔 다섯 값이 전부 받침으로 끝나 '과'로 고정돼 있었으나,
+    //   이름이 바뀌면 그 우연이 깨진다(순응·협조처럼 받침 없는 이름). 사전이 받침을 보고 고른다.
+    title: `${withJosa(EGO_STRENGTH[top1], '과/와')} ${withJosa(EGO_STRENGTH[top2], '이/가')} 함께 도드라지는 분`,
     desc: '',
     fallback: true,
   };
 }
 
 // 그래프 라벨 — "통제적 부모" 같은 코드 정식명 대신 강점 평이어 (제안 2, 미스리딩 제거)
-const EGO_PLAIN_LABEL = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
+const EGO_PLAIN_LABEL = EGO_LABEL;   // 용어 사전이 단일 출처
 
 // 손소장 26.0609: cm4_3/cm4_5 끝의 "⚠️ 만약 17점 이상…/가장 낮은 성향…" 고정 블록을
 //   점수 기반으로 개인화. (1)이모지 제거 (2)한 줄 띄워 별도 문단 (3)실제 17점↑ 성향·최저 성향을 이름으로 명시.
@@ -204,7 +199,7 @@ function deepReplaceOOO(node, name) {
 
 // 유형 강점 명칭 ("~의 힘", 26.0528 피터공 선택). 가장 강한 유형(top1)을 이 이름으로 부각 — 손소장 강조점.
 // 부모/아이 메타포 제거, 강점 프레이밍. 프로토타입 인라인 — 4단계서 데이터화.
-const EGO_TYPE_NAME = { CP: '기준을 세우는 힘', NP: '마음을 살피는 힘', A: '흐름을 읽는 힘', FC: '분위기를 여는 힘', AC: '보폭을 맞추는 힘' };
+// (값은 용어 사전 data/ego_terms.yaml의 type_name)
 
 function Section({ number, title, children }) {
   return (

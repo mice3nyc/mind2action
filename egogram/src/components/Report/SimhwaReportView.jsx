@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { buildSimhwa } from '../../lib/buildSimhwa';
+import { EGO_COLOR, EGO_LABEL, LABEL_TO_CODE, egoTermRe } from '../../lib/egoTerms';
 
 // ─────────────────────────────────────────────────────────────
 // SimhwaReportView — M2A 성향별 심화코칭 리포트 렌더러 (ReportViewV2 형제).
@@ -10,24 +11,23 @@ import { buildSimhwa } from '../../lib/buildSimhwa';
 //   SPEC: docs/simhwa/SPEC.md §6·§14. 스타일: styles/praxi.css .simhwa-*.
 // ─────────────────────────────────────────────────────────────
 
-const EGO_COLORS = { CP: '#ef4444', NP: '#f59e0b', A: '#38bdf8', FC: '#10b981', AC: '#8b5cf6' };
-const EGO_PLAIN = { CP: '기준·결단', NP: '배려·공감', A: '이성·판단', FC: '친화·표현', AC: '협조·조율' };
+const EGO_COLORS = EGO_COLOR;   // 색·이름은 용어 사전(data/ego_terms.yaml)이 단일 출처
+const EGO_PLAIN = EGO_LABEL;
 
 // 본문 성향명 컬러 코딩 + 에고 코드 제거 (SPEC §14-③). **기존 성향리포트 colorizeEgo와 100% 동일 로직**
 //   (피터공 확정: 기존 리포트에 맞춤). 심화 확장 = 코드 없는 맨 라벨("기준·결단")도 매칭.
 //   두 형태: (1) "CP(기준·결단)" 정순 코드형 → 코드·괄호 제거 / (2) 맨 라벨 "기준·결단".
 //   손소장 규칙(base 동일): 라벨만 색칠. 뒤에 '성향'이 이미 있으면 그 '성향'은 무색으로 둠(hasSuffix).
 //   '성향'이 없으면 라벨 뒤에 무색 아닌 접미 " 성향"을 붙이고 조사 교정(성향=받침ㅇ).
-const LABEL_TO_CODE = { '기준·결단': 'CP', '배려·공감': 'NP', '이성·판단': 'A', '친화·표현': 'FC', '협조·조율': 'AC' };
-const COLOR_RE = new RegExp(`(?:(CP|NP|FC|AC|A)\\([가-힣·,]+\\))|(${Object.keys(LABEL_TO_CODE).join('|')})`, 'g');
+//   매칭 규칙(코드형 + 맨 라벨 + 옛 표기 별칭)은 용어 사전이 만든다 — 성향리포트와 같은 정규식 하나.
 const JOSA_FIX = { '가': '이', '는': '은', '를': '을', '와': '과', '로': '으로' };
 
 function colorize(text, kp) {
   if (typeof text !== 'string') return text;
   const parts = [];
   let last = 0, i = 0, m;
-  COLOR_RE.lastIndex = 0;
-  while ((m = COLOR_RE.exec(text)) !== null) {
+  const re = egoTermRe();
+  while ((m = re.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
     const code = m[1] || LABEL_TO_CODE[m[2]];
     let end = m.index + m[0].length;

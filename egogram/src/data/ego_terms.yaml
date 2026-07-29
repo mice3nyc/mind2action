@@ -1,0 +1,69 @@
+# ─────────────────────────────────────────────────────────────
+# 성향 용어 정본 사전 — 화면에 나가는 이름과 색의 단일 출처.
+#
+#   SPEC: docs/SPEC-ego-terms.md
+#   여기 없는 이름·색을 컴포넌트에 새로 적지 않는다. `npm run check:terms`가 잡는다.
+#
+# 이름을 바꿀 때:
+#   1) label을 새 이름으로 고친다
+#   2) 옛 이름을 aliases에 내려놓는다  ← 이걸 빼먹으면 산문 속 옛 표기가 색·치환을 못 받는다
+#   3) `npm run check:terms` → `npm run build` → 렌더 덤프 대조
+#   조사(이/가·과/와…)는 label의 받침을 보고 자동으로 고른다. 받침 없는 이름이 와도 안 깨진다.
+# ─────────────────────────────────────────────────────────────
+
+# 그래프 축·표지 칩·리스트에 나가는 순서 (점수순 아님)
+order: [CP, NP, A, FC, AC]
+
+# 동점 시 우선순위 — TOP·BOTTOM 공통. 손소장 26.0611(1): A 최우선 (구: CP A NP AC FC)
+tie_priority: [A, CP, NP, FC, AC]
+
+# 유형 한 줄 소개(§3 customer_title)는 이름만 갈아끼우는 틀로 둔다.
+#   yaml 산문에 이름을 박으면 렌더러를 안 지나는 자리(h3)에서 옛 이름이 살아남는다.
+templates:
+  customer_title: '{label} 성향 고객을 10분 만에 알아보는 방법'
+
+terms:
+  CP:
+    label: 원칙·결단              # 정본 표기. 그래프 축·본문·CSV·표지 칩
+    color: '#ef4444'              # 기본 색
+    tint: '#fef2f2'               # 옅은 배경 (admin 카드)
+    ink: '#dc2626'                # 진한 글자색 (admin 카드)
+    strength: 또렷한 기준          # 인물상 fallback 문장용
+    type_name: 기준을 세우는 힘     # top1 강조용
+    aliases: ['기준·결단']        # 산문에 남아 있는 옛 표기(맨 라벨 형태만). 2026-07-29 이전 표기
+
+  NP:
+    label: 공감·배려
+    color: '#f59e0b'
+    tint: '#fffbeb'
+    ink: '#d97706'
+    strength: 따뜻한 공감
+    type_name: 마음을 살피는 힘
+    aliases: ['배려·공감']        # 2026-07-29 이전 표기(순서가 뒤집혔다)
+
+  A:
+    label: 이성·판단
+    color: '#38bdf8'
+    tint: '#f0f9ff'
+    ink: '#0284c7'
+    strength: 차분한 분석
+    type_name: 흐름을 읽는 힘
+    aliases: []
+
+  FC:
+    label: 친화·표현
+    color: '#10b981'
+    tint: '#ecfdf5'
+    ink: '#059669'
+    strength: 밝은 표현력
+    type_name: 분위기를 여는 힘
+    aliases: []
+
+  AC:
+    label: 순응·협조
+    color: '#8b5cf6'
+    tint: '#f5f3ff'
+    ink: '#7c3aed'
+    strength: 세심한 조율
+    type_name: 보폭을 맞추는 힘
+    aliases: ['협조·조율']        # 2026-07-29 이전 표기

@@ -1,13 +1,8 @@
 import { EGO_STATES, EGO_LABELS, getSuccessRange } from '../../lib/scoreEngine';
+import { EGO_COLOR } from '../../lib/egoTerms';
 
-// 리포트(ReportPageV2 EGO_COLORS)와 동일 값을 로컬 복제 — 성향 이름 컬러 표시용
-const EGO_COLORS = {
-  CP: '#ef4444',
-  NP: '#f59e0b',
-  A: '#38bdf8',
-  FC: '#10b981',
-  AC: '#8b5cf6',
-};
+// 성향 이름 컬러 표시용 — 용어 사전(data/ego_terms.yaml)이 단일 출처
+const EGO_COLORS = EGO_COLOR;
 
 // 성향 이름 — 리포트처럼 컬러+볼드 (코드 없이)
 function EgoName({ ego }) {

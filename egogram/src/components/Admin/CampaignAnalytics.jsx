@@ -1,13 +1,12 @@
 import { useMemo } from 'react';
 import { EGO_LABELS } from '../../lib/scoreEngine';
+import { EGO_ORDER, EGO_COLOR } from '../../lib/egoTerms';
 
 // 캠페인 분석 페이지 (강사 사전 준비용) — 추가 모니터링 화면.
 // 라이브 설문/리포트에 영향 없음. SPEC: docs/SPEC-analytics.md (v1, 2026-06-16).
 
-const EGO_KEYS = ['CP', 'NP', 'A', 'FC', 'AC'];
-const EGO_COLORS = {
-  CP: '#ef4444', NP: '#f59e0b', A: '#38bdf8', FC: '#10b981', AC: '#8b5cf6',
-};
+const EGO_KEYS = EGO_ORDER;
+const EGO_COLORS = EGO_COLOR;   // 용어 사전이 단일 출처
 const JOB_LABELS = {
   sales: '고객 컨설팅 영업', coach: '신인 육성 코칭', sales_leader: '조직운영 리더',
   branch_manager: '지점장/지사장', training_leader: '교육팀장/지원팀장',

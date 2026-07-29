@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { loadResults, deleteResult } from '../../lib/storage';
 import { listCampaigns, deleteCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
+import { EGO_ORDER, EGO_COLOR, EGO_TINT, EGO_INK } from '../../lib/egoTerms';
 import { JOB_LABELS, INCOME_LABELS, sortRows } from '../../lib/resultLabels';
 import CampaignManager from './CampaignManager';
 import CampaignDashboard from './CampaignDashboard';
@@ -18,13 +19,10 @@ const JOB_TO_REPORT = {
   executive: '관리자',
 };
 
-const EGO_COLORS = {
-  CP: { bg: '#ef4444', light: '#fef2f2', text: '#dc2626' },
-  NP: { bg: '#f59e0b', light: '#fffbeb', text: '#d97706' },
-  A:  { bg: '#38bdf8', light: '#f0f9ff', text: '#0284c7' },
-  FC: { bg: '#10b981', light: '#ecfdf5', text: '#059669' },
-  AC: { bg: '#8b5cf6', light: '#f5f3ff', text: '#7c3aed' },
-};
+// 용어 사전의 color·tint·ink를 이 화면이 쓰는 이름(bg/light/text)으로 옮긴다.
+const EGO_COLORS = Object.fromEntries(EGO_ORDER.map(c => [c, {
+  bg: EGO_COLOR[c], light: EGO_TINT[c], text: EGO_INK[c],
+}]));
 
 // 고객사명 → 안정적 색 (하드코딩 GROUP_COLORS 대체)
 const GROUP_PALETTE = ['#0012de', '#e11d48', '#059669', '#d97706', '#7c3aed', '#0891b2', '#be185d', '#4338ca'];

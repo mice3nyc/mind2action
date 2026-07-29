@@ -11,6 +11,17 @@
 
 > 현재 단계: **Phase 1 ✅ + Phase 2 부분 완료 + Phase 3 보험설계사 1차 + 5/18 회의 반영**
 
+## 결과 테이블 정렬 + 전체리포트 PDF 정렬 연동 — 7/3
+
+> 피터공 요청: admin 결과 테이블에서 소속/직무/소득 정렬. 명세 = SPEC.md §4 "테이블 정렬". 소득은 사전순이 아니라 `INCOME_ORDER` 배열 기준 구간 크기순 — "1000-1500"이 "200-400"보다 앞서지 않게.
+- [x] `AdminDashboard.jsx` — 소속·직무·소득 헤더 클릭 정렬(`SortableTh`, 재클릭 시 오름↔내림 토글), 캠페인 필터 변경 시 정렬 리셋
+- [x] 버튼 UI 3라운드: 아웃라인 파랑 → 검정 테두리 → **기본 검정 fill, hover·활성 파랑 fill**(피터공 확정)
+- [x] `lib/resultLabels.js` 신설 — JOB_LABELS·INCOME_LABELS·INCOME_ORDER·`sortRows()` 공용화(AdminDashboard 자체 정의 제거, camelCase/snake_case 필드 양쪽 대응)
+- [x] "전체리포트 PDF 출력하기" 링크에 현재 정렬을 쿼리스트링(`?sortKey=&sortDir=`)으로 전달, `ReportBatchPage`가 로드 후 같은 기준으로 재정렬(`useSearchParams`)
+- [x] `npm run build` clean, 정렬 로직 별도 스크립트로 목데이터 검증(소득 구간 크기순 확인)
+- [x] 커밋 2회·푸시(`75c8a30`, `ec90b5c`) + `npm run deploy` gh-pages 배포(`03f6940`)
+- [ ] **피터공 실사용 확인** — admin 로그인 정보가 없어 실브라우저에서 정렬+PDF 순서 직접 확인은 못 함
+
 ## 결과 화면 성향 인사이트 팝업 (검토 프로토타입) — 6/16 (세션492)
 
 > 개인 리포트 만족도용 두 그래프 시험. **관리자 결과 테이블 개인 행 "그래프 보기" 버튼** → 모달 2탭. 라이브 설문/리포트/점수 무변. 명세 = `egogram/docs/SPEC-result-insight.md`. 요청 노트 [[요청.26.0616.1620-결과화면인사이트팝업]].
@@ -350,3 +361,5 @@
 | 6/9 | 7b9c45b | **본문 에고 라벨 코드 제거** — `colorizeEgo`에서 "AC(협조·조율)" → "협조·조율"(코드·괄호 빼고 한글 유형명만, 색·볼드 유지). §2·§3·§4 등 전 본문 공통. 뒤 조사는 원문 유지. 라이브 `index-BmpcIUsP.js` ("v0.10 · 0609-1804 · 7b9c45b") |
 | 6/11 | 87e1742 | **인물상 20조합 identity.yaml 외부화** — 손소장 승인(26.0611 "ㅇㅋ") → 인라인 IDENTITY(9) 폐지, identity.yaml 20조합 import(fallback 안전망 유지). FC_A 복붙 의심은 새 xlsx에서 해결 확인. import_survey_csv.py 동점 우선순위 v0.11 동기화(다음 적재부터 적용). ※ "responses 0행" 오판 정정 — RLS select가 admin 전용(5/30 보안 작업)이라 anon에 빈 결과가 정상, DB손해보험 112명 그대로 있음. 검증 = admin 로그인 상태 리포트 열람 |
 | 6/11 | 9a5795f·db9f64f | **v0.11 — 손소장 26.0611 수정요청 11건 반영** — 26.0611 xlsx 3종 재변환(CM3·CM5·CM6 호칭 OOO화, CM4-2 구조 개편, CM4-4 전원 0~7) + 동점 우선순위 A>CP>NP>FC>AC + 안전구간 세 역할 통일(CP·NP·A·FC 11-20/AC 8-16, 그래프 점선 유지) + AC 상세조율 반전(0~7=cm4_4, 17+=cm4_2 멘트) + 본문 라벨 "성향" 접미·조사 교정 + 동적 안내 컬러화 + CM4-5 두 단락 교체 + OOO 치환 전역화(`deepReplaceOOO`). node 로직 검증 22건 PASS·조사 교정 전수(323건) 안전 확인. 라이브 `index-CqsfWW8Z.js` ("v0.11 · 0611-1608 · db9f64f"). ⚠️ responses 0행+RLS insert 차단으로 라이브 리포트 검증 불가 — 검증 데이터 필요 |
+| 7/29 | — | **성향 용어 사전 도입 (`ego_terms`)** — 성향 이름·색이 코드 곳곳에 복사돼 있어(라벨 5곳·색 6곳·매칭 정규식 2벌) 이름 한 번 바꾸려면 여러 파일을 동시에 맞춰야 했다. 단일 출처 `src/data/ego_terms.yaml`(label·color·tint·ink·strength·type_name·**aliases**) + 로더 `src/lib/egoTerms.js`로 통합. 소비처 9파일에서 복사본 제거(scoreEngine·ReportPageV2·SimhwaReportView·InsightCharts·ResultPage·AdminDashboard·CampaignAnalytics·buildSimhwa·PreviewSimhwaPage). **`aliases`가 장치의 핵심** — 매칭은 옛 표기로, 출력은 정본으로. 산문 400여 곳을 안 건드리고 이름이 바뀐다. **조사 자동 교정**(`src/lib/josa.js`, 순수 함수로 분리) — 현행 라벨 5개가 우연히 전부 받침으로 끝나 코드가 "조사는 항상 '과'"를 전제로 깔고 있었고, 받침 없는 이름(순응·협조)이 오면 깨진다. `simhwa_static.yaml` `customer_title` 5줄은 h3로 직렬 렌더돼 치환 파이프라인을 안 지나므로 사전 틀 조립으로 이관. 드리프트 검사 `npm run check:terms` 신설(정본 스냅샷 대조·복사본 탐지·산문 미등록 표기·조사 규칙 9경우). **검증**: build clean 107 modules · lint 16건(전부 기존, 신규 0) · check:terms 전부 통과 · **회귀 = 헤드리스 CDP 렌더 덤프 7화면(심화 5샘플+결과 2건) 개편 전후 한 글자·한 rgb도 동일**(`scripts/dump-render.mjs`+`compare-render.mjs`) · 콘솔 0 · **이름 변경 리허설**(AC→순응·협조) 통과: 표지 칩·에너지 헤드·customer_title·결과화면 전역 교체, 옛 이름 잔존 0, 색 유지, 조사 깨짐 0 · 검사 오염 주입 테스트로 진짜 2유형 탐지 확인. **라벨은 안 바꿨다**(피터공 지시). 미커밋·미배포 → SPEC `docs/SPEC-ego-terms.md` |
+| 7/29 | — | **v0.13 — 성향 라벨 5종 교체 (손소장 확정)** — `기준·결단→원칙·결단` / `배려·공감→공감·배려`(순서 뒤집힘) / `협조·조율→순응·협조`. A·FC는 변동 없음(A는 링크 시트2의 "이성·분석"이 아니라 **이성·판단**으로 확정). 손소장은 "성향코칭·심화코칭 두 리포트"라 했으나 **다섯 낱말이 시스템 한 벌**이라 관리자·코치 리포트·결과화면·admin CSV까지 함께 바뀐다(어휘를 갈라 두면 같은 사람이 화면마다 다른 이름으로 불림 → 한 벌 유지 판단). **바꾼 곳은 사전 한 곳** — `ego_terms.yaml` label 5줄 + aliases 3줄(옛 표기 내려놓기) + `check-ego-terms.mjs`의 `FROZEN.label` + `identity.yaml` 머리 주석. **산문은 한 글자도 안 건드렸다**(별칭이 옛 표기를 계속 매칭, 출력만 새 이름). 같은 날 오전 지은 용어 사전이 실제로 값을 한 첫 사례. **★받침 없는 라벨이 둘 생겼다**(공감·배려·순응·협조) — 옛 코드의 "성향 이름은 항상 받침으로 끝난다" 전제가 실제로 깨진 것이고, `josa.js`가 막았다. **검증**: build clean 107 modules · check:terms 통과(받침 없는 라벨 2건을 스스로 리포트) · **렌더 7화면에서 옛 이름 잔존 0 / 새 이름 159곳 / 받침 없는 라벨 뒤 조사 깨짐 0** · **정답지에 이름만 치환하면 새 화면과 완전 일치**(이름 외 변화 0, 색 rgb 유지) · 콘솔 0. **⛔ MBTI 대응 줄은 반영 안 함**(피터공) — 항목 3 미착수라 애초에 들어간 적 없음, 시트1 옮길 때 뗀다 → simhwa SPEC §15 |

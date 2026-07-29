@@ -1,18 +1,11 @@
 import questions from '../data/questions.json';
+import { EGO_ORDER, EGO_LABEL, TIE_PRIORITY } from './egoTerms';
 
-const EGO_STATES = ['CP', 'NP', 'A', 'FC', 'AC'];
-// 자아상태 라벨 — TA 정식명("통제적 부모" 등)은 부정적으로 읽혀 중립 키워드로 통일.
-// 리포트(ReportPageV2 EGO_PLAIN_LABEL)와 동일한 표기. 결과 화면·admin CSV가 이걸 쓴다.
-const EGO_LABELS = {
-  CP: '기준·결단',
-  NP: '배려·공감',
-  A: '이성·판단',
-  FC: '친화·표현',
-  AC: '협조·조율'
-};
-
-// 동점 시 우선순위 (TOP·BOTTOM 공통) — 손소장 26.0611(1): A 최우선으로 변경 (구: CP A NP AC FC)
-const TIE_PRIORITY = ['A', 'CP', 'NP', 'FC', 'AC'];
+// 자아상태 코드·라벨·동점 우선순위는 전부 용어 사전(data/ego_terms.yaml)에서 온다.
+//   라벨은 TA 정식명("통제적 부모" 등)이 부정적으로 읽혀 중립 키워드로 통일한 것.
+//   결과 화면·admin CSV·리포트가 같은 값을 본다. SPEC: docs/SPEC-ego-terms.md
+const EGO_STATES = EGO_ORDER;
+const EGO_LABELS = EGO_LABEL;
 
 const QUESTION_EGO = {};
 for (const q of questions) {
