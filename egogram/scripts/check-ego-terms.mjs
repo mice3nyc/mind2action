@@ -133,5 +133,21 @@ for (const code of dict.order) {
 }
 if (!josaBad) ok(`${CASES.length}개 경우 전부 통과`);
 
+// ── 5. 금지 어휘 ─────────────────────────────────────────────
+// 리포트에 실리면 안 되는 낱말. 지금은 MBTI 하나 — 과학적 근거 없는 유형론을 겹쳐 설명하면
+// 놀공 산출물의 신뢰가 깎인다는 피터공 판단(2026-07-29). 손소장 원문에 5줄 들어 있었고,
+// 데이터로 옮기다 딸려 들어가기 쉬운 자리(각 편 2번째 줄)라 검사로 막는다.
+console.log('\n[5] 금지 어휘가 리포트 데이터에 들어오지 않았는가');
+const BANNED = [{ word: 'MBTI', why: '과학적 근거 없는 유형론 — 피터공 2026-07-29 배제 결정' }];
+let banned = 0;
+for (const f of readdirSync(dataDir).filter(f => f.endsWith('.yaml'))) {
+  const text = readFileSync(join(dataDir, f), 'utf-8');
+  for (const { word, why } of BANNED) {
+    const n = text.split('\n').filter(l => l.toUpperCase().includes(word)).length;
+    if (n) { fail(`${f}: 금지 어휘 "${word}" ${n}줄 — ${why}. 원문을 옮길 때 떼고 옮길 것`); banned++; }
+  }
+}
+if (!banned) ok(`전 yaml — 금지 어휘 없음 (${BANNED.map(b => b.word).join(', ')})`);
+
 console.log(failures ? `\n실패 ${failures}건\n` : '\n전부 통과\n');
 process.exit(failures ? 1 : 0);
