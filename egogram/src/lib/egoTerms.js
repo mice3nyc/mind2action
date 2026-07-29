@@ -26,6 +26,14 @@ export function customerTitle(code) {
   return terms.templates.customer_title.replace('{label}', EGO_LABEL[code]);
 }
 
+// 유형 블록 안 소제목 — 옛 큰 제목이 내려온 자리(손소장 항목 3·6, 2026-07-30).
+export function customerRecognizeTitle(code) {
+  return terms.templates.customer_recognize_title.replace('{label}', EGO_LABEL[code]);
+}
+
+// 상담 방법 문단의 소제목. 성향 이름이 안 들어가는 고정 문구라 치환 대상이 없다.
+export const CUSTOMER_GUIDE_TITLE = terms.templates.customer_guide_title;
+
 // 산문 속 표기 → 코드. 정본 라벨과 별칭(옛 표기)을 함께 받는다.
 //   이름을 바꿔도 산문에 남은 옛 표기가 계속 매칭되는 것은 이 별칭 덕분이다.
 export const LABEL_TO_CODE = {};
@@ -45,8 +53,25 @@ const LABEL_ALT = Object.keys(LABEL_TO_CODE)
   .join('|');
 const CODE_ALT = [...EGO_ORDER].sort((a, b) => b.length - a.length).join('|');
 
-export function egoTermRe() {
-  return new RegExp(`(?:(${CODE_ALT})\\([가-힣·,\\s]+\\))|(${LABEL_ALT})`, 'g');
+// 옵션 bareCode: 괄호도 라벨도 없는 맨 코드(`CP의 방향 제시가`)까지 잡는다.
+//   손소장 항목 2·4(2026-07-30) — 심화 synergy 산문에 영문 코드가 그대로 노출돼 있던 건.
+//   ⚠️ 기본값 false로 둔 이유: 이 정규식은 성향리포트(ReportPageV2)와 공용이다.
+//      전역으로 켜면 안 바꾸기로 한 쪽까지 바뀐다(Manifesto 26.0729 교훈, SPEC-ego-terms §7).
+//      켜는 곳은 SimhwaReportView 한 곳뿐이고, ReportPageV2는 회귀 감시 대상이다.
+//   오탐 방어 둘: (1) 앞이 영문·밑줄이면 안 잡는다(yaml 키 `CP_NP`) (2) 뒤가 아래 둘 중 하나일 때만.
+//      특히 `A`는 한 글자라 이 조건이 없으면 영문 문장에서 걸린다. 넓히지 말 것.
+//      - 조사가 바로 붙는 형태: `CP의 방향`, `AC는 …`
+//      - 뒤에 `고객`이 오는 수식 형태: `CP 고객은 신뢰를…` (손소장 시트1 각 편 마지막 문단)
+const JOSA_AFTER = '의|가|이|는|은|를|을|와|과|도|만|에|로';
+const BARE_TAIL = `(?:(?:${JOSA_AFTER})[\\s,.]|\\s고객)`;
+
+export function egoTermRe({ bareCode = false } = {}) {
+  const alts = [
+    `(?:(${CODE_ALT})\\([가-힣·,\\s]+\\))`,
+    `(${LABEL_ALT})`,
+  ];
+  if (bareCode) alts.push(`(?<![A-Za-z_])(${CODE_ALT})(?=${BARE_TAIL})`);
+  return new RegExp(alts.join('|'), 'g');
 }
 
 // ── 조사 ──────────────────────────────────────────────────────

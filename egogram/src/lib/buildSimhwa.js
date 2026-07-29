@@ -7,7 +7,10 @@ import lowtraitData from '../data/simhwa_lowtrait.yaml';
 import genData from '../data/simhwa_gen.yaml';
 import energyData from '../data/simhwa_energy.yaml';
 import { EGO_STATES } from './scoreEngine';
-import { EGO_ORDER, TIE_PRIORITY, customerTitle } from './egoTerms';
+import { EGO_ORDER, TIE_PRIORITY, customerTitle, customerRecognizeTitle } from './egoTerms';
+
+// 표지 평균 비교 기준값 (손소장 항목 7). 표본이 갱신될 값이라 용어 사전이 아니라 심화 데이터에 둔다.
+export const BENCHMARK = staticData.benchmark;
 
 // 강점 조합키 후보 = 비-AC 4성향. AC는 강점으로 세우지 않는다(SPEC §1-B).
 const NON_AC = ['CP', 'NP', 'A', 'FC'];
@@ -103,10 +106,12 @@ export function buildSimhwa(result) {
   const customers = CUSTOMER_ORDER.map(type => ({
     type,
     title: customerTitle(type),                                              // 사전 틀로 조립(옛 이름 박제 방지)
-    intro: tk(staticData.customer_intro[type]),                              // [고정] 도입부
+    recognizeTitle: customerRecognizeTitle(type),                            // 소제목 — 옛 큰 제목이 내려온 자리
+    intro: tk(staticData.customer_intro[type]),                              // [고정] 10분 만에 알아보는 방법(항목 6)
+    guide: tk(staticData.customer_guide[type]),                              // [고정] 상담을 효과적으로 하는 방법(항목 3)
     synergy: tk(g(gen.synergy, strengthKey, CUSTOMER_GENKEY[type])),         // G4 잘 맞는 부분
-    talk: talkOf(type),                                                      // 상담 화법 [규칙]
-    reject: lines(staticData.reject_pool[type]).map(tk),                     // 거절 대응 [규칙]
+    talk: talkOf(type),                                                      // 상담 화법 [규칙] — 2026-07-30 렌더에서 뺌(데이터 보존)
+    reject: lines(staticData.reject_pool[type]).map(tk),                     // 거절 대응 [규칙] — 위와 같음
     core: tk(g(gen.core_customer, strengthKey, CUSTOMER_GENKEY[type])),      // G6 핵심 코칭
   }));
 

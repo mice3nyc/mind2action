@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { buildSimhwa } from '../../lib/buildSimhwa';
-import { EGO_COLOR, EGO_LABEL, LABEL_TO_CODE, egoTermRe } from '../../lib/egoTerms';
+import { EGO_COLOR, EGO_LABEL, LABEL_TO_CODE, egoTermRe, CUSTOMER_GUIDE_TITLE } from '../../lib/egoTerms';
+import { GroupRadar } from '../Result/InsightCharts';
+import { BENCHMARK } from '../../lib/buildSimhwa';
 
 // ─────────────────────────────────────────────────────────────
 // SimhwaReportView — M2A 성향별 심화코칭 리포트 렌더러 (ReportViewV2 형제).
@@ -22,14 +24,16 @@ const EGO_PLAIN = EGO_LABEL;
 //   매칭 규칙(코드형 + 맨 라벨 + 옛 표기 별칭)은 용어 사전이 만든다 — 성향리포트와 같은 정규식 하나.
 const JOSA_FIX = { '가': '이', '는': '은', '를': '을', '와': '과', '로': '으로' };
 
+//   2026-07-30 항목 2·4: 괄호 없는 맨 코드(`CP의 방향 제시가`)도 색 라벨로 바꾼다.
+//   bareCode 옵션은 심화에서만 켠다 — 같은 정규식을 성향리포트(ReportPageV2)가 쓰기 때문이다.
 function colorize(text, kp) {
   if (typeof text !== 'string') return text;
   const parts = [];
   let last = 0, i = 0, m;
-  const re = egoTermRe();
+  const re = egoTermRe({ bareCode: true });
   while ((m = re.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
-    const code = m[1] || LABEL_TO_CODE[m[2]];
+    const code = m[1] || m[3] || LABEL_TO_CODE[m[2]];
     let end = m.index + m[0].length;
     const hasSuffix = /^ ?성향/.test(text.slice(end));   // 원문에 '성향'이 이어지면 그건 색 밖(무색)에 둔다
     parts.push(
@@ -82,32 +86,35 @@ function IconHead({ children, tint }) {
   );
 }
 
+// 고객 유형 블록 — 손소장 7/28 수정요청 항목 3·5·6으로 2026-07-30 재편.
+//   큰 제목(h3) = 시트1 "상담을 효과적으로 하는 방법". 옛 큰 제목("10분 만에 알아보는 방법")은
+//   소제목(h4)으로 내려와 관찰 문단(intro)을 받는다.
+//   ⚠️ 상담 화법(c.talk)·거절 대응(c.reject)은 요청대로 화면에서 뺐다. 데이터(talk_pool·reject_pool)와
+//      조립(buildSimhwa)은 그대로 둔다 — 되돌릴 수 있게(SPEC §16-1).
+//   제목 색은 성향 이름까지만(항목 5) — inline color를 걷어내고 colorize에 맡긴다.
 function CustomerBlock({ c, nameLabel }) {
   return (
     <div className="simhwa-customer">
-      <h3 className="simhwa-customer-title" style={{ color: EGO_COLORS[c.type] }}>
-        {c.title}
+      <h3 className="simhwa-customer-title">
+        {colorize(c.title, `ct-${c.type}`)}
       </h3>
-      <Paras text={c.intro} className="simhwa-intro" />
+
+      <div className="simhwa-block">
+        <IconHead>{colorize(c.recognizeTitle, `rt-${c.type}`)}</IconHead>
+        <Paras text={c.intro} className="simhwa-intro" />
+      </div>
+
+      {c.guide && (
+        <div className="simhwa-block">
+          <IconHead>{CUSTOMER_GUIDE_TITLE}</IconHead>
+          <Paras text={c.guide} />
+        </div>
+      )}
 
       {c.synergy && (
         <div className="simhwa-block">
           <IconHead>{nameLabel}과 잘 맞는 부분</IconHead>
           <Paras text={c.synergy} />
-        </div>
-      )}
-
-      {c.talk.length > 0 && (
-        <div className="simhwa-block">
-          <IconHead>상담 화법</IconHead>
-          <LineList items={c.talk} className="simhwa-talk" />
-        </div>
-      )}
-
-      {c.reject.length > 0 && (
-        <div className="simhwa-block">
-          <IconHead>고객 거절 대응</IconHead>
-          <LineList items={c.reject} className="simhwa-reject" />
         </div>
       )}
 
@@ -158,6 +165,16 @@ export function SimhwaView({ row }) {
             </span>
           ))}
         </div>
+
+        {/* 평균 비교 레이더 (손소장 항목 7, 2026-07-30) — 결과화면 GroupRadar 재사용 */}
+        <div className="simhwa-cover-radar">
+          <GroupRadar scores={scores} groupAvg={BENCHMARK.scores} />
+          <p className="simhwa-cover-radar-legend">
+            <span className="simhwa-legend-mine">실선</span> {nameLabel}의 점수
+            <span className="simhwa-legend-sep">·</span>
+            <span className="simhwa-legend-avg">점선</span> {BENCHMARK.label} 평균
+          </p>
+        </div>
       </div>
 
       {/* 1. 리포트의 목적 */}
@@ -183,8 +200,8 @@ export function SimhwaView({ row }) {
         {r.customers.map(c => <CustomerBlock key={c.type} c={c} nameLabel={nameLabel} />)}
       </Section>
 
-      {/* 4. 소개를 만드는 고객관리 */}
-      <Section num="4." title="소개를 만드는 고객관리">
+      {/* 4. 소개를 만드는 실천 전략 (손소장 항목 8, 2026-07-30 개명) */}
+      <Section num="4." title="소개를 만드는 실천 전략">
         <Paras text={rf.intro} />
         {rf.strength && (
           <div className="simhwa-block"><Paras text={rf.strength} /></div>
@@ -197,7 +214,7 @@ export function SimhwaView({ row }) {
           <LineList items={rf.request} className="simhwa-talk" />
         </div>
         <div className="simhwa-block">
-          <IconHead>고객관리 체크리스트</IconHead>
+          <IconHead>소개를 만드는 고객관리 체크리스트</IconHead>
           <LineList items={rf.checklist} className="simhwa-checklist" />
         </div>
         <div className="simhwa-block">
