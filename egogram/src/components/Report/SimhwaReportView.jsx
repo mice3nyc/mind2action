@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { buildSimhwa } from '../../lib/buildSimhwa';
-import { EGO_COLOR, EGO_LABEL, LABEL_TO_CODE, egoTermRe, CUSTOMER_GUIDE_TITLE } from '../../lib/egoTerms';
+import { EGO_COLOR, EGO_LABEL, LABEL_TO_CODE, egoTermRe } from '../../lib/egoTerms';
 import { GroupRadar } from '../Result/InsightCharts';
 import { BENCHMARK } from '../../lib/buildSimhwa';
 
@@ -55,12 +55,44 @@ function Paras({ text, className }) {
   return paras.map((p, i) => <p key={i} className={className}>{colorize(p.replace(/\n/g, ' '), `p${i}`)}</p>);
 }
 
-// 줄 배열을 개별 라인(<p>)으로 — 화법·멘트·체크리스트 등.
-function LineList({ items, className }) {
+// 줄 배열을 목록으로 — 멘트·체크리스트 (SPEC §17-4).
+//   2026-07-30: <p> 나열이라 문단처럼 흘러 목록으로 안 읽혔다 → <ul>/<li>로 세운다.
+//   variant='check'면 체크박스 마커(인쇄본에 손으로 체크), 아니면 인용 목록.
+function LineList({ items, className, variant }) {
   if (!items || items.length === 0) return null;
   return (
-    <div className={className}>
-      {items.map((line, i) => <p key={i} className="simhwa-line">{colorize(line, `l${i}`)}</p>)}
+    <ul className={`simhwa-linelist${variant === 'check' ? ' is-check' : ''} ${className || ''}`}>
+      {items.map((line, i) => <li key={i} className="simhwa-line">{colorize(line, `l${i}`)}</li>)}
+    </ul>
+  );
+}
+
+// ② 에너지 발현 상태 문구 — 두 축(자동성 × 적정성) 분리 (SPEC §17-5).
+//   옛 5단계("매우 강하게/안정적으로/…")는 자동성 넷에 적정성 하나가 섞여 있어 혼돈이었다.
+const ENERGY_STATE_TEXT = {
+  over: '자연스럽게 나오지만, 지금은 조금 강합니다',
+  ok:   '자연스럽게 나오는 강점입니다. 지금 이대로 쓰시면 됩니다',
+  near: '의식하면 나옵니다. 조금만 더 신경 쓰면 충분합니다',
+  low:  '지금은 잘 나오지 않습니다. 연습이 필요한 부분입니다',
+};
+
+// 0~20 트랙 위에 안전구간을 띠로 깔고 내 점수에 마커. "만점 20에 14점, 그 자리가 안전구간 안"이 한눈에.
+function ScoreBar({ score, max, safe, color }) {
+  const [low, high] = safe;
+  const pct = (v) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
+  return (
+    <div className="simhwa-scorebar">
+      <div className="simhwa-scorebar-track">
+        <div
+          className="simhwa-scorebar-safe"
+          style={{ left: pct(low), width: `${((high - low) / max) * 100}%` }}
+        />
+        <div className="simhwa-scorebar-mark" style={{ left: pct(score), background: color }} />
+      </div>
+      <div className="simhwa-scorebar-foot">
+        <span className="simhwa-scorebar-score"><b>{score}</b> / {max}</span>
+        <span className="simhwa-scorebar-safelabel">코칭이 필요 없는 구간 {low}~{high}</span>
+      </div>
     </div>
   );
 }
@@ -86,37 +118,35 @@ function IconHead({ children, tint }) {
   );
 }
 
-// 고객 유형 블록 — 손소장 7/28 수정요청 항목 3·5·6으로 2026-07-30 재편.
-//   큰 제목(h3) = 시트1 "상담을 효과적으로 하는 방법". 옛 큰 제목("10분 만에 알아보는 방법")은
-//   소제목(h4)으로 내려와 관찰 문단(intro)을 받는다.
-//   ⚠️ 상담 화법(c.talk)·거절 대응(c.reject)은 요청대로 화면에서 뺐다. 데이터(talk_pool·reject_pool)와
-//      조립(buildSimhwa)은 그대로 둔다 — 되돌릴 수 있게(SPEC §16-1).
+// 고객 유형 블록 — 2026-07-30 회의로 두 장으로 갈랐다(SPEC §17-2).
+//   3장 = 알아보는 법(RecognizeBlock) 다섯 성향, 4장 = 대응(GuideBlock) 다섯 성향. 성향을 두 바퀴 돈다.
+//   근거(피터공): "먼저 어떻게 고객 성향을 확인하라는 건지 알려주고, 그 다음에 유형별 대응 방향."
+//   ⚠️ 상담 화법(c.talk)·거절 대응(c.reject)·잘 맞는 부분(c.synergy)은 화면에서 뺐다.
+//      데이터(talk_pool·reject_pool·gen.synergy)와 조립은 그대로 둔다 — 되돌릴 수 있게(§16-1·§17-3).
 //   제목 색은 성향 이름까지만(항목 5) — inline color를 걷어내고 colorize에 맡긴다.
-function CustomerBlock({ c, nameLabel }) {
+
+// 3장 — "○○ 성향 고객을 10분 만에 알아보는 방법". 옛 소제목이 제 장 제목을 되찾아 h3로 올라왔다.
+function RecognizeBlock({ c }) {
+  return (
+    <div className="simhwa-customer is-recognize">
+      <h3 className="simhwa-customer-title">
+        {colorize(c.recognizeTitle, `rt-${c.type}`)}
+      </h3>
+      <Paras text={c.intro} className="simhwa-intro" />
+    </div>
+  );
+}
+
+// 4장 — "○○ 성향이 강한 고객과 보험 상담을 효과적으로 하는 방법" + 핵심 코칭.
+//   장 제목이 곧 그 말이라 §16-9의 `CUSTOMER_GUIDE_TITLE` 소제목은 중복이 되어 없앴다(§17-2).
+function GuideBlock({ c }) {
   return (
     <div className="simhwa-customer">
       <h3 className="simhwa-customer-title">
         {colorize(c.title, `ct-${c.type}`)}
       </h3>
 
-      <div className="simhwa-block">
-        <IconHead>{colorize(c.recognizeTitle, `rt-${c.type}`)}</IconHead>
-        <Paras text={c.intro} className="simhwa-intro" />
-      </div>
-
-      {c.guide && (
-        <div className="simhwa-block">
-          <IconHead>{CUSTOMER_GUIDE_TITLE}</IconHead>
-          <Paras text={c.guide} />
-        </div>
-      )}
-
-      {c.synergy && (
-        <div className="simhwa-block">
-          <IconHead>{nameLabel}과 잘 맞는 부분</IconHead>
-          <Paras text={c.synergy} />
-        </div>
-      )}
+      {c.guide && <Paras text={c.guide} />}
 
       {c.core && (
         <div className="simhwa-core">
@@ -169,10 +199,12 @@ export function SimhwaView({ row }) {
         {/* 평균 비교 레이더 (손소장 항목 7, 2026-07-30) — 결과화면 GroupRadar 재사용 */}
         <div className="simhwa-cover-radar">
           <GroupRadar scores={scores} groupAvg={BENCHMARK.scores} />
+          {/* 2026-07-30(§17-1): 점선이 실측 평균 → 코칭이 필요 없는 구간의 상한(16)으로 바뀌었다.
+              "평균" 하드코딩을 뺀다 — 16은 평균이 아니다. 문구는 benchmark.label이 온전히 정한다. */}
           <p className="simhwa-cover-radar-legend">
             <span className="simhwa-legend-mine">실선</span> {nameLabel}의 점수
             <span className="simhwa-legend-sep">·</span>
-            <span className="simhwa-legend-avg">점선</span> {BENCHMARK.label} 평균
+            <span className="simhwa-legend-avg">점선</span> {BENCHMARK.label}
           </p>
         </div>
       </div>
@@ -184,24 +216,37 @@ export function SimhwaView({ row }) {
 
       {/* 2. 상담 시 성향 점수별 에너지 발현 상태 (7/13 수정요청 #4) */}
       <Section num="2." title="상담 시 성향 점수별 에너지 발현 상태">
+        {/* 2026-07-30(§17-5): 구간 라벨("14~16점")을 뺐다 — 내 점수가 든 구간일 뿐인데 정보처럼 보였다.
+            대신 상태 한 줄(두 축 분리) + 0~20 막대에 안전구간 띠. */}
         {r.section2.energyStates.map(es => (
-          <div className="simhwa-energy" key={es.trait}>
+          <div className={`simhwa-energy is-${es.state}`} key={es.trait}>
             <h3 className="simhwa-energy-head" style={{ color: EGO_COLORS[es.trait] }}>
               <span className="simhwa-energy-name">{EGO_PLAIN[es.trait]} 성향</span>
-              <span className="simhwa-energy-band">{es.band} · {es.score}점</span>
             </h3>
+            <ScoreBar
+              score={es.score}
+              max={es.max}
+              safe={es.safe}
+              color={EGO_COLORS[es.trait]}
+            />
+            <p className="simhwa-energy-state">{ENERGY_STATE_TEXT[es.state]}</p>
             <Paras text={es.text} className="simhwa-intro" />
           </div>
         ))}
       </Section>
 
-      {/* 3. 다섯 고객유형별 상담코칭 */}
-      <Section num="3." title="고객 유형별 상담 코칭">
-        {r.customers.map(c => <CustomerBlock key={c.type} c={c} nameLabel={nameLabel} />)}
+      {/* 3. 고객 성향을 10분 만에 알아보는 방법 (2026-07-30 회의, §17-2) */}
+      <Section num="3." title="고객 성향을 10분 만에 알아보는 방법">
+        {r.customers.map(c => <RecognizeBlock key={c.type} c={c} />)}
       </Section>
 
-      {/* 4. 소개를 만드는 실천 전략 (손소장 항목 8, 2026-07-30 개명) */}
-      <Section num="4." title="소개를 만드는 실천 전략">
+      {/* 4. 고객 유형별 상담 코칭 (2026-07-30 회의로 3장에서 갈라져 나옴, §17-2) */}
+      <Section num="4." title="고객 유형별 상담 코칭">
+        {r.customers.map(c => <GuideBlock key={c.type} c={c} />)}
+      </Section>
+
+      {/* 5. 소개를 만드는 실천 전략 (손소장 항목 8로 개명, 2026-07-30 회의로 4→5장) */}
+      <Section num="5." title="소개를 만드는 실천 전략">
         <Paras text={rf.intro} />
         {rf.strength && (
           <div className="simhwa-block"><Paras text={rf.strength} /></div>
@@ -215,7 +260,7 @@ export function SimhwaView({ row }) {
         </div>
         <div className="simhwa-block">
           <IconHead>소개를 만드는 고객관리 체크리스트</IconHead>
-          <LineList items={rf.checklist} className="simhwa-checklist" />
+          <LineList items={rf.checklist} className="simhwa-checklist" variant="check" />
         </div>
         <div className="simhwa-block">
           <IconHead>감사 멘트</IconHead>
