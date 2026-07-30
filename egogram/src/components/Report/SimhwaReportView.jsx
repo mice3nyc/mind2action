@@ -3,8 +3,8 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { buildSimhwa } from '../../lib/buildSimhwa';
 import { EGO_COLOR, EGO_LABEL, LABEL_TO_CODE, egoTermRe } from '../../lib/egoTerms';
-import { GroupRadar } from '../Result/InsightCharts';
-import { BENCHMARK } from '../../lib/buildSimhwa';
+import { SafeBandRadar } from '../Result/InsightCharts';
+import { BENCHMARK, SIMHWA_SAFE_RANGES } from '../../lib/buildSimhwa';
 
 // ─────────────────────────────────────────────────────────────
 // SimhwaReportView — M2A 성향별 심화코칭 리포트 렌더러 (ReportViewV2 형제).
@@ -67,16 +67,15 @@ function LineList({ items, className, variant }) {
   );
 }
 
-// ② 에너지 발현 상태 문구 — 두 축(자동성 × 적정성) 분리 (SPEC §17-5).
-//   옛 5단계("매우 강하게/안정적으로/…")는 자동성 넷에 적정성 하나가 섞여 있어 혼돈이었다.
-const ENERGY_STATE_TEXT = {
-  over: '자연스럽게 나오지만, 지금은 조금 강합니다',
-  ok:   '자연스럽게 나오는 강점입니다. 지금 이대로 쓰시면 됩니다',
-  near: '의식하면 나옵니다. 조금만 더 신경 쓰면 충분합니다',
-  low:  '지금은 잘 나오지 않습니다. 연습이 필요한 부분입니다',
-};
+// ② 에너지 발현 상태 문구는 여기 있던 ENERGY_STATE_TEXT에서 데이터로 옮겼다 (SPEC §18-1).
+//   → src/data/simhwa_energy.yaml `state_text`(CP류 공용) + `ac_state_text`(AC 5구간).
+//   손소장이 7/30 요청에서 이 문구를 AC용 표로 정리해 돌려줬다 = 우리 문구가 정본이 됐다.
+//   조립은 buildSimhwa.energyStatus(). 뷰는 es.stateText를 그대로 쓴다.
 
 // 0~20 트랙 위에 안전구간을 띠로 깔고 내 점수에 마커. "만점 20에 14점, 그 자리가 안전구간 안"이 한눈에.
+// ⚠️ 2026-07-30 저녁(§18-3): 손소장 항목 3으로 렌더에서 물러났다(2장 페이지 넘침).
+//    되살릴 수 있게 함수와 CSS(.simhwa-scorebar-*)를 남겨 둔다. synergy·거절 블록과 같은 처리.
+// eslint-disable-next-line no-unused-vars
 function ScoreBar({ score, max, safe, color }) {
   const [low, high] = safe;
   const pct = (v) => `${Math.max(0, Math.min(100, (v / max) * 100))}%`;
@@ -196,15 +195,16 @@ export function SimhwaView({ row }) {
           ))}
         </div>
 
-        {/* 평균 비교 레이더 (손소장 항목 7, 2026-07-30) — 결과화면 GroupRadar 재사용 */}
+        {/* 표지 레이더 (손소장 7/30 항목 4·5, §18-4) — 안전구간을 띠로 */}
         <div className="simhwa-cover-radar">
-          <GroupRadar scores={scores} groupAvg={BENCHMARK.scores} />
-          {/* 2026-07-30(§17-1): 점선이 실측 평균 → 코칭이 필요 없는 구간의 상한(16)으로 바뀌었다.
-              "평균" 하드코딩을 뺀다 — 16은 평균이 아니다. 문구는 benchmark.label이 온전히 정한다. */}
+          {/* 2026-07-30 저녁: GroupRadar(상한 점선 하나) → SafeBandRadar(하한~상한 초록 띠).
+              AC 상한이 13으로 좁혀져 "다섯 성향 전부 16"이 깨졌고, 구간 자체를 보여야 한다.
+              GroupRadar는 결과화면과 공용이라 건드리지 않고 전용 컴포넌트를 새로 썼다. */}
+          <SafeBandRadar scores={scores} safeRanges={SIMHWA_SAFE_RANGES} />
           <p className="simhwa-cover-radar-legend">
             <span className="simhwa-legend-mine">실선</span> {nameLabel}의 점수
             <span className="simhwa-legend-sep">·</span>
-            <span className="simhwa-legend-avg">점선</span> {BENCHMARK.label}
+            <span className="simhwa-legend-band">초록 띠</span> {BENCHMARK.label}
           </p>
         </div>
       </div>
@@ -217,19 +217,16 @@ export function SimhwaView({ row }) {
       {/* 2. 상담 시 성향 점수별 에너지 발현 상태 (7/13 수정요청 #4) */}
       <Section num="2." title="상담 시 성향 점수별 에너지 발현 상태">
         {/* 2026-07-30(§17-5): 구간 라벨("14~16점")을 뺐다 — 내 점수가 든 구간일 뿐인데 정보처럼 보였다.
-            대신 상태 한 줄(두 축 분리) + 0~20 막대에 안전구간 띠. */}
+            2026-07-30 저녁(§18-3, 손소장 항목 3): ScoreBar를 렌더에서 뺐다 — 2장이 한 페이지에
+            안 들어가서다. 안전구간 표시는 표지 레이더가 받았다(§18-4). ScoreBar 함수·CSS는 남겨 뒀다.
+            첫줄 문장은 buildSimhwa가 정한다(AC만 구간 표, 나머지 넷은 계산 4상태 — §18-1). */}
         {r.section2.energyStates.map(es => (
           <div className={`simhwa-energy is-${es.state}`} key={es.trait}>
             <h3 className="simhwa-energy-head" style={{ color: EGO_COLORS[es.trait] }}>
               <span className="simhwa-energy-name">{EGO_PLAIN[es.trait]} 성향</span>
+              <span className="simhwa-energy-score">{es.score} / {es.max}</span>
             </h3>
-            <ScoreBar
-              score={es.score}
-              max={es.max}
-              safe={es.safe}
-              color={EGO_COLORS[es.trait]}
-            />
-            <p className="simhwa-energy-state">{ENERGY_STATE_TEXT[es.state]}</p>
+            <p className="simhwa-energy-state">{es.stateText}</p>
             <Paras text={es.text} className="simhwa-intro" />
           </div>
         ))}

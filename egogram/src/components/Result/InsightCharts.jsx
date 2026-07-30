@@ -87,6 +87,45 @@ export function MyRadar({ scores, jobType }) {
   );
 }
 
+// ── 심화코칭 표지: 안전구간 띠 레이더 (SPEC §18-4) ──────────────
+// 손소장 7/30 항목 4·5: 표지 레이더에 "코칭이 필요 없는 구간"을 초록으로 구분.
+//   상한선 하나가 아니라 하한~상한 구간 띠라서 GroupRadar의 점선으로는 표현할 수 없다.
+// ⚠️ GroupRadar를 고치지 않고 새로 만든 이유: GroupRadar는 결과화면 인사이트 팝업
+//   (ResultInsightModal)이 같이 쓴다. 공용 컴포넌트를 고치면 안 바꾸기로 한 화면까지 바뀐다
+//   (Manifesto 2026-07-29 교훈). 띠 방식 자체는 위 MyRadar가 이미 쓰는 정본을 이식했다.
+// MyRadar와 다른 점: 구간을 getSuccessRange(엔진 UNIFIED_RANGES)에서 얻지 않고
+//   safeRanges 파라미터로 받는다 — 심화는 SIMHWA_SAFE_RANGES를 쓴다(성향리포트와 값이 다르다).
+export function SafeBandRadar({ scores, safeRanges }) {
+  const size = 300, R = 92;
+  const geo = makeGeo(size, R);
+
+  const lowScores = {}, highScores = {};
+  EGO_KEYS.forEach((k) => {
+    const [lo, hi] = safeRanges[k] || [11, 16];
+    lowScores[k] = lo; highScores[k] = hi;
+  });
+  // 바깥(상한) 다각형에서 안쪽(하한) 다각형을 빼 링을 만든다.
+  const bandPath = `M${polyStr(highScores, geo).replace(/ /g, 'L')}Z M${polyStr(lowScores, geo).replace(/ /g, 'L')}Z`;
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block', margin: '0 auto', maxWidth: '100%' }}>
+      <Grid geo={geo} />
+      <path d={bandPath} fillRule="evenodd" fill="#10b98114" stroke="none" />
+      {/* 상한 점선 — 항목 4가 말하는 "상한" 개념을 띠 안에 남긴다 */}
+      <polygon points={polyStr(highScores, geo)} fill="none" stroke="#10b981" strokeWidth="1.5"
+        strokeDasharray="5 4" strokeLinejoin="round" opacity="0.55" />
+      <polygon points={polyStr(scores, geo)} fill={`${ACCENT}1f`} stroke={ACCENT} strokeWidth="2.5" strokeLinejoin="round" />
+      {EGO_KEYS.map((k, i) => {
+        const [px, py] = geo.pt(i, scores[k]);
+        return <circle key={k} cx={px} cy={py} r="4" fill={EGO_COLORS[k]} stroke="#fff" strokeWidth="1.5" />;
+      })}
+      {/* ⚠️ scores를 넘기지 않는다 — 축 라벨에 점수가 붙으면 표지 점수 칩과 중복된다.
+          MyRadar(결과화면)는 넘기지만 심화 표지는 위에 이미 칩이 있다. */}
+      <AxisLabels geo={geo} />
+    </svg>
+  );
+}
+
 // ── 전체 속 내 위치: 오버레이 레이더 ──────────────────────────
 export function GroupRadar({ scores, groupAvg }) {
   const size = 300, R = 92;

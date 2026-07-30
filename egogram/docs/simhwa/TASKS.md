@@ -114,3 +114,16 @@ type: TASKS (진행 작업, live 체크리스트)
 - ⚠️ `SIMHWA_SAFE_RANGES`는 **심화 전용**이다. `scoreEngine.UNIFIED_RANGES`(성향리포트 공용, CP·NP·A·FC=[11,20])는 건드리지 않았다 — 피터공 "여기서만 해줘". 통합은 손소장에게 CP·NP·A·FC 17점 이상 본문을 받은 뒤(SPEC §17-0·§17-6).
 - **미커밋·미배포 — 피터공 확인 후.**
 - [x] **커밋·push·배포·라이브 검증 ✅** (2026-07-30 오후) — 커밋 `e363c77`(v0.15 회의 5건) main push. `npm run deploy` gh-pages Published. **번들 `index-BzwD68Ke.js` 전파 4초 만에 확인**(해시 먼저, 렌더 검증은 그다음). **라이브 = 로컬 덤프와 전 화면 동일 · 항목별 50/50 PASS · 성향리포트 2화면은 오전 배포본과 바이트 단위 동일(회귀 0) · 콘솔 0.**
+
+### 빌드 기록 (v0.16 후보) — 손소장 7/30 저녁 수정요청 6건
+- 2026-07-30 저녁 수정요청 6항목(SPEC §18) — 수정 파일 6개:
+  - `src/data/simhwa_energy.yaml` — `state_text`(CP류 공용 4상태) + `ac_state_text`(AC 5구간, 손소장 verbatim) 신설. 뷰에 하드코딩돼 있던 `ENERGY_STATE_TEXT`가 데이터로 내려왔다.
+  - `src/data/simhwa_static.yaml` — `purpose` 2문단 → 4문단(항목 6), `benchmark.label` 성향별 표기로 교체. `benchmark.scores`는 렌더에서 물러남(주석 보존).
+  - `src/lib/buildSimhwa.js` — `SIMHWA_SAFE_RANGES.AC` `[8,16]`→`[8,13]`(항목 1·4), `energyStatus()`·`prefixName()` 신설, energyStates에 `stateText` 추가.
+  - `src/components/Result/InsightCharts.jsx` — `SafeBandRadar` **신설 export**(항목 4·5). `GroupRadar`·`MyRadar`는 **한 줄도 안 건드렸다**.
+  - `src/components/Report/SimhwaReportView.jsx` — 표지 레이더 교체 + 범례 문구, `ScoreBar` 렌더 제거(함수·CSS 보존), `ENERGY_STATE_TEXT` 제거 → `es.stateText`, 성향명 옆 `14 / 20` 칩.
+  - `src/styles/praxi.css` — `.simhwa-legend-band`·`.simhwa-energy-score` 신설, 인쇄에서 에너지 블록 여백 축소.
+- **검증**: `check:terms` 전부 통과 · `vite build` clean 107 modules · **lint 16건 = 기준선과 동일(신규 0)** · 렌더 덤프 전후 대조에서 **성향리포트 2화면 바이트 단위 완전 동일**(회귀 0, 공용 코드로 안 샘) · **상태 판정 25/25 정확**(AC 17→많이 / 14~16→조금 / 11~13·8~10→강점 2종 / 0~7→의식하면, CP류는 현행 유지) · **이름 접두 25/25**(5명 × 5성향) · §1 4문단 확인 · 콘솔 에러 0 · **인쇄 = 5명 전건 다섯 성향이 2페이지 한 장에**(전체 9~10페이지).
+- ⚠️ 검증 중 잡은 것 하나: `SafeBandRadar`에 처음 `scores`를 넘겨 축 라벨에 점수가 붙었다(표지 점수 칩과 중복, 요청에 없는 변경). 렌더 대조의 첫 diff 지점이 그 자리라 바로 잡았다. **덤프 대조가 잡아낸 회귀다.**
+- **명세와 달라진 곳 1**: 막대를 빼면서 `14 / 20`이 갈 자리가 없어져 성향명 옆 작은 숫자로 남겼다. 손소장이 없애라고 한 것은 그래프이고 점수 자체는 본문 해석의 기준이라 지운다고 읽지 않았다. 되돌리기 쉬운 한 줄(`.simhwa-energy-score`).
+- **미커밋·미배포 — 피터공 확인 후.** 로컬 확인: `http://localhost:4173/#/preview/simhwa?s=김정임`

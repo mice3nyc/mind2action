@@ -41,12 +41,13 @@ function energyBandIndex(score) {
   return Math.max(0, bands.length - 1);
 }
 
-// ── 안전구간(코칭이 필요 없는 구간) — 심화코칭 전용 (SPEC §17-0) ──────────────────
+// ── 안전구간(코칭이 필요 없는 구간) — 심화코칭 전용 (SPEC §17-0, §18-1) ────────────
 // 손소장 7/30 정리: CP·NP·A·FC 11~16 / AC 8~16.
+// 2026-07-30 저녁 수정요청 항목 1·4: 손소장이 AC를 8~13으로 좁혔다(8~16도 손소장이 준 값이었다).
 // ⚠️ scoreEngine.UNIFIED_RANGES(성향리포트 공용)는 CP·NP·A·FC=[11,20]이고 6/11 손소장 확정분이다.
 //    거기를 16으로 내리면 CM4-2 17~20 칸이 CP=센티넬·NP/A/FC=빈칸이라 성향리포트에 빈 조율 카드가 나간다.
 //    그래서 엔진을 건드리지 않고 심화 전용 상수로 둔다("여기서만 해줘", 피터공 2026-07-30).
-export const SIMHWA_SAFE_RANGES = { CP: [11, 16], NP: [11, 16], A: [11, 16], FC: [11, 16], AC: [8, 16] };
+export const SIMHWA_SAFE_RANGES = { CP: [11, 16], NP: [11, 16], A: [11, 16], FC: [11, 16], AC: [8, 13] };
 export const SCORE_MAX = 20;
 
 // 근접(③)으로 볼 폭 — 하한 아래 3점까지. CP류 8~10, AC 5~7.
@@ -62,12 +63,36 @@ export function energyState(trait, score) {
   return 'low';
 }
 
+// 첫줄 상태 문장 — AC만 구간 표 조회, 나머지 넷은 계산 4상태 (SPEC §18-1).
+// 손소장 원문: "AC만 첫줄 문장을 따로 사용". AC 안전구간이 한 구간 아래로 밀려
+// 같은 상태(over/ok) 안에서 문구가 갈리므로 계산으로는 재현할 수 없다.
+// 반환: { state, text }. state는 CSS 상태 클래스(is-over 등)에 그대로 쓴다.
+export function energyStatus(trait, score) {
+  if (trait === 'AC') {
+    const row = (energyData.ac_state_text || [])[energyBandIndex(score)];
+    if (row && row.text) return { state: row.state, text: row.text };
+    // 표가 비면 계산으로 물러난다 — 조용히 빈 줄이 나가지 않게.
+  }
+  const state = energyState(trait, score);
+  return { state, text: (energyData.state_text || {})[state] || '' };
+}
+
 // 원문(손소장 verbatim) 첫 문장 = 옛 5단계 상태 선언. 새 상태 문구와 같은 말이라 표시에서만 뗀다.
 // 25개(5성향×5구간) 전부 이 형태임을 확인했다. 안 걸리면 원문을 그대로 둔다 — 조용히 자르지 않는다.
 const LEAD_STATE_RE = /^(?:매우 강하게|안정적으로|필요할 때|의식해야|노력해야)[^.]*발현[^.]*\.\s*/;
 
 export function stripLeadState(text) {
   return typeof text === 'string' ? text.replace(LEAD_STATE_RE, '') : text;
+}
+
+// 본문 앞에 이름 붙이기 (SPEC §18-2, 손소장 7/30 항목 2). "OOO님은 책임감 있고…"
+// 25칸 첫 문장을 전부 검사했고 주어가 생략된 서술문이라 접두가 문법을 깨지 않는다.
+// 이름이 없으면(관리자 미리보기 등) 그대로 둔다. 호칭 뒤라 조사는 항상 '은'.
+// 띄어쓰기는 리포트 관행을 따른다 — 다른 자리가 "{이름} {호칭}"("김정임 님의 점수")이라
+// 여기만 붙여 쓰면 한 리포트 안에서 갈린다. 손소장 원문 "OOO님은"은 슬롯 표기로 본다.
+export function prefixName(text, name, honorificLabel) {
+  if (typeof text !== 'string' || !text || !name) return text;
+  return `${name} ${honorificLabel}은 ${text}`;
 }
 
 // 강점 조합키 산출 (SPEC §1-B, AC 억제). 비-AC 4성향 중 점수 상위 2 → `top_second`.
@@ -96,17 +121,21 @@ export function buildSimhwa(result) {
   // ② 성향 점수별 에너지 발현 상태 — 5성향 각각 점수→구간→문장(7/13 수정요청 #4, CM2 시트).
   // 2026-07-30(§17-5): 구간 라벨(band)을 표시에서 뺐다 — "14~16점 · 14점"이 정보처럼 보이지만
   // 내 점수가 든 구간일 뿐이라 혼돈이었다. 대신 상태(state) + 안전구간(safe) + 만점(max)을 넘긴다.
+  // 2026-07-30 저녁(§18-1·§18-2): AC 첫줄 문장은 구간 표에서 오고(state까지 표가 정한다),
+  //   본문 앞에는 이름을 붙인다("OOO님은 책임감 있고…", 손소장 항목 2).
   const energyStates = CUSTOMER_ORDER.map(trait => {
     const idx = energyBandIndex(scores[trait]);
     const score = scores[trait];
+    const status = energyStatus(trait, score);
     return {
       trait,
       score,
       max: SCORE_MAX,
       safe: SIMHWA_SAFE_RANGES[trait] || [11, 16],
-      state: energyState(trait, score),
+      state: status.state,
+      stateText: status.text,
       band: (energyData.bands[idx] || {}).label || '',   // 데이터 보존(렌더에선 안 씀)
-      text: stripLeadState((energyData.energy[trait] || [])[idx] || ''),
+      text: prefixName(stripLeadState((energyData.energy[trait] || [])[idx] || ''), name, honorificLabel),
     };
   });
 

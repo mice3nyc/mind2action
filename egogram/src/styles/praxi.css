@@ -1437,6 +1437,8 @@ body:has(.report-bling) { background: #fff; }
 .simhwa-cover-radar-legend { margin: 6px 0 0; font-size: 12px; color: #6b7280; }
 .simhwa-legend-mine { font-weight: 700; color: #1f2733; }
 .simhwa-legend-avg { font-weight: 700; color: #9aa0a6; }
+/* 2026-07-30 저녁(§18-4): 상한 점선 → 안전구간 초록 띠. 범례 색을 띠와 맞춘다. */
+.simhwa-legend-band { font-weight: 700; color: #10b981; }
 .simhwa-legend-sep { margin: 0 8px; color: #d4d9e0; }
 .simhwa-score-chip { font-size: 12.5px; }
 .simhwa-score-chip b { font-size: 13.5px; }
@@ -1459,6 +1461,9 @@ body:has(.report-bling) { background: #fff; }
 /* 구간 라벨은 2026-07-30(§17-5) 렌더에서 뺐다 — 내 점수가 든 구간일 뿐인데 정보처럼 읽혔다.
    클래스는 남겨 둔다(되돌릴 때). */
 .simhwa-energy-band { font-size: 12.5px; font-weight: 600; color: #6b7280; }
+/* 2026-07-30 저녁(§18-3): 막대를 빼면서 "14 / 20"이 갈 자리가 없어졌다. 성향명 옆 작은 숫자로 남긴다.
+   손소장이 없애라고 한 것은 그래프이고 점수 자체는 본문 해석의 기준이라 지운다고 읽지 않았다. */
+.simhwa-energy-score { font-size: 12.5px; font-weight: 600; color: #6b7280; }
 
 /* ── 점수 막대 (§17-5) — 0~20 트랙 + 코칭이 필요 없는 구간 띠 + 내 점수 마커 ── */
 .simhwa-scorebar { margin: 2px 0 10px; }
@@ -1562,6 +1567,13 @@ body:has(.report-bling) { background: #fff; }
      3장 관찰 블록은 짧아서 페이지를 주면 빈 자리만 늘어난다. */
   .simhwa-customer:not(.is-recognize):not(:last-child) { break-after: page; page-break-after: always; }
   .simhwa-customer.is-recognize { break-inside: avoid; page-break-inside: avoid; }
+  /* 2026-07-30 저녁(§18-3): 손소장 "다섯가지 성향이 한 페이지에". 막대를 뺀 뒤에도 다섯 번째
+     블록(순응·협조)만 다음 장으로 넘어갔다. 인쇄에서만 블록 여백·간격을 줄여 한 장에 넣는다.
+     화면은 그대로 둔다 — 화면은 스크롤이라 좁힐 이유가 없다. */
+  .simhwa-energy { margin: 9px 0 10px; padding: 9px 14px; }
+  .simhwa-energy-head { margin-bottom: 4px; }
+  .simhwa-energy-state { margin: 4px 0 6px; }
+  .simhwa-energy .simhwa-intro { margin: 4px 0 0; }
   .simhwa-customer, .simhwa-core, .simhwa-energy, .simhwa-clover, .simhwa-cover, .simhwa-section-num, .simhwa-cover-brand, .simhwa-customer-title, .simhwa-energy-head, .simhwa-score-chip {
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
