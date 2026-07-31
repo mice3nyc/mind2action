@@ -271,6 +271,9 @@ export function SimhwaView({ row }) {
         )}
         {rf.clover && (
           <div className="simhwa-clover">
+            {/* 2026-07-31(§19-2): 손소장 원문 머리의 "마무리 코칭-"을 본문에서 떼어
+                제목으로 올렸다. 바로 위 "핵심 코칭"과 같은 자리라 형태를 맞춘다. */}
+            <IconHead>마무리 코칭</IconHead>
             <Paras text={rf.clover} />
           </div>
         )}

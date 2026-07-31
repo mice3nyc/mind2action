@@ -63,18 +63,19 @@ export function energyState(trait, score) {
   return 'low';
 }
 
-// 첫줄 상태 문장 — AC만 구간 표 조회, 나머지 넷은 계산 4상태 (SPEC §18-1).
-// 손소장 원문: "AC만 첫줄 문장을 따로 사용". AC 안전구간이 한 구간 아래로 밀려
-// 같은 상태(over/ok) 안에서 문구가 갈리므로 계산으로는 재현할 수 없다.
-// 반환: { state, text }. state는 CSS 상태 클래스(is-over 등)에 그대로 쓴다.
+// 첫줄 상태 문장 — 다섯 성향 모두 구간 표 조회 (SPEC §19-1).
+// 2026-07-31: AC만 표였던 것을 전부 표로 통일했다. 손소장이 안전구간 안을 둘로 갈라 달라고 했고
+// (AC 8~10 vs 11~13, CP류 11~13 vs 14~16) 안전구간 전체가 energyState의 `ok` 하나라
+// 계산으로는 재현할 수 없다. 요구한 경계가 energy.yaml bands 경계와 일치해 표로 합쳤다.
+// 반환: { state, text }. state는 표가 정하고, CSS 상태 클래스(is-over 등)에 그대로 쓴다.
 export function energyStatus(trait, score) {
-  if (trait === 'AC') {
-    const row = (energyData.ac_state_text || [])[energyBandIndex(score)];
-    if (row && row.text) return { state: row.state, text: row.text };
-    // 표가 비면 계산으로 물러난다 — 조용히 빈 줄이 나가지 않게.
-  }
-  const state = energyState(trait, score);
-  return { state, text: (energyData.state_text || {})[state] || '' };
+  const table = (energyData.state_text_bands || {})[trait]
+             || (energyData.state_text_bands || {}).common
+             || [];
+  const row = table[energyBandIndex(score)];
+  if (row && row.text) return { state: row.state, text: row.text };
+  // 표가 비면 계산 상태만이라도 넘긴다 — 조용히 빈 줄이 나가지 않게.
+  return { state: energyState(trait, score), text: '' };
 }
 
 // 원문(손소장 verbatim) 첫 문장 = 옛 5단계 상태 선언. 새 상태 문구와 같은 말이라 표시에서만 뗀다.
@@ -215,7 +216,8 @@ export function buildSimhwa(result) {
       checklist: lines(staticData.referral.checklist),           // [고정] 체크리스트 6
       thanks: lines(staticData.referral.thanks).map(tk),         // [고정] 감사 멘트 2
       core: tk(g(gen.core_referral, strengthKey, bottom)),       // G11 
-      clover: tk(g(gen.clover, strengthKey)),                    // G12 
+      clover: tk(gen.clover || ''),                              // [고정] 마무리 코칭 (§19-2)
+      //   2026-07-31: 조합키 12문장(G12 생성 슬롯) → 공통 한 문단. 옛 12문장은 gen.clover_retired
     },
   };
 }
