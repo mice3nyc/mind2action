@@ -172,6 +172,8 @@ export function SimhwaView({ row }) {
   const { name, honorificLabel, scores } = r.meta;
   const nameLabel = `${name} ${honorificLabel}`;
   const rf = r.referral;
+  // 표지 점 링 색을 정할 상태 맵 (§20-2). 2장 블록이 쓰는 state를 성향키로 뒤집은 것뿐이다.
+  const dotStates = Object.fromEntries(r.section2.energyStates.map(es => [es.trait, es.state]));
 
   return (
     <div className="simhwa-container">
@@ -200,11 +202,26 @@ export function SimhwaView({ row }) {
           {/* 2026-07-30 저녁: GroupRadar(상한 점선 하나) → SafeBandRadar(하한~상한 초록 띠).
               AC 상한이 13으로 좁혀져 "다섯 성향 전부 16"이 깨졌고, 구간 자체를 보여야 한다.
               GroupRadar는 결과화면과 공용이라 건드리지 않고 전용 컴포넌트를 새로 썼다. */}
-          <SafeBandRadar scores={scores} safeRanges={SIMHWA_SAFE_RANGES} />
+          {/* 2026-07-31 저녁(§20): 평균 점선 복원 + 점 상태 링.
+              dotStates는 2장(에너지 발현 상태)이 이미 쓰는 판정을 그대로 올린 것 —
+              여기서 다시 계산하면 표지와 본문이 어긋날 수 있다. */}
+          <SafeBandRadar
+            scores={scores}
+            safeRanges={SIMHWA_SAFE_RANGES}
+            avgScores={BENCHMARK.avg}
+            dotStates={dotStates}
+          />
           <p className="simhwa-cover-radar-legend">
-            <span className="simhwa-legend-mine">실선</span> {nameLabel}의 점수
-            <span className="simhwa-legend-sep">·</span>
-            <span className="simhwa-legend-band">초록 띠</span> {BENCHMARK.label}
+            <span className="simhwa-legend-row">
+              <span className="simhwa-legend-mine">실선</span>: {nameLabel}의 점수
+            </span>
+            <span className="simhwa-legend-row">
+              <span className="simhwa-legend-avg">점선</span>: {BENCHMARK.avg_label}
+            </span>
+            {/* 초록 띠 줄은 §18-4에서 손소장 요청으로 들어간 기존 줄이다. 지우면 색이 설명 없이 남는다. */}
+            <span className="simhwa-legend-row">
+              <span className="simhwa-legend-band">초록 띠</span>: {BENCHMARK.label}
+            </span>
           </p>
         </div>
       </div>

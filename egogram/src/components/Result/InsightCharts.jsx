@@ -11,6 +11,10 @@ const EGO_COLORS = EGO_COLOR;
 const EGO_PLAIN_LABEL = EGO_LABEL;
 const ACCENT = '#0012de'; // 개인 점수 강조색 (분석 레이더와 동일 톤)
 const MAX = 20;
+// 심화 표지 전용 (SPEC §20). 셋 다 코드베이스에 이미 있던 값을 가져온 것이다 — 새로 정하지 않았다.
+const AVG_LINE = '#9aa0a6';      // 평균 점선 = GroupRadar 그룹 평균과 같은 회색
+const DOT_RING_OK = '#2f7d54';   // 칭찬(ok) = praxi.css .simhwa-energy.is-ok 왼쪽 테두리
+const DOT_RING_COACH = '#b4231f';// 코칭 필요(over/near/low) = DiffBars 음수색
 
 // 펜타곤 좌표 계산기 — 위 꼭짓점(-90도)에서 시계방향.
 function makeGeo(size, R) {
@@ -95,7 +99,9 @@ export function MyRadar({ scores, jobType }) {
 //   (Manifesto 2026-07-29 교훈). 띠 방식 자체는 위 MyRadar가 이미 쓰는 정본을 이식했다.
 // MyRadar와 다른 점: 구간을 getSuccessRange(엔진 UNIFIED_RANGES)에서 얻지 않고
 //   safeRanges 파라미터로 받는다 — 심화는 SIMHWA_SAFE_RANGES를 쓴다(성향리포트와 값이 다르다).
-export function SafeBandRadar({ scores, safeRanges }) {
+// 2026-07-31(SPEC §20): avgScores(평균 점선) + dotStates(점 상태 링) 두 파라미터를 더했다.
+//   둘 다 안 넘기면 7/30 그림 그대로다 — 기본 동작을 보존한다.
+export function SafeBandRadar({ scores, safeRanges, avgScores, dotStates }) {
   const size = 300, R = 92;
   const geo = makeGeo(size, R);
 
@@ -111,13 +117,27 @@ export function SafeBandRadar({ scores, safeRanges }) {
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ display: 'block', margin: '0 auto', maxWidth: '100%' }}>
       <Grid geo={geo} />
       <path d={bandPath} fillRule="evenodd" fill="#10b98114" stroke="none" />
-      {/* 상한 점선 — 항목 4가 말하는 "상한" 개념을 띠 안에 남긴다 */}
-      <polygon points={polyStr(highScores, geo)} fill="none" stroke="#10b981" strokeWidth="1.5"
-        strokeDasharray="5 4" strokeLinejoin="round" opacity="0.55" />
+      {/* 평균 점선 (SPEC §20-1) — 색은 GroupRadar의 그룹 평균과 같은 회색. 같은 뜻에 같은 색.
+          7/30의 "상한 점선"은 여기서 뺐다: 초록 띠 바깥 경계가 곧 상한이라 중복이고,
+          점선 두 개가 서로 다른 뜻(상한/평균)을 갖게 되면 범례로도 못 푼다. */}
+      {avgScores && (
+        <polygon points={polyStr(avgScores, geo)} fill="none" stroke={AVG_LINE} strokeWidth="2"
+          strokeDasharray="5 4" strokeLinejoin="round" />
+      )}
       <polygon points={polyStr(scores, geo)} fill={`${ACCENT}1f`} stroke={ACCENT} strokeWidth="2.5" strokeLinejoin="round" />
       {EGO_KEYS.map((k, i) => {
         const [px, py] = geo.pt(i, scores[k]);
-        return <circle key={k} cx={px} cy={py} r="4" fill={EGO_COLORS[k]} stroke="#fff" strokeWidth="1.5" />;
+        // 상태 링 (SPEC §20-2) — 2장 에너지 발현 상태를 표지 점으로 올린다.
+        //   판정은 energyStatus()가 이미 한 것을 받아 쓴다(여기서 다시 계산하면 두 벌이 된다).
+        //   점 바깥 끝 4.75 + 간격 2.0 + 선폭 1.5 → r=7.5.
+        const st = dotStates && dotStates[k];
+        const ring = st ? (st === 'ok' ? DOT_RING_OK : DOT_RING_COACH) : null;
+        return (
+          <g key={k}>
+            {ring && <circle cx={px} cy={py} r="7.5" fill="none" stroke={ring} strokeWidth="1.5" />}
+            <circle cx={px} cy={py} r="4" fill={EGO_COLORS[k]} stroke="#fff" strokeWidth="1.5" />
+          </g>
+        );
       })}
       {/* ⚠️ scores를 넘기지 않는다 — 축 라벨에 점수가 붙으면 표지 점수 칩과 중복된다.
           MyRadar(결과화면)는 넘기지만 심화 표지는 위에 이미 칩이 있다. */}

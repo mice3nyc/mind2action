@@ -1434,8 +1434,11 @@ body:has(.report-bling) { background: #fff; }
 /* 표지 평균 비교 레이더 (손소장 항목 7) — 첫 페이지 아래 공란을 채운다. */
 .simhwa-cover-radar { margin: 18px auto 0; max-width: 360px; }
 .simhwa-cover-radar svg { width: 100%; height: auto; }
-.simhwa-cover-radar-legend { margin: 6px 0 0; font-size: 12px; color: #6b7280; }
-.simhwa-legend-mine { font-weight: 700; color: #1f2733; }
+.simhwa-cover-radar-legend { margin: 8px 0 0; font-size: 12px; color: #6b7280; line-height: 1.55; }
+/* 2026-07-31 저녁(§20-1): 한 줄 나열 → 줄바꿈 3줄. <br>이 아니라 블록이라 인쇄에서 줄이 안 붙는다. */
+.simhwa-cover-radar-legend .simhwa-legend-row { display: block; }
+/* 범례의 '실선'·'점선'·'초록 띠'는 그래프에 실제로 그려진 선과 같은 색이다(§20-1). */
+.simhwa-legend-mine { font-weight: 700; color: #0012de; }
 .simhwa-legend-avg { font-weight: 700; color: #9aa0a6; }
 /* 2026-07-30 저녁(§18-4): 상한 점선 → 안전구간 초록 띠. 범례 색을 띠와 맞춘다. */
 .simhwa-legend-band { font-weight: 700; color: #10b981; }
