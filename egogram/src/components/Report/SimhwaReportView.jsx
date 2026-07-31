@@ -218,10 +218,9 @@ export function SimhwaView({ row }) {
             <span className="simhwa-legend-row">
               <span className="simhwa-legend-avg">점선</span>: {BENCHMARK.avg_label}
             </span>
-            {/* 초록 띠 줄은 §18-4에서 손소장 요청으로 들어간 기존 줄이다. 지우면 색이 설명 없이 남는다. */}
-            <span className="simhwa-legend-row">
-              <span className="simhwa-legend-band">초록 띠</span>: {BENCHMARK.label}
-            </span>
+            {/* §20-4: 초록 띠 줄은 피터공 지시로 뺐다("원하는 건 점선 월소득 1천만원 이상까지").
+                띠 자체는 그대로 그린다 — 지운 건 범례 줄이다.
+                BENCHMARK.label과 .simhwa-legend-band는 되살릴 수 있게 남겨 뒀다(§18-4 손소장 요청 이력). */}
           </p>
         </div>
       </div>

@@ -13,8 +13,11 @@ const ACCENT = '#0012de'; // 개인 점수 강조색 (분석 레이더와 동일
 const MAX = 20;
 // 심화 표지 전용 (SPEC §20). 셋 다 코드베이스에 이미 있던 값을 가져온 것이다 — 새로 정하지 않았다.
 const AVG_LINE = '#9aa0a6';      // 평균 점선 = GroupRadar 그룹 평균과 같은 회색
-const DOT_RING_OK = '#2f7d54';   // 칭찬(ok) = praxi.css .simhwa-energy.is-ok 왼쪽 테두리
-const DOT_RING_COACH = '#b4231f';// 코칭 필요(over/near/low) = DiffBars 음수색
+// 링 색 (§20-4): 처음엔 테두리·막대용 어두운 값(#2f7d54·#b4231f)을 재활용했는데 탁했다.
+//   얇은 획 하나로 쓰는 자리라 같은 계열이라도 더 밝고 채도가 높아야 한다.
+//   성향 점 색(CP #ef4444 · FC #10b981)과 계열이 겹치지만 둘 다 그보다 채도가 높아 앞으로 나온다.
+const DOT_RING_OK = '#00c853';   // 칭찬(ok)
+const DOT_RING_COACH = '#ff1744';// 코칭 필요(over/near/low)
 
 // 펜타곤 좌표 계산기 — 위 꼭짓점(-90도)에서 시계방향.
 function makeGeo(size, R) {
@@ -129,13 +132,15 @@ export function SafeBandRadar({ scores, safeRanges, avgScores, dotStates }) {
         const [px, py] = geo.pt(i, scores[k]);
         // 상태 링 (SPEC §20-2) — 2장 에너지 발현 상태를 표지 점으로 올린다.
         //   판정은 energyStatus()가 이미 한 것을 받아 쓴다(여기서 다시 계산하면 두 벌이 된다).
-        //   점 바깥 끝 4.75 + 간격 2.0 + 선폭 1.5 → r=7.5.
+        //   §20-4: 점 바깥 끝 4.0(흰 테두리 뺀 값) + 간격 2.0 + 선폭 2.2의 절반 1.1 → r=7.1.
         const st = dotStates && dotStates[k];
         const ring = st ? (st === 'ok' ? DOT_RING_OK : DOT_RING_COACH) : null;
         return (
           <g key={k}>
-            {ring && <circle cx={px} cy={py} r="7.5" fill="none" stroke={ring} strokeWidth="1.5" />}
-            <circle cx={px} cy={py} r="4" fill={EGO_COLORS[k]} stroke="#fff" strokeWidth="1.5" />
+            {ring && <circle cx={px} cy={py} r="7.1" fill="none" stroke={ring} strokeWidth="2.2" />}
+            {/* §20-4: 흰 테두리를 뺐다 — 점 둘레를 파먹어 파랑 실선이 점에 닿기 전에 끊겨 보였다.
+                점을 실선보다 나중에 그리므로 선이 점까지 이어지고 점이 그 위에 얹힌다. */}
+            <circle cx={px} cy={py} r="4" fill={EGO_COLORS[k]} />
           </g>
         );
       })}
