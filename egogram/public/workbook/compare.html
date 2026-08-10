@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<!--
+  26.0708 아리공 — M2A 자가 워크북 선택지 방식 비교 시안.
+  목적: 주관식의 근본 한계(내 답의 정확도에 피드백 불가)를 선택지로 풀 때,
+        질문 성격마다 선택지가 어떻게 작동하는지 눈으로 비교.
+  담은 것(같은 STEP을 방식별로 나란히):
+    A. [스킬형]  STEP 8 거절 화법 — 선택지 채점형 (정답·오답 + 가치 라벨, 손소장 녹취 근거)
+    B. [리프레임·정답형] STEP 1 — 하나가 정답인 객관식 (=(가) 전면 선택지화가 리프레임에 닿을 때)
+    C. [리프레임·진단형] STEP 1 — 정답 없이 각 보기의 패턴·가치 진단 (=(나)식)
+    D. [참고] 초안1의 주관식 원형 — 대조용.
+  선택지 콘텐츠 근거 = 손소장 개인 심화 코칭 녹취(26.0704). 정답/오답은 손소장이
+  실제로 문장을 "좋다/영업 안 해본 티 난다"고 평가한 데서 추출.
+  판단·비교용 시안이라 localStorage·인쇄 최적화 없음.
+-->
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>워크북 방식 비교 · MIND2ACTION</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css" />
+<style>
+:root { --bg:#ffffff; --text:#1a1a1a; --text-strong:#111; --text-muted:#888; --accent:#0012de; --good:#0a7d3c; --bad:#b23; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Paperlogy',-apple-system,BlinkMacSystemFont,sans-serif; font-weight:400; font-size:16px; line-height:1.65; color:var(--text); background:#f2f2f2; -webkit-font-smoothing:antialiased; }
+h1,h2,h3,h4 { font-family:'Paperlogy',sans-serif; font-weight:700; color:var(--text-strong); letter-spacing:-0.02em; }
+.wrap { max-width:760px; margin:0 auto; padding:0 20px 80px; }
+
+/* Page head */
+.pagehead { background:#fff; border-top:3px solid #111; padding:26px 26px 22px; margin:24px 0 10px; }
+.pagehead .kick { font-size:13px; letter-spacing:3px; color:var(--accent); font-weight:700; }
+.pagehead h1 { font-size:23px; margin:6px 0 10px; }
+.pagehead p { font-size:15.5px; color:#444; line-height:1.7; }
+.pagehead b { color:var(--accent); }
+
+/* Card = one sample */
+.card { background:#fff; border:1px solid #ddd; padding:24px 26px 26px; margin:18px 0; }
+.mode { display:inline-block; font-size:11px; font-weight:800; letter-spacing:1.5px; padding:4px 10px; border-radius:2px; margin-bottom:4px; }
+.mode.skill { background:var(--accent); color:#fff; }
+.mode.correct { background:#111; color:#fff; }
+.mode.diag { background:#e9e9ff; color:var(--accent); }
+.mode.subj { background:#f0f0f0; color:#666; }
+.card > .why { font-size:14.5px; color:var(--text-muted); margin:6px 0 16px; line-height:1.6; }
+.card .stepname { font-size:18px; font-weight:800; margin:2px 0 4px; }
+.card .stepname .n { color:#fff; background:var(--accent); font-size:13px; font-weight:800; padding:2px 7px; border-radius:2px; margin-right:7px; letter-spacing:1px; }
+
+.situ { background:#f7f7f7; padding:12px 14px; font-size:15.5px; line-height:1.7; margin:0 0 6px; }
+.situ b { color:var(--accent); }
+.coach { border-left:4px solid var(--accent); padding:5px 0 5px 13px; margin:10px 0; font-size:15px; line-height:1.65; color:#333; }
+.coach .who { font-size:10px; font-weight:700; color:var(--accent); letter-spacing:1px; display:block; margin-bottom:2px; }
+.q { font-weight:700; font-size:16.5px; margin:16px 0 10px; }
+
+/* Options */
+.opts { display:flex; flex-direction:column; gap:9px; }
+.opt { border:1px solid #ccc; padding:12px 14px; font-size:15.5px; line-height:1.6; cursor:pointer; background:#fff; transition:border-color .12s, background .12s; position:relative; }
+.opt:hover { border-color:var(--accent); }
+.opt .letter { font-weight:800; color:var(--accent); margin-right:8px; }
+.opt.sel { border-color:var(--accent); border-width:2px; padding:11px 13px; }
+.opt.good  { border-color:var(--good); background:#f2fbf5; }
+.opt.bad   { border-color:var(--bad);  background:#fdf3f4; }
+.opt .fb { display:none; margin-top:9px; padding-top:9px; border-top:1px dotted #ccc; font-size:14.5px; line-height:1.6; color:#333; }
+.opt.reveal .fb { display:block; }
+.opt .val { display:inline-block; font-size:11px; font-weight:800; letter-spacing:.5px; padding:2px 8px; border-radius:2px; margin-bottom:5px; }
+.val.g { background:var(--good); color:#fff; }
+.val.b { background:var(--bad); color:#fff; }
+.val.n { background:#666; color:#fff; }
+.hint { font-size:13px; color:var(--text-muted); margin-top:10px; min-height:1.4em; }
+.hint b { color:var(--accent); }
+
+/* Subjective ref */
+.subjwrite { width:100%; min-height:70px; border:1px dashed #bbb; padding:10px 12px; font-family:inherit; font-size:15.5px; line-height:1.6; background:#fcfcfc; resize:vertical; }
+.reveal-box { margin-top:10px; border:1px dotted #999; }
+.reveal-box summary { cursor:pointer; padding:9px 13px; font-size:14.5px; font-weight:700; color:var(--accent); }
+.reveal-box .rb { padding:11px 13px; font-size:15px; line-height:1.7; }
+
+/* Verdict strip */
+.verdict { background:#111; color:#fff; padding:20px 26px; margin:22px 0 0; font-size:15.5px; line-height:1.75; }
+.verdict h3 { color:#fff; font-size:16.5px; margin-bottom:8px; letter-spacing:1px; }
+.verdict b { color:#8ea0ff; }
+.verdict ul { margin:8px 0 0 18px; } .verdict li { margin-bottom:5px; }
+
+.foot { font-size:11px; color:#aaa; text-align:right; margin-top:16px; letter-spacing:.5px; }
+@media (max-width:600px){ .card, .pagehead { padding-left:18px; padding-right:18px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="pagehead">
+    <div class="kick">MIND2ACTION 자가 워크북 · 방식 비교</div>
+    <h1>주관식 vs 선택지 — 어느 질문에 뭐가 맞나</h1>
+    <p>주관식의 한계는 <b>내 답의 정확도에 피드백을 줄 수 없다는 것</b>. 선택지로 가면 각 보기의 가치를 미리 매기고 정답·오답을 필터링해 둘 수 있습니다. 아래는 같은 STEP을 방식별로 만들어 나란히 놓은 것 — <b>보기를 실제로 눌러보세요.</b> 스킬 질문과 리프레임 질문에서 선택지가 어떻게 다르게 작동하는지 체감용입니다.</p>
+  </div>
+
+  <!-- ============ A. 스킬형 ============ -->
+  <div class="card">
+    <span class="mode skill">스킬형 · 선택지 채점</span>
+    <div class="why">화법·질문처럼 잘·못이 분명한 단계. 선택지가 가장 잘 맞습니다. 정답·오답이 손소장 코칭에 이미 갈려 있음.</div>
+    <div class="stepname"><span class="n">STEP 8</span>세 가지 거절 화법</div>
+    <div class="situ">고객: <b>"저는 이미 아는 설계사가 있어요."</b> 나는 뭐라고 답할까요?</div>
+    <p class="q">가장 좋은 응답을 고르세요.</p>
+    <div class="opts" data-group="A">
+      <div class="opt" data-v="bad"  data-val="정면 반박" data-fb="맞서 이기려는 순간 고객은 방어벽을 세웁니다. 손소장: “고객을 눌러 이기려 하면 안 돼요.”">
+        <span class="letter">A</span>"그 설계사가 이 상품도 갖고 있나요? 저희가 더 유리합니다."</div>
+      <div class="opt" data-v="good" data-val="오히려 화법" data-fb="거절의 이유를 역이용해 문턱을 낮춥니다. 손소장이 롤플레이로 만들어 준 실제 대사.">
+        <span class="letter">B</span>"아, 그러시면 오히려 부담이 덜 되시겠네요. 어차피 그분이 관리해 주실 테니, 저는 DB손해보험 상품만 말씀드리고 가겠습니다."</div>
+      <div class="opt" data-v="bad"  data-val="물러섬" data-fb="필요성을 못 만들고 그냥 후퇴. 3일 유효기간 안에 2차 방문의 고리도 못 겁니다.">
+        <span class="letter">C</span>"아 그러시군요. 그럼 다음에 필요하시면 연락 주세요."</div>
+      <div class="opt" data-v="soso" data-val="나쁘진 않음" data-fb="부담 제거 방향은 맞지만 이 상황(경쟁 설계사)엔 ‘오히려 화법’이 더 정확합니다. 부담 제거 화법은 첫 방문 문턱 낮추기에 씁니다.">
+        <span class="letter">D</span>"오늘은 청약서도 안 갖고 왔습니다. 결정하실 건 없고 대화만 나누고 가겠습니다."</div>
+    </div>
+    <div class="hint" data-hint></div>
+  </div>
+
+  <!-- ============ B. 리프레임 · 정답형 ============ -->
+  <div class="card">
+    <span class="mode correct">리프레임 · 정답형</span>
+    <div class="why">전면 선택지화(가안)가 마음 틀기 질문에 닿으면 이렇게 됩니다. 정답이 하나 — 그런데 <b>정답이 뻔히 보여</b> 각성이 약해집니다.</div>
+    <div class="stepname"><span class="n">STEP 1</span>거절의 정체</div>
+    <p class="q">고객이 계약하지 않았습니다. 그 진짜 이유는?</p>
+    <div class="opts" data-group="B">
+      <div class="opt" data-v="bad"  data-val="오답" data-fb="거절을 나에게로 끌어오는 순간 악순환이 시작됩니다. 보험을 안 한 걸 나 때문이라 여기는 것.">
+        <span class="letter">A</span>내 설명이 부족했다.</div>
+      <div class="opt" data-v="good" data-val="정답" data-fb="대부분의 거절은 “아직 필요를 못 느꼈다”는 신호. 손소장: 니즈 파악을 안 한 게 진짜 원인.">
+        <span class="letter">B</span>고객이 아직 필요를 못 느꼈다.</div>
+      <div class="opt" data-v="bad"  data-val="오답" data-fb="자기 존재에 대한 평가로 번지면 위축의 시작. 고객은 ‘나’가 아니라 ‘보험’을 안 한 겁니다.">
+        <span class="letter">C</span>내가 부족한 사람이라 그렇다.</div>
+      <div class="opt" data-v="bad"  data-val="오답" data-fb="체념은 니즈 발굴의 기회를 닫아버립니다.">
+        <span class="letter">D</span>고객이 원래 안 살 사람이었다.</div>
+    </div>
+    <div class="hint" data-hint></div>
+  </div>
+
+  <!-- ============ C. 리프레임 · 진단형 ============ -->
+  <div class="card">
+    <span class="mode diag">리프레임 · 진단형</span>
+    <div class="why">(나)식. 정답을 묻지 않고 <b>“내가 실제로 하는 것”</b>을 고르게 합니다. 뻔한 정답 고르기가 아니라 내 패턴 진단 — 고른 뒤 그 반응의 가치를 알려줍니다.</div>
+    <div class="stepname"><span class="n">STEP 1</span>거절의 정체</div>
+    <p class="q">거절을 받으면 나는 <b>실제로</b> 어떻게 되나요? (정답 없음 · 솔직하게)</p>
+    <div class="opts" data-group="C">
+      <div class="opt" data-v="n" data-val="악순환의 첫 고리" data-fb="위축 → 기운 빠짐 → 계약에 매달림 → 다시 실적 하락. 손소장이 짚은 악순환이 여기서 시작합니다. 눈치보기(AC) 성향이 밟는 길.">
+        <span class="letter">A</span>위축돼서 다음 상담이 무서워진다.</div>
+      <div class="opt" data-v="n" data-val="조급증 신호" data-fb="계약을 나에게로 끌어오면 고객이 그 조급함을 느끼고 방어벽을 세웁니다. 결과가 아니라 과정으로 마음을 틀 지점.">
+        <span class="letter">B</span>다음엔 꼭 계약시키려 더 매달린다.</div>
+      <div class="opt" data-v="n" data-val="건강한 분리" data-fb="바로 이 반응이 목표 지점. “고객은 보험을 안 한 거지 나를 안 한 게 아니다.” 여기서 니즈 발굴로 넘어갈 수 있습니다.">
+        <span class="letter">C</span>"보험 때문이지 나 때문 아니다" 하고 넘긴다.</div>
+      <div class="opt" data-v="n" data-val="성장형(단, 자책과 구분)" data-fb="복기는 좋지만 “뭘 잘못했나”가 자책으로 흐르면 A와 같아집니다. 복기의 방향을 ‘니즈 질문을 했나’로 잡으세요.">
+        <span class="letter">D</span>뭐가 문제였는지 복기한다.</div>
+    </div>
+    <div class="hint" data-hint></div>
+  </div>
+
+  <!-- ============ D. 주관식 원형 ============ -->
+  <div class="card">
+    <span class="mode subj">참고 · 초안1 주관식 원형</span>
+    <div class="why">지금 워크북(초안1)의 방식. 쓸 순 있지만 <b>내 답이 맞는지 확인이 안 됩니다</b> — 다시 보기는 코치 관점을 보여줄 뿐 채점은 못 함.</div>
+    <div class="stepname"><span class="n">STEP 1</span>거절의 정체</div>
+    <p class="q">고객이 계약하지 않으면, 가장 먼저 어떤 생각이 드나요?</p>
+    <textarea class="subjwrite" placeholder="떠오르는 생각을 그대로"></textarea>
+    <details class="reveal-box">
+      <summary>다 쓰셨나요? 다시 보기</summary>
+      <div class="rb">손소장은 답을 바로 주지 않고 “설명이 부족했나? 그게 맞을까요?” 하고 되물었고, 김성아 TCR님 스스로 “니즈 파악을 한 번도 안 했다”를 찾아냈습니다. 대부분의 거절은 나에 대한 평가가 아니라 “아직 필요를 못 느꼈다”는 신호입니다. — <i>하지만 이 글은 내가 위에 쓴 답이 좋았는지는 말해주지 못합니다.</i></div>
+    </details>
+  </div>
+
+  <!-- ============ 판정 ============ -->
+  <div class="verdict">
+    <h3>네 개를 눌러 본 소감 — 아리공 정리</h3>
+    <ul>
+      <li><b>A 스킬형</b>: 선택지가 깨끗하게 맞습니다. 정답·오답·가치가 손소장 코칭에 이미 있어 그대로 옮기면 됨.</li>
+      <li><b>B 리프레임·정답형</b>: 정답(“필요를 못 느꼈다”)이 너무 뻔해서, 고르는 순간 각성이 아니라 시험 문제가 됩니다. 마음 틀기엔 약함.</li>
+      <li><b>C 리프레임·진단형</b>: 같은 리프레임 질문인데 “내가 실제 하는 것”을 고르게 하니 정직한 자기 위치가 찍히고, 그 반응의 가치를 피드백으로 받습니다. 리프레임엔 이쪽.</li>
+      <li><b>D 주관식</b>: 자기 언어로 쓰는 맛은 있지만 피드백이 안 붙습니다. 피터공이 짚은 그 한계.</li>
+    </ul>
+    <p style="margin-top:10px">→ 결론 방향: <b>스킬 단계는 A식, 리프레임 단계는 C식</b>으로 가면 대부분에 피드백이 붙습니다. 순수 회고(“7일간 가장 큰 변화”)만 D 주관식으로 남기면 됨. 어느 조합으로 초안2를 짤지 정해주세요.</p>
+  </div>
+
+  <div class="foot">M2A 자가 워크북 · 선택지 방식 비교 시안 · 26.0708 · 아리공</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.opts').forEach(function(group){
+  var hint = group.parentElement.querySelector('[data-hint]');
+  var opts = Array.prototype.slice.call(group.querySelectorAll('.opt'));
+  opts.forEach(function(opt){
+    opt.addEventListener('click', function(){
+      opts.forEach(function(o){ o.classList.remove('sel','good','bad','reveal'); });
+      // reveal every option's value + feedback so the "가치 사전 매김" is visible
+      opts.forEach(function(o){
+        var v=o.getAttribute('data-v');
+        var val=o.getAttribute('data-val');
+        var fb=o.getAttribute('data-fb');
+        var cls = v==='good'?'g' : (v==='bad'?'b':'n');
+        var box=o.querySelector('.fb');
+        if(!box){ box=document.createElement('div'); box.className='fb'; o.appendChild(box); }
+        box.innerHTML='<span class="val '+cls+'">'+val+'</span><br>'+fb;
+        o.classList.add('reveal');
+        if(v==='good') o.classList.add('good');
+        if(v==='bad')  o.classList.add('bad');
+      });
+      opt.classList.add('sel');
+      var picked=opt.getAttribute('data-v');
+      if(picked==='good') hint.innerHTML='<b>정확합니다.</b> 이 선택의 가치가 왜 높은지 위 초록 박스에서 확인하세요.';
+      else if(picked==='bad') hint.innerHTML='다시 보세요 — <b>초록으로 표시된 보기</b>가 더 정확합니다. 내가 고른 것이 왜 약한지 붉은 박스에 있습니다.';
+      else if(picked==='soso') hint.innerHTML='나쁘진 않지만 이 상황엔 <b>초록 보기</b>가 더 맞습니다.';
+      else hint.innerHTML='정답이 있는 질문이 아닙니다. <b>내가 고른 반응의 가치</b>를 위에서 확인하세요.';
+    });
+  });
+});
+</script>
+</body>
+</html>
