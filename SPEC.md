@@ -569,3 +569,54 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 - **(4) §3 조율 카드 한 줄**: 라벨(h4)과 설명이 2줄 → `협조·조율 18점 : 설명…` 한 줄. 상세 카드(cm4_4)는 `detailed.trait`, 단순 카드는 `cm4_1`을 헤드에 인라인. JSX: `h4` → `p.report-coaching-head`(`report-coaching-ego`·`report-coaching-score`·`report-coaching-sep`·`report-coaching-headtext`). 헬퍼 `inlineFlow(text,key)` = 문단 줄바꿈을 공백으로 합쳐 `colorizeEgo` 적용(에고 라벨 색·성향 접미 유지). 상세 카드의 별도 `report-detailed-trait` 줄 폐지(헤드로 흡수)
 - **(5) §4 화법 한 줄**: cm5 manner/improvement의 `✔ 화법 ①` 라벨과 다음 줄 내용이 `breaks` 렌더에서 2줄로 갈리던 것 → 한 줄. 헬퍼 `joinSpeechLabels(text)` = `/(✔\s*화법\s*[①-⑩0-9]+)\s*\n+/ → '$1 '`로 라벨 줄과 다음 줄 결합. **데이터 무변경(렌더 직전 변환) — 재변환 안전.** manner·improvement 양쪽 적용
 - **(6) intro(목적) 간격**: 단문 단락이 `margin 12px`+`line-height 1.7`로 빈 줄처럼 벌어져 보임 → `.report-intro-v2 p` margin 12px→6px·line-height 1.7→1.65, `.report-intro h2` margin-bottom 16px→10px
+
+## §11 탭 이름(document.title) 규칙 — 26.0810
+
+**문제**: 여러 화면을 동시에 열면 브라우저 탭이 전부 "MIND2ACTION…"으로만 보여 구별이 안 된다. 원인이 두 군데였다.
+- **에고그램 앱**: 라우트 7개가 `document.title`을 한 번도 안 건드려 `index.html`의 `MIND2ACTION — 에고그램 설문` 하나를 공유했다. 설문·관리자·리포트·심화·미리보기가 전부 같은 글자.
+- **워크북 정적 4종**: title은 각각 있었으나 전부 `MIND2ACTION 자가 워크북 —`으로 시작해, 구별되는 뒷부분이 탭 폭에서 잘렸다.
+
+**규칙**: **구별어를 앞에, 브랜드를 뒤에.** `{화면 이름} · MIND2ACTION`. 탭은 앞 8~10자만 보이므로 브랜드를 앞에 두면 정보가 0이 된다.
+
+**앱** (`src/App.jsx`) — `PAGE_TITLES` 배열 + `pageTitle(pathname)` + `useEffect([location.pathname])`. HashRouter라 라우트별 HTML이 없어 런타임 설정이 유일한 방법.
+
+| 경로 | 탭 이름 |
+|---|---|
+| `/*` (기본) | 에고그램 설문 · MIND2ACTION |
+| `/admin` | 관리자 · MIND2ACTION |
+| `/report/:id` | 성향 리포트 · MIND2ACTION |
+| `/report-batch/:campaignId` | 리포트 일괄 · MIND2ACTION |
+| `/simhwa/:id` | 심화 코칭 리포트 · MIND2ACTION |
+| `/preview/result` | 미리보기 · 성향 리포트 · MIND2ACTION |
+| `/preview/simhwa` | 미리보기 · 심화 코칭 · MIND2ACTION |
+
+⚠️ `PAGE_TITLES`는 `startsWith` 선착순이라 **`/report-batch`가 `/report`보다 앞에 있어야 한다.** 순서를 바꾸면 일괄 화면이 "성향 리포트"로 표시된다.
+
+**워크북 정적** (`public/workbook/`): `워크북 허브` · `워크북 실전 여정 · 김성아 TCR` · `워크북 유형별 사전 · 김성아 TCR` · `워크북 방식 비교`.
+
+## §12 워크북 본문 확대 — 26.0810
+
+피터공: 본문이 너무 작다. 워크북 4종의 **본문급만** 확대(제목·배지 라벨은 유지 — 같이 키우면 위계가 무너진다).
+
+| 기존 | 변경 | 해당 |
+|---|---|---|
+| 15px | 16.5px | `.report-container` 등 본문 컨테이너 |
+| 14px | 15.5px | 안내·상황 문단 |
+| 13.5px | 15px | 카드 설명·코치 인용 |
+| 13px | 14.5px | 부가 설명 |
+| 12.5px | 13.5px | 캡션 |
+| 12px | 13px | 소라벨 |
+| 11px·10px | **유지** | letter-spacing 배지(에디션·모드) — 키우면 자간과 함께 줄이 넘친다 |
+| 16px+ | **유지** | 제목류 |
+
+⚠️ **인쇄는 건드리지 않는다.** journey·types의 `@media print`에 `.report-container { font-size:15px; }`를 명시해 화면 확대가 인쇄로 새지 않게 고정했다. 인쇄 조판은 "번호 블록이 페이지 중간에 안 끊기게" 튜닝된 상태(초안2)라, 본문이 커지면 그 조판이 깨진다.
+
+### 검증 하니스 (§11·§12 공용)
+
+`scripts/check-tab-titles.mjs` — `node scripts/check-tab-titles.mjs` (전제: `npx vite preview --port 4173`).
+
+**탭 이름은 문자열이 다른지가 아니라 앞 10자가 다른지로 판정한다.** 그게 사용자가 실제로 보는 것이라, 뒤에서만 갈리는 이름은 통과시키면 안 된다. 하니스가 앞 10자 충돌을 별도 실패로 잡는다.
+
+⚠️ **워크북 4종은 preview 서버로 검사하면 안 된다** — `vite preview`의 SPA fallback이 `/workbook/*.html`에도 앱 `index.html`을 돌려줘, 통과해도 검사 대상이 워크북이 아니다(라이브 S3는 실제 파일을 준다). 하니스가 fallback 없는 정적 서버를 자체적으로 띄우는 이유. `file://` 우회도 안 된다(헤드리스가 http 페이지의 file:// 이동을 차단해 빈 페이지가 된다).
+
+인쇄 회귀는 `Emulation.setEmulatedMedia({media:'print'})`로 같은 셀렉터를 다시 읽어 15px 유지를 확인한다.
