@@ -163,3 +163,15 @@ type: TASKS (진행 작업, live 체크리스트)
 - **"탁하다"의 정체**: 처음 고른 `#2f7d54`·`#b4231f`는 테두리·막대용 어두운 값이었다. 링은 얇은 획 하나라 같은 계열이라도 더 밝고 채도가 높아야 한다.
 - **검증**: `vite build` clean · lint 신규 0 · **렌더된 SVG 실측 = 링 5개 전부 `r=7.1` `stroke-width=2.2`, dot 5개 전부 `stroke=null`** · 범례 2줄 · **회귀 = 결과화면 `result_김정임`·`result_이서연` 완전 동일** · 심화 5화면 변화는 범례 줄 삭제 + 링 색 교체 + dot 흰 테두리 제거뿐(svgFills 대조) · 인쇄 쪽수는 범례가 한 줄 **줄어든** 변경이라 늘 수 없다(10쪽 유지) · 콘솔 0.
 - [x] **커밋·push·배포·라이브 검증 ✅** (2026-07-31 저녁) — 커밋 `4의 되물림 반영분` main push. `npm run deploy` gh-pages Published. **번들 `index-DbmRh2Qk.js` 전파 5초 만에 확인 후** 라이브 덤프 → **로컬과 7화면 전부 동일 · 콘솔 0.** 라이브 = `https://survey.mind2action.kr/`
+
+### 빌드 기록 (v0.20) — 손소장 8/1 수정요청 2건, 표지 색 + 인쇄 윗여백
+- 출처 `Assets/incoming/MIND2ACTION/inbox/수정요청/8월1일 수정요청.csv`(검토필요 2건). SPEC §21. 수정 파일 2개 + 하니스 1개 + SPEC/TASKS:
+  - `src/styles/praxi.css` — `.simhwa-cover-brand` 핑크 `#E84A8A` → **검정 `#1f2733`** · 인쇄 전용 3줄 신설(`.simhwa-cover{padding-top:11px}` · 마지막 섹션 꼬리 여백 0 · 푸터 압축).
+  - `src/components/Report/SimhwaReportView.jsx` — 표지 점수 칩의 **인라인 성향색 제거**(되살리려면 `style={{color: EGO_COLORS[e]}}` 한 줄) · `useSimhwaPageMargin()` 신설 — `@page{margin-top:21mm}`를 심화 화면이 떠 있는 동안만 주입.
+  - `scripts/print-simhwa.mjs` **신설** — CDP `Page.printToPDF`(`scale:1`·`preferCSSPageSize:true`) + `pdftotext -bbox`로 쪽수·페이지별 윗여백·2장 분해·꼬리장·@page 누수를 잰다.
+- **왜 주입인가**: `@page`는 문서 전역이라 praxi.css에 그냥 적으면 성향리포트·일괄 리포트 인쇄까지 21mm가 걸린다. CSS 선택자로 못 가르는 자리라 컴포넌트 수명에 묶었다.
+- **표지가 밀리지 않게** 인쇄 `padding-top`을 52px → 11px로(늘어난 10.8mm 상쇄). `@page :first`를 안 쓴 건 그게 "문서의 첫 장"이라 여러 명을 한 문서로 뽑으면 두 번째부터 표지가 밀리기 때문.
+- ⚠️ **중간에 새로 생긴 결함을 실측으로 잡았다** — 윗여백을 키우자 10쪽이 되고 마지막 장에 푸터 한 줄만 남았다. 모자란 7pt의 정체는 푸터가 아니라 그 위 섹션의 꼬리 여백 34px. 둘 다 줄여 9쪽 복귀(§21-4). 구조로 막은 게 아니라 여유를 늘린 것이라 **하니스에 `꼬리장` 검사를 상시로 넣었다.**
+- **검증**: `vite build` clean · **lint 신규 0**(16건 전부 기존 — 심화 파일은 `__BUILD_ID__` 1건뿐) · 콘솔 0 · **인쇄 실측 5인 전수 = 9쪽 유지 · 본문 윗여백 9.9 → 21.0mm · 표지 23.4 → 23.7mm(제자리) · 2장 다섯 성향 한 페이지 · 꼬리장 OK** · **회귀 = 심화 밖 화면에 @page 태그 0 · 그 화면 윗여백 16mm(누수 아님)** · **표지 세 줄 유채색 0**(렌더 덤프, 소속 회색만 유지) · 본문 성향 5색·섹션 번호 핑크 5개 그대로.
+- [ ] 커밋·push·배포·라이브 검증 — **피터공 확인 후.** 배포는 `egogram` 폴더에서 `npm run deploy`, 번들 해시 전파 확인 → 그다음 라이브(`https://survey.mind2action.kr/`) 렌더 검증.
+- [ ] 피터공 확인 항목 — ①로고까지 검정으로 간 표지 ②소속 회색 유지 판단 ③인쇄 윗여백 두 줄 분량(더 원하면 `21mm` 숫자 하나)

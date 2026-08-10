@@ -157,8 +157,27 @@ function GuideBlock({ c }) {
   );
 }
 
+// 인쇄 페이지 윗여백 (§21-2, 손소장 8/1 항목 2 — "문장의 시작을 한두 줄 밑에서부터").
+//   @page는 문서 전역이라 praxi.css에 그냥 쓰면 성향리포트(ReportPageV2)·일괄 리포트 인쇄까지 같이 바뀐다.
+//   그 둘은 이번 요청 범위가 아니고 페이지 나눔이 따로 맞춰져 있다 → 심화 화면이 떠 있는 동안만 붙인다.
+//   표지는 제자리에 두려고 인쇄 padding-top을 같은 양만큼 줄였다(praxi.css @media print .simhwa-cover).
+const PAGE_MARGIN_CSS = '@page { margin-top: 21mm; }';   // 크롬 기본 10.16mm → +10.8mm ≈ 본문 두 줄
+
+function useSimhwaPageMargin() {
+  useEffect(() => {
+    const ID = 'simhwa-page-margin';
+    if (document.getElementById(ID)) return;              // 한 화면에 여러 벌 떠도 한 번만
+    const el = document.createElement('style');
+    el.id = ID;
+    el.textContent = PAGE_MARGIN_CSS;
+    document.head.appendChild(el);
+    return () => el.remove();
+  }, []);
+}
+
 // row: supabase snake_case 응답 행. honorific(PA/TCR)은 스키마에 없어 파라미터로 보강(기본 PA).
 export function SimhwaView({ row }) {
+  useSimhwaPageMargin();
   const result = {
     scores: { CP: row.score_cp, NP: row.score_np, A: row.score_a, FC: row.score_fc, AC: row.score_ac },
     top1: row.top1,
@@ -189,9 +208,12 @@ export function SimhwaView({ row }) {
           <span className="simhwa-cover-name">{nameLabel}</span>
         </div>
         {/* 입력 점수 요약(작게) */}
+        {/* 2026-08-09(§21-1, 손소장 8/1 항목 1): 칩의 인라인 성향색을 뺐다 — "회사로고부터 세 줄까지
+            검정색으로". 색은 EGO_COLORS[e]였고 되살리려면 style={{ color: EGO_COLORS[e] }} 한 줄이다.
+            본문 성향명 색(§14-③)과 표지 레이더(§20)는 그대로 — 요청 범위가 표지 세 줄이다. */}
         <div className="simhwa-scoreline">
           {['CP', 'NP', 'A', 'FC', 'AC'].map(e => (
-            <span key={e} className="simhwa-score-chip" style={{ color: EGO_COLORS[e] }}>
+            <span key={e} className="simhwa-score-chip">
               {EGO_PLAIN[e]} <b>{scores[e]}</b>
             </span>
           ))}
