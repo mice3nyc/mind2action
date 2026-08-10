@@ -23,7 +23,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIND2ACTION 자가 워크북 — 김성아 TCR님</title>
+<title>워크북 유형별 사전 · 김성아 TCR</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css" />
 <style>
 :root { --bg:#ffffff; --text:#1a1a1a; --text-strong:#111111; --text-muted:#888888; --accent:#0012de; }
@@ -31,11 +31,11 @@
 body { font-family:'Paperlogy',-apple-system,BlinkMacSystemFont,sans-serif; font-weight:400; font-size:17px; line-height:1.65; color:var(--text); background:var(--bg); -webkit-font-smoothing:antialiased; }
 h1,h2,h3,h4 { font-family:'Paperlogy',sans-serif; font-weight:700; color:var(--text-strong); letter-spacing:-0.02em; }
 .main-report { max-width:720px; margin:0 auto; padding:0 24px 80px; }
-.report-container { font-family:'Paperlogy',sans-serif; color:var(--text); line-height:1.65; font-size:15px; }
+.report-container { font-family:'Paperlogy',sans-serif; color:var(--text); line-height:1.65; font-size:16.5px; }
 .report-container p { max-width:none; margin-bottom:6px; }
 
 /* Version switch */
-.wb-switch { display:flex; justify-content:space-between; align-items:center; gap:12px; border:1px solid var(--accent); padding:10px 14px; margin:16px 0 0; font-size:13px; flex-wrap:wrap; }
+.wb-switch { display:flex; justify-content:space-between; align-items:center; gap:12px; border:1px solid var(--accent); padding:10px 14px; margin:16px 0 0; font-size:14.5px; flex-wrap:wrap; }
 .wb-switch .cur { font-weight:700; color:var(--accent); }
 .wb-switch .cur::before { content:"◉ "; }
 .wb-switch a { color:#111; text-decoration:none; border-bottom:1px solid #111; font-weight:600; padding-bottom:1px; }
@@ -48,66 +48,66 @@ h1,h2,h3,h4 { font-family:'Paperlogy',sans-serif; font-weight:700; color:var(--t
 .report-cover-brand { color:var(--accent); font-weight:300; }
 .report-cover-id { padding:24px 0; border-bottom:1px dotted #999; }
 .report-cover-name { font-size:20px; font-weight:700; margin:0; }
-.report-cover-meta { font-size:14px; font-weight:300; color:var(--text-muted); margin-right:10px; }
-.report-cover-theme { font-size:14px; color:var(--accent); margin-top:8px; font-weight:600; }
+.report-cover-meta { font-size:15.5px; font-weight:300; color:var(--text-muted); margin-right:10px; }
+.report-cover-theme { font-size:15.5px; color:var(--accent); margin-top:8px; font-weight:600; }
 
 /* Guide box */
-.wb-guide { border:1px dotted #999; padding:18px 20px; margin:0 0 12px; font-size:14px; }
-.wb-guide h2 { font-size:15px; margin-bottom:8px; }
+.wb-guide { border:1px dotted #999; padding:18px 20px; margin:0 0 12px; font-size:15.5px; }
+.wb-guide h2 { font-size:16.5px; margin-bottom:8px; }
 .wb-guide ol { margin:6px 0 0 18px; }
 .wb-guide li { margin-bottom:5px; line-height:1.6; }
 .wb-guide b { color:var(--accent); }
 
 /* Part divider */
 .wb-part { margin:40px 0 26px; padding:14px 0; border-top:3px solid #111; border-bottom:1px solid #111; }
-.wb-part-label { font-size:12px; letter-spacing:3px; color:var(--accent); font-weight:700; }
+.wb-part-label { font-size:13px; letter-spacing:3px; color:var(--accent); font-weight:700; }
 .wb-part-title { font-size:20px; font-weight:800; margin-top:4px; }
-.wb-part-sub { font-size:13px; color:var(--text-muted); margin-top:6px; line-height:1.6; }
+.wb-part-sub { font-size:14.5px; color:var(--text-muted); margin-top:6px; line-height:1.6; }
 
 /* Sections */
 .report-section { padding:0 0 30px; margin-bottom:30px; border-bottom:1px dotted #999; }
 .report-section-title { font-size:18px; font-weight:700; margin-bottom:14px; display:flex; align-items:baseline; gap:6px; }
 .report-section-num { font-size:22px; font-weight:800; color:var(--accent); }
-.report-subhead { font-size:14px; font-weight:700; margin:22px 0 8px; padding-bottom:6px; border-bottom:1px solid #ddd; }
+.report-subhead { font-size:15.5px; font-weight:700; margin:22px 0 8px; padding-bottom:6px; border-bottom:1px solid #ddd; }
 .report-subhead:first-of-type { margin-top:0; }
 
 /* 고객 알아보기 box */
-.wb-know { background:#f7f7f7; padding:13px 15px; font-size:14px; margin:6px 0 14px; line-height:1.75; }
+.wb-know { background:#f7f7f7; padding:13px 15px; font-size:15.5px; margin:6px 0 14px; line-height:1.75; }
 .wb-know .cue { color:#555; }
 
 /* Workbook question + write field */
-.wb-q { font-weight:700; font-size:15px; margin:18px 0 4px; }
+.wb-q { font-weight:700; font-size:16.5px; margin:18px 0 4px; }
 .wb-q:first-of-type { margin-top:0; }
 .wb-qnum { color:var(--accent); font-weight:800; margin-right:4px; }
-.wb-instruct { font-size:13px; color:var(--text-muted); margin:2px 0 8px; line-height:1.55; }
-.wb-write { width:100%; min-height:64px; border:1px dashed #bbb; padding:10px 12px; font-family:inherit; font-size:14px; line-height:1.65; color:var(--text); background:#fcfcfc; resize:vertical; display:block; }
+.wb-instruct { font-size:14.5px; color:var(--text-muted); margin:2px 0 8px; line-height:1.55; }
+.wb-write { width:100%; min-height:64px; border:1px dashed #bbb; padding:10px 12px; font-family:inherit; font-size:15.5px; line-height:1.65; color:var(--text); background:#fcfcfc; resize:vertical; display:block; }
 .wb-write:focus { outline:none; border-color:var(--accent); background:#fff; }
 .wb-write.short { min-height:42px; }
 
 /* Self-check (정답은 없지만 최소 기준) */
 .wb-check { border:1px dotted #999; padding:11px 14px; margin:8px 0 4px; }
-.wb-check-lead { font-size:12px; color:var(--text-muted); margin-bottom:6px; }
-.wb-check-item { display:flex; align-items:flex-start; gap:8px; padding:3px 0; font-size:14px; line-height:1.5; }
+.wb-check-lead { font-size:13px; color:var(--text-muted); margin-bottom:6px; }
+.wb-check-item { display:flex; align-items:flex-start; gap:8px; padding:3px 0; font-size:15.5px; line-height:1.5; }
 .wb-check-item input[type=checkbox] { margin-top:3px; width:15px; height:15px; accent-color:var(--accent); cursor:pointer; flex-shrink:0; }
 .wb-check-item label { cursor:pointer; }
 
 /* Reveal (다시 보기) */
 .wb-reveal { margin:10px 0 6px; border:1px dotted #999; }
-.wb-reveal>summary { cursor:pointer; padding:10px 14px; font-size:13px; font-weight:700; color:var(--accent); list-style:none; user-select:none; }
+.wb-reveal>summary { cursor:pointer; padding:10px 14px; font-size:14.5px; font-weight:700; color:var(--accent); list-style:none; user-select:none; }
 .wb-reveal>summary::-webkit-details-marker { display:none; }
 .wb-reveal>summary::before { content:"▸ "; }
 .wb-reveal[open]>summary::before { content:"▾ "; }
 .wb-reveal[open]>summary { border-bottom:1px dotted #ccc; }
-.wb-reveal-body { padding:12px 14px; font-size:14px; line-height:1.7; }
+.wb-reveal-body { padding:12px 14px; font-size:15.5px; line-height:1.7; }
 .wb-reveal-body strong { color:var(--text-strong); }
 .wb-reveal-body p { margin-bottom:7px; }
 
 /* Model sentences */
 .report-quotes { display:flex; flex-direction:column; gap:9px; margin:8px 0 4px; }
-.report-quote { padding:11px 15px; border:1px solid #111; border-left-width:4px; border-left-color:var(--accent); font-size:14px; font-weight:500; line-height:1.6; }
+.report-quote { padding:11px 15px; border:1px solid #111; border-left-width:4px; border-left-color:var(--accent); font-size:15.5px; font-weight:500; line-height:1.6; }
 
 /* 7-day log */
-.wb-log { width:100%; border-collapse:collapse; font-size:13px; margin:12px 0 4px; }
+.wb-log { width:100%; border-collapse:collapse; font-size:14.5px; margin:12px 0 4px; }
 .wb-log th, .wb-log td { border:1px solid #ddd; padding:9px 6px; text-align:center; }
 .wb-log th { background:#f7f7f7; font-weight:700; }
 .wb-log td:first-child, .wb-log th:first-child { text-align:left; font-weight:600; width:34%; }
@@ -120,17 +120,17 @@ h1,h2,h3,h4 { font-family:'Paperlogy',sans-serif; font-weight:700; color:var(--t
 
 /* Closing + footer */
 .report-closing { padding:24px 0; }
-.report-closing p { font-size:15px; margin:0 0 12px; line-height:1.7; color:#333; }
+.report-closing p { font-size:16.5px; margin:0 0 12px; line-height:1.7; color:#333; }
 .report-footer-bar { display:flex; justify-content:space-between; align-items:center; border-top:3px solid #111; padding:16px 0 8px; margin-top:20px; }
-.report-footer-copyright { font-size:12px; color:#333; font-weight:600; letter-spacing:1px; }
-.report-footer-email { font-size:13px; color:#333; letter-spacing:0.3px; }
+.report-footer-copyright { font-size:13px; color:#333; font-weight:600; letter-spacing:1px; }
+.report-footer-email { font-size:14.5px; color:#333; letter-spacing:0.3px; }
 .report-footer-build { font-size:10px; color:#c4c4c4; letter-spacing:0.5px; }
 
 /* Action buttons */
 .wb-actions { display:flex; gap:10px; margin:0 0 28px; }
-.wb-btn { border:1px solid #111; background:#fff; padding:8px 16px; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; }
+.wb-btn { border:1px solid #111; background:#fff; padding:8px 16px; font-family:inherit; font-size:14.5px; font-weight:600; cursor:pointer; }
 .wb-btn:hover { background:#111; color:#fff; }
-.wb-savednote { font-size:12px; color:var(--text-muted); align-self:center; }
+.wb-savednote { font-size:13px; color:var(--text-muted); align-self:center; }
 
 @media (max-width:640px) { .main-report { padding:0 16px 60px; } .report-cover h1 { font-size:21px; } .wb-log { font-size:11px; } .wb-log td, .wb-log th { padding:6px 3px; } }
 @media print {
@@ -145,6 +145,7 @@ h1,h2,h3,h4 { font-family:'Paperlogy',sans-serif; font-weight:700; color:var(--t
   .report-closing { break-after:avoid; page-break-after:avoid; }
   /* 자가체크 추가분만큼 인쇄 여백 압축 — 번호 블록이 한 페이지에 들어가도록 */
   body { font-size:15.5px; }
+  .report-container { font-size:15px; }  /* 화면만 확대(26.0810), 인쇄는 기존 조판 유지 */
   .wb-q { margin:14px 0 3px; }
   .wb-instruct { margin:2px 0 6px; }
   .wb-write { min-height:54px; }

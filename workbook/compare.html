@@ -16,7 +16,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M2A 워크북 — 선택지 방식 비교 시안</title>
+<title>워크북 방식 비교 · MIND2ACTION</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/subsets/Paperlogy-dynamic-subset.css" type="text/css" />
 <style>
 :root { --bg:#ffffff; --text:#1a1a1a; --text-strong:#111; --text-muted:#888; --accent:#0012de; --good:#0a7d3c; --bad:#b23; }
@@ -27,9 +27,9 @@ h1,h2,h3,h4 { font-family:'Paperlogy',sans-serif; font-weight:700; color:var(--t
 
 /* Page head */
 .pagehead { background:#fff; border-top:3px solid #111; padding:26px 26px 22px; margin:24px 0 10px; }
-.pagehead .kick { font-size:12px; letter-spacing:3px; color:var(--accent); font-weight:700; }
+.pagehead .kick { font-size:13px; letter-spacing:3px; color:var(--accent); font-weight:700; }
 .pagehead h1 { font-size:23px; margin:6px 0 10px; }
-.pagehead p { font-size:14px; color:#444; line-height:1.7; }
+.pagehead p { font-size:15.5px; color:#444; line-height:1.7; }
 .pagehead b { color:var(--accent); }
 
 /* Card = one sample */
@@ -39,42 +39,42 @@ h1,h2,h3,h4 { font-family:'Paperlogy',sans-serif; font-weight:700; color:var(--t
 .mode.correct { background:#111; color:#fff; }
 .mode.diag { background:#e9e9ff; color:var(--accent); }
 .mode.subj { background:#f0f0f0; color:#666; }
-.card > .why { font-size:13px; color:var(--text-muted); margin:6px 0 16px; line-height:1.6; }
+.card > .why { font-size:14.5px; color:var(--text-muted); margin:6px 0 16px; line-height:1.6; }
 .card .stepname { font-size:18px; font-weight:800; margin:2px 0 4px; }
-.card .stepname .n { color:#fff; background:var(--accent); font-size:12px; font-weight:800; padding:2px 7px; border-radius:2px; margin-right:7px; letter-spacing:1px; }
+.card .stepname .n { color:#fff; background:var(--accent); font-size:13px; font-weight:800; padding:2px 7px; border-radius:2px; margin-right:7px; letter-spacing:1px; }
 
-.situ { background:#f7f7f7; padding:12px 14px; font-size:14px; line-height:1.7; margin:0 0 6px; }
+.situ { background:#f7f7f7; padding:12px 14px; font-size:15.5px; line-height:1.7; margin:0 0 6px; }
 .situ b { color:var(--accent); }
-.coach { border-left:4px solid var(--accent); padding:5px 0 5px 13px; margin:10px 0; font-size:13.5px; line-height:1.65; color:#333; }
+.coach { border-left:4px solid var(--accent); padding:5px 0 5px 13px; margin:10px 0; font-size:15px; line-height:1.65; color:#333; }
 .coach .who { font-size:10px; font-weight:700; color:var(--accent); letter-spacing:1px; display:block; margin-bottom:2px; }
-.q { font-weight:700; font-size:15px; margin:16px 0 10px; }
+.q { font-weight:700; font-size:16.5px; margin:16px 0 10px; }
 
 /* Options */
 .opts { display:flex; flex-direction:column; gap:9px; }
-.opt { border:1px solid #ccc; padding:12px 14px; font-size:14px; line-height:1.6; cursor:pointer; background:#fff; transition:border-color .12s, background .12s; position:relative; }
+.opt { border:1px solid #ccc; padding:12px 14px; font-size:15.5px; line-height:1.6; cursor:pointer; background:#fff; transition:border-color .12s, background .12s; position:relative; }
 .opt:hover { border-color:var(--accent); }
 .opt .letter { font-weight:800; color:var(--accent); margin-right:8px; }
 .opt.sel { border-color:var(--accent); border-width:2px; padding:11px 13px; }
 .opt.good  { border-color:var(--good); background:#f2fbf5; }
 .opt.bad   { border-color:var(--bad);  background:#fdf3f4; }
-.opt .fb { display:none; margin-top:9px; padding-top:9px; border-top:1px dotted #ccc; font-size:13px; line-height:1.6; color:#333; }
+.opt .fb { display:none; margin-top:9px; padding-top:9px; border-top:1px dotted #ccc; font-size:14.5px; line-height:1.6; color:#333; }
 .opt.reveal .fb { display:block; }
 .opt .val { display:inline-block; font-size:11px; font-weight:800; letter-spacing:.5px; padding:2px 8px; border-radius:2px; margin-bottom:5px; }
 .val.g { background:var(--good); color:#fff; }
 .val.b { background:var(--bad); color:#fff; }
 .val.n { background:#666; color:#fff; }
-.hint { font-size:12px; color:var(--text-muted); margin-top:10px; min-height:1.4em; }
+.hint { font-size:13px; color:var(--text-muted); margin-top:10px; min-height:1.4em; }
 .hint b { color:var(--accent); }
 
 /* Subjective ref */
-.subjwrite { width:100%; min-height:70px; border:1px dashed #bbb; padding:10px 12px; font-family:inherit; font-size:14px; line-height:1.6; background:#fcfcfc; resize:vertical; }
+.subjwrite { width:100%; min-height:70px; border:1px dashed #bbb; padding:10px 12px; font-family:inherit; font-size:15.5px; line-height:1.6; background:#fcfcfc; resize:vertical; }
 .reveal-box { margin-top:10px; border:1px dotted #999; }
-.reveal-box summary { cursor:pointer; padding:9px 13px; font-size:13px; font-weight:700; color:var(--accent); }
-.reveal-box .rb { padding:11px 13px; font-size:13.5px; line-height:1.7; }
+.reveal-box summary { cursor:pointer; padding:9px 13px; font-size:14.5px; font-weight:700; color:var(--accent); }
+.reveal-box .rb { padding:11px 13px; font-size:15px; line-height:1.7; }
 
 /* Verdict strip */
-.verdict { background:#111; color:#fff; padding:20px 26px; margin:22px 0 0; font-size:14px; line-height:1.75; }
-.verdict h3 { color:#fff; font-size:15px; margin-bottom:8px; letter-spacing:1px; }
+.verdict { background:#111; color:#fff; padding:20px 26px; margin:22px 0 0; font-size:15.5px; line-height:1.75; }
+.verdict h3 { color:#fff; font-size:16.5px; margin-bottom:8px; letter-spacing:1px; }
 .verdict b { color:#8ea0ff; }
 .verdict ul { margin:8px 0 0 18px; } .verdict li { margin-bottom:5px; }
 
