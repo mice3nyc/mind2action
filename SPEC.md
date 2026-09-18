@@ -332,7 +332,8 @@ egogram/
 | `src/data/cm_manager.yaml` | 리더(manager) | v0.8 전체 재변환 (cm1·cm8만 보존) |
 | `src/data/cm_coach.yaml` | 코치(coach) | v0.8 전체 재변환 (cm1·cm8만 보존) |
 | `src/data/cm6_common_consultant.yaml` | 컨설턴트 CM6 공통 | **5/25 재정정** — 소제목을 시트 좌열로 교체(고객의 실제 심리 해석/재질문 및 재결정 유도/최종 진행 멘트), 본문 2섹션 갱신 |
-| `src/data/identity.yaml` | 인물상 (직군 공통) | **26.0611 신설** — §1·§2 첫 정의 "OOO님은 ___한 분". top1_top2 20조합 `{title, desc}`. 원본: [[에고그램 인물상 20조합 검토 요청 - 손소장]](9 기존 + 11 신규, 손소장 26.0611 ㅇㅋ). `ReportPageV2`의 인라인 `IDENTITY` 폐지, yaml import로 교체. 미충원 조합 fallback 합성(`EGO_STRENGTH`)은 안전망으로 유지 |
+| `src/data/identity.yaml` | 인물상 (직군 공통) | **26.0611 신설** — §1·§2 첫 정의 "OOO님은 ___한 분". top1_top2 20조합 `{title, desc}`. 원본: [[에고그램 인물상 20조합 검토 요청 - 손소장]](9 기존 + 11 신규, 손소장 26.0611 ㅇㅋ). `ReportPageV2`의 인라인 `IDENTITY` 폐지, yaml import로 교체. 미충원 조합 fallback 합성(`EGO_STRENGTH`)은 안전망으로 유지. **26.0918 연결 해제 → `identity60.yaml`(§13)**, 파일만 보존 |
+| `src/data/identity60.yaml` | 인물상 60조합 (직군 공통) | **26.0918 신설**(§13) — 키 `top1_top2_bottom`, `{title, desc}`(desc 두 줄). **생성물** — `scripts/build-identity60.mjs`가 `docs/source/손소장_인물상60_260918.csv`에서 만든다. 대조 `scripts/check-identity60.mjs` |
 
 > **5/25 CM6 재정정**: 손소장 새 파일 `Assets/incoming/에고그램/data/컨설턴트로 수정 - 손소장.xlsx`(CM6 시트 + CM6 공통적용 시트 추가). CM6만 정정 요청 — cm6 클로징 9조합("고객님은~" → "이 상황에서 컨설턴트는~" 화자 정정) + cm6_common 3섹션(좌열=소제목, 우열=본문). cm2~cm5·cm7은 현재 yaml과 동일 확인하고 건드리지 않음. cm4_2 2셀("코칭이 필요없는 구간"→"조율이 필요없는 구간")은 별도 발견, 반영 여부 피터공 확인 대기
 
@@ -620,3 +621,51 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 ⚠️ **워크북 4종은 preview 서버로 검사하면 안 된다** — `vite preview`의 SPA fallback이 `/workbook/*.html`에도 앱 `index.html`을 돌려줘, 통과해도 검사 대상이 워크북이 아니다(라이브 S3는 실제 파일을 준다). 하니스가 fallback 없는 정적 서버를 자체적으로 띄우는 이유. `file://` 우회도 안 된다(헤드리스가 http 페이지의 file:// 이동을 차단해 빈 페이지가 된다).
 
 인쇄 회귀는 `Emulation.setEmulatedMedia({media:'print'})`로 같은 셀렉터를 다시 읽어 15px 유지를 확인한다.
+
+## §13 인물상 20조합 → 60조합 (top1+top2+bottom1) — 26.0918
+
+**요청**: 손소장 9/17 수정요청 2번 (원본 `Assets/incoming/MIND2ACTION/inbox/수정요청/0917/9월17일 수정 요청 - 9월17일.pdf`). 리포트를 한 명에게 줄 때는 문제가 없지만 **여러 교육생에게 한꺼번에 주면 서로 비교하며 1장 첫 박스만 보고 "우리 같네"가 나온다.** 인물상이 top1_top2 20종뿐이라서다. 가장 낮은 성향까지 넣은 60종으로 다양성을 보여 준다.
+**기한**: 10/21 GA 한화피플라이프 200명 강의(첫 타회사 강의) 전 라이브.
+**데이터 정본**: `egogram/docs/source/손소장_인물상60_260918.csv` (= inbox `링크_2.1_…csv`, 9/18 14:55 손소장 수정본. 첫 판 `링크_2`는 폐기 — 둘째 문장 A·NP·CP 셋이 바뀌었다).
+
+### §13-1 결정 (피터공 9/18)
+
+| 항목 | 결정 |
+|---|---|
+| 적용 범위 | **전 직군**. 인물상은 원래 직군 공통 데이터라 영업만 바꾸면 두 벌이 된다 |
+| 「가장 강한 힘 / {top1 강점명}」 라벨 | **유지**. top1 하나를 가리키는 이름이라 60종 제목과 겹치지 않는다. 목업(ChatGPT 편집본)에 없는 것은 목업의 생략으로 본다 |
+| 소제목 | **넣지 않는다**. CSV 열 이름(「나를 표현하는 한마디」·「생활 속 성향과 행동」)은 시트 정리용이다 |
+| 2장 첫 줄 | **같이 바뀐다**. 1장 박스와 2장 첫 줄은 같은 `identity`를 읽는다(`ReportPageV2.jsx` 310·363). 한 리포트에 자기소개가 두 가지 나오지 않게 |
+| 3장 「조율 포인트」의 bottom 문단 | **손대지 않는다**. CSV 둘째 문장도 bottom에서 나오지만 2.1에서 생활 언어로 바뀌어 3장(성향 이름을 직접 부름)과 말투가 갈렸다 — 예고와 본론 |
+
+### §13-2 데이터
+
+- 새 파일 `src/data/identity60.yaml` — 키 `{top1}_{top2}_{bottom}`(예 `CP_NP_A`), 값 `{title, desc}`. **CSV에서 스크립트로 생성**(`scripts/build-identity60.mjs`, 손으로 옮기지 않는다). title = 「나를 표현하는 한마디」, desc = 「생활 속 성향과 행동」.
+- desc는 두 문장이 줄바꿈으로 갈려 온다(첫 문장 = top1_top2 20종, 둘째 = bottom 5종). **줄바꿈을 보존**해 두 줄로 렌더한다. 줄 끝 공백은 정리.
+- `identity.yaml`(20조합)은 **파일은 남기고 import만 끊는다**. §10 표의 해당 줄에 「26.0918 연결 해제 → identity60」을 적는다.
+- CSV 검토 결과(9/18): 60행 · 조합 중복 0 · 코드 오류 0 · 제목 중복 0 · 첫 문장은 top 쌍마다 1종, 둘째 문장은 bottom마다 1종.
+
+### §13-3 렌더
+
+```
+가장 강한 힘                         ← 유지
+{EGO_TYPE_NAME[top1]}                ← 유지
+{이름}님은 **{title}**입니다.         ← title이 「…사람」으로 끝나 「…사람입니다」
+{desc 첫 줄}
+{desc 둘째 줄}
+```
+2장 첫 줄: `{이름}님은 **{title}**. 그 성향은 이런 강점으로 드러납니다.` — 문형 그대로, title만 60종.
+
+### §13-4 동점 가장자리 — bottom이 top과 겹칠 때
+
+`scoreEngine`은 top·bottom을 **같은 동점 우선순위**(`tie_priority: [A, CP, NP, FC, AC]`)로 양방향 정렬한다. 그래서 최저점에 4~5개가 동점이면 **bottom이 top1 또는 top2와 같은 코드**가 된다(예: 전부 0점 → top1 = bottom = A). 0~20점 전수 408만 조합 중 1,071개(0.026%). 이때 60종 키 `X_Y_Y`는 존재하지 않는다.
+- **처리**: 인물상 조회에서만 `bottom ∈ {top1, top2}`이면 오름차순 정렬에서 top1·top2가 아닌 첫 성향을 쓴다(`identityBottom()` — `src/lib/identityKey.js`, yaml import 없는 순수 함수라 node 대조 스크립트도 같은 함수를 쓴다. 동점 우선순위는 인자로). **`scoreEngine`의 `bottom`은 바꾸지 않는다** — cm7·조율 포인트 등 다른 소비자가 읽는다(범위 선을 공용 코드에서 깨지 않는다).
+- 옛 fallback 합성(`EGO_STRENGTH` 두 강점)은 안전망으로 유지 — 키 누락 시 빈 화면 대신.
+
+### §13-5 검증
+
+- **대조 검사** `scripts/check-identity60.mjs`: CSV 60행 각각에 대해 yaml의 `title`·`desc`가 **CSV 값과 같은지**(존재 여부가 아니라 동일성). 60건 미만이면 실패. 일부러 한 칸 틀려 붉어지는지 먼저 본다.
+- 동점 헬퍼: 전부 0점·4개 동점 두 경우에서 `X_Y_Z` 세 코드가 모두 다르고 키가 존재하는지.
+- 렌더: 실제 응답 3건 이상(top 쌍이 같고 bottom만 다른 두 사람 포함 — 이번 요청의 핵심 장면) `/report/:id` 덤프로 1장 박스·2장 첫 줄이 같은 title인지.
+- 일괄 출력 `/report-batch/:campaignId`도 같은 컴포넌트라 자동 반영 — 한 캠페인으로 확인.
+- `vite build` clean · 배포 후 번들 해시 전파 확인 → 라이브 `survey.mind2action.kr` 확인.

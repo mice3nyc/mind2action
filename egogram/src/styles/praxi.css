@@ -892,7 +892,7 @@ p {
 .report-identity-top { font-size: 26px; font-weight: 800; line-height: 1.25; margin: 0 0 14px; padding-bottom: 14px; border-bottom: 1px solid #e3e3e3; }
 .report-identity-line { font-size: 19px; line-height: 1.5; margin: 0; }
 .report-identity-line strong { font-weight: 800; }
-.report-identity-desc { font-size: 14px; line-height: 1.7; color: var(--text); margin: 4px 0 0; }
+.report-identity-desc { font-size: 14px; line-height: 1.7; color: var(--text); margin: 4px 0 0; white-space: pre-line; }  /* 26.0918 §13: 인물상60 desc 두 줄 */
 /* 관점 소제목 */
 .report-subhead { font-size: 14px; font-weight: 700; margin: 24px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #ddd; }
 /* 그래프 ego 코드 (보조, 흐리게) */
@@ -1401,6 +1401,8 @@ body:has(.report-bling) { background: #fff; }
 @media print {
   .report-batch-toolbar { display: none; }
   .report-batch-item:not(:last-child) { break-after: page; page-break-after: always; }
+  /* 심화 일괄(§23-2) — 사람마다 표지부터 새 쪽 */
+  .simhwa-batch-item:not(:last-child) { break-after: page; page-break-after: always; }
 }
 
 /* 캠페인 삭제 버튼 — 파괴적 동작이라 빨강 톤으로 마감과 구분 */
@@ -1528,6 +1530,12 @@ body:has(.report-bling) { background: #fff; }
 /* 화법·멘트·체크리스트 등 개별 라인 */
 .simhwa-line { margin: 0 0 5px; }
 .simhwa-talk .simhwa-line { color: #374151; }
+/* 4장 질문으로 파악 (§23-1) — 표는 성향리포트 괘선 문법(§22): 1px #ddd, 배경 없음, 머리만 굵게 */
+.simhwa-fallback-lead { margin-bottom: 0; }
+.simhwa-fallback-table { width: 100%; border-collapse: collapse; margin: 12px 0 18px; }
+.simhwa-fallback-table th, .simhwa-fallback-table td { border: 1px solid #ddd; padding: 7px 12px; text-align: left; vertical-align: top; }
+.simhwa-fallback-table th { font-weight: 700; }
+.simhwa-fallback-table td:first-child { width: 58%; }
 .simhwa-checklist .simhwa-line { color: #1f2733; }
 
 /* ── 목록형 세 블록 (§17-4) — 소개 요청 멘트·체크리스트·감사 멘트 ──
@@ -1600,7 +1608,7 @@ body:has(.report-bling) { background: #fff; }
      화면은 그대로 — 화면은 스크롤이라 좁힐 이유가 없다(§18-3과 같은 처리). */
   /* §22-1-3으로 섹션에 padding-bottom 36px와 점선이 붙었다 — 마지막 장은 그 둘도 같이 뗀다.
      푸터 자신이 3px 괘선을 이미 그으므로 바로 위 점선은 중복이기도 하다. */
-  .simhwa-container > .simhwa-section:nth-last-child(2) { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }  /* 푸터 바로 위 = 5장 */
+  .simhwa-container > .simhwa-section:nth-last-child(2) { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }  /* 푸터 바로 위 = 6장(9/18 §23으로 5→6) */
   .simhwa-footer-bar { margin-top: 0; padding-top: 4px; font-size: 10.5px; line-height: 1.3; }
   .simhwa-section, .simhwa-core, .simhwa-energy, .simhwa-clover { break-inside: avoid; page-break-inside: avoid; }
   /* 한 성향 한 페이지 (손소장 항목 3). 본문이 길어져 통째 avoid는 더 이상 걸지 않는다 —
@@ -1610,6 +1618,10 @@ body:has(.report-bling) { background: #fff; }
      3장 관찰 블록은 짧아서 페이지를 주면 빈 자리만 늘어난다. */
   .simhwa-customer:not(.is-recognize):not(:last-child) { break-after: page; page-break-after: always; }
   .simhwa-customer.is-recognize { break-inside: avoid; page-break-inside: avoid; }
+  /* §23-1: 4장은 새 쪽에서 (손소장 "다음 페이지에") */
+  .simhwa-section.is-fallback { break-before: page; page-break-before: always; }
+  .simhwa-fallback-table { margin: 8px 0 12px; }
+  .simhwa-fallback-table th, .simhwa-fallback-table td { padding: 4px 10px; }
   /* 2026-07-30 저녁(§18-3): 손소장 "다섯가지 성향이 한 페이지에". 막대를 뺀 뒤에도 다섯 번째
      블록(순응·협조)만 다음 장으로 넘어갔다. 인쇄에서만 블록 여백·간격을 줄여 한 장에 넣는다.
      화면은 그대로 둔다 — 화면은 스크롤이라 좁힐 이유가 없다. */

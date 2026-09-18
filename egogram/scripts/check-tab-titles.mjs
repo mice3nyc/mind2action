@@ -26,6 +26,7 @@ const PAGES = [
   ['관리자', '/#/admin', '관리자 · MIND2ACTION'],
   ['성향 리포트', '/#/report/demo-id', '성향 리포트 · MIND2ACTION'],
   ['리포트 일괄', '/#/report-batch/demo-campaign', '리포트 일괄 · MIND2ACTION'],
+  ['심화 일괄', '/#/simhwa-batch/demo-campaign', '심화 일괄 · MIND2ACTION'],
   ['심화 코칭', '/#/simhwa/demo-id', '심화 코칭 리포트 · MIND2ACTION'],
   ['미리보기 결과', '/#/preview/result?cp=14&np=13&a=18&fc=14&ac=6&name=김정임', '미리보기 · 성향 리포트 · MIND2ACTION'],
   ['미리보기 심화', '/#/preview/simhwa?s=김정임', '미리보기 · 심화 코칭 · MIND2ACTION'],

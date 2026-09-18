@@ -8,16 +8,9 @@ import CampaignManager from './CampaignManager';
 import CampaignDashboard from './CampaignDashboard';
 import CampaignAnalytics from './CampaignAnalytics';
 import ResultInsightModal from '../Result/ResultInsightModal';
+import { reportTypeOf, isSimhwaTarget } from '../../lib/reportType';
 
-const JOB_TO_REPORT = {
-  sales: '보험설계사',
-  coach: '코치/멘토',
-  sales_leader: '관리자',
-  branch_manager: '관리자',
-  training_leader: '관리자',
-  division_head: '관리자',
-  executive: '관리자',
-};
+// 직군 → 리포트 종류·심화 대상 판정은 lib/reportType으로 옮겼다(9/18, 심화 일괄 출력과 같이 쓴다 — SPEC simhwa §23-2).
 
 // 용어 사전의 color·tint·ink를 이 화면이 쓰는 이름(bg/light/text)으로 옮긴다.
 const EGO_COLORS = Object.fromEntries(EGO_ORDER.map(c => [c, {
@@ -300,10 +293,10 @@ export default function AdminDashboard({ onLogout }) {
                       <td>
                         <div className="report-action-group">
                           <a href={`#/report/${r.id}`} target="_blank" className="btn-report-action">
-                            리포트 보기<span className="btn-report-type" data-type={JOB_TO_REPORT[r.jobType] || '보험설계사'}>{JOB_TO_REPORT[r.jobType] || '보험설계사'}</span>
+                            리포트 보기<span className="btn-report-type" data-type={reportTypeOf(r.jobType)}>{reportTypeOf(r.jobType)}</span>
                           </a>
                           {/* 심화코칭 리포트 — 보험설계사(sales)만 (심화는 sales 전용, SPEC §11 D5) */}
-                          {(JOB_TO_REPORT[r.jobType] || '보험설계사') === '보험설계사' && (
+                          {isSimhwaTarget(r.jobType) && (
                             <a href={`#/simhwa/${r.id}`} target="_blank" className="btn-report-action btn-simhwa-action">
                               심화코칭
                             </a>

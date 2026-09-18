@@ -96,9 +96,9 @@ function ScoreBar({ score, max, safe, color }) {
   );
 }
 
-function Section({ num, title, children }) {
+function Section({ num, title, children, className }) {
   return (
-    <div className="simhwa-section">
+    <div className={`simhwa-section${className ? ` ${className}` : ''}`}>
       <h2 className="simhwa-section-title">
         <span className="simhwa-section-num">{num}</span>
         {title}
@@ -136,7 +136,33 @@ function RecognizeBlock({ c }) {
   );
 }
 
-// 4장 — "○○ 성향이 강한 고객과 보험 상담을 효과적으로 하는 방법" + 핵심 코칭.
+// 4장(§23-1) — 10분 안에 성향이 안 읽히는 고객에게 질문으로 방향을 잡는다. 전원 공통 고정 텍스트.
+//   원본의 빨간 질문은 강조 표시로 읽고 화법 인용 스타일(.simhwa-talk)로 — 심화 팔레트에 빨강이 없다(§22).
+function FallbackBlock({ q }) {
+  if (!q) return null;
+  return (
+    <div className="simhwa-fallback">
+      <IconHead>{q.head1}</IconHead>
+      <p>{q.intro}</p>
+      <p className="simhwa-fallback-lead">{q.ask_lead}</p>
+      <LineList items={[q.question1]} className="simhwa-talk" />
+      <table className="simhwa-fallback-table">
+        <thead><tr>{q.table_head.map(h => <th key={h}>{h}</th>)}</tr></thead>
+        <tbody>
+          {q.table.map(([ans, ego], i) => (
+            <tr key={i}><td>{ans}</td><td>{colorize(ego, `fq${i}`)}</td></tr>
+          ))}
+        </tbody>
+      </table>
+      <IconHead>{q.head2}</IconHead>
+      <p>{colorize(q.body2, 'fb2')}</p>
+      <LineList items={[q.question2]} className="simhwa-talk" />
+      <p>{colorize(q.body3, 'fb3')}</p>
+    </div>
+  );
+}
+
+// 5장(옛 4장) — "○○ 성향이 강한 고객과 보험 상담을 효과적으로 하는 방법" + 핵심 코칭.
 //   장 제목이 곧 그 말이라 §16-9의 `CUSTOMER_GUIDE_TITLE` 소제목은 중복이 되어 없앴다(§17-2).
 function GuideBlock({ c }) {
   return (
@@ -275,13 +301,18 @@ export function SimhwaView({ row }) {
         {r.customers.map(c => <RecognizeBlock key={c.type} c={c} />)}
       </Section>
 
-      {/* 4. 고객 유형별 상담 코칭 (2026-07-30 회의로 3장에서 갈라져 나옴, §17-2) */}
-      <Section num="4." title="고객 유형별 상담 코칭">
+      {/* 4. 10분 안에 성향이 안 읽힐 때 — 질문으로 파악 (손소장 9/17 요청 1, §23-1). 새 쪽에서 시작 */}
+      <Section num="4." title="고객의 성향을 10분 내에 파악하기 어려웠다면" className="is-fallback">
+        <FallbackBlock q={r.fallbackQ} />
+      </Section>
+
+      {/* 5. 고객 유형별 상담 코칭 (2026-07-30 회의로 3장에서 갈라져 나옴, §17-2 · 9/18 §23으로 4→5장) */}
+      <Section num="5." title="고객 유형별 상담 코칭">
         {r.customers.map(c => <GuideBlock key={c.type} c={c} />)}
       </Section>
 
-      {/* 5. 소개를 만드는 실천 전략 (손소장 항목 8로 개명, 2026-07-30 회의로 4→5장) */}
-      <Section num="5." title="소개를 만드는 실천 전략">
+      {/* 6. 소개를 만드는 실천 전략 (손소장 항목 8로 개명, 2026-07-30 회의로 4→5장 · 9/18 §23으로 5→6장) */}
+      <Section num="6." title="소개를 만드는 실천 전략">
         <Paras text={rf.intro} />
         {rf.strength && (
           <div className="simhwa-block"><Paras text={rf.strength} /></div>

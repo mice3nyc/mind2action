@@ -259,6 +259,20 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     ) : (
                       <button className="btn-view-results" disabled title="참여자가 없습니다">전체리포트 PDF 출력하기</button>
                     )}
+                    {/* 심화코칭 일괄 출력 (손소장 9/17 요청 3, SPEC simhwa §23-2) — 보험설계사만 담긴다 */}
+                    {counts[c.id] > 0 ? (
+                      <a
+                        className="btn-view-results"
+                        href={`#/simhwa-batch/${c.id}${batchLinkParams}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="심화코칭 대상(보험설계사) 전원을 한 화면에 모아 PDF로 저장"
+                      >
+                        심화코칭 PDF 출력하기
+                      </a>
+                    ) : (
+                      <button className="btn-view-results" disabled title="참여자가 없습니다">심화코칭 PDF 출력하기</button>
+                    )}
                   </td>
                   <td>
                     <div className="campaign-actions">

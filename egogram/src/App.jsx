@@ -5,6 +5,7 @@ import AdminApp from './pages/AdminApp';
 import ReportPageV2 from './components/Report/ReportPageV2';
 import ReportBatchPage from './components/Report/ReportBatchPage';
 import SimhwaReportPage from './components/Report/SimhwaReportView';
+import SimhwaBatchPage from './components/Report/SimhwaBatchPage';
 import PreviewResultPage from './pages/PreviewResultPage';
 import PreviewSimhwaPage from './pages/PreviewSimhwaPage';
 import Header from './components/Layout/Header';
@@ -17,6 +18,7 @@ const PAGE_TITLES = [
   ['/admin', '관리자'],
   ['/report-batch', '리포트 일괄'],
   ['/report', '성향 리포트'],
+  ['/simhwa-batch', '심화 일괄'],   // /simhwa보다 앞 — startsWith 선착순 (SPEC §11)
   ['/simhwa', '심화 코칭 리포트'],
   ['/preview/result', '미리보기 · 성향 리포트'],
   ['/preview/simhwa', '미리보기 · 심화 코칭'],
@@ -44,6 +46,7 @@ function AppContent() {
           <Route path="/admin" element={<AdminApp />} />
           <Route path="/report/:id" element={<ReportPageV2 />} />
           <Route path="/report-batch/:campaignId" element={<ReportBatchPage />} />
+          <Route path="/simhwa-batch/:campaignId" element={<SimhwaBatchPage />} />
           <Route path="/simhwa/:id" element={<SimhwaReportPage />} />
           <Route path="/preview/result" element={<PreviewResultPage />} />
           <Route path="/preview/simhwa" element={<PreviewSimhwaPage />} />

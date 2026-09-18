@@ -195,6 +195,9 @@ export function buildSimhwa(result) {
     // ③~⑦ 다섯 고객유형별 상담코칭
     customers,
 
+    // 4장 10분 안에 안 읽힐 때 — 질문으로 파악 [고정] (손소장 9/17 요청 1, SPEC §23-1)
+    fallbackQ: staticData.fallback_questions,
+
     // ⑧ 고객 거절 대응 심화
     rejectDeep: {
       intro: tk(staticData.reject_deep.intro),                    // [고정]

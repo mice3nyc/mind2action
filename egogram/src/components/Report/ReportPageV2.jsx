@@ -3,9 +3,10 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { lookupReport, EGO_STATES, EGO_LABELS, needsCoaching, isNoAdjust } from '../../lib/cmLookup';
 import { getSuccessRange } from '../../lib/scoreEngine';
-import { EGO_COLOR, EGO_LABEL, EGO_STRENGTH, EGO_TYPE_NAME, LABEL_TO_CODE, egoTermRe, withJosa } from '../../lib/egoTerms';
+import { EGO_COLOR, EGO_LABEL, EGO_STRENGTH, EGO_TYPE_NAME, LABEL_TO_CODE, TIE_PRIORITY, egoTermRe, withJosa } from '../../lib/egoTerms';
 import uiTexts from '../../data/ui_texts.yaml';
-import identityData from '../../data/identity.yaml';
+import identityData from '../../data/identity60.yaml';
+import { identityKey } from '../../lib/identityKey';
 
 // ─────────────────────────────────────────────────────────────
 // ReportPageV2 — 리포트 리디자인 프로토타입 무대 (26.0528~)
@@ -136,12 +137,16 @@ function plainTranslation(ego, score, cm1) {
 // top1+top2 조합(20종) → "당신은 ___한 분" 명명 + 짧은 설명.
 // 점수에서 결정론적으로 조합이 정해지므로 고정 텍스트도 개인화돼 보인다(원칙 5의 나).
 // 26.0611: 인라인 9조합 → identity.yaml 20조합 외부화 (손소장 검토 승인분).
+// 26.0918: 20조합 → identity60.yaml top1_top2_bottom 60조합 (손소장 9/17 요청 2번, SPEC §13).
+//   여러 교육생이 서로 비교하면 20종으론 "우리 같네"가 나온다. identity.yaml은 파일만 남기고 연결 해제.
+//   desc는 두 줄(첫 줄=top 쌍, 둘째=bottom) — Paragraphs 없이 줄바꿈 그대로(.report-identity-desc pre-line).
 const IDENTITY = identityData;
 
 // 미충원 조합 fallback — 두 강점을 합성 (빈 화면 방지). 강점명은 용어 사전에서 온다.
 
-function getIdentity(top1, top2, name) {
-  const hit = IDENTITY[`${top1}_${top2}`];
+function getIdentity(result) {
+  const { top1, top2 } = result;
+  const hit = IDENTITY[identityKey(result, TIE_PRIORITY)];
   if (hit) return hit;
   return {
     // 손소장 26.0607(14): 강점명 뒤 조사. 예전엔 다섯 값이 전부 받침으로 끝나 '과'로 고정돼 있었으나,
@@ -270,7 +275,7 @@ export function ReportViewV2({ row, showToggle = true }) {
 
   const data = { ...row, result };
   const { scores, top1, top2, bottom } = result;
-  const identity = getIdentity(top1, top2, report.name);
+  const identity = getIdentity(result);
 
   return (
     <div className={`report-container ${bling ? 'report-bling' : ''}`}>
