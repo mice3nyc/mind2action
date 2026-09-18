@@ -17,6 +17,9 @@ import { join } from 'node:path';
 
 const OUT = process.argv[2];
 const BASE = process.argv[3] || 'http://localhost:4173';
+// 기대 쪽수 — §23-3: 새 4장이 들어가 9 → 10쪽. EXPECT_PAGES 환경변수는 변이 시험용.
+const EXPECT_PAGES = Number(process.env.EXPECT_PAGES || 10);
+const fails = [];
 if (!OUT) { console.error('사용: node scripts/print-simhwa.mjs <출력디렉토리> [베이스URL]'); process.exit(1); }
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
@@ -116,8 +119,17 @@ async function main() {
     const lastPage = (texts[texts.length - 1] || '').replace(/\s+/g, ' ').trim();
     const footerOnlyLastPage = /^© \d{4} MIND2ACTION/.test(lastPage) && lastPage.length < 80;
 
+    // §23-4 — 새 4장(질문으로 파악)이 한 쪽 안에: 장 제목·표 마지막 행·장 마지막 문장이 같은 쪽
+    const flat = texts.map(p => p.replace(/\s+/g, ''));
+    const p4 = ['4.고객의성향을10분내에파악하기어려웠다면', '필요하다고판단되면빨리결정하는편입니다', '함께조율하는상담이좋습니다']
+      .map(k => flat.findIndex(p => p.includes(k)));
+    const ch4OnePage = !p4.includes(-1) && new Set(p4).size === 1;
+    if (texts.length !== EXPECT_PAGES) fails.push(`${name} ${texts.length}쪽 (기대 ${EXPECT_PAGES})`);
+    if (!ch4OnePage) fails.push(`${name} 4장 쪽 ${JSON.stringify(p4.map(i => i + 1))}`);
+
     summary[name] = {
       pages: texts.length,
+      ch4Pages: p4.map(i => i + 1),
       topsPt: tops,
       topsMm: tops.map(v => v == null ? null : Math.round(v * 0.3528 * 10) / 10),
       section2Pages: s2page,
@@ -125,7 +137,9 @@ async function main() {
       footerOnlyLastPage,
     };
     const t = summary[name];
-    console.log(`  ${name}  ${t.pages}쪽 · 윗여백(mm) 1p=${t.topsMm[0]} 2p=${t.topsMm[1]} 3p=${t.topsMm[2]} · 2장 페이지 ${JSON.stringify(t.section2Pages)} ${t.section2OnePage ? '한 페이지 ✅' : '갈라짐 ⛔'} · 꼬리장 ${footerOnlyLastPage ? '푸터만 ⛔' : 'OK'}`);
+    console.log(`  ${name}  ${t.pages}쪽 · 윗여백(mm) 1p=${t.topsMm[0]} 2p=${t.topsMm[1]} 3p=${t.topsMm[2]} · 2장 페이지 ${JSON.stringify(t.section2Pages)} ${t.section2OnePage ? '한 페이지 ✅' : '갈라짐 ⛔'} · 꼬리장 ${footerOnlyLastPage ? '푸터만 ⛔' : 'OK'} · 4장 ${ch4OnePage ? `${p4[0] + 1}쪽 한 쪽 ✅` : '갈라짐 ⛔'}`);
+    if (!t.section2OnePage) fails.push(`${name} 2장 갈라짐`);
+    if (footerOnlyLastPage) fails.push(`${name} 꼬리장 푸터만`);
   }
 
   // 회귀 — @page 주입이 심화 화면 밖으로 새지 않는가 (§21-2).
@@ -146,10 +160,14 @@ async function main() {
   summary._leak = { styleTagPresent: leak.result.value, otherPageTopMm: otherTop };
   console.log(`  [회귀] 심화 밖 화면 — @page 태그 ${leak.result.value ? '남아 있음 ⛔' : '없음 ✅'} · 윗여백 ${otherTop}mm(21mm이면 누수)`);
 
+  if (leak.result.value) fails.push('@page 태그 누수');
   writeFileSync(join(OUT, '_summary.json'), JSON.stringify(summary, null, 1));
   ws.close();
   chrome.kill();
   try { rmSync(PROFILE, { recursive: true, force: true }); } catch { /* 임시 프로필 */ }
+  // 판정 — 2026-09-18(§23-4) 전까지는 출력만 하고 판정하지 않았다. 이제 실패가 종료코드로 나간다.
+  console.log(fails.length ? `⛔ 실패 ${fails.length}: ${fails.join(' / ')}` : `✅ 전부 통과 (${EXPECT_PAGES}쪽 · 4장 한 쪽 · 2장 한 쪽 · 꼬리장 · 누수 없음)`);
+  process.exit(fails.length ? 1 : 0);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

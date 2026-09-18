@@ -667,5 +667,6 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 - **대조 검사** `scripts/check-identity60.mjs`: CSV 60행 각각에 대해 yaml의 `title`·`desc`가 **CSV 값과 같은지**(존재 여부가 아니라 동일성). 60건 미만이면 실패. 일부러 한 칸 틀려 붉어지는지 먼저 본다.
 - 동점 헬퍼: 전부 0점·4개 동점 두 경우에서 `X_Y_Z` 세 코드가 모두 다르고 키가 존재하는지.
 - 렌더: 실제 응답 3건 이상(top 쌍이 같고 bottom만 다른 두 사람 포함 — 이번 요청의 핵심 장면) `/report/:id` 덤프로 1장 박스·2장 첫 줄이 같은 title인지.
+  - **구현 시(9/18)**: 응답 테이블이 관리자 로그인 없이는 안 열려(anon 0행) 실응답 대신 **`ReportViewV2`를 vite SSR로 가짜 행 4건 렌더**했다 — 같은 top 쌍·다른 bottom 두 사람(CP_NP_A / CP_NP_FC) 제목 다름 · 전부 0점 → `A_CP_NP` · 코치 직군 적용 · 1장·2장 같은 title. 커밋 8ffb222, 라이브 번들 문자열 확인.
 - 일괄 출력 `/report-batch/:campaignId`도 같은 컴포넌트라 자동 반영 — 한 캠페인으로 확인.
 - `vite build` clean · 배포 후 번들 해시 전파 확인 → 라이브 `survey.mind2action.kr` 확인.
