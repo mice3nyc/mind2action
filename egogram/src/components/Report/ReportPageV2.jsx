@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { lookupReport, EGO_STATES, EGO_LABELS, needsCoaching, isNoAdjust } from '../../lib/cmLookup';
 import { getSuccessRange } from '../../lib/scoreEngine';
-import { EGO_COLOR, EGO_LABEL, EGO_STRENGTH, EGO_TYPE_NAME, LABEL_TO_CODE, TIE_PRIORITY, egoTermRe, withJosa } from '../../lib/egoTerms';
+import { EGO_COLOR, EGO_LABEL, EGO_STRENGTH, LABEL_TO_CODE, TIE_PRIORITY, egoTermRe, withJosa } from '../../lib/egoTerms';
 import uiTexts from '../../data/ui_texts.yaml';
 import identityData from '../../data/identity60.yaml';
 import { identityKey } from '../../lib/identityKey';
@@ -307,10 +307,9 @@ export function ReportViewV2({ row, showToggle = true }) {
       {/* ── §1 성향분석 — v2 가이드 2차 (원칙 6·7) ─────────────────
           종합 정체성 먼저 → 소제목 → 그래프(평이 라벨, 보조) → 자아상태별 깊은 본문. */}
       <Section number={1} title={`${report.name}${uiTexts.report.sections.s1_title}`}>
-        {/* 1. 종합 성향 정체성 — 가장 강한 힘(top1) 부각(손소장 강조점) + 종합 인물상 */}
+        {/* 1. 종합 성향 정체성 — 인물상 60조합(§13). 옛 top1 부각 라벨은 9/18 손소장 요청으로 뺐다 */}
         <div className="report-identity">
-          <p className="report-identity-toplabel">가장 강한 힘</p>
-          <p className="report-identity-top">{EGO_TYPE_NAME[top1]}</p>
+          {/* 9/18 오후 손소장: 「가장 강한 힘 / 강점명」 두 줄 삭제 (SPEC §13-1). CSS(.report-identity-top*)는 되살릴 수 있게 남긴다 */}
           <p className="report-identity-line">
             {report.name}님은 <strong>{identity.title}</strong>입니다.
           </p>

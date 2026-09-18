@@ -1323,6 +1323,8 @@ body:has(.report-bling) { background: #fff; }
   font-weight: 400;
   margin-left: 1px;
 }
+/* 전체 PDF 칸 — 성향리포트·심화 두 버튼을 세로로 (9/18, simhwa §23-2) */
+.campaign-pdf-actions { display: inline-flex; flex-direction: column; gap: 6px; align-items: stretch; }
 .campaign-actions {
   display: inline-flex;
   gap: 8px;

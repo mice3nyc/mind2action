@@ -246,6 +246,8 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     )}
                   </td>
                   <td>
+                    {/* 전체 PDF 두 개 — 세로로 쌓는다(9/18, 버튼이 nowrap이라 가로면 표가 넓어진다) */}
+                    <div className="campaign-pdf-actions">
                     {counts[c.id] > 0 ? (
                       <a
                         className="btn-view-results"
@@ -273,6 +275,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     ) : (
                       <button className="btn-view-results" disabled title="참여자가 없습니다">심화코칭 PDF 출력하기</button>
                     )}
+                    </div>
                   </td>
                   <td>
                     <div className="campaign-actions">
