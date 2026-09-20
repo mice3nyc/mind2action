@@ -1123,9 +1123,12 @@ body:has(.report-bling) { background: #fff; }
     break-inside: avoid;
   }
 
-  /* 제목이 페이지 맨 아래 홀로 남지 않게 — 다음 내용과 붙임 */
+  /* 제목이 페이지 맨 아래 홀로 남지 않게 — 다음 내용과 붙임.
+     26.0920(§14): .report-subhead 추가 — 손소장 9/20 「성향별로 자세히 보기」가 1장 바닥에 홀로 남았다.
+     표본 6명 × 여백 3종 전부(18/18)에서 났다. 1장 소제목 둘 다 이 클래스라 같이 걸린다. */
   .report-section-title,
-  .report-intro h2 {
+  .report-intro h2,
+  .report-subhead {
     break-after: avoid;
   }
 

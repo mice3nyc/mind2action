@@ -669,3 +669,39 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
   - **구현 시(9/18)**: 응답 테이블이 관리자 로그인 없이는 안 열려(anon 0행) 실응답 대신 **`ReportViewV2`를 vite SSR로 가짜 행 4건 렌더**했다 — 같은 top 쌍·다른 bottom 두 사람(CP_NP_A / CP_NP_FC) 제목 다름 · 전부 0점 → `A_CP_NP` · 코치 직군 적용 · 1장·2장 같은 title. 커밋 8ffb222, 라이브 번들 문자열 확인.
 - 일괄 출력 `/report-batch/:campaignId`도 같은 컴포넌트라 자동 반영 — 한 캠페인으로 확인.
 - `vite build` clean · 배포 후 번들 해시 전파 확인 → 라이브 `survey.mind2action.kr` 확인.
+
+## §14 인쇄 — 소제목이 페이지 바닥에 홀로 남는 것 — 26.0920
+
+**요청**: 손소장 9/20 (이미지 `Assets/incoming/MIND2ACTION/inbox/수정요청/0917/Mind2Action 페이지브레이크 문제.jpg`). 「제일 마지막줄에 있는 상황별로 자세히 보기를 다음페이지 맨위로 부탁해요」. 이미지의 실제 문구는 **「성향별로 자세히 보기」**(영업성향 리포트 1장 마지막 줄). 9/17 PDF 3건과 별건 — 그 PDF에는 이 항목이 없다(전문 재확인, 행 셋뿐).
+
+**원인**: `egogram/src/styles/praxi.css` `@media print`의 「제목이 페이지 맨 아래 홀로 남지 않게」 규칙(`break-after: avoid`) 대상이 `.report-section-title`·`.report-intro h2` 둘뿐이다. 문제의 제목은 `.report-subhead`(`ReportPageV2.jsx` 320·328)라 규칙이 안 닿아, 제목만 바닥에 남고 본문이 다음 장으로 넘어간다.
+
+### §14-1 결정
+
+| 항목 | 결정 |
+|---|---|
+| 방식 | `.report-subhead`를 기존 `break-after: avoid` 목록에 **추가**한다. `break-before: page`로 항상 새 장을 여는 방식은 쓰지 않는다 — 자리가 남아도 장을 만들어 종이가 늘어난다 |
+| 적용 범위 | 클래스에 걸므로 1장의 **소제목 둘 다**(「한눈에 보는 다섯 성향」·「성향별로 자세히 보기」). 제목 고아는 둘 다 막는 것이 맞다 |
+| 대상 리포트 | 영업성향(일반) 리포트. 심화는 `.report-subhead`를 쓰지 않아 영향 없음(grep 전수: 이 클래스 사용처는 `ReportPageV2.jsx` 두 곳뿐) |
+
+### §14-2 검증 — 하니스
+
+`egogram/scripts/print-report.mjs` (무대 `egogram/harness/print-report.html`·`print-report.jsx`·`report-samples.js`).
+`node scripts/print-report.mjs <출력디렉토리>`. vite dev와 크롬을 러너가 띄우고 끝나면 죽인다. 하니스 무대는 dev 서버만 서빙하므로 `vite build`(엔트리 = index.html 하나) 산출물에는 안 들어간다 — 빌드 후 `dist/` grep으로 확인함.
+
+- **판정**: 눈이 아니라 PDF 페이지 스트림. 「그 제목이 있는 쪽에서 제목 뒤에 아무 글자도 없고, 뒤에 쪽이 더 있으면 고아」. 소제목 둘 다 잰다.
+- **표본**: 6명 × 여백 3종(기본 0.4in·넓게 0.6in·좁게 0.25in) = 36건. 실응답이 아니다(anon으로 `responses` 0행) — `harness/report-samples.js`가 점수에서 top1/top2/bottom/grades를 `scoreEngine`과 같은 규칙으로 판다. 이선규(전부 13점 동점)는 §13-4 가장자리(bottom = top1)를 같이 태운다.
+- **0건 통과 차단**: 무대가 안 서면 「고아 0건」이 공허하게 참이 되므로, 표본 전건 렌더(`.report-subhead` 2개 확인)와 측정 건수 36을 통과 조건에 박았다.
+
+#### 실측 (26.0920)
+
+| | 「성향별로 자세히 보기」 고아 | 쪽수 |
+|---|---|---|
+| 고치기 전 | **18/18 판 전부** (1쪽 바닥) | — |
+| 고친 뒤 | **0/18** (전부 2쪽 맨 위) | 18판 중 2판만 +1쪽 |
+
+- ★**「사람마다 다르게 난다」는 틀렸다 — 전원에게 난다.** 제목 위(표지·인트로·인물상 박스·그래프)의 높이가 사실상 고정이라 여섯 표본·세 여백 18판이 전부 같은 자리에서 났다. 10/21 한화피플라이프 200명이면 200명 전원이 겪는 장면이었다.
+- 고치기 전 판이 **붉게 뜨는 것을 먼저 확인**했고(18건), 같은 검사가 「한눈에 보는 다섯 성향」은 전 판에서 OK로 갈라 냈다 — 검사가 아무거나 고아로 부르지 않는다는 뜻.
+- **쪽수 대가**: 기본·좁게 여백에서는 증가 0. 넓게(0.6in)에서만 2판(김정임·허진랑) 4→5쪽. 200명 일괄 출력에서 기본 여백이면 종이가 안 늘어난다.
+- `vite build` clean · 빌드 CSS에 `.report-section-title,.report-intro h2,.report-subhead{break-after:avoid}` 들어간 것 확인.
+- 배포 후 번들 해시 전파 확인 → 라이브 `survey.mind2action.kr` 확인.
