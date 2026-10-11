@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { fetchAllRows } from './fetchAll';
 
 export async function saveResult(profile, result, campaignId = null) {
   const row = {
@@ -29,18 +30,8 @@ export async function saveResult(profile, result, campaignId = null) {
   return row;
 }
 
-export async function loadResults() {
-  const { data, error } = await supabase
-    .from('responses')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Load failed:', error);
-    return [];
-  }
-
-  return (data || []).map(r => ({
+function mapRow(r) {
+  return {
     id: r.id,
     timestamp: r.created_at,
     campaignId: r.campaign_id,
@@ -59,18 +50,47 @@ export async function loadResults() {
     top1: r.top1,
     top2: r.top2,
     bottom: r.bottom,
-  }));
+  };
+}
+
+// responses 여러 행 조회 — 끝까지 읽는다 (SPEC §14). 오름차순으로 읽어 돌려준다.
+//   filter(q) — 조건을 붙일 자리. 실패하면 throw (부분 결과·빈 배열로 돌려주지 않는다).
+export async function fetchResponses(columns = '*', filter = (q) => q) {
+  const { rows, error } = await fetchAllRows(() =>
+    filter(supabase.from('responses').select(columns, { count: 'exact' }))
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true })
+  );
+  if (error) {
+    console.error('Load failed:', error);
+    throw error;
+  }
+  return rows;
+}
+
+// 관리자 결과 목록 — 전체, 최신순. 실패하면 throw (0건은 「다 지워졌다」로 읽힌다).
+export async function loadResults() {
+  const rows = await fetchResponses();
+  return rows.reverse().map(mapRow);
+}
+
+// 한 캠페인의 응답 전부 — 캠페인 삭제 전 백업용. 메모리 목록이 아니라 DB에 다시 묻는다.
+export async function loadCampaignResults(campaignId) {
+  const rows = await fetchResponses('*', (q) => q.eq('campaign_id', campaignId));
+  return rows.reverse().map(mapRow);
 }
 
 // 캠페인 평균 5축 점수 + 표본 수. 집계만 조회(타인 개별 데이터 비노출).
 // 결과 화면 "전체 속 내 위치" 비교용. campaignId 없으면 null.
 export async function loadCampaignAverage(campaignId) {
   if (!campaignId) return null;
-  const { data, error } = await supabase
-    .from('responses')
-    .select('score_cp, score_np, score_a, score_fc, score_ac')
-    .eq('campaign_id', campaignId);
-  if (error || !data || data.length === 0) return null;
+  let data;
+  try {
+    data = await fetchResponses('score_cp, score_np, score_a, score_fc, score_ac', (q) => q.eq('campaign_id', campaignId));
+  } catch {
+    return null;
+  }
+  if (data.length === 0) return null;
   const cols = { CP: 'score_cp', NP: 'score_np', A: 'score_a', FC: 'score_fc', AC: 'score_ac' };
   const avg = {};
   for (const [k, col] of Object.entries(cols)) {
@@ -82,7 +102,6 @@ export async function loadCampaignAverage(campaignId) {
 export async function deleteResult(id) {
   const { error } = await supabase.from('responses').delete().eq('id', id);
   if (error) console.error('Delete failed:', error);
-  return loadResults();
 }
 
 export async function clearResults() {

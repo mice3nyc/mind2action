@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "deploy": "vite build && gh-pages -d dist --add",
     "deploy:clean": "vite build && gh-pages -d dist",
-    "check:terms": "node scripts/check-ego-terms.mjs"
+    "check:terms": "node scripts/check-ego-terms.mjs",
+    "check:fetch": "node scripts/check-fetch-all.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",

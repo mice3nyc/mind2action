@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { loadResults, deleteResult } from '../../lib/storage';
+import { loadResults, loadCampaignResults, deleteResult } from '../../lib/storage';
 import { listCampaigns, deleteCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import { EGO_ORDER, EGO_COLOR, EGO_TINT, EGO_INK } from '../../lib/egoTerms';
@@ -72,11 +72,13 @@ export default function AdminDashboard({ onLogout }) {
   const [analyticsCampId, setAnalyticsCampId] = useState(null);
   const [insightIdx, setInsightIdx] = useState(null); // 개인 인사이트 팝업 — filtered 내 인덱스 (검토 프로토타입 26.0616)
   const [sortConfig, setSortConfig] = useState(null); // { key: 'department'|'jobType'|'incomeRange', dir: 'asc'|'desc' } — null=기본(입력순)
+  const [loadError, setLoadError] = useState(false); // 응답 조회 실패 — 0건으로 보이면 「다 지워졌다」로 읽힌다 (SPEC §14)
 
   async function reload() {
-    const [r, c] = await Promise.all([loadResults(), listCampaigns()]);
-    setResults(r);
+    const [r, c] = await Promise.all([loadResults().catch(() => null), listCampaigns()]);
     setCampaigns(c);
+    if (r) setResults(r); // 실패하면 지난 목록은 그대로 둔다
+    setLoadError(!r);
   }
 
   useEffect(() => {
@@ -132,14 +134,22 @@ export default function AdminDashboard({ onLogout }) {
   async function handleDelete(id) {
     const target = results.find(r => r.id === id);
     if (!window.confirm(`${target?.name || ''}님의 결과를 삭제하시겠습니까?`)) return;
-    const updated = await deleteResult(id);
-    setResults(updated);
+    await deleteResult(id);
+    await reload();
   }
 
   // 캠페인 삭제 — 백업(그 캠페인 응답 CSV) 자동 다운로드 후 삭제.
   // 전체 일괄 삭제는 폐기, 캠페인 단위로만 (피터공 5/31).
+  // 백업 대상은 화면 목록이 아니라 그 자리에서 DB에 다시 물어 만든다 — 삭제는 DB 전부를 지우므로
+  // 백업도 DB 전부여야 한다. 조회가 실패하면 삭제하지 않는다 (SPEC §14).
   async function handleDeleteCampaign(campaign) {
-    const campRows = results.filter(r => r.campaignId === campaign.id);
+    let campRows;
+    try {
+      campRows = await loadCampaignResults(campaign.id);
+    } catch {
+      window.alert('이 캠페인의 응답을 불러오지 못해 삭제를 중단했습니다. 잠시 후 다시 시도해 주세요.');
+      return;
+    }
     const ok = window.confirm(
       `[${campaign.client_name}] 캠페인과 연결된 응답 ${campRows.length}건을 삭제합니다.\n\n` +
       `삭제 전 이 캠페인 응답을 CSV로 백업 다운로드합니다. 계속할까요?`
@@ -198,6 +208,11 @@ export default function AdminDashboard({ onLogout }) {
         <div>
           <h1>관리자</h1>
           <p className="admin-count">설문 결과 {results.length}건 · 캠페인 {campaigns.length}개</p>
+          {loadError && (
+            <p className="admin-count" role="alert" style={{ color: '#d0021b' }}>
+              응답을 불러오지 못했습니다. 아래 숫자는 최신이 아닐 수 있습니다. 새로고침해 주세요.
+            </p>
+          )}
         </div>
         <button className="btn btn-secondary" onClick={onLogout}>로그아웃</button>
       </div>

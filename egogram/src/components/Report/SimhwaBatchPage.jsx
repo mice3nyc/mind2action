@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { fetchResponses } from '../../lib/storage';
 import { SimhwaView } from './SimhwaReportView';
 import { sortRows, isValidSortKey } from '../../lib/resultLabels';
 import { isSimhwaTarget } from '../../lib/reportType';
@@ -29,12 +30,11 @@ export default function SimhwaBatchPage() {
         .select('*')
         .eq('id', campaignId)
         .single();
-      const { data: resp, error: err } = await supabase
-        .from('responses')
-        .select('*')
-        .eq('campaign_id', campaignId)
-        .order('created_at', { ascending: true });
-      if (err) {
+      // 한 캠페인이 1,000명을 넘어도 끝까지 읽는다 (SPEC §14)
+      let resp;
+      try {
+        resp = await fetchResponses('*', (q) => q.eq('campaign_id', campaignId));
+      } catch {
         setError('응답을 불러오지 못했습니다.');
         return;
       }
