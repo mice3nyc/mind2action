@@ -11,7 +11,9 @@
     "deploy": "vite build && gh-pages -d dist --add",
     "deploy:clean": "vite build && gh-pages -d dist",
     "check:terms": "node scripts/check-ego-terms.mjs",
-    "check:fetch": "node scripts/check-fetch-all.mjs"
+    "check:fetch": "node scripts/check-fetch-all.mjs",
+    "check:admin": "node scripts/check-admin-data.mjs",
+    "check:admin-ui": "node scripts/check-admin-ui.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",

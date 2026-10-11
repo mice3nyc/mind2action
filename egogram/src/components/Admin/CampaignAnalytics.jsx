@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useCampaignRows } from '../../lib/useCampaignRows';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import { EGO_ORDER, EGO_COLOR } from '../../lib/egoTerms';
 
@@ -283,10 +284,9 @@ function Card({ title, hint, children }) {
 
 // ── 메인 ────────────────────────────────────────────────
 
-export default function CampaignAnalytics({ campaigns, results, campId, onCampId }) {
-  // 응답 수 집계
-  const countById = {};
-  for (const r of results) if (r.campaignId) countById[r.campaignId] = (countById[r.campaignId] || 0) + 1;
+// counts = 캠페인별 응답 수(개수만 물은 값). 본문은 고른 캠페인 하나만 읽는다 (SPEC §15-3).
+export default function CampaignAnalytics({ campaigns, counts, version, campId, onCampId }) {
+  const countById = counts;
   const options = campaigns
     .filter((c) => countById[c.id] > 0)
     .sort((a, b) => (countById[b.id] || 0) - (countById[a.id] || 0));
@@ -294,7 +294,8 @@ export default function CampaignAnalytics({ campaigns, results, campId, onCampId
   // controlled: 캠페인 관리 화면에서 특정 캠페인 분석으로 진입 가능. 미지정이면 응답 최다 캠페인.
   const effectiveId = (campId && options.some((o) => o.id === campId)) ? campId : (options[0]?.id || '');
   const selected = campaigns.find((c) => c.id === effectiveId);
-  const rows = useMemo(() => results.filter((r) => r.campaignId === effectiveId), [results, effectiveId]);
+  const { rows: loaded, loading, error } = useCampaignRows(effectiveId || null, version);
+  const rows = useMemo(() => loaded || [], [loaded]);
   const A = useMemo(() => analyze(rows), [rows]);
 
   return (
@@ -310,7 +311,11 @@ export default function CampaignAnalytics({ campaigns, results, campId, onCampId
         {selected && <span style={{ fontSize: 12, color: '#aaa' }}>{selected.target || ''}</span>}
       </div>
 
-      {!A ? (
+      {error ? (
+        <div className="admin-empty" role="alert">응답을 불러오지 못했습니다. 새로고침해 주세요.</div>
+      ) : !loaded && loading ? (
+        <div className="admin-empty">불러오는 중…</div>
+      ) : !A ? (
         <div className="admin-empty">이 캠페인에는 아직 응답이 없습니다.</div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

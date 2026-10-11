@@ -1,5 +1,5 @@
-import { supabase } from './supabase';
-import { fetchAllRows } from './fetchAll';
+import { supabase } from './supabase.js';
+import { fetchAllRows } from './fetchAll.js';
 
 export async function saveResult(profile, result, campaignId = null) {
   const row = {
@@ -68,16 +68,46 @@ export async function fetchResponses(columns = '*', filter = (q) => q) {
   return rows;
 }
 
-// 관리자 결과 목록 — 전체, 최신순. 실패하면 throw (0건은 「다 지워졌다」로 읽힌다).
+// 전체, 최신순 — 「전체 CSV」 전용 (SPEC §15-5). 화면을 여는 것만으로는 부르지 않는다.
+// 실패하면 throw (0건은 「다 지워졌다」로 읽힌다).
 export async function loadResults() {
   const rows = await fetchResponses();
   return rows.reverse().map(mapRow);
 }
 
-// 한 캠페인의 응답 전부 — 캠페인 삭제 전 백업용. 메모리 목록이 아니라 DB에 다시 묻는다.
+// 한 캠페인의 응답 전부, 최신순 — 결과 확인·분석 탭, 캠페인 삭제 전 백업.
 export async function loadCampaignResults(campaignId) {
   const rows = await fetchResponses('*', (q) => q.eq('campaign_id', campaignId));
   return rows.reverse().map(mapRow);
+}
+
+// 선택 키로 읽기 — 캠페인 id 또는 NO_CAMPAIGN(캠페인에 안 묶인 응답). SPEC §15-3
+export const NO_CAMPAIGN = 'none';
+export async function loadResultsByKey(key) {
+  if (key !== NO_CAMPAIGN) return loadCampaignResults(key);
+  const rows = await fetchResponses('*', (q) => q.is('campaign_id', null));
+  return rows.reverse().map(mapRow);
+}
+
+// 개수만 — 본문은 한 줄도 내려받지 않는다 (SPEC §15-2).
+async function countResponses(filter = (q) => q) {
+  const { count, error } = await filter(supabase.from('responses').select('*', { count: 'exact', head: true }));
+  if (error || typeof count !== 'number') throw error || new Error('countResponses: count 없음');
+  return count;
+}
+
+// 관리자 숫자 — { total, none, byCampaign: { [id]: n } }. 하나라도 실패하면 throw
+// (일부만 0으로 채워 주지 않는다 — 0명은 「아무도 안 했다」로 읽힌다).
+// 요청 수가 캠페인 수에 비례한다. 캠페인이 100개를 넘기면 RPC 하나로 바꿀 자리.
+export async function loadResponseCounts(campaignIds) {
+  const [total, none, ...per] = await Promise.all([
+    countResponses(),
+    countResponses((q) => q.is('campaign_id', null)),
+    ...campaignIds.map((id) => countResponses((q) => q.eq('campaign_id', id))),
+  ]);
+  const byCampaign = {};
+  campaignIds.forEach((id, i) => { byCampaign[id] = per[i]; });
+  return { total, none, byCampaign };
 }
 
 // 캠페인 평균 5축 점수 + 표본 수. 집계만 조회(타인 개별 데이터 비노출).

@@ -236,7 +236,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     </button>
                   </td>
                   <td>
-                    <button className="btn-view-results" onClick={() => onViewResults(c.client_name)}>설문결과 데이터 보기</button>
+                    <button className="btn-view-results" onClick={() => onViewResults(c.id)}>설문결과 데이터 보기</button>
                   </td>
                   <td>
                     {counts[c.id] > 0 ? (

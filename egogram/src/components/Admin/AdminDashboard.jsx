@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { loadResults, loadCampaignResults, deleteResult } from '../../lib/storage';
+import { loadResults, loadCampaignResults, loadResponseCounts, deleteResult, NO_CAMPAIGN } from '../../lib/storage';
+import { useCampaignRows } from '../../lib/useCampaignRows';
+import { orderCampaignsForFilter, resolveCampaignKey } from '../../lib/adminSelect';
 import { listCampaigns, deleteCampaign } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import { EGO_ORDER, EGO_COLOR, EGO_TINT, EGO_INK } from '../../lib/egoTerms';
@@ -66,19 +68,24 @@ function SortableTh({ label, sortKey, sortConfig, onSort }) {
 
 export default function AdminDashboard({ onLogout }) {
   const [tab, setTab] = useState('results');
-  const [results, setResults] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
-  const [filter, setFilter] = useState('all');
+  const [counts, setCounts] = useState(null); // { total, none, byCampaign } — 개수만 묻는다. null=아직 모름 (SPEC §15-2)
+  const [filter, setFilter] = useState(null); // 사람이 고른 캠페인 id | NO_CAMPAIGN. null이면 자동 선택 (§15-4)
+  const [version, setVersion] = useState(0); // 올리면 고른 캠페인을 다시 읽는다
+  const [exportingAll, setExportingAll] = useState(false);
   const [analyticsCampId, setAnalyticsCampId] = useState(null);
   const [insightIdx, setInsightIdx] = useState(null); // 개인 인사이트 팝업 — filtered 내 인덱스 (검토 프로토타입 26.0616)
   const [sortConfig, setSortConfig] = useState(null); // { key: 'department'|'jobType'|'incomeRange', dir: 'asc'|'desc' } — null=기본(입력순)
-  const [loadError, setLoadError] = useState(false); // 응답 조회 실패 — 0건으로 보이면 「다 지워졌다」로 읽힌다 (SPEC §14)
+  const [loadError, setLoadError] = useState(false); // 개수 조회 실패 — 0건으로 보이면 「다 지워졌다」로 읽힌다 (SPEC §14)
 
+  // 화면을 여는 것만으로는 응답 본문을 내려받지 않는다 — 캠페인 목록 + 개수만 (SPEC §15-1)
   async function reload() {
-    const [r, c] = await Promise.all([loadResults().catch(() => null), listCampaigns()]);
+    const c = await listCampaigns();
+    const n = await loadResponseCounts(c.map(x => x.id)).catch(() => null);
     setCampaigns(c);
-    if (r) setResults(r); // 실패하면 지난 목록은 그대로 둔다
-    setLoadError(!r);
+    if (n) setCounts(n); // 실패하면 지난 숫자는 그대로 둔다
+    setLoadError(!n);
+    setVersion(v => v + 1);
   }
 
   useEffect(() => {
@@ -86,8 +93,9 @@ export default function AdminDashboard({ onLogout }) {
   }, []);
 
   // 캠페인 목록에서 "설문 결과 확인" → 그 캠페인만 필터링된 결과 탭
-  function viewCampaignResults(clientName) {
-    setFilter(clientName || 'all');
+  function viewCampaignResults(campaignId) {
+    setFilter(campaignId || null);
+    setSortConfig(null);
     setTab('results');
   }
 
@@ -97,13 +105,15 @@ export default function AdminDashboard({ onLogout }) {
     setTab('analytics');
   }
 
-  // 캠페인별 참여수 (results 기준)
-  const counts = {};
-  for (const r of results) {
-    if (r.campaignId) counts[r.campaignId] = (counts[r.campaignId] || 0) + 1;
-  }
+  const byCampaign = counts?.byCampaign || {};
 
-  const filtered = filter === 'all' ? results : results.filter(r => r.group === filter);
+  // 결과 확인 탭 — 고른 캠페인의 응답만 읽는다 (SPEC §15-3)
+  const selectedKey = resolveCampaignKey(filter, campaigns, counts);
+  const { rows, loading: rowsLoading, error: rowsError } = useCampaignRows(selectedKey, version);
+  const filtered = rows || [];
+  const selectedName = selectedKey === NO_CAMPAIGN
+    ? '캠페인없음'
+    : (campaigns.find(c => c.id === selectedKey)?.client_name || '');
 
   // 헤더 클릭 정렬 — 소속/직무/소득 3개 지원. 같은 헤더 재클릭 시 오름↔내림 토글, 다른 헤더 클릭 시 오름차순부터.
   function handleSort(key) {
@@ -115,24 +125,11 @@ export default function AdminDashboard({ onLogout }) {
 
   const sorted = sortRows(filtered, sortConfig);
 
-  const groupCounts = {};
-  for (const r of results) {
-    if (r.group) groupCounts[r.group] = (groupCounts[r.group] || 0) + 1;
-  }
-
-  // 결과 필터 옵션: 캠페인을 일정(참여 시작)순 → 생성순
-  const orderedCampaignNames = [...new Set(
-    campaigns.slice().sort((a, b) =>
-      (a.period_start || '9999-99-99').localeCompare(b.period_start || '9999-99-99')
-      || (a.created_at || '').localeCompare(b.created_at || '')
-    ).map(c => c.client_name)
-  )];
-  // 실존 캠페인만 (삭제·레거시 group_name 잔재 제외 — 손소장 26.0604).
-  // group_name == client_name으로 적재되므로 필터 매칭은 그대로 유효.
-  const filterOptions = orderedCampaignNames;
+  // 결과 필터 옵션: 캠페인을 일정(참여 시작)순 → 생성순. 선택 단위는 캠페인 id (SPEC §15-3)
+  const filterOptions = orderCampaignsForFilter(campaigns);
 
   async function handleDelete(id) {
-    const target = results.find(r => r.id === id);
+    const target = filtered.find(r => r.id === id);
     if (!window.confirm(`${target?.name || ''}님의 결과를 삭제하시겠습니까?`)) return;
     await deleteResult(id);
     await reload();
@@ -196,8 +193,22 @@ export default function AdminDashboard({ onLogout }) {
     URL.revokeObjectURL(url);
   }
 
+  // 파일명에 캠페인명 — 「전체 CSV」와 같은 이름이면 내려받은 뒤 어느 것이 전체인지 안 갈린다 (SPEC §15-5)
   function handleExportCSV() {
-    downloadResultsCSV(filtered, `egogram_results_${new Date().toISOString().slice(0, 10)}.csv`);
+    downloadResultsCSV(filtered, `egogram_${selectedName}_${new Date().toISOString().slice(0, 10)}.csv`);
+  }
+
+  // 전체 CSV — 누를 때만 전체를 읽는다. 실패하면 파일을 만들지 않는다(부분 파일 금지).
+  async function handleExportAllCSV() {
+    setExportingAll(true);
+    try {
+      const all = await loadResults();
+      downloadResultsCSV(all, `egogram_전체_${new Date().toISOString().slice(0, 10)}.csv`);
+    } catch {
+      window.alert('전체 응답을 불러오지 못해 CSV를 만들지 않았습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setExportingAll(false);
+    }
   }
 
   const egoKeys = ['CP', 'NP', 'A', 'FC', 'AC'];
@@ -207,7 +218,7 @@ export default function AdminDashboard({ onLogout }) {
       <div className="admin-header">
         <div>
           <h1>관리자</h1>
-          <p className="admin-count">설문 결과 {results.length}건 · 캠페인 {campaigns.length}개</p>
+          <p className="admin-count">설문 결과 {counts ? counts.total : '…'}건 · 캠페인 {campaigns.length}개</p>
           {loadError && (
             <p className="admin-count" role="alert" style={{ color: '#d0021b' }}>
               응답을 불러오지 못했습니다. 아래 숫자는 최신이 아닐 수 있습니다. 새로고침해 주세요.
@@ -225,15 +236,15 @@ export default function AdminDashboard({ onLogout }) {
       </div>
 
       {tab === 'campaigns' && (
-        <CampaignManager campaigns={campaigns} counts={counts} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} sortConfig={sortConfig} />
+        <CampaignManager campaigns={campaigns} counts={byCampaign} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} sortConfig={sortConfig} />
       )}
 
       {tab === 'dashboard' && (
-        <CampaignDashboard campaigns={campaigns} counts={counts} />
+        <CampaignDashboard campaigns={campaigns} counts={byCampaign} />
       )}
 
       {tab === 'analytics' && (
-        <CampaignAnalytics campaigns={campaigns} results={results} campId={analyticsCampId} onCampId={setAnalyticsCampId} />
+        <CampaignAnalytics campaigns={campaigns} counts={byCampaign} version={version} campId={analyticsCampId} onCampId={setAnalyticsCampId} />
       )}
 
       {tab === 'results' && (
@@ -243,24 +254,34 @@ export default function AdminDashboard({ onLogout }) {
               <label className="results-filter-label">캠페인</label>
               <select
                 className="form-input results-filter-select"
-                value={filter}
-                onChange={e => { setFilter(e.target.value); setSortConfig(null); }}
+                value={selectedKey || ''}
+                onChange={e => { setFilter(e.target.value || null); setSortConfig(null); }}
               >
-                <option value="all">전체 ({results.length})</option>
-                {filterOptions.map(g => (
-                  <option key={g} value={g}>{g} ({groupCounts[g] || 0})</option>
+                {!selectedKey && <option value="">응답이 있는 캠페인 없음</option>}
+                {filterOptions.map(c => (
+                  <option key={c.id} value={c.id}>{c.client_name} ({byCampaign[c.id] ?? '…'})</option>
                 ))}
+                {counts?.none > 0 && <option value={NO_CAMPAIGN}>캠페인 없음 ({counts.none})</option>}
               </select>
             </div>
             <div className="admin-actions">
               <button className="btn btn-primary" onClick={handleExportCSV} disabled={filtered.length === 0}>
                 CSV 다운로드
               </button>
+              <button className="btn btn-secondary" onClick={handleExportAllCSV} disabled={exportingAll || !counts || counts.total === 0} title="모든 캠페인의 응답을 한 파일로">
+                {exportingAll ? '전체 불러오는 중…' : `전체 CSV (${counts ? counts.total : '…'}건)`}
+              </button>
             </div>
           </div>
 
-          {filtered.length === 0 ? (
-            <div className="admin-empty">아직 설문 결과가 없습니다.</div>
+          {rowsError ? (
+            <div className="admin-empty" role="alert">응답을 불러오지 못했습니다. 새로고침해 주세요.</div>
+          ) : !selectedKey ? (
+            <div className="admin-empty">{counts ? '아직 설문 결과가 없습니다.' : loadError ? '응답 수를 불러오지 못했습니다. 새로고침해 주세요.' : '불러오는 중…'}</div>
+          ) : !rows && rowsLoading ? (
+            <div className="admin-empty">불러오는 중…</div>
+          ) : filtered.length === 0 ? (
+            <div className="admin-empty">이 캠페인에는 아직 응답이 없습니다.</div>
           ) : (
             <div className="admin-table-wrap">
               <table className="admin-table">
