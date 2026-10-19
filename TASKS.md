@@ -16,9 +16,10 @@
 > 피터공 10/11: 「이 서비스를 안 건드리고 손소장에게 넘긴다. 앞으로 우리는 안 건드림.」 서비스는 돌볼 서버가 없어 그대로 돌아간다. 넘긴다는 것은 **주인을 바꾸는 일**이지 다시 만드는 일이 아니다(코드 수정 0).
 > 넘긴 뒤에도 놀공(피터공) 명의로 남는 것 셋 — 도메인 `mind2action.kr`(만료 2028-03-18) · 사이트 호스팅(이 저장소의 GitHub Pages) · Supabase 조직.
 - [x] Supabase 조직에 손소장용 이메일 로그인 계정을 Owner로 추가 (피터공이 초대·수락. Table Editor에서 `campaigns`·`responses` 열림 확인). 기존 GitHub 로그인도 Owner 유지
-- [ ] 손소장이 GitHub 계정을 만들어 계정 이름을 알려 온다 (10/11 요청함) ← 지금 여기. 10/11 저녁 손소장이 계정을 만들어 피터공에게 보내옴. **아리공은 사용자 이름을 아직 못 받았다**(세션1237)
+- [x] 손소장 GitHub 계정 = `sonyongbae`(egogram.son@gmail.com, 10/11 생성) — 10/19 피터공 전달, 계정 존재·같은 이름 저장소 없음 확인. 암호는 받지 않는다(이전에 필요 없음)
+- [ ] (옛 줄) 손소장이 GitHub 계정을 만들어 계정 이름을 알려 온다 (10/11 요청함). 10/11 저녁 손소장이 계정을 만들어 피터공에게 보내옴. **아리공은 사용자 이름을 아직 못 받았다**(세션1237)
 - [x] 이전 전 저장소 실물 점검 (10/11 세션1237, 읽기 전용) — 공개 저장소라 받는 쪽이 무료 계정이어도 Pages 유지 · Actions 시크릿 0·배포 키 0·웹훅 0·협업자는 mice3nyc뿐 · 추적 중인 `.env` 없음 · 계정 단위 도메인 인증 잠금 없음(`protected_domain_state` null) · Pages = `gh-pages` 루트·`survey.mind2action.kr`·HTTPS 강제 · DNS CNAME = `mice3nyc.github.io`
-- [ ] 저장소 Transfer ownership → 넘어간 뒤 Pages 설정에 `survey.mind2action.kr`이 그대로 잡혀 있는지 확인. 이름을 받으면 계정 존재부터 조회하고 `gh api repos/mice3nyc/mind2action/transfer -f new_owner=…`. 손소장이 **하루 안에 메일로 수락**해야 하고(안 누르면 만료), 수락 뒤엔 우리가 되돌릴 수 없다. 그 계정에 `mind2action` 저장소가 이미 있으면 거부된다
+- [ ] 저장소 Transfer ownership ← 지금 여기(10/19: 아리공 셸의 transfer API가 권한 분류기에 막힘 → 피터공이 `! gh api -X POST repos/mice3nyc/mind2action/transfer -f new_owner=sonyongbae` 또는 웹 Settings→Transfer로 실행 대기) → 넘어간 뒤 Pages 설정에 `survey.mind2action.kr`이 그대로 잡혀 있는지 확인. 이름을 받으면 계정 존재부터 조회하고 `gh api repos/mice3nyc/mind2action/transfer -f new_owner=…`. 손소장이 **하루 안에 메일로 수락**해야 하고(안 누르면 만료), 수락 뒤엔 우리가 되돌릴 수 없다. 그 계정에 `mind2action` 저장소가 이미 있으면 거부된다
 - [ ] 후이즈 DNS: `survey` CNAME을 `mice3nyc.github.io` → 새 계정 주소로
 - [ ] Supabase: 손소장 계정 쪽 조직으로 프로젝트 Transfer (데이터·주소·키 그대로). **먼저 지금 조직에 다른 프로젝트가 있는지 확인** — Owner는 조직의 모든 프로젝트를 본다
 - [ ] 도메인 명의: 넘길지 2028-03까지 둘지 (피터공 판단). 두면 만료일을 손소장에게 알린다
