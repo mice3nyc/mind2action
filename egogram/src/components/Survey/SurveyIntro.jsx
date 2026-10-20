@@ -1,10 +1,10 @@
 import { useState } from 'react';
+import { EDITION, JOB_LABELS } from '../../lib/edition';
 
+// 선택지는 에디션마다 다르다 — 보험판 세 역할 / 일반판 한 역할 (SPEC-org-edition §10)
 const JOB_OPTIONS = [
   { value: '', label: '선택해주세요' },
-  { value: 'sales', label: '고객 컨설팅 영업' },
-  { value: 'coach', label: '신인 육성 코칭' },
-  { value: 'sales_leader', label: '조직운영 리더' },
+  ...EDITION.roleOptions.map(value => ({ value, label: JOB_LABELS[value] })),
 ];
 
 const INCOME_OPTIONS = [
@@ -74,12 +74,14 @@ export default function SurveyIntro({ group, onSubmit }) {
             {JOB_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
         </div>
-        <div className="form-group">
-          <label className="form-label">직전 3개월 평균 소득</label>
-          <select className="form-input form-select" name="incomeRange" value={form.incomeRange} onChange={handleChange}>
-            {INCOME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
+        {EDITION.hasIncome && (
+          <div className="form-group">
+            <label className="form-label">직전 3개월 평균 소득</label>
+            <select className="form-input form-select" name="incomeRange" value={form.incomeRange} onChange={handleChange}>
+              {INCOME_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+        )}
         <button type="submit" className="btn btn-primary btn-full" disabled={!isValid}>
           설문 시작
         </button>

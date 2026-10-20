@@ -1,15 +1,9 @@
 // 결과 테이블(AdminDashboard) + 배치 리포트(ReportBatchPage) 공용 — 직무/소득 라벨 + 정렬 로직.
 // 두 곳에서 각자 정의하면 라벨이 어긋날 위험이 있어 한 곳으로 모음 (7/3).
 
-export const JOB_LABELS = {
-  sales: '고객 컨설팅 영업',
-  coach: '신인 육성 코칭',
-  sales_leader: '조직운영 리더',
-  branch_manager: '지점장/지사장',
-  training_leader: '교육팀장/지원팀장',
-  division_head: '사업단장/부장',
-  executive: '본부장',
-};
+// 역할 라벨은 lib/edition의 역할 표 한 벌에서 (SPEC-org-edition §2 — 세 군데에 따로 적혀 있던 것)
+import { JOB_LABELS } from './edition';
+export { JOB_LABELS };
 
 export const INCOME_LABELS = {
   under200: '200만 미만',

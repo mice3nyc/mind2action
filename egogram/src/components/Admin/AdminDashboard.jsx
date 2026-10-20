@@ -11,6 +11,7 @@ import CampaignDashboard from './CampaignDashboard';
 import CampaignAnalytics from './CampaignAnalytics';
 import ResultInsightModal from '../Result/ResultInsightModal';
 import { reportTypeOf, isSimhwaTarget } from '../../lib/reportType';
+import { EDITION } from '../../lib/edition';
 
 // 직군 → 리포트 종류·심화 대상 판정은 lib/reportType으로 옮겼다(9/18, 심화 일괄 출력과 같이 쓴다 — SPEC simhwa §23-2).
 
@@ -163,7 +164,10 @@ export default function AdminDashboard({ onLogout }) {
   // 결과 행 배열 → CSV 다운로드 (내보내기·삭제 전 백업 공용)
   function downloadResultsCSV(rows, filename) {
     if (!rows || rows.length === 0) return;
-    const headers = ['그룹', '이름', '생년월일', '경력(월)', '회사', '소속', '직무', '소득', '리크루팅', 'CP', 'NP', 'A', 'FC', 'AC', '총점', 'TOP1', 'TOP2', 'BOTTOM', '일시'];
+    // 소득·리크루팅 열은 보험판에만 (일반판 SPEC-org-edition §10)
+    const headers = ['그룹', '이름', '생년월일', '경력(월)', '회사', '소속', '직무',
+      ...(EDITION.hasIncome ? ['소득'] : []), ...(EDITION.hasRecruit ? ['리크루팅'] : []),
+      'CP', 'NP', 'A', 'FC', 'AC', '총점', 'TOP1', 'TOP2', 'BOTTOM', '일시'];
     const dataRows = rows.map(r => [
       r.group,
       r.name,
@@ -172,8 +176,8 @@ export default function AdminDashboard({ onLogout }) {
       r.company || '',
       r.department,
       JOB_LABELS[r.jobType] || r.jobType,
-      INCOME_LABELS[r.incomeRange] || r.incomeRange || '',
-      r.recruitCount || '',
+      ...(EDITION.hasIncome ? [INCOME_LABELS[r.incomeRange] || r.incomeRange || ''] : []),
+      ...(EDITION.hasRecruit ? [r.recruitCount || ''] : []),
       r.scores?.CP, r.scores?.NP, r.scores?.A, r.scores?.FC, r.scores?.AC,
       r.total,
       `${r.top1} ${EGO_LABELS[r.top1]}`,
@@ -294,8 +298,8 @@ export default function AdminDashboard({ onLogout }) {
                     <th>회사</th>
                     <SortableTh label="소속" sortKey="department" sortConfig={sortConfig} onSort={handleSort} />
                     <SortableTh label="직무" sortKey="jobType" sortConfig={sortConfig} onSort={handleSort} />
-                    <SortableTh label="소득" sortKey="incomeRange" sortConfig={sortConfig} onSort={handleSort} />
-                    <th>리크루팅</th>
+                    {EDITION.hasIncome && <SortableTh label="소득" sortKey="incomeRange" sortConfig={sortConfig} onSort={handleSort} />}
+                    {EDITION.hasRecruit && <th>리크루팅</th>}
                     {egoKeys.map(e => (
                       <th key={e} className="th-ego" style={{ color: EGO_COLORS[e].bg }}>{e}</th>
                     ))}
@@ -317,8 +321,8 @@ export default function AdminDashboard({ onLogout }) {
                       <td>{r.company || '-'}</td>
                       <td className="td-dept">{r.department}</td>
                       <td>{JOB_LABELS[r.jobType] || r.jobType}</td>
-                      <td className="td-small">{INCOME_LABELS[r.incomeRange] || '-'}</td>
-                      <td>{r.recruitCount || '-'}</td>
+                      {EDITION.hasIncome && <td className="td-small">{INCOME_LABELS[r.incomeRange] || '-'}</td>}
+                      {EDITION.hasRecruit && <td>{r.recruitCount || '-'}</td>}
                       {egoKeys.map(e => (
                         <ScoreCell key={e} ego={e} score={r.scores?.[e] || 0} />
                       ))}

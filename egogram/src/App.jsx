@@ -11,6 +11,7 @@ import PreviewSimhwaPage from './pages/PreviewSimhwaPage';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
 import './styles/praxi.css';
+import { EDITION, EDITION_KEY } from './lib/edition';
 
 // 화면별 탭 이름 — 구별어를 앞에 둔다. 탭은 좁아서 뒤쪽이 잘리므로
 // "MIND2ACTION —"으로 시작하면 여러 탭이 전부 같은 글자로 보인다 (26.0810)
@@ -26,7 +27,7 @@ const PAGE_TITLES = [
 
 function pageTitle(pathname) {
   const hit = PAGE_TITLES.find(([prefix]) => pathname.startsWith(prefix));
-  return `${hit ? hit[1] : '에고그램 설문'} · MIND2ACTION`;
+  return `${hit ? hit[1] : '에고그램 설문'} · ${EDITION.brandSuffix}`;
 }
 
 function AppContent() {
@@ -38,9 +39,12 @@ function AppContent() {
     document.title = pageTitle(location.pathname);
   }, [location.pathname]);
 
+  // 일반판 관리 화면만 청색 테마 — 참여자 화면은 그대로 (SPEC-org-edition §5)
+  const orgAdmin = isAdmin && EDITION_KEY === 'org';
+
   return (
-    <div className="app">
-      {!isReport && <Header />}
+    <div className={orgAdmin ? 'app app-org-admin' : 'app'}>
+      {!isReport && <Header sub={isAdmin ? EDITION.headerSub : ''} />}
       <main className={isAdmin ? 'main-content main-admin' : isReport ? 'main-content main-report' : 'main-content'}>
         <Routes>
           <Route path="/admin" element={<AdminApp />} />

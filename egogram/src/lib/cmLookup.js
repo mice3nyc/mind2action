@@ -4,6 +4,7 @@ import cmCoach from '../data/cm_coach.yaml';
 import cm6Common from '../data/cm6_common_consultant.yaml';
 import cmLlmSales from '../data/cm_llm_sales.yaml';
 import { EGO_STATES, EGO_LABELS, SAFE_RANGES, roleFromJobType } from './scoreEngine';
+import { JOB_TO_CM } from './edition';
 
 const CM_DATA = {
   sales: cmInsurance,
@@ -11,15 +12,7 @@ const CM_DATA = {
   coach: cmCoach,
 };
 
-const JOB_TO_CM = {
-  sales: 'sales',
-  coach: 'coach',
-  sales_leader: 'manager',
-  branch_manager: 'manager',
-  training_leader: 'manager',
-  division_head: 'manager',
-  executive: 'manager',
-};
+// 역할 → 문안 묶음은 lib/edition의 역할 표 한 벌에서 (SPEC-org-edition §2)
 
 function getScoreRange(score) {
   if (score >= 17) return '17-20';

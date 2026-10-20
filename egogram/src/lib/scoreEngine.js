@@ -1,5 +1,6 @@
 import questions from '../data/questions.json';
 import { EGO_ORDER, EGO_LABEL, TIE_PRIORITY } from './egoTerms';
+import { JOB_TO_ROLE } from './edition';
 
 // 자아상태 코드·라벨·동점 우선순위는 전부 용어 사전(data/ego_terms.yaml)에서 온다.
 //   라벨은 TA 정식명("통제적 부모" 등)이 부정적으로 읽혀 중립 키워드로 통일한 것.
@@ -30,15 +31,7 @@ const SAFE_RANGES = {
   coach:   UNIFIED_RANGES,  // 코치
 };
 
-const JOB_TO_ROLE = {
-  sales: 'sales',
-  coach: 'coach',
-  sales_leader: 'manager',
-  branch_manager: 'manager',
-  training_leader: 'manager',
-  division_head: 'manager',
-  executive: 'manager',
-};
+// 역할 → 안전구간 키는 lib/edition의 역할 표 한 벌에서 (SPEC-org-edition §2)
 
 function roleFromJobType(jobType) {
   return JOB_TO_ROLE[jobType] || 'sales';

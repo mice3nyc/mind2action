@@ -1638,3 +1638,27 @@ body:has(.report-bling) { background: #fff; }
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
 }
+
+/* ─── 일반 조직판 관리 화면 (SPEC-org-edition §5) ───
+   색만 덮는다. 레이아웃·간격·글자 크기는 보험판과 같다 — 운영 중 두 판을 헷갈리지 않게 하려는 것.
+   보험판도 강조가 파랑이라 강조색만으로는 안 갈린다 → 바탕(연청 모눈)과 헤더(진청 띠)를 바꾼다.
+   입력칸·표는 var(--bg) 흰색 그대로 둔다. */
+.app-org-admin {
+  background-color: #eaf0ff;
+  background-image:
+    linear-gradient(rgba(0, 18, 222, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 18, 222, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.app-org-admin .header {
+  background: var(--accent-blue);
+  border-bottom-color: #000a8a;
+}
+.app-org-admin .header-brand,
+.app-org-admin .header-sub {
+  color: #ffffff;
+}
+/* 표는 모눈 위에서 읽기 어렵다 — 흰 바탕을 깐다(색만, 크기 불변) */
+.app-org-admin .admin-table-wrap {
+  background: #ffffff;
+}

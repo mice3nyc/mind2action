@@ -2,21 +2,15 @@ import { useMemo } from 'react';
 import { useCampaignRows } from '../../lib/useCampaignRows';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import { EGO_ORDER, EGO_COLOR } from '../../lib/egoTerms';
+import { ROLE_GROUP, EDITION } from '../../lib/edition';
 
 // 캠페인 분석 페이지 (강사 사전 준비용) — 추가 모니터링 화면.
 // 라이브 설문/리포트에 영향 없음. SPEC: docs/SPEC-analytics.md (v1, 2026-06-16).
 
 const EGO_KEYS = EGO_ORDER;
 const EGO_COLORS = EGO_COLOR;   // 용어 사전이 단일 출처
-const JOB_LABELS = {
-  sales: '고객 컨설팅 영업', coach: '신인 육성 코칭', sales_leader: '조직운영 리더',
-  branch_manager: '지점장/지사장', training_leader: '교육팀장/지원팀장',
-  division_head: '사업단장/부장', executive: '본부장',
-};
-const ROLE_OF = {
-  sales: '컨설턴트', coach: '코치', sales_leader: '리더', branch_manager: '리더',
-  training_leader: '리더', division_head: '리더', executive: '리더',
-};
+// 역할 라벨·분류는 lib/edition의 역할 표 한 벌에서 (SPEC-org-edition §2)
+const ROLE_OF = ROLE_GROUP;
 const INCOME_ORDER = ['under200', '200-400', '400-600', '600-800', '800-1000', '1000-1500', '1500-2000', 'over2000'];
 const INCOME_LABELS = {
   under200: '200만 미만', '200-400': '200~400만', '400-600': '400~600만', '600-800': '600~800만',
@@ -387,7 +381,7 @@ export default function CampaignAnalytics({ campaigns, counts, version, campId, 
                 <SubLabel>직무 역할별 자아상태</SubLabel>
                 <CompareRow groups={A.roleProfiles.map((p) => ({ label: p.role, n: p.n, avg: p.avg }))} />
               </div>
-              {A.recruitSplit ? (
+              {!EDITION.hasRecruit ? null : A.recruitSplit ? (
                 <div>
                   <SubLabel>리크루팅 성과 상위 대 하위</SubLabel>
                   <CompareRow groups={[
