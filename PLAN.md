@@ -1,5 +1,7 @@
 # MIND2ACTION — 개발 계획
 
+> **26.1020 일반 조직판 분기** — 손소장 요청(「리더(일반 조직 운영)」 역할, 애련공 교육지원청 리더십 교육용)을 피터공이 **보험판과 분리**로 결정. 같은 저장소에서 빌드 둘: 보험판 `survey.mind2action.kr/`(현행) · 일반판 `survey.mind2action.kr/org/`(`npm run deploy:org`). 일반판은 별도 Supabase 조직 `Mind2Action 일반`(피터공 단독, 손소장 Owner 아님)의 `m2a-org` 프로젝트, 관리 계정 master(피터공·애련공)·son(손소장, 삭제 불가). 관리 화면은 청색 테마로 구별, 레이아웃 동일. 일반판 리포트 문안은 손소장 포맷이 오기 전까지 보험판 관리자 문안 임시 — 테스트용 라이브만, 참여자 링크는 아직 안 보낸다. 정본 `egogram/docs/SPEC-org-edition.md`. ⚠️ `deploy:clean`은 막혔다(`/org/`를 지운다).
+>
 > **26.1019 재전환 — 인계 취소, 놀공이 계속 운영한다.** 피터공 10/19 「인계 없이 운영해야 할 것 같아」. 저장소·Pages·도메인·Supabase 모두 피터공 명의 그대로(이전 요청 미발송). 손소장 계정(egogram.son@gmail.com)은 Supabase 조직 Owner로 **유지**(피터공 10/19 「두어도 될듯」) — 손소장이 데이터를 직접 보고 내려받을 수 있다.
 >
 > ~~**26.1011 방향 전환 — 손소장에게 넘기고 놀공은 더 손대지 않는다.** 응답 1,000건 조회 절단을 고친 것(SPEC §14·§15)이 놀공 쪽 마지막 개발이다. 남은 것은 주인 바꾸기(저장소·Supabase 프로젝트·DNS)이고 코드 작업은 없다. 진행 상태는 `TASKS.md` 맨 위 「손소장 인계」.~~
@@ -24,10 +26,11 @@
 
 | 환경 | URL |
 |------|-----|
-| 프로덕션 | https://mice3nyc.github.io/mind2action/egogram/ |
-| 관리자 | https://mice3nyc.github.io/mind2action/egogram/#/admin |
+| 프로덕션 (보험판) | https://survey.mind2action.kr/ |
+| 관리자 (보험판) | https://survey.mind2action.kr/#/admin |
+| 일반 조직판 | https://survey.mind2action.kr/org/ · 관리자 `/org/#/admin` (10/20) |
 | GitHub | https://github.com/mice3nyc/mind2action |
-| Supabase | https://supabase.com/dashboard (프로젝트: Mind2Action) |
+| Supabase | 보험판 = 조직 mice3nyc · 프로젝트 Mind2Action / 일반판 = 조직 Mind2Action 일반 · 프로젝트 m2a-org (서울) |
 
 배포 방법: `egogram/` 폴더에서 `npm run deploy` (vite build → gh-pages -d dist --dest egogram)
 `--dest egogram` 필수 — 없으면 gh-pages 루트에 올라가서 /egogram/ 경로 404.

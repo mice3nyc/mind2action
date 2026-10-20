@@ -39,7 +39,7 @@
 
 - `src/lib/edition.js` 한 파일이 에디션별 값을 쥔다: 역할 선택지·라벨·역할→문안·역할→리포트 종류·역할→안전구간 키·관리 화면 테마 클래스·탭 제목.
 - §0의 여섯 군데는 이 파일을 읽도록 바꾼다. **보험판은 값이 지금과 글자까지 같아야 한다**(라벨 하나 바꾸는 것 말고는 회귀 0).
-- `.env.org` = `VITE_EDITION=org` + 새 Supabase URL·anon 키. 빌드 `vite build --mode org --base /org/`.
+- `.env.org` = `VITE_EDITION=org` 한 줄(커밋됨). 새 Supabase 주소·공개 키는 `.env.org.local`(gitignore). 빌드 `npm run build:org` = `vite build --mode org` → base `/org/`·산출 `dist-org/` (vite.config가 mode로 정한다).
 - 일반판에서 보험 전용 기능은 닫는다: **심화코칭**(`isSimhwaTarget`이 보험설계사만 → 일반판에서는 버튼 자체가 안 뜬다, 확인만).
 
 ## 3. 일반판 리포트 문안
@@ -51,14 +51,14 @@
 ## 4. 계정과 권한
 
 - 새 Supabase 프로젝트의 Auth에 두 계정. 둘 다 실제 메일함 아님(기존 admin@와 같음), 비번은 사람끼리 공유하고 코드에 안 둔다.
-- 권한 구분은 Auth 사용자의 `app_metadata.role` = `master` | `son`, RLS가 이 값을 읽는다.
-- **기본안(승인 대기)**: son = 조회·캠페인 생성/수정·리포트·CSV 전부, **삭제(응답·캠페인)만 master**. 관리 화면은 son 로그인 시 삭제 버튼을 숨긴다(RLS가 진짜 막고, 화면은 가림).
+- 권한 구분은 Auth 사용자의 `app_metadata.role` = `master` | `son`, RLS가 이 값을 읽는다(`app_role()`).
+- **기본안(승인 대기)**: son = 조회·캠페인 생성/수정·리포트·CSV 전부, **삭제(응답·캠페인)만 master**. 관리 화면은 son 로그인 시 삭제 버튼을 숨긴다(RLS가 진짜 막고, 화면은 가림). ⏳ **화면 숨김은 미구현(10/20)** — 지금은 son이 눌러도 DB가 0건으로 거부만 한다.
 - **새 프로젝트는 별도 Supabase 조직에 만든다 (피터공 10/20 「손소장은 조직 owner 권한을 줄건 아니지」).** 손소장은 보험판 조직(Mind2Action)의 Owner라, 같은 조직에 만들면 대시보드로 일반판 DB까지 열린다. 새 조직은 피터공 단독, 손소장은 앱의 son 계정으로만 들어온다.
 - 스키마 정본 = `supabase-org-schema.sql` (테이블 둘 · `app_role()` · RLS · `get_campaign_by_code`). 실행 전에 보험판 라이브 열 목록과 대조한다(§7).
 
 ## 5. 청색 테마 (관리 화면만)
 
-- **레이아웃·간격·글자 크기·컴포넌트 변경 0.** CSS 변수와 바탕만 바꾼다. 루트에 `.edition-org` 클래스를 달고 그 아래에서만 덮는다.
+- **레이아웃·간격·글자 크기·컴포넌트 변경 0.** 바탕과 헤더 색만 바꾼다. App이 «일반판이면서 관리 화면일 때만» `.app`에 `app-org-admin` 클래스를 달고 그 아래에서만 덮는다(구현 10/20 — 처음 적은 `.edition-org`·`<html data-edition>` 안은 참여자 화면까지 걸려 버렸다).
 - 보험판도 이미 버튼·강조가 파랑(#0012de)이라 **강조색만 파랗게 하면 구별이 안 된다.** 그래서 면 전체를 바꾼다: 연청 바탕 + 얇은 모눈(blueprint) + 상단 진청 띠에 「일반 조직판」 표기. 라운딩은 기존 그대로(레이아웃 불변 원칙이 우선).
 - 참여자가 보는 설문·결과·리포트 화면은 바꾸지 않는다 — 혼동은 운영자 쪽 문제다.
 - 탭 제목도 「MIND2ACTION 관리 · 일반 조직」으로 갈라 브라우저 탭에서 구별되게.
@@ -94,7 +94,8 @@
 
 - **`npm run deploy:clean`(보험판)은 브랜치 전체를 갈아 `/org/`를 지운다.** → 스크립트를 일반판 폴더를 보존하는 형태로 고치거나 폐기. 고치기 전에는 쓰지 않는다.
 - 일반판 배포 = `gh-pages -d dist-org --dest org --add`. `public/CNAME`이 `/org/`에 따라 들어가지 않게 뺀다.
-- 새 Supabase 스키마는 **라이브 DB에서 DDL을 뽑아** 만든다(스키마 파일 불신, §0). 뽑은 DDL을 `supabase-schema.sql`에 정본으로 갱신해 다음 사람이 같은 함정에 안 빠지게 한다.
+- 새 Supabase 스키마는 **라이브 DB와 대조해** 만든다(스키마 파일 불신, §0). 10/20 대조 결과로 `supabase-schema.sql`(보험판)도 라이브 모양으로 갱신했다. 일반판 정본은 `supabase-org-schema.sql`.
+- 검사: `npm run check:edition`(역할 표 회귀)
 
 ## 8. 작업 순서
 
@@ -116,7 +117,7 @@
 3. 보험판 라벨 `sales_leader` = 「리더(보험 조직 운영)」 (손소장 요청분, 저장값 불변)
 4. 일반판 역할 = `org_leader` 「리더(일반 조직 운영)」 하나. **문안은 임시로 보험판 관리자 문안(cm_manager)을 가리킨다** — 손소장 포맷이 오면 `cm_org_leader.yaml`로 교체. 그때까지 일반판은 배포하지 않는다
 5. 일반판에서 소득 제거: 설문 첫 화면 칸 · 관리 표 「소득」 열·정렬 · CSV 「소득」 열. 리크루팅(관리 표 열·CSV 열·분석의 「리크루팅 성과 상위 대 하위」)도 일반판에서 숨긴다. 분석의 소득 비교는 데이터가 없으면 원래 안 뜨므로 손대지 않는다
-6. 관리 화면 청색 테마(일반판만, §5) — `<html data-edition="org">` 아래에서만 CSS 덮기. 헤더를 진청 바탕+흰 글자로, 기존 빈 자리 `.header-sub`에 「일반 조직판」. 관리 화면 바탕 연청+모눈. 탭 제목 뒤 `MIND2ACTION` → `MIND2ACTION 일반`
+6. 관리 화면 청색 테마(일반판만, §5) — `.app-org-admin` 아래에서만 CSS 덮기. 헤더를 진청 바탕+흰 글자로, 기존 빈 자리 `.header-sub`에 「일반 조직판」. 관리 화면 바탕 연청+모눈. 탭 제목 뒤 `MIND2ACTION` → `MIND2ACTION 일반`
 7. 빌드 배관: `.env.org`(gitignore 대상 `.env.*.local`이 아니므로 **`.env.org.local`**에 둔다) · `npm run build:org` = `vite build --mode org` → `dist-org/`, base `/org/` · `deploy:org` 스크립트는 만들되 실행하지 않는다
 8. **안전장치 — 일반판이 보험 DB를 가리키면 빌드를 멈춘다.** `.env`(보험 DB)는 모든 모드에서 읽히고 `supabase.js`에도 보험 주소가 기본값으로 박혀 있어, `.env.org.local`이 없거나 빠진 값이 있으면 **일반판이 조용히 보험 DB에 붙는다.** vite 설정에서 mode=org일 때 URL이 없거나 보험 URL과 같으면 throw
 9. `deploy:clean` 무력화 — 브랜치 전체를 갈아 `/org/`를 지우므로 실행 시 경고 후 종료하게 바꾼다

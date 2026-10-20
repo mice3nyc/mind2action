@@ -16,7 +16,8 @@
     "check:terms": "node scripts/check-ego-terms.mjs",
     "check:fetch": "node scripts/check-fetch-all.mjs",
     "check:admin": "node scripts/check-admin-data.mjs",
-    "check:admin-ui": "node scripts/check-admin-ui.mjs"
+    "check:admin-ui": "node scripts/check-admin-ui.mjs",
+    "check:edition": "node scripts/check-edition.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",
