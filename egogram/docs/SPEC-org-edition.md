@@ -147,7 +147,9 @@
 - 실행 전 대조: 보험판 라이브를 읽기 전용 SQL로 조회 → 캠페인 11열·응답 22열·`get_campaign_by_code` 하나 — `supabase-org-schema.sql`과 열 단위 일치
 - 스키마 실행 Success. 공개 키(publishable)로 바깥 확인: RPC 200 `[]`, 로그인 없이 응답·캠페인 조회 0건
 - `.env.org.local`(gitignore)에 주소·키. `npm run deploy:org` → `survey.mind2action.kr/org/` 200, 번들이 새 DB를 가리킴. 보험판 루트 번들 `index-CtQ-DME3.js` 그대로
-- 남은 것: 계정 둘(비밀번호는 피터공이 정해 직접 생성) → 역할 SQL → son·master 로그인·삭제 권한 라이브 확인
+- 계정 둘: 피터공이 대시보드에서 직접 생성(비밀번호는 피터공 보관, 아리공 모름) → 역할 SQL로 `master@`=master · `son@`=son, 둘 다 인증 완료
+- **RLS 시험(DB 안에서 역할 가장, 예외로 전부 롤백)**: son 읽기 1 · son 캠페인 읽기 1 · son 응답 삭제 0 · son 캠페인 삭제 0 · son 캠페인 수정 1 · 역할 없는 로그인 읽기 0 · master 읽기 1 · master 응답 삭제 1 · anon 캠페인 읽기 0 · anon 코드 조회 1 → 설계대로. 시험 뒤 캠페인·응답 0건(잔여 없음)
+- 남은 것: 피터공 라이브 확인(master 로그인 → 시험 캠페인 → 설문 1건 → 리포트 → son 로그인). son 화면엔 삭제 버튼이 아직 보인다 — 누르면 DB가 거부(0건). 버튼 숨김은 다음 손질
 
 ## 9. 미결
 
