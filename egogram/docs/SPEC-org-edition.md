@@ -141,6 +141,14 @@
 - 아직 안 한 것: `deploy:org` 실행(2단계 Supabase 이후) · 보험판 배포(라벨 변경분 — 피터공 승인 후)
 - **배포 정책 정정 (피터공 10/20 「내보내지 않아도 라이브해야 우리가 테스팅이 되지」)**: 일반판은 문안이 임시여도 `/org/`에 **테스트용으로 라이브 배포한다.** 막는 것은 「참여자에게 링크를 내보내는 것」이지 배포가 아니다. 캠페인 링크를 교육지원청에 보내는 것은 손소장 문안 교체 뒤
 
+### 10-S. 2단계 진행 (10/20 저녁)
+
+- Supabase 새 조직 `Mind2Action 일반`(Free, 피터공 단독) + 프로젝트 `m2a-org`(서울, ref `qklojqehzcazbwlaovty`). GitHub 연결 안 함
+- 실행 전 대조: 보험판 라이브를 읽기 전용 SQL로 조회 → 캠페인 11열·응답 22열·`get_campaign_by_code` 하나 — `supabase-org-schema.sql`과 열 단위 일치
+- 스키마 실행 Success. 공개 키(publishable)로 바깥 확인: RPC 200 `[]`, 로그인 없이 응답·캠페인 조회 0건
+- `.env.org.local`(gitignore)에 주소·키. `npm run deploy:org` → `survey.mind2action.kr/org/` 200, 번들이 새 DB를 가리킴. 보험판 루트 번들 `index-CtQ-DME3.js` 그대로
+- 남은 것: 계정 둘(비밀번호는 피터공이 정해 직접 생성) → 역할 SQL → son·master 로그인·삭제 권한 라이브 확인
+
 ## 9. 미결
 
 1. son과 master의 권한 차이 — §4 기본안(삭제만 master)으로 갈지
