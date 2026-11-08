@@ -18,7 +18,8 @@
     "check:admin": "node scripts/check-admin-data.mjs",
     "check:admin-ui": "node scripts/check-admin-ui.mjs",
     "check:edition": "node scripts/check-edition.mjs",
-    "check:intro": "node scripts/check-intro.mjs"
+    "check:intro": "node scripts/check-intro.mjs",
+    "check:ties": "node scripts/check-report-ties.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",

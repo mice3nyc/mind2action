@@ -7,8 +7,14 @@ import { ReportViewV2 } from '../src/components/Report/ReportPageV2';
 import { SAMPLES, deriveRow } from './report-samples.js';
 import '../src/styles/praxi.css';
 
-const want = new URLSearchParams(location.search).get('s');
-const sample = SAMPLES.find(s => s.name === want) || SAMPLES[0];
+const q = new URLSearchParams(location.search);
+const want = q.get('s');
+// ?scores=CP,NP,A,FC,AC&job=org_leader — 표본에 없는 점수(동점 가장자리)를 직접 넣는다. SPEC §13-4 check:ties
+const custom = q.get('scores')?.split(',').map(Number);
+const sample = custom?.length === 5
+  ? { name: q.get('name') || '시험', job_type: q.get('job') || 'sales', company: '', department: '',
+      scores: { CP: custom[0], NP: custom[1], A: custom[2], FC: custom[3], AC: custom[4] } }
+  : SAMPLES.find(s => s.name === want) || SAMPLES[0];
 
 // showToggle=false — bling 버튼은 인쇄에서 숨겨지지만 레이아웃 판정에 끼어들 여지를 아예 없앤다.
 createRoot(document.getElementById('root')).render(

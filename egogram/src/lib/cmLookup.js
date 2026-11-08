@@ -5,6 +5,8 @@ import cm6Common from '../data/cm6_common_consultant.yaml';
 import cmLlmSales from '../data/cm_llm_sales.yaml';
 import { EGO_STATES, EGO_LABELS, SAFE_RANGES, roleFromJobType } from './scoreEngine';
 import { JOB_TO_CM } from './edition';
+import { identityKey } from './identityKey';
+import { TIE_PRIORITY } from './egoTerms';
 
 const CM_DATA = {
   sales: cmInsurance,
@@ -75,7 +77,9 @@ export function lookupReport(result, jobType) {
   });
 
   const top1top2 = `${top1}_${top2}`;
-  const top1top2bottom = `${top1}_${top2}_${bottom}`;
+  // 60종 열쇠 — 동점 가장자리(bottom이 top1/top2와 겹침)에서도 있는 키가 되게 인물상과 같은 규칙을 쓴다.
+  //   result.bottom은 그대로(조율 포인트·관리 표가 읽는다). 동점이 아니면 bottom 그대로. SPEC §13-4 (11/8 확장)
+  const top1top2bottom = identityKey(result, TIE_PRIORITY);
 
   const isInsurance = cmKey === 'sales';
 

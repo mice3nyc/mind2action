@@ -660,6 +660,13 @@ TOP/BOTTOM 키: `{TOP1}_{TOP2}` 또는 `{TOP1}_{TOP2}_{BOTTOM}` (예: `CP_NP_A`)
 `scoreEngine`은 top·bottom을 **같은 동점 우선순위**(`tie_priority: [A, CP, NP, FC, AC]`)로 양방향 정렬한다. 그래서 최저점에 4~5개가 동점이면 **bottom이 top1 또는 top2와 같은 코드**가 된다(예: 전부 0점 → top1 = bottom = A). 0~20점 전수 408만 조합 중 1,071개(0.026%). 이때 60종 키 `X_Y_Y`는 존재하지 않는다.
 - **처리**: 인물상 조회에서만 `bottom ∈ {top1, top2}`이면 오름차순 정렬에서 top1·top2가 아닌 첫 성향을 쓴다(`identityBottom()` — `src/lib/identityKey.js`, yaml import 없는 순수 함수라 node 대조 스크립트도 같은 함수를 쓴다. 동점 우선순위는 인자로). **`scoreEngine`의 `bottom`은 바꾸지 않는다** — cm7·조율 포인트 등 다른 소비자가 읽는다(범위 선을 공용 코드에서 깨지 않는다).
 - 옛 fallback 합성(`EGO_STRENGTH` 두 강점)은 안전망으로 유지 — 키 누락 시 빈 화면 대신.
+- **11/8 확장 — 같은 60종 키를 쓰는 다른 조회에도 적용.** 9/18엔 인물상에만 넣어, 같은 키 `top1_top2_bottom`으로 찾는 **§4 「성과에 도움이 되는 말투」(cm5·cm5_1)와 cm7**은 그대로 남았다. 동점 가장자리에서 cm5가 null이 되어 **§4가 통째로 빠진다.** 발견: 11/8 일반판 라이브 시험, 이승택 응답이 다섯 성향 전부 20점(top1 = bottom = A) → 리포트가 §3에서 끝남(손소장 지적). 같은 결함이 보험판에도 있다
+  - 처리: `cmLookup.lookupReport`가 60종 키를 `identityKey(result, TIE_PRIORITY)`로 만든다 — cm5·cm5_1·cm7 셋. 20종 키(cm3·cm6)는 bottom을 안 쓰니 그대로
+  - 여전히 **`result.bottom`은 바꾸지 않는다** — 조율 포인트(cm4)·관리 표 BOT·분석이 그대로 읽는다. 바뀌는 것은 «문안을 찾는 열쇠»뿐
+  - 동점이 아닌 응답은 `identityBottom`이 bottom을 그대로 돌려주므로 문안이 한 글자도 안 바뀐다
+  - cm8(`top1_bottom`, 리더·코치)도 전부 동점이면 `A_A`로 빈다. 그러나 **cm8은 렌더 폐기**(명언 §8 삭제)라 화면 영향이 없어 손대지 않는다
+  - **결과(11/8)**: 고치기 전 코드로 check:ties 12건 붉음(동점 사례 전부 §4 0자) → 고친 뒤 13/13. 동점 없는 응답 5종 × 역할 넷 = 20건의 §4 전문을 고치기 전/후 덤프해 바이트 동일
+  - 검증: `npm run check:ties` — 인쇄 하니스에 점수를 직접 넣어(전부 동점 = bottom이 top1과 겹침 / 최저 넷 동점 = bottom이 top2와 겹침 / 동점 없음) 세 역할 문안(sales·coach·manager)과 일반판 역할(org_leader)에서 §4가 뜨는지. 동점 없는 응답은 고치기 전과 §4 글자가 같은지. 고치기 전 코드로 돌려 동점 사례가 붉어지는지
 
 ### §13-5 검증
 
