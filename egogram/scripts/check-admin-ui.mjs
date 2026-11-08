@@ -92,6 +92,9 @@ async function main() {
   const rowCount = `document.querySelectorAll('.admin-table tbody tr').length`;
   const selectVal = `document.querySelector('.results-filter-select').value`;
   const served = `__fake.stats.rowsServed`;
+  // 삭제 버튼은 글자로 찾는다 — 「마감/재개」도 같은 btn-delete-action 클래스다 (SPEC-org-edition §4)
+  const delBtnRows = `[...document.querySelectorAll('.admin-table tbody tr')].filter(tr => [...tr.querySelectorAll('button')].some(b => b.textContent.trim() === '삭제')).length`;
+  const colsMatch = `(() => { const h = document.querySelectorAll('.admin-table thead th').length; const rows = [...document.querySelectorAll('.admin-table tbody tr')]; return rows.length > 0 && rows.every(tr => tr.children.length === h); })()`;
 
   // 1. 첫 화면
   const header = await ev(`document.querySelector('.admin-count').textContent`);
@@ -99,6 +102,7 @@ async function main() {
   await until(`${rowCount} > 0`, '첫 표');
   ok(await ev(selectVal) === 'camp-d', '자동 선택 = camp-d(응답 있는 것 중 가장 최근)', await ev(selectVal));
   ok(await ev(rowCount) === D.expected['camp-d'], `표 행 수 = ${D.expected['camp-d']}`, String(await ev(rowCount)));
+  ok(await ev(delBtnRows) === D.expected['camp-d'], `기본(master) 결과 표: 행마다 「삭제」 버튼`, String(await ev(delBtnRows)));
   ok(await ev(served) === D.expected['camp-d'], `첫 화면에서 내려받은 본문 = ${D.expected['camp-d']}행(고른 캠페인 것만)`, `${await ev(served)}행`);
   const opts = await ev(`[...document.querySelectorAll('.results-filter-select option')].map(o => o.textContent)`);
   ok(!opts.some((t) => t.startsWith('전체')), '필터에 「전체」 없음', opts.join(' | '));
@@ -134,6 +138,7 @@ async function main() {
     const n = D.expected[c.id];
     ok(!!row && new RegExp(`(^|\\D)${n}(/|\\D)`).test(row.replace(c.name, '')), `캠페인 관리: ${c.name} 인원 ${n}`, row ? row.slice(0, 80) : '행 없음');
   }
+  ok(await ev(delBtnRows) === D.camps.length, `기본(master) 캠페인 관리: 캠페인마다 「삭제」 버튼`, String(await ev(delBtnRows)));
   // 「설문결과 데이터 보기」 → 그 캠페인이 골라진 결과 탭
   await ev(`[...document.querySelectorAll('table tbody tr')].find(tr => tr.textContent.includes('다라 사업단')).querySelector('.btn-view-results').click()`);
   await until(`document.querySelector('.results-filter-select') && ${selectVal} === 'camp-b' && ${rowCount} === ${D.expected['camp-b']}`, '데이터 보기 → camp-b');
@@ -164,7 +169,18 @@ async function main() {
   ok(true, '개수 실패 중에도 손으로 고른 캠페인은 읽힌다');
   ok(exceptions.length === 0, '콘솔 예외 0 (실패 시나리오 포함)', exceptions.join(' / ').slice(0, 300));
 
-  const EXPECT = 29;
+  // 7. son 화면(?canDelete=0) — 삭제 버튼 둘이 숨고, 열 수가 맞고, 「마감/재개」는 남는다
+  await send(ws, 'Page.navigate', { url: `${BASE}/harness/admin.html?canDelete=0` }, sessionId);
+  await until(`${rowCount} > 0 && ${selectVal} === 'camp-d'`, 'son 첫 표');
+  ok(await ev(delBtnRows) === 0, 'son 결과 표: 「삭제」 버튼 0', String(await ev(delBtnRows)));
+  ok(await ev(colsMatch), 'son 결과 표: 머리칸 수 = 행 칸 수(빈 열 없음)');
+  await clickTab('캠페인 관리');
+  await until(`document.querySelectorAll('table tbody tr').length >= ${D.camps.length}`, 'son 캠페인 관리 표');
+  ok(await ev(delBtnRows) === 0, 'son 캠페인 관리: 「삭제」 버튼 0', String(await ev(delBtnRows)));
+  const closeBtns = await ev(`[...document.querySelectorAll('table tbody tr')].filter(tr => [...tr.querySelectorAll('button')].some(b => ['마감', '재개'].includes(b.textContent.trim()))).length`);
+  ok(closeBtns === D.camps.length, 'son 캠페인 관리: 「마감/재개」는 그대로', String(closeBtns));
+
+  const EXPECT = 35;
   if (ran !== EXPECT) { fail++; console.log(`⛔ 검사 ${ran}개만 돎 (${EXPECT}개여야 함)`); }
   ws.close();
   cleanup();

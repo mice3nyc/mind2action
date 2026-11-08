@@ -67,7 +67,7 @@ function SortableTh({ label, sortKey, sortConfig, onSort }) {
   );
 }
 
-export default function AdminDashboard({ onLogout }) {
+export default function AdminDashboard({ onLogout, canDelete = true }) {
   const [tab, setTab] = useState('results');
   const [campaigns, setCampaigns] = useState([]);
   const [counts, setCounts] = useState(null); // { total, none, byCampaign } — 개수만 묻는다. null=아직 모름 (SPEC §15-2)
@@ -130,6 +130,7 @@ export default function AdminDashboard({ onLogout }) {
   const filterOptions = orderCampaignsForFilter(campaigns);
 
   async function handleDelete(id) {
+    if (!canDelete) return;
     const target = filtered.find(r => r.id === id);
     if (!window.confirm(`${target?.name || ''}님의 결과를 삭제하시겠습니까?`)) return;
     await deleteResult(id);
@@ -141,6 +142,7 @@ export default function AdminDashboard({ onLogout }) {
   // 백업 대상은 화면 목록이 아니라 그 자리에서 DB에 다시 물어 만든다 — 삭제는 DB 전부를 지우므로
   // 백업도 DB 전부여야 한다. 조회가 실패하면 삭제하지 않는다 (SPEC §14).
   async function handleDeleteCampaign(campaign) {
+    if (!canDelete) return;
     let campRows;
     try {
       campRows = await loadCampaignResults(campaign.id);
@@ -240,7 +242,7 @@ export default function AdminDashboard({ onLogout }) {
       </div>
 
       {tab === 'campaigns' && (
-        <CampaignManager campaigns={campaigns} counts={byCampaign} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} sortConfig={sortConfig} />
+        <CampaignManager campaigns={campaigns} counts={byCampaign} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} canDelete={canDelete} sortConfig={sortConfig} />
       )}
 
       {tab === 'dashboard' && (
@@ -308,7 +310,7 @@ export default function AdminDashboard({ onLogout }) {
                     <th>BOT</th>
                     <th>일시</th>
                     <th>리포트</th>
-                    <th></th>
+                    {canDelete && <th></th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -347,9 +349,11 @@ export default function AdminDashboard({ onLogout }) {
                           </button>
                         </div>
                       </td>
-                      <td>
-                        <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>
-                      </td>
+                      {canDelete && (
+                        <td>
+                          <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

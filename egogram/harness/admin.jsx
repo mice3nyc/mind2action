@@ -21,4 +21,6 @@ window.__fake = { stats: backend.stats, control: backend.control, data, blocked 
 const { createRoot } = await import('react-dom/client');
 const { default: AdminDashboard } = await import('../src/components/Admin/AdminDashboard');
 await import('../src/styles/praxi.css');
-createRoot(document.getElementById('root')).render(<AdminDashboard onLogout={() => {}} />);
+// ?canDelete=0 — son 계정 화면(삭제 버튼 숨김, SPEC-org-edition §4)
+const canDelete = new URLSearchParams(location.search).get('canDelete') !== '0';
+createRoot(document.getElementById('root')).render(<AdminDashboard onLogout={() => {}} canDelete={canDelete} />);

@@ -34,5 +34,9 @@ export default function AdminApp() {
     return <AdminLogin />;
   }
 
-  return <AdminDashboard onLogout={() => supabase.auth.signOut()} />;
+  // son(손소장) 계정은 삭제 버튼을 숨긴다 — 진짜 막는 것은 RLS, 화면은 가린다 (SPEC-org-edition §4).
+  //   역할로 판정한다: 보험판 admin@은 역할 값이 없어 그대로 보인다.
+  const canDelete = session.user?.app_metadata?.role !== 'son';
+
+  return <AdminDashboard onLogout={() => supabase.auth.signOut()} canDelete={canDelete} />;
 }

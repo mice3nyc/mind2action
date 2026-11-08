@@ -36,7 +36,7 @@ function StatusBadge({ camp }) {
   return <span className={`campaign-status campaign-status-${camp.status}`}>{STATUS_LABEL[camp.status] || camp.status}</span>;
 }
 
-export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onViewAnalytics, onDeleteCampaign, sortConfig }) {
+export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onViewAnalytics, onDeleteCampaign, canDelete = true, sortConfig }) {
   // 결과 테이블에서 정렬 중이면 전체 PDF도 같은 기준으로 — 쿼리스트링으로 전달
   const batchLinkParams = sortConfig ? `?sortKey=${sortConfig.key}&sortDir=${sortConfig.dir}` : '';
   const [form, setForm] = useState(EMPTY_FORM);
@@ -289,13 +289,15 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                       <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
                         {c.status === 'closed' ? '재개' : '마감'}
                       </button>
-                      <button
-                        className="btn-delete-action btn-delete-campaign"
-                        onClick={() => onDeleteCampaign(c)}
-                        title="이 캠페인과 응답을 삭제 (백업 후)"
-                      >
-                        삭제
-                      </button>
+                      {canDelete && (
+                        <button
+                          className="btn-delete-action btn-delete-campaign"
+                          onClick={() => onDeleteCampaign(c)}
+                          title="이 캠페인과 응답을 삭제 (백업 후)"
+                        >
+                          삭제
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
