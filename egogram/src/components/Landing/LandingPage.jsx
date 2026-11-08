@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getCampaignByCode } from '../../lib/campaigns';
 
-// 링크는 survey.mind2action.kr/?g=code (해시 앞 쿼리)
+// 링크는 survey.mind2action.kr/?g=code · 일반판은 /org/?g=code (해시 앞 쿼리, campaignLink)
 function getCodeFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get('g');

@@ -11,9 +11,10 @@ function genCode(len = 7) {
   return s;
 }
 
-// 설문 링크 (배포 도메인 기준)
+// 설문 링크 (배포 도메인 기준) — 경로는 빌드가 정한다: 보험판 '/', 일반판 '/org/' (SPEC-org-edition §7).
+//   도메인은 고정: 로컬에서 복사해도 남에게 줄 주소에 내 origin이 들어가지 않게.
 export function campaignLink(code) {
-  return `https://survey.mind2action.kr/?g=${code}`;
+  return `https://survey.mind2action.kr${import.meta.env.BASE_URL}?g=${code}`;
 }
 
 // 관리자: 전체 캠페인 (로그인 필요 — RLS authenticated)

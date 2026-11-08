@@ -96,6 +96,7 @@
 - 일반판 배포 = `gh-pages -d dist-org --dest org --add`. `public/CNAME`이 `/org/`에 따라 들어가지 않게 뺀다.
 - 새 Supabase 스키마는 **라이브 DB와 대조해** 만든다(스키마 파일 불신, §0). 10/20 대조 결과로 `supabase-schema.sql`(보험판)도 라이브 모양으로 갱신했다. 일반판 정본은 `supabase-org-schema.sql`.
 - 검사: `npm run check:edition`(역할 표 회귀)
+- **설문 링크도 판을 따라간다 (11/8 발견·수정)**: 관리 화면 「링크 복사」의 `campaignLink()`(`src/lib/campaigns.js`)가 `https://survey.mind2action.kr/?g=`를 고정으로 들고 있어 **일반판에서 복사한 링크가 보험판 설문으로 갔다.** 보험판은 그 코드를 모르니 「설문 링크를 확인해 주세요」로 멈추고 보험 DB에 쓰지는 않는다(안전한 실패). 10/20 분기 때 §0 「역할 표 여섯 군데」만 훑고 주소가 박힌 자리는 안 봤다. 수정 = 경로를 빌드의 `import.meta.env.BASE_URL`(보험 `/`, 일반 `/org/`)에서 받는다 → 일반판 `https://survey.mind2action.kr/org/?g=코드`. 도메인은 그대로 고정(관리자가 로컬에서 복사해도 남에게 줄 주소에 내 origin이 들어가지 않게). 검사 = 두 판 빌드 번들에서 링크 문자열을 직접 찾는다(보험 번들엔 `/org/?g=` 없음 · 일반 번들엔 있음). 다른 고정 주소: 소스 전체 `survey.mind2action.kr` grep 결과는 이것 하나와 주석뿐.
 
 ## 8. 작업 순서
 
