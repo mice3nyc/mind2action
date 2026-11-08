@@ -41,11 +41,18 @@ for (const [table, want] of Object.entries(BEFORE)) {
 eq('insurance.roleOptions', EDITIONS.insurance.roleOptions.join(','), 'sales,coach,sales_leader');
 eq('insurance.hasIncome', EDITIONS.insurance.hasIncome, true);
 eq('insurance.hasRecruit', EDITIONS.insurance.hasRecruit, true);
+eq('insurance.hasCareer', EDITIONS.insurance.hasCareer, true);
+eq('insurance.hasCompany', EDITIONS.insurance.hasCompany, true);
+eq('insurance.deptPlaceholder', EDITIONS.insurance.deptPlaceholder, 'OO지점');
 eq('insurance.brandSuffix', EDITIONS.insurance.brandSuffix, 'MIND2ACTION');   // 탭 제목 불변
 // 3. 일반판 — 역할 하나, 소득·리크루팅 없음, 보험설계사 리포트(심화 대상)가 아님
 eq('org.roleOptions', EDITIONS.org.roleOptions.join(','), 'org_leader');
 eq('org.hasIncome', EDITIONS.org.hasIncome, false);
 eq('org.hasRecruit', EDITIONS.org.hasRecruit, false);
+eq('org.hasCareer', EDITIONS.org.hasCareer, false);   // §10-T 첫 화면 = 이름·생년월일·소속
+eq('org.hasCompany', EDITIONS.org.hasCompany, false);
+eq('org.deptPlaceholder', EDITIONS.org.deptPlaceholder, '');
+eq('org 역할 하나 (선택칸 숨김·미리 채움 조건)', EDITIONS.org.roleOptions.length, 1);
 eq('org_leader.report', JOB_TO_REPORT.org_leader, '관리자');
 // 4. 선택지에 오른 역할은 전부 표에 있어야 한다(라벨 없는 선택지 방지)
 for (const [ed, cfg] of Object.entries(EDITIONS)) for (const r of cfg.roleOptions) eq(`${ed} 선택지 ${r} 표에 있음`, !!ROLES[r], true);

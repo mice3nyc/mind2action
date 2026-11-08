@@ -166,16 +166,17 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
   // 결과 행 배열 → CSV 다운로드 (내보내기·삭제 전 백업 공용)
   function downloadResultsCSV(rows, filename) {
     if (!rows || rows.length === 0) return;
-    // 소득·리크루팅 열은 보험판에만 (일반판 SPEC-org-edition §10)
-    const headers = ['그룹', '이름', '생년월일', '경력(월)', '회사', '소속', '직무',
+    // 소득·리크루팅·경력·회사 열은 보험판에만 (일반판 SPEC-org-edition §10·§10-T)
+    const headers = ['그룹', '이름', '생년월일',
+      ...(EDITION.hasCareer ? ['경력(월)'] : []), ...(EDITION.hasCompany ? ['회사'] : []), '소속', '직무',
       ...(EDITION.hasIncome ? ['소득'] : []), ...(EDITION.hasRecruit ? ['리크루팅'] : []),
       'CP', 'NP', 'A', 'FC', 'AC', '총점', 'TOP1', 'TOP2', 'BOTTOM', '일시'];
     const dataRows = rows.map(r => [
       r.group,
       r.name,
       r.birthDate,
-      r.careerMonths,
-      r.company || '',
+      ...(EDITION.hasCareer ? [r.careerMonths] : []),
+      ...(EDITION.hasCompany ? [r.company || ''] : []),
       r.department,
       JOB_LABELS[r.jobType] || r.jobType,
       ...(EDITION.hasIncome ? [INCOME_LABELS[r.incomeRange] || r.incomeRange || ''] : []),
@@ -296,8 +297,8 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
                     <th>그룹</th>
                     <th>이름</th>
                     <th>생년월일</th>
-                    <th>경력</th>
-                    <th>회사</th>
+                    {EDITION.hasCareer && <th>경력</th>}
+                    {EDITION.hasCompany && <th>회사</th>}
                     <SortableTh label="소속" sortKey="department" sortConfig={sortConfig} onSort={handleSort} />
                     <SortableTh label="직무" sortKey="jobType" sortConfig={sortConfig} onSort={handleSort} />
                     {EDITION.hasIncome && <SortableTh label="소득" sortKey="incomeRange" sortConfig={sortConfig} onSort={handleSort} />}
@@ -319,8 +320,8 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
                       <td><GroupBadge group={r.group} /></td>
                       <td className="td-name">{r.name}</td>
                       <td>{r.birthDate}</td>
-                      <td>{r.careerMonths && `${r.careerMonths}개월`}</td>
-                      <td>{r.company || '-'}</td>
+                      {EDITION.hasCareer && <td>{r.careerMonths && `${r.careerMonths}개월`}</td>}
+                      {EDITION.hasCompany && <td>{r.company || '-'}</td>}
                       <td className="td-dept">{r.department}</td>
                       <td>{JOB_LABELS[r.jobType] || r.jobType}</td>
                       {EDITION.hasIncome && <td className="td-small">{INCOME_LABELS[r.incomeRange] || '-'}</td>}

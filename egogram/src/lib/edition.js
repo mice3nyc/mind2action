@@ -25,6 +25,9 @@ export const EDITIONS = {
     roleOptions: ['sales', 'coach', 'sales_leader'],
     hasIncome: true,     // 설문 소득 칸 · 관리 표/CSV 소득 열
     hasRecruit: true,    // 관리 표/CSV 리크루팅 열 · 분석 리크루팅 대조
+    hasCareer: true,     // 설문 경력 칸 · 관리 표/CSV 경력 열
+    hasCompany: true,    // 설문 회사 칸 · 관리 표/CSV 회사 열
+    deptPlaceholder: 'OO지점',
     brandSuffix: 'MIND2ACTION',
     headerSub: '',
   },
@@ -32,6 +35,9 @@ export const EDITIONS = {
     roleOptions: ['org_leader'],
     hasIncome: false,    // 피터공 10/20: 설계사가 아니니 소득은 필요 없다
     hasRecruit: false,
+    hasCareer: false,    // 피터공 11/8: 첫 화면은 이름·생년월일·소속만 (SPEC §10-T)
+    hasCompany: false,
+    deptPlaceholder: '',
     brandSuffix: 'MIND2ACTION 일반',
     headerSub: '일반 조직판',
   },

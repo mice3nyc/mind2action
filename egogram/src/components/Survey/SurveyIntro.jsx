@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { EDITION, JOB_LABELS } from '../../lib/edition';
 
 // 선택지는 에디션마다 다르다 — 보험판 세 역할 / 일반판 한 역할 (SPEC-org-edition §10)
+//   하나뿐이면 칸을 빼고 그 값으로 미리 채운다 — 리포트 문안이 job_type으로 갈리니 값은 반드시 있어야 한다 (§10-T)
+const ONLY_ROLE = EDITION.roleOptions.length === 1 ? EDITION.roleOptions[0] : '';
 const JOB_OPTIONS = [
   { value: '', label: '선택해주세요' },
   ...EDITION.roleOptions.map(value => ({ value, label: JOB_LABELS[value] })),
@@ -26,7 +28,7 @@ export default function SurveyIntro({ group, onSubmit }) {
     careerMonths: '',
     company: '',
     department: '',
-    jobType: '',
+    jobType: ONLY_ROLE,
     incomeRange: '',
   });
 
@@ -36,11 +38,14 @@ export default function SurveyIntro({ group, onSubmit }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!form.name || !form.birthDate || !form.careerMonths || !form.company || !form.department || !form.jobType) return;
+    if (!isValid) return;
     onSubmit(form);
   }
 
-  const isValid = form.name && form.birthDate && form.careerMonths && form.company && form.department && form.jobType;
+  // 화면에 없는 칸은 필수에서 뺀다 (§10-T)
+  const isValid = !!(form.name && form.birthDate && form.department && form.jobType
+    && (!EDITION.hasCareer || form.careerMonths)
+    && (!EDITION.hasCompany || form.company));
 
   return (
     <section className="intro-section">
@@ -56,24 +61,30 @@ export default function SurveyIntro({ group, onSubmit }) {
           <label className="form-label">생년월일 *</label>
           <input className="form-input" name="birthDate" value={form.birthDate} onChange={handleChange} placeholder="19850315" maxLength={8} />
         </div>
-        <div className="form-group">
-          <label className="form-label">경력 (개월) *</label>
-          <input className="form-input" name="careerMonths" type="number" value={form.careerMonths} onChange={handleChange} placeholder="36" />
-        </div>
-        <div className="form-group">
-          <label className="form-label">회사 *</label>
-          <input className="form-input" name="company" value={form.company} onChange={handleChange} placeholder="회사명" />
-        </div>
+        {EDITION.hasCareer && (
+          <div className="form-group">
+            <label className="form-label">경력 (개월) *</label>
+            <input className="form-input" name="careerMonths" type="number" value={form.careerMonths} onChange={handleChange} placeholder="36" />
+          </div>
+        )}
+        {EDITION.hasCompany && (
+          <div className="form-group">
+            <label className="form-label">회사 *</label>
+            <input className="form-input" name="company" value={form.company} onChange={handleChange} placeholder="회사명" />
+          </div>
+        )}
         <div className="form-group">
           <label className="form-label">소속 *</label>
-          <input className="form-input" name="department" value={form.department} onChange={handleChange} placeholder="OO지점" />
+          <input className="form-input" name="department" value={form.department} onChange={handleChange} placeholder={EDITION.deptPlaceholder} />
         </div>
-        <div className="form-group">
-          <label className="form-label">성향 코칭을 받고 싶은 역할 *</label>
-          <select className="form-input form-select" name="jobType" value={form.jobType} onChange={handleChange}>
-            {JOB_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-        </div>
+        {!ONLY_ROLE && (
+          <div className="form-group">
+            <label className="form-label">성향 코칭을 받고 싶은 역할 *</label>
+            <select className="form-input form-select" name="jobType" value={form.jobType} onChange={handleChange}>
+              {JOB_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+          </div>
+        )}
         {EDITION.hasIncome && (
           <div className="form-group">
             <label className="form-label">직전 3개월 평균 소득</label>
