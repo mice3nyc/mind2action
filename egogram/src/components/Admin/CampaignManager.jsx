@@ -36,7 +36,7 @@ function StatusBadge({ camp }) {
   return <span className={`campaign-status campaign-status-${camp.status}`}>{STATUS_LABEL[camp.status] || camp.status}</span>;
 }
 
-export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onViewAnalytics, onDeleteCampaign, canDelete = true, sortConfig }) {
+export default function CampaignManager({ campaigns, counts, onChange, onViewResults, onViewAnalytics, onDeleteCampaign, canDelete = true, sortConfig, canHide = false, canRestore = false, onHideCampaign, onRestoreCampaign }) {
   // 결과 테이블에서 정렬 중이면 전체 PDF도 같은 기준으로 — 쿼리스트링으로 전달
   const batchLinkParams = sortConfig ? `?sortKey=${sortConfig.key}&sortDir=${sortConfig.dir}` : '';
   const [form, setForm] = useState(EMPTY_FORM);
@@ -215,8 +215,12 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
               </tr>
             </thead>
             <tbody>
-              {campaigns.map(c => (
-                <tr key={c.id}>
+              {campaigns.map(c => {
+                // 지운 캠페인(master 「지운 항목 보기」) — 흐리게, 분석·전체 PDF는 닫는다 (SPEC-org-edition §12)
+                const hidden = canHide && Boolean(c.hidden_at);
+                const has = counts[c.id] > 0 && !hidden;
+                return (
+                <tr key={c.id} className={hidden ? 'row-hidden' : undefined} style={hidden ? { opacity: 0.45 } : undefined}>
                   <td className="td-name">
                     {c.client_name}
                     {c.target && <div className="campaign-target">{c.target}</div>}
@@ -239,7 +243,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     <button className="btn-view-results" onClick={() => onViewResults(c.id)}>설문결과 데이터 보기</button>
                   </td>
                   <td>
-                    {counts[c.id] > 0 ? (
+                    {has ? (
                       <button className="btn-view-results" onClick={() => onViewAnalytics(c.id)} title="이 캠페인의 집단 특성·성과 분석">분석 보기</button>
                     ) : (
                       <button className="btn-view-results" disabled title="참여자가 없습니다">분석 보기</button>
@@ -248,7 +252,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                   <td>
                     {/* 전체 PDF 두 개 — 세로로 쌓는다(9/18, 버튼이 nowrap이라 가로면 표가 넓어진다) */}
                     <div className="campaign-pdf-actions">
-                    {counts[c.id] > 0 ? (
+                    {has ? (
                       <a
                         className="btn-view-results"
                         href={`#/report-batch/${c.id}${batchLinkParams}`}
@@ -262,7 +266,7 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                       <button className="btn-view-results" disabled title="참여자가 없습니다">전체리포트 PDF 출력하기</button>
                     )}
                     {/* 심화코칭 일괄 출력 (손소장 9/17 요청 3, SPEC simhwa §23-2) — 보험설계사만 담긴다 */}
-                    {counts[c.id] > 0 ? (
+                    {has ? (
                       <a
                         className="btn-view-results"
                         href={`#/simhwa-batch/${c.id}${batchLinkParams}`}
@@ -289,6 +293,9 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                       <button className="btn-delete-action" onClick={() => handleToggleStatus(c)}>
                         {c.status === 'closed' ? '재개' : '마감'}
                       </button>
+                      {hidden
+                        ? canRestore && <button className="btn-delete-action btn-restore-action" onClick={() => onRestoreCampaign(c)}>되살리기</button>
+                        : canHide && <button className="btn-delete-action btn-hide-action" onClick={() => onHideCampaign(c)} title="목록·출력에서 뺀다 (데이터는 남고 관리자가 되살린다)">지움</button>}
                       {canDelete && (
                         <button
                           className="btn-delete-action btn-delete-campaign"
@@ -301,7 +308,8 @@ export default function CampaignManager({ campaigns, counts, onChange, onViewRes
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

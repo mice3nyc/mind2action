@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { loadResults, loadCampaignResults, loadResponseCounts, deleteResult, NO_CAMPAIGN } from '../../lib/storage';
+import { loadResults, loadCampaignResults, loadResponseCounts, deleteResult, setResultHidden, NO_CAMPAIGN } from '../../lib/storage';
 import { useCampaignRows } from '../../lib/useCampaignRows';
 import { orderCampaignsForFilter, resolveCampaignKey } from '../../lib/adminSelect';
-import { listCampaigns, deleteCampaign } from '../../lib/campaigns';
+import { listCampaigns, deleteCampaign, setCampaignHidden } from '../../lib/campaigns';
 import { EGO_LABELS } from '../../lib/scoreEngine';
 import { EGO_ORDER, EGO_COLOR, EGO_TINT, EGO_INK } from '../../lib/egoTerms';
 import { JOB_LABELS, INCOME_LABELS, sortRows } from '../../lib/resultLabels';
@@ -78,11 +78,19 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
   const [insightIdx, setInsightIdx] = useState(null); // 개인 인사이트 팝업 — filtered 내 인덱스 (검토 프로토타입 26.0616)
   const [sortConfig, setSortConfig] = useState(null); // { key: 'department'|'jobType'|'incomeRange', dir: 'asc'|'desc' } — null=기본(입력순)
   const [loadError, setLoadError] = useState(false); // 개수 조회 실패 — 0건으로 보이면 「다 지워졌다」로 읽힌다 (SPEC §14)
+  const [showHidden, setShowHidden] = useState(false); // master 「지운 항목 보기」 (SPEC-org-edition §12)
+
+  // 지움(보관) — 일반판만. son·master 모두 「지움」, 되살리기·토글은 master(=canDelete)만 (SPEC-org-edition §12)
+  //   보험판은 hasHide가 꺼져 있어 버튼·토글·거르기가 하나도 안 생긴다.
+  const canHide = EDITION.hasHide;
+  const canRestore = canHide && canDelete;
+  const includeHidden = canRestore && showHidden;
 
   // 화면을 여는 것만으로는 응답 본문을 내려받지 않는다 — 캠페인 목록 + 개수만 (SPEC §15-1)
   async function reload() {
-    const c = await listCampaigns();
-    const n = await loadResponseCounts(c.map(x => x.id)).catch(() => null);
+    const c = await listCampaigns({ includeHidden });
+    const hiddenCampaignIds = canHide ? c.filter(x => x.hidden_at).map(x => x.id) : [];
+    const n = await loadResponseCounts(c.map(x => x.id), { hiddenCampaignIds }).catch(() => null);
     setCampaigns(c);
     if (n) setCounts(n); // 실패하면 지난 숫자는 그대로 둔다
     setLoadError(!n);
@@ -91,7 +99,12 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
 
   useEffect(() => {
     reload();
-  }, []);
+    // reload는 매 렌더 새로 만들어지지만 includeHidden 말고는 바뀌는 입력이 없다
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [includeHidden]);
+
+  // 지운 캠페인은 진행 현황·분석에서 빠진다(토글과 무관). 보험판은 hidden_at이 없어 전부 남는다
+  const visibleCampaigns = canHide ? campaigns.filter(c => !c.hidden_at) : campaigns;
 
   // 캠페인 목록에서 "설문 결과 확인" → 그 캠페인만 필터링된 결과 탭
   function viewCampaignResults(campaignId) {
@@ -110,7 +123,7 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
 
   // 결과 확인 탭 — 고른 캠페인의 응답만 읽는다 (SPEC §15-3)
   const selectedKey = resolveCampaignKey(filter, campaigns, counts);
-  const { rows, loading: rowsLoading, error: rowsError } = useCampaignRows(selectedKey, version);
+  const { rows, loading: rowsLoading, error: rowsError } = useCampaignRows(selectedKey, version, includeHidden);
   const filtered = rows || [];
   const selectedName = selectedKey === NO_CAMPAIGN
     ? '캠페인없음'
@@ -132,8 +145,57 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
   async function handleDelete(id) {
     if (!canDelete) return;
     const target = filtered.find(r => r.id === id);
-    if (!window.confirm(`${target?.name || ''}님의 결과를 삭제하시겠습니까?`)) return;
+    // 일반판은 「지움」과 갈라 보이게 한 줄 더 (§12). 보험판 문구는 그대로
+    if (!window.confirm(`${target?.name || ''}님의 결과를 삭제하시겠습니까?${canHide ? '\n되돌릴 수 없습니다.' : ''}`)) return;
     await deleteResult(id);
+    await reload();
+  }
+
+  // 지움 — 행에 hidden_at만 적는다. 데이터는 남고 master가 되살린다 (§12)
+  async function handleHide(id) {
+    if (!canHide) return;
+    const target = filtered.find(r => r.id === id);
+    if (!window.confirm(`${target?.name || ''}님의 결과를 목록에서 지웁니다. (관리자가 되살릴 수 있습니다)`)) return;
+    try {
+      await setResultHidden(id, true);
+    } catch {
+      window.alert('지우지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+    await reload();
+  }
+
+  async function handleRestore(id) {
+    if (!canRestore) return;
+    try {
+      await setResultHidden(id, false);
+    } catch {
+      window.alert('되살리지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+    await reload();
+  }
+
+  // 캠페인 지움 — 백업 CSV는 받지 않는다(데이터가 남는다). 설문 링크는 계속 열린다 (§12)
+  async function handleHideCampaign(campaign) {
+    if (!canHide) return;
+    if (!window.confirm(
+      `[${campaign.client_name}] 캠페인을 목록에서 지웁니다. 그 응답도 결과·리포트 출력에서 빠집니다.\n` +
+      `(관리자가 되살릴 수 있습니다. 설문 링크는 계속 열립니다 — 접수를 닫으려면 「마감」)`
+    )) return;
+    try {
+      await setCampaignHidden(campaign.id, true);
+    } catch {
+      window.alert('지우지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+    await reload();
+  }
+
+  async function handleRestoreCampaign(campaign) {
+    if (!canRestore) return;
+    try {
+      await setCampaignHidden(campaign.id, false);
+    } catch {
+      window.alert('되살리지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    }
     await reload();
   }
 
@@ -145,7 +207,7 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
     if (!canDelete) return;
     let campRows;
     try {
-      campRows = await loadCampaignResults(campaign.id);
+      campRows = await loadCampaignResults(campaign.id, { includeHidden: true }); // 지운 응답도 같이 지워지므로 백업에도 넣는다
     } catch {
       window.alert('이 캠페인의 응답을 불러오지 못해 삭제를 중단했습니다. 잠시 후 다시 시도해 주세요.');
       return;
@@ -201,8 +263,9 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
   }
 
   // 파일명에 캠페인명 — 「전체 CSV」와 같은 이름이면 내려받은 뒤 어느 것이 전체인지 안 갈린다 (SPEC §15-5)
+  //   지운 응답은 넣지 않는다 — 「지운 항목 보기」를 켜 둬도 (§12)
   function handleExportCSV() {
-    downloadResultsCSV(filtered, `egogram_${selectedName}_${new Date().toISOString().slice(0, 10)}.csv`);
+    downloadResultsCSV(filtered.filter(r => !r.hiddenAt), `egogram_${selectedName}_${new Date().toISOString().slice(0, 10)}.csv`);
   }
 
   // 전체 CSV — 누를 때만 전체를 읽는다. 실패하면 파일을 만들지 않는다(부분 파일 금지).
@@ -225,7 +288,13 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
       <div className="admin-header">
         <div>
           <h1>관리자</h1>
-          <p className="admin-count">설문 결과 {counts ? counts.total : '…'}건 · 캠페인 {campaigns.length}개</p>
+          <p className="admin-count">설문 결과 {counts ? counts.total : '…'}건 · 캠페인 {visibleCampaigns.length}개</p>
+          {canRestore && (
+            <label className="admin-count admin-hidden-toggle" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+              <input type="checkbox" checked={showHidden} onChange={e => setShowHidden(e.target.checked)} />
+              지운 항목 보기
+            </label>
+          )}
           {loadError && (
             <p className="admin-count" role="alert" style={{ color: '#d0021b' }}>
               응답을 불러오지 못했습니다. 아래 숫자는 최신이 아닐 수 있습니다. 새로고침해 주세요.
@@ -243,15 +312,16 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
       </div>
 
       {tab === 'campaigns' && (
-        <CampaignManager campaigns={campaigns} counts={byCampaign} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} canDelete={canDelete} sortConfig={sortConfig} />
+        <CampaignManager campaigns={campaigns} counts={byCampaign} onChange={reload} onViewResults={viewCampaignResults} onViewAnalytics={viewCampaignAnalytics} onDeleteCampaign={handleDeleteCampaign} canDelete={canDelete} sortConfig={sortConfig}
+          canHide={canHide} canRestore={canRestore} onHideCampaign={handleHideCampaign} onRestoreCampaign={handleRestoreCampaign} />
       )}
 
       {tab === 'dashboard' && (
-        <CampaignDashboard campaigns={campaigns} counts={byCampaign} />
+        <CampaignDashboard campaigns={visibleCampaigns} counts={byCampaign} />
       )}
 
       {tab === 'analytics' && (
-        <CampaignAnalytics campaigns={campaigns} counts={byCampaign} version={version} campId={analyticsCampId} onCampId={setAnalyticsCampId} />
+        <CampaignAnalytics campaigns={visibleCampaigns} counts={byCampaign} version={version} campId={analyticsCampId} onCampId={setAnalyticsCampId} />
       )}
 
       {tab === 'results' && (
@@ -266,13 +336,13 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
               >
                 {!selectedKey && <option value="">응답이 있는 캠페인 없음</option>}
                 {filterOptions.map(c => (
-                  <option key={c.id} value={c.id}>{c.client_name} ({byCampaign[c.id] ?? '…'})</option>
+                  <option key={c.id} value={c.id}>{c.client_name} ({byCampaign[c.id] ?? '…'}){canHide && c.hidden_at ? ' · 지움' : ''}</option>
                 ))}
                 {counts?.none > 0 && <option value={NO_CAMPAIGN}>캠페인 없음 ({counts.none})</option>}
               </select>
             </div>
             <div className="admin-actions">
-              <button className="btn btn-primary" onClick={handleExportCSV} disabled={filtered.length === 0}>
+              <button className="btn btn-primary" onClick={handleExportCSV} disabled={!filtered.some(r => !r.hiddenAt)}>
                 CSV 다운로드
               </button>
               <button className="btn btn-secondary" onClick={handleExportAllCSV} disabled={exportingAll || !counts || counts.total === 0} title="모든 캠페인의 응답을 한 파일로">
@@ -311,12 +381,12 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
                     <th>BOT</th>
                     <th>일시</th>
                     <th>리포트</th>
-                    {canDelete && <th></th>}
+                    {(canDelete || canHide) && <th></th>}
                   </tr>
                 </thead>
                 <tbody>
                   {sorted.map((r, ri) => (
-                    <tr key={r.id}>
+                    <tr key={r.id} className={r.hiddenAt ? 'row-hidden' : undefined} style={r.hiddenAt ? { opacity: 0.45 } : undefined}>
                       <td><GroupBadge group={r.group} /></td>
                       <td className="td-name">{r.name}</td>
                       <td>{r.birthDate}</td>
@@ -350,9 +420,13 @@ export default function AdminDashboard({ onLogout, canDelete = true }) {
                           </button>
                         </div>
                       </td>
-                      {canDelete && (
+                      {(canDelete || canHide) && (
                         <td>
-                          <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>
+                          {/* 지운 행(master 토글)엔 「되살리기」, 아니면 「지움」(일반판). 「삭제」는 master만 */}
+                          {r.hiddenAt
+                            ? canRestore && <button className="btn-delete-action btn-restore-action" onClick={() => handleRestore(r.id)}>되살리기</button>
+                            : canHide && <button className="btn-delete-action btn-hide-action" onClick={() => handleHide(r.id)}>지움</button>}
+                          {canDelete && <button className="btn-delete-action" onClick={() => handleDelete(r.id)}>삭제</button>}
                         </td>
                       )}
                     </tr>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { fetchResponses } from '../../lib/storage';
+import { EDITION } from '../../lib/edition';
 import { SimhwaView } from './SimhwaReportView';
 import { sortRows, isValidSortKey } from '../../lib/resultLabels';
 import { isSimhwaTarget } from '../../lib/reportType';
@@ -31,9 +32,11 @@ export default function SimhwaBatchPage() {
         .eq('id', campaignId)
         .single();
       // 한 캠페인이 1,000명을 넘어도 끝까지 읽는다 (SPEC §14)
+      // 일반판: 지운 응답은 fetchResponses가 빼고, 지운 캠페인은 통째로 비운다 (SPEC-org-edition §12)
+      const campHidden = EDITION.hasHide && Boolean(camp?.hidden_at);
       let resp;
       try {
-        resp = await fetchResponses('*', (q) => q.eq('campaign_id', campaignId));
+        resp = campHidden ? [] : await fetchResponses('*', (q) => q.eq('campaign_id', campaignId));
       } catch {
         setError('응답을 불러오지 못했습니다.');
         return;

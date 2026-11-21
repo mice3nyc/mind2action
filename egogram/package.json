@@ -20,7 +20,8 @@
     "check:edition": "node scripts/check-edition.mjs",
     "check:intro": "node scripts/check-intro.mjs",
     "check:ties": "node scripts/check-report-ties.mjs",
-    "check:org-report": "node scripts/check-org-report.mjs"
+    "check:org-report": "node scripts/check-org-report.mjs",
+    "check:hide": "node scripts/check-admin-hide.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",

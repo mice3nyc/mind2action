@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { EDITION } from './edition';
 
 // 링크 코드용 문자셋 — 혼동문자(0 O 1 I l) 제외
 const CODE_CHARS = 'abcdefghjkmnpqrstuvwxyz23456789';
@@ -18,11 +19,12 @@ export function campaignLink(code) {
 }
 
 // 관리자: 전체 캠페인 (로그인 필요 — RLS authenticated)
-export async function listCampaigns() {
-  const { data, error } = await supabase
-    .from('campaigns')
-    .select('*')
-    .order('created_at', { ascending: false });
+//   일반판은 지운 캠페인을 뺀다(SPEC-org-edition §12). includeHidden = master의 「지운 항목 보기」.
+//   보험판(hasHide false)은 조건을 붙이지 않는다 — 보험판 DB엔 hidden_at 열이 없다.
+export async function listCampaigns({ includeHidden = false } = {}) {
+  let q = supabase.from('campaigns').select('*');
+  if (EDITION.hasHide && !includeHidden) q = q.is('hidden_at', null);
+  const { data, error } = await q.order('created_at', { ascending: false });
   if (error) {
     console.error('listCampaigns failed:', error);
     return [];
@@ -70,6 +72,12 @@ export async function updateCampaign(id, fields) {
     throw error;
   }
   return data;
+}
+
+// 관리자: 캠페인 지움/되살리기 — 일반판만 (§12). 설문 링크는 그대로 열린다(접수를 닫는 것은 「마감」).
+export async function setCampaignHidden(id, hidden) {
+  if (!EDITION.hasHide) throw new Error('지움은 일반판만');
+  return updateCampaign(id, { hidden_at: hidden ? new Date().toISOString() : null });
 }
 
 // 관리자: 캠페인 삭제 — 연결 응답 먼저, 그다음 캠페인 (FK 순서)

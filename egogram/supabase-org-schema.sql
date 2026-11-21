@@ -4,7 +4,8 @@
 -- 보험판 라이브와 같은 모양으로 맞췄다. 근거: 앱 코드가 읽고 쓰는 열(storage.js·campaigns.js)
 --   + CAMPAIGNS.md §2·§3 + ADMIN-SECURITY.md §2. 저장소의 supabase-schema.sql은 옛 판이라 쓰지 않는다
 --   (RLS가 전면 개방, campaigns 없음).
--- 보험판과 다른 점은 하나 — 삭제는 master만. 계정 구분은 auth.users의 app_metadata.role.
+-- 보험판과 다른 점 — 삭제는 master만 · 지움(hidden_at, §12 11/21). 계정 구분은 auth.users의 app_metadata.role.
+-- 이미 만든 프로젝트에 지움만 더할 땐 supabase-org-migrate-1121-hide.sql (이 파일과 같은 내용의 변경분).
 
 -- ─── 캠페인 ───
 create table if not exists campaigns (
@@ -18,7 +19,8 @@ create table if not exists campaigns (
   education_date date,
   expected_count int,
   memo text,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  hidden_at timestamptz null   -- 지움(보관) 시각. null = 보임 (SPEC-org-edition §12)
 );
 
 -- ─── 응답 ───
@@ -45,7 +47,8 @@ create table if not exists responses (
   top1 text not null,
   top2 text not null,
   bottom text not null,
-  grades jsonb
+  grades jsonb,
+  hidden_at timestamptz null   -- 지움(보관) 시각. null = 보임. 지운 캠페인의 응답은 여기 안 적고 캠페인으로 거른다 (§12)
 );
 
 -- ─── 계정 역할 ───
@@ -85,6 +88,12 @@ create policy "staff read responses" on responses
   for select to authenticated using (app_role() in ('master', 'son'));
 create policy "master delete responses" on responses
   for delete to authenticated using (app_role() = 'master');
+-- 지움 — son·master. 열 권한으로 hidden_at 하나만 고치게 묶는다(근거: supabase-org-migrate-1121-hide.sql 주석)
+create policy "staff hide responses" on responses
+  for update to authenticated using (app_role() in ('master', 'son')) with check (app_role() in ('master', 'son'));
+revoke update on responses from authenticated;
+revoke update on responses from anon;
+grant update (hidden_at) on responses to authenticated;
 
 -- ─── 계정 역할 부여 ───
 -- 대시보드 Authentication → Add user(Auto Confirm)로 두 계정을 만든 «뒤에» 실행한다.

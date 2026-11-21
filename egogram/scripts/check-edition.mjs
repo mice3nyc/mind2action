@@ -45,6 +45,7 @@ eq('insurance.hasIncome', EDITIONS.insurance.hasIncome, true);
 eq('insurance.hasRecruit', EDITIONS.insurance.hasRecruit, true);
 eq('insurance.hasCareer', EDITIONS.insurance.hasCareer, true);
 eq('insurance.hasCompany', EDITIONS.insurance.hasCompany, true);
+eq('insurance.hasHide', EDITIONS.insurance.hasHide, false);   // §12 보험판 DB엔 hidden_at 열이 없다
 eq('insurance.deptPlaceholder', EDITIONS.insurance.deptPlaceholder, 'OO지점');
 eq('insurance.brandSuffix', EDITIONS.insurance.brandSuffix, 'MIND2ACTION');   // 탭 제목 불변
 // 3. 일반판 — 역할 하나, 소득·리크루팅 없음, 보험설계사 리포트(심화 대상)가 아님
@@ -53,6 +54,7 @@ eq('org.hasIncome', EDITIONS.org.hasIncome, false);
 eq('org.hasRecruit', EDITIONS.org.hasRecruit, false);
 eq('org.hasCareer', EDITIONS.org.hasCareer, false);   // §10-T 첫 화면 = 이름·생년월일·소속
 eq('org.hasCompany', EDITIONS.org.hasCompany, false);
+eq('org.hasHide', EDITIONS.org.hasHide, true);   // §12 지움·되살리기
 eq('org.deptPlaceholder', EDITIONS.org.deptPlaceholder, '');
 eq('org 역할 하나 (선택칸 숨김·미리 채움 조건)', EDITIONS.org.roleOptions.length, 1);
 eq('org_leader.report', JOB_TO_REPORT.org_leader, '관리자');

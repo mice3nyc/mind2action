@@ -231,6 +231,75 @@
 - 장학사 5명 실응답 렌더는 아리공이 못 본다 — 응답은 로그인해야 열리고(RLS) 아리공은 일반판 계정 비밀번호가 없다. 그래서 같은 코드 경로를 60조합 전부로 덮었고, 실응답 확인은 배포 뒤 피터공 손
 - 남은 것: 일반판 배포(피터공 승인) → 번들 해시 확인 → 장학사 응답 하나 열어 확인
 
+## 12. 지움(보관)과 삭제 — 일반판 (11/21 선문)
+
+> 피터공 11/21: 「보관/숨김 기능을 만들까? 손소장 화면에는 지움이라고 버튼이 보이는 것으로. 그리고 나는 지움과 삭제 이렇게 두개의 다른 버튼이 있는 것이지. 그럼 이렇게 하면 전체 리포트 파일에서 숨긴 사람은 빠지는 것이지?」
+> 배경: 지금 삭제는 DB 행을 지운다(되돌릴 수 없음, 무료 플랜이라 백업도 없음). son은 §4대로 삭제가 막혀 있어 손소장이 목록을 치울 방법이 없다. 「치우기」와 「없애기」를 가른다.
+
+**두 동작**
+
+| | 지움 (보관) | 삭제 |
+|---|---|---|
+| 하는 일 | 행에 `hidden_at`(지운 시각)을 적는다. 데이터는 남는다 | 지금 그대로 DB 행을 지운다 |
+| 누가 | son·master | master만 (RLS 그대로) |
+| 되돌리기 | master가 「되살리기」 | 불가 |
+| 대상 | 응답 하나 · 캠페인 하나 | 같음 |
+
+- son 화면: 결과 표 행과 캠페인 행에 「지움」 하나. 「삭제」 없음(§4 숨김 그대로)
+- master 화면: 「지움」과 「삭제」 둘 다. 그리고 「지운 항목 보기」 토글 — 켜면 지운 응답·캠페인이 흐리게 섞여 보이고 그 행에만 「되살리기」(와 「삭제」)
+- 확인 창 문구: 지움 = 「…님의 결과를 목록에서 지웁니다. (관리자가 되살릴 수 있습니다)」 / 삭제 = 지금 문구 + 「되돌릴 수 없습니다」
+
+**지운 것은 어디서 빠지나 (기본 = 전부 뺀다)**
+- 결과 표 · 결과 수 · 캠페인별 응답 수 · CSV 내려받기 · **전체 리포트 일괄 출력(ReportBatchPage)** · 캠페인 분석(평균·비교) · 캠페인 목록
+- 응답 하나 리포트 주소(`#/report/:id`)는 지운 뒤에도 master에게는 열린다(되살리기 전 확인용). son에게도 열린다 — RLS를 읽기에서 가르지 않는다(단순하게)
+- 지운 캠페인: 목록에서 빠지고 그 캠페인 응답도 목록·출력에서 빠진다(응답 행에 따로 적지 않고 캠페인으로 거른다). **설문 링크는 계속 열린다** — 링크를 닫는 것은 기존 「마감」이 한다. 지움은 화면 정리지 접수 차단이 아니다
+- 캠페인 「지움」은 백업 CSV를 내려받지 않는다(데이터가 남으므로). 「삭제」는 지금처럼 백업 후 삭제
+
+**DB (일반판만 — 피터공이 SQL 창에 붙여 넣는다)**
+- `responses.hidden_at timestamptz null`, `campaigns.hidden_at timestamptz null`
+- `responses`에는 지금 update 정책이 없다 → 정책 추가 `staff hide responses`: update to authenticated using/with check `app_role() in ('master','son')`. 그리고 **열 권한으로 묶는다**: `revoke update on responses from authenticated; grant update (hidden_at) on responses to authenticated;` — 지움 권한이 점수·이름을 고치는 권한이 되지 않게
+- `campaigns`는 son이 이미 수정 가능(§4) → `hidden_at`은 열 하나 더일 뿐, 정책 추가 없음
+- 정본 `supabase-org-schema.sql`에 반영 + 이번 변경분만 담은 `supabase-org-migrate-1121-hide.sql`
+
+**보험판은 바꾸지 않는다 — 스위치로 가른다**
+- 같은 코드가 보험판 DB(열 없음)에도 간다. `hidden_at`을 거르는 조건이 보험판 쿼리에 들어가면 **보험판 목록이 통째로 깨진다**(없는 열). → `edition.js`에 `hasHide`(보험 false · 일반 true). 거르기·버튼·토글 전부 이 스위치 뒤
+- 보험판 회귀: check:admin-ui·check:admin·check:fetch가 보험판 무대에서 지금과 같아야 한다
+
+**순서**: 코드·검사 → 피터공 SQL 실행 → (아리공이 anon/로그인 없이 확인 가능한 것만 curl로) → `deploy:org`. **SQL 전에 배포하면 일반판 목록이 깨진다**(없는 열을 거름)
+
+**검증**
+- (a) 아리공: 가짜 PostgREST(`scripts/lib/fake-postgrest.mjs`)에 `hidden_at` 지원을 넣고 일반판 무대에서 — son 화면 「지움」만·master 「지움」「삭제」·지운 행이 표·수·CSV·일괄 리포트 대상에서 빠짐·토글 켜면 보이고 되살리기 후 돌아옴·지운 캠페인의 응답도 빠짐. 보험판 무대 — 버튼·쿼리 변화 0(요청 URL에 `hidden_at` 없음). 변이: 거르기 조건을 빼면 붉어지는지. 실명 대신 가짜 이름
+- (b) 피터공(배포 뒤): son으로 시험 응답 하나 지움 → master에서 토글로 보임 → 되살리기
+
+### 12-R. 결과 (11/21)
+
+**만든 것**
+- 스위치 `edition.js` `hasHide`(보험 false · 일반 true). `hidden_at`을 붙이거나 읽는 자리는 전부 이 뒤 — 보험판 행에 그런 값이 실려 와도 무시한다(`mapRow.hiddenAt`·캠페인 흐림·「· 지움」 표시까지)
+- `storage.js`: `fetchResponses(columns, filter, { includeHidden })`가 일반판에서 `hidden_at=is.null`을 기본으로 붙인다 → `loadCampaignResults`·`loadResultsByKey`·`loadCampaignAverage`·일괄 리포트 둘이 같이 거른다. 개수(`countResponses`)도 같은 조건. `loadResults`(전체 CSV)는 지운 캠페인 id를 따로 물어(`campaigns?hidden_at=not.is.null`) 그 응답을 뺀다. 새 함수 `setResultHidden(id, hidden)` — PATCH 본문은 `{hidden_at}` 하나(열 권한과 맞춤)
+- `campaigns.js`: `listCampaigns({ includeHidden })` · `setCampaignHidden(id, hidden)`(=`updateCampaign`)
+- `AdminDashboard`: `canHide = hasHide` · `canRestore = canHide && canDelete`(master) · 「지운 항목 보기」 토글은 헤더 건수 밑(결과·캠페인 탭 공통). 토글을 켜면 목록·결과 표가 지운 것까지 읽어 `opacity .45`(`tr.row-hidden`)로 섞고 그 행엔 「되살리기」(+「삭제」). 진행 현황·분석에는 토글과 무관하게 지운 캠페인을 넘기지 않는다
+- `CampaignManager`: 행 「지움」/「되살리기」. 지운 캠페인 행은 분석·전체 PDF·심화 PDF 버튼을 닫는다
+- `ReportBatchPage`·`SimhwaBatchPage`: 캠페인이 지워졌으면 빈 출력(「참여자가 없습니다」), 아니면 지운 응답 뺀 나머지
+- 캠페인 삭제 전 백업은 `includeHidden: true` — 삭제는 지운 응답까지 지우므로 백업도 전부
+- SQL: 정본 `supabase-org-schema.sql` 반영 + 변경분 `supabase-org-migrate-1121-hide.sql`(멱등, 확인 쿼리 2개 포함). 열 권한 근거는 그 파일 주석: anon insert는 insert 권한이라 무관 · 읽기·master 삭제 정책 그대로 · `get_campaign_by_code`는 security definer라 무관. anon의 update도 같이 걷었다(SPEC 원문은 authenticated만 — 원래 정책이 없어 RLS가 막지만 한 겹 더)
+
+**SPEC과 달라진 점 · 정한 것**
+1. 헤더 「설문 결과 N건」(total)은 일반판에서 따로 묻지 않고 **캠페인 없음 + 지우지 않은 캠페인들의 합**으로 낸다. 지운 캠페인의 응답을 서버 조건 하나로 뺄 길이 없어서다(`campaign_id`는 FK라 합이 정확). 보험판은 요청 순서까지 그대로
+2. 개수(필터 괄호 숫자·캠페인 인원·헤더)는 토글을 켜도 **지운 응답을 뺀 값**이다. 토글은 «보여 주기»만 바꾼다
+3. CSV(고른 캠페인)는 토글을 켜도 **지운 응답을 넣지 않는다**. 단, master가 토글로 지운 캠페인을 골라 CSV를 누르면 그 캠페인의 (지우지 않은) 응답은 나간다 — 일부러 고른 것이라 막지 않았다
+4. 지움 확인 창은 SPEC 문구 그대로. 삭제 확인 창의 「되돌릴 수 없습니다」 줄은 **일반판에만** 붙인다(보험판 문구 불변이 우선)
+5. 응답 「지움」 실패 시 알림 한 줄을 띄우고 목록을 다시 읽는다
+
+**검사**
+- 새 `npm run check:hide`(`scripts/check-admin-hide.mjs`) **57/57** — 보험판 무대 12 · 일반판 master 38 · son 7. 하니스 `harness/admin.jsx`에 `?data=hide`(지움 표본, 가짜 이름) · `?batch=<id>`(ReportBatchPage) · CSV·확인 창 가로채기를 더했고, `fake-postgrest.mjs`에 `not.is.null` · PATCH · 단건 응답 · 요청 본문 기록을 더했다
+  - 보험판: 「삭제」만·토글 없음·흐림 없음·삭제 문구 그대로·지움 표본을 올려도 13건 그대로·일괄 리포트 40명 그대로 · **모은 요청 30건의 URL·본문에 `hidden_at` 0**
+  - master: 7건·캠페인 2개 · 지운 응답이 표·필터 수·캠페인 CSV·전체 CSV·캠페인 없음·분석·진행 현황·일괄 리포트에서 빠짐 · 지움 → 6건 · 토글 → 흐린 2행 + 「되살리기」 · 되살리기 → 7건 · 캠페인 지움 → 2건·1개·백업 CSV 없음 · 되살리기 → 7건·2개 · 일반판 요청에 거르기가 실제로 붙었는지(접촉 확인)
+  - son: 토글 없음 · 결과·캠페인 「지움」만 · 지움 동작
+- 변이 8종 전부 붉음: 거르기 빼기(9항) · 보험판 스위치 뒤집기(6항) · 전체 CSV의 지운 캠페인 거르기 빼기(2) · 일괄 리포트 캠페인 거르기 빼기(1) · CSV 토글 거르기 빼기(1) · 총수에서 지운 캠페인 빼기 끊기(1) · son에게 토글 주기(1) · 캠페인 목록 거르기 빼기(8)
+- 기존: check:edition 82(새 2: `hasHide` 두 값) · check:terms 통과 · check:admin 33/33 · check:fetch 15/15 · check:admin-ui 35/35 · check:intro 18/18 · check:ties 13/13 · check:org-report 121/121. 두 판 빌드 통과. eslint `src` 9건 = 전과 같음(새 오류 0)
+
+**남은 것**: 피터공 SQL 실행 → `deploy:org`(SQL 다음에만) → (b) 피터공 손 확인. 라이브 DB·배포는 이번에 건드리지 않았다
+
 ## 9. 미결
 
 1. ~~son과 master의 권한 차이~~ → 기본안(삭제만 master)으로 확정. DB(RLS)는 10/20, 화면 삭제 버튼 숨김은 11/8(§4)

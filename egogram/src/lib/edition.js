@@ -30,6 +30,7 @@ export const EDITIONS = {
     hasCareer: true,     // 설문 경력 칸 · 관리 표/CSV 경력 열
     hasCompany: true,    // 설문 회사 칸 · 관리 표/CSV 회사 열
     deptPlaceholder: 'OO지점',
+    hasHide: false,      // 지움(보관)·되살리기 — 보험판 DB엔 hidden_at 열이 없다. 켜면 목록이 통째로 깨진다 (SPEC-org-edition §12)
     brandSuffix: 'MIND2ACTION',
     headerSub: '',
   },
@@ -40,6 +41,7 @@ export const EDITIONS = {
     hasCareer: false,    // 피터공 11/8: 첫 화면은 이름·생년월일·소속만 (SPEC §10-T)
     hasCompany: false,
     deptPlaceholder: '',
+    hasHide: true,       // 피터공 11/21: son은 「지움」, master는 「지움」「삭제」 + 되살리기 (SPEC §12)
     brandSuffix: 'MIND2ACTION 일반',
     headerSub: '일반 조직판',
   },
