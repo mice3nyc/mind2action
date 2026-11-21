@@ -15,7 +15,8 @@ v0.9 변경:
 - 에고 라벨 정규화: 일부 콤보 라벨 셀에 "CP(기준,결단)" 한글 표기가 섞임 →
   ego_code()로 코드만 추출해 조회 키 오염 방지
 
-사용: python3 convert_cm.py <코치|리더|컨설턴트> <기존yaml> <출력yaml>
+사용: python3 convert_cm.py <코치|리더|컨설턴트|일반리더> <기존yaml> <출력yaml>
+  일반리더: 기존yaml = cm_manager.yaml (cm1 키워드·cm8만 빌려 온다. 시트에 없는 블록)
 """
 import sys, os, openpyxl, yaml
 
@@ -66,7 +67,35 @@ ROLE_FILE = {
     '리더':   '26.0615_리더로 수정 - 손소장.xlsx',
     '컨설턴트': '26.0615_컨설턴트로 수정 - 손소장.xlsx',
     '코치':   '26.0615_코치로 통합 수정-손소장.xlsx',
+    # 일반 조직판(m2a-org) 리더 — 손소장 시트 「리더십(영업외,일반)의 포맷」(9/28 생성, 11/20 수정) xlsx 내보내기.
+    #   11/21 장학사 응답이 보험 관리자 문안(cm_manager)으로 나가던 것을 고치며 처음 들어옴. SPEC-org-edition §11
+    '일반리더': '26.1120_리더십(영업외,일반) - 손소장.xlsx',
 }
+
+# 직군 → 저장되는 job_type (기존 yaml에서 가져오지 않는 직군만)
+#   job_label은 '관리자'로 둔다 — ReportPageV2가 §4 제목을 job_label === '관리자'로 고른다(「성과에 도움이 되는 말투」)
+JOB_TYPE_OVERRIDE = {'일반리더': ('org_leader', '관리자')}
+
+# 일반리더 시트에는 인물상 60조합 탭(CM1)이 있다 → 일반판 전용 인물상 yaml을 같이 낸다 (SPEC-org-edition §11)
+IDENTITY_ORG_OUT = '/Users/p.air15/Neo-Obsi-Sync/_dev/mind2action/egogram/src/data/identity60_org.yaml'
+
+
+def parse_identity(ws):
+    """CM1 탭: 번호 | TOP 1 | TOP 2 | BOTTOM 1 | 대표 표현 | 삶을 대하는 태도 → {key: {title, desc}}.
+    desc는 줄마다 trim·빈 줄 제거 (build-identity60.mjs의 identityRow와 같은 규칙)."""
+    hdr = [cell(ws, 1, c) for c in range(1, ws.max_column + 1)]
+    col = {h: i + 1 for i, h in enumerate(hdr)}
+    out = {}
+    for r in range(2, ws.max_row + 1):
+        t1, t2, b = (ego_code(cell(ws, r, col[h])) for h in ('TOP 1', 'TOP 2', 'BOTTOM 1'))
+        if not (t1 and t2 and b):
+            continue
+        key = f'{t1}_{t2}_{b}'
+        assert key not in out, f'인물상 키 중복 {key}'
+        desc = '\n'.join(x.strip() for x in cell(ws, r, col['삶을 대하는 태도']).split('\n') if x.strip())
+        out[key] = {'title': cell(ws, r, col['대표 표현']), 'desc': desc}
+    assert len(out) == 60, f'인물상 {len(out)}조합 (60이어야 함)'
+    return out
 
 
 def ego_code(s):
@@ -283,7 +312,7 @@ def parse_cm6_common(ws):
 
 
 def convert(role, old_path, out_path):
-    base = '/Users/p.air15/Neo-Obsi-Sync/Assets/incoming/에고그램/data'
+    base = '/Users/p.air15/Neo-Obsi-Sync/Assets/incoming/MIND2ACTION/data'  # 11/21: 폴더명 에고그램→MIND2ACTION 반영
     src = f'{base}/{ROLE_FILE[role]}'
     if not os.path.exists(src):
         raise FileNotFoundError(f"원본 xlsx 없음: {src}")
@@ -303,8 +332,8 @@ def convert(role, old_path, out_path):
         raise KeyError(f"{name} 시트 없음 (있는 시트: {wb.sheetnames})")
 
     data = {
-        'job_type': old['job_type'],
-        'job_label': old['job_label'],
+        'job_type': JOB_TYPE_OVERRIDE.get(role, (old['job_type'],))[0],
+        'job_label': JOB_TYPE_OVERRIDE.get(role, (None, old['job_label']))[1],
         'cm1': old['cm1'],                                   # 유지(자아상태 키워드, 시트 없음)
         'cm2': parse_range_ego(sheet('CM2')),
         'cm3': parse_combo_single(sheet('CM3강점추가')),
@@ -337,6 +366,16 @@ def convert(role, old_path, out_path):
             yaml.dump(cmc, f, allow_unicode=True, default_flow_style=False,
                       sort_keys=False, width=10**9)
         print(f"  cm6_common → {os.path.basename(CM6_COMMON_OUT)}: {len(cmc['items'])} items")
+
+    if role == '일반리더':
+        idn = fix_typos(parse_identity(wb.worksheets[0]))   # 첫 탭 'CM1(리포트 1.OOO님의 성향 박스…'
+        head = ('# 인물상 — 일반 조직판 리더 전용 (top1_top2_bottom 60조합). 보험판은 identity60.yaml\n'
+                '# 생성물이다. 손으로 고치지 말 것 → python3 scripts/convert_cm.py 일반리더 … 로 다시 만든다\n'
+                f'# 원본: {ROLE_FILE[role]} 의 CM1 탭. SPEC-org-edition §11\n')
+        with open(IDENTITY_ORG_OUT, 'w') as f:
+            f.write(head)
+            yaml.dump(idn, f, allow_unicode=True, default_flow_style=False, sort_keys=False, width=10**9)
+        print(f"  identity → {os.path.basename(IDENTITY_ORG_OUT)}: {len(idn)}조합")
 
     # 요약
     print(f"[{role}] → {out_path}")

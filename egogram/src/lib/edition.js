@@ -7,17 +7,19 @@
 //   range  = 안전구간 키 (scoreEngine SAFE_RANGES 키)
 //   report = 리포트 종류 이름 (관리 표 배지 · 심화 대상 판정)
 //   group  = 캠페인 분석의 역할 분류
+//   identity = 인물상 60조합 묶음 (ReportPageV2 IDENTITY_DATA 키). 일반판 리더만 따로(SPEC-org-edition §11)
 export const ROLES = {
-  sales:           { label: '고객 컨설팅 영업',     cm: 'sales',   range: 'sales',   report: '보험설계사', group: '컨설턴트' },
-  coach:           { label: '신인 육성 코칭',       cm: 'coach',   range: 'coach',   report: '코치/멘토',  group: '코치' },
-  sales_leader:    { label: '리더(보험 조직 운영)', cm: 'manager', range: 'manager', report: '관리자',     group: '리더' },  // 손소장 10/20 개명. 저장값 그대로
+  sales:           { label: '고객 컨설팅 영업',     cm: 'sales',   range: 'sales',   report: '보험설계사', group: '컨설턴트', identity: 'common' },
+  coach:           { label: '신인 육성 코칭',       cm: 'coach',   range: 'coach',   report: '코치/멘토',  group: '코치', identity: 'common' },
+  sales_leader:    { label: '리더(보험 조직 운영)', cm: 'manager', range: 'manager', report: '관리자',     group: '리더', identity: 'common' },  // 손소장 10/20 개명. 저장값 그대로
   // 5/18에 선택지에서 내린 옛 역할
-  branch_manager:  { label: '지점장/지사장',        cm: 'manager', range: 'manager', report: '관리자',     group: '리더' },
-  training_leader: { label: '교육팀장/지원팀장',    cm: 'manager', range: 'manager', report: '관리자',     group: '리더' },
-  division_head:   { label: '사업단장/부장',        cm: 'manager', range: 'manager', report: '관리자',     group: '리더' },
-  executive:       { label: '본부장',               cm: 'manager', range: 'manager', report: '관리자',     group: '리더' },
-  // 일반 조직판. ⚠️ 문안은 임시로 보험판 관리자 문안 — 손소장 포맷(cm_org_leader)이 오기 전엔 일반판을 배포하지 않는다
-  org_leader:      { label: '리더(일반 조직 운영)', cm: 'manager', range: 'manager', report: '관리자',     group: '리더' },
+  branch_manager:  { label: '지점장/지사장',        cm: 'manager', range: 'manager', report: '관리자',     group: '리더', identity: 'common' },
+  training_leader: { label: '교육팀장/지원팀장',    cm: 'manager', range: 'manager', report: '관리자',     group: '리더', identity: 'common' },
+  division_head:   { label: '사업단장/부장',        cm: 'manager', range: 'manager', report: '관리자',     group: '리더', identity: 'common' },
+  executive:       { label: '본부장',               cm: 'manager', range: 'manager', report: '관리자',     group: '리더', identity: 'common' },
+  // 일반 조직판. 문안·인물상 = 손소장 「리더십(영업외,일반)의 포맷」(11/21 교체, SPEC-org-edition §11).
+  //   10/20~11/21엔 cm이 'manager'(보험 관리자 문안)를 가리켜 장학사 리포트에 영업조직리더 포맷이 나갔다.
+  org_leader:      { label: '리더(일반 조직 운영)', cm: 'org_leader', range: 'manager', report: '관리자', group: '리더', identity: 'org' },
 };
 
 export const EDITIONS = {
@@ -52,3 +54,4 @@ export const JOB_TO_CM = pick('cm');
 export const JOB_TO_ROLE = pick('range');
 export const JOB_TO_REPORT = pick('report');
 export const ROLE_GROUP = pick('group');
+export const JOB_TO_IDENTITY = pick('identity');

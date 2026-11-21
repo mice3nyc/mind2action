@@ -23,7 +23,7 @@ const CASES = [
 const JOBS = ['sales', 'coach', 'sales_leader', 'org_leader'];
 // 동점 없는 응답 — 고치기 전과 §4 글자가 같아야 한다(손용배 11/8 점수)
 const PLAIN = [14, 9, 7, 3, 11];
-// 고치기 전 코드(cmLookup 원래 열쇠)로 뽑아 둔 손용배 §4 첫 문장 — org_leader(=manager 문안) CP_AC_FC
+// 고치기 전 코드(cmLookup 원래 열쇠)로 뽑아 둔 손용배 §4 첫 문장 — org_leader CP_AC_FC (11/21부터 cm_org_leader 문안, 첫머리 「OOO님은」은 같다)
 const PLAIN_HEAD = 'OOO님은';
 
 let msgId = 0;

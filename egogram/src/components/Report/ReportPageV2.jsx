@@ -6,6 +6,8 @@ import { getSuccessRange } from '../../lib/scoreEngine';
 import { EGO_COLOR, EGO_LABEL, EGO_STRENGTH, LABEL_TO_CODE, TIE_PRIORITY, egoTermRe, withJosa } from '../../lib/egoTerms';
 import uiTexts from '../../data/ui_texts.yaml';
 import identityData from '../../data/identity60.yaml';
+import identityOrgData from '../../data/identity60_org.yaml';  // 일반판 리더 전용 (SPEC-org-edition §11)
+import { JOB_TO_IDENTITY } from '../../lib/edition';
 import { identityKey } from '../../lib/identityKey';
 
 // ─────────────────────────────────────────────────────────────
@@ -140,12 +142,14 @@ function plainTranslation(ego, score, cm1) {
 // 26.0918: 20조합 → identity60.yaml top1_top2_bottom 60조합 (손소장 9/17 요청 2번, SPEC §13).
 //   여러 교육생이 서로 비교하면 20종으론 "우리 같네"가 나온다. identity.yaml은 파일만 남기고 연결 해제.
 //   desc는 두 줄(첫 줄=top 쌍, 둘째=bottom) — Paragraphs 없이 줄바꿈 그대로(.report-identity-desc pre-line).
-const IDENTITY = identityData;
+// 11/21: 인물상 묶음을 역할로 고른다 — 일반판 리더(org_leader)는 손소장 영업외 포맷의 60조합(SPEC-org-edition §11).
+const IDENTITY_DATA = { common: identityData, org: identityOrgData };
 
 // 미충원 조합 fallback — 두 강점을 합성 (빈 화면 방지). 강점명은 용어 사전에서 온다.
 
-function getIdentity(result) {
+function getIdentity(result, jobType) {
   const { top1, top2 } = result;
+  const IDENTITY = IDENTITY_DATA[JOB_TO_IDENTITY[jobType]] || identityData;
   const hit = IDENTITY[identityKey(result, TIE_PRIORITY)];
   if (hit) return hit;
   return {
@@ -275,7 +279,7 @@ export function ReportViewV2({ row, showToggle = true }) {
 
   const data = { ...row, result };
   const { scores, top1, top2, bottom } = result;
-  const identity = getIdentity(result);
+  const identity = getIdentity(result, row.job_type);
 
   return (
     <div className={`report-container ${bling ? 'report-bling' : ''}`}>

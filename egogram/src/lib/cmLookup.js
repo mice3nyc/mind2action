@@ -1,6 +1,7 @@
 import cmInsurance from '../data/cm_insurance.yaml';
 import cmManager from '../data/cm_manager.yaml';
 import cmCoach from '../data/cm_coach.yaml';
+import cmOrgLeader from '../data/cm_org_leader.yaml';  // 일반판 리더 (SPEC-org-edition §11)
 import cm6Common from '../data/cm6_common_consultant.yaml';
 import cmLlmSales from '../data/cm_llm_sales.yaml';
 import { EGO_STATES, EGO_LABELS, SAFE_RANGES, roleFromJobType } from './scoreEngine';
@@ -12,6 +13,7 @@ const CM_DATA = {
   sales: cmInsurance,
   manager: cmManager,
   coach: cmCoach,
+  org_leader: cmOrgLeader,
 };
 
 // 역할 → 문안 묶음은 lib/edition의 역할 표 한 벌에서 (SPEC-org-edition §2)
